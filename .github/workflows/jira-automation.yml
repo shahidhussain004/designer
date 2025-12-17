@@ -40,15 +40,25 @@ jobs:
           BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
           echo "Branch: $BRANCH_NAME"
           
-          # Try to match KAN-XX pattern
+          # Try to match KAN-XX pattern in branch name
           if [[ $BRANCH_NAME =~ (KAN-[0-9]+) ]]; then
             TICKET="${BASH_REMATCH[1]}"
-            echo "✓ Found ticket: $TICKET"
+            echo "✓ Found ticket in branch: $TICKET"
             echo "ticket_key=$TICKET" >> $GITHUB_OUTPUT
             echo "ticket_found=true" >> $GITHUB_OUTPUT
           else
-            echo "⚠ No ticket found in branch name"
-            echo "ticket_found=false" >> $GITHUB_OUTPUT
+            # If not in branch name, try commit message (for merges to main)
+            COMMIT_MSG="${{ github.event.head_commit.message }}"
+            echo "Commit message: $COMMIT_MSG"
+            if [[ $COMMIT_MSG =~ (KAN-[0-9]+) ]]; then
+              TICKET="${BASH_REMATCH[1]}"
+              echo "✓ Found ticket in commit message: $TICKET"
+              echo "ticket_key=$TICKET" >> $GITHUB_OUTPUT
+              echo "ticket_found=true" >> $GITHUB_OUTPUT
+            else
+              echo "⚠ No ticket found in branch name or commit message"
+              echo "ticket_found=false" >> $GITHUB_OUTPUT
+            fi
           fi
 
   on-pr-opened:
