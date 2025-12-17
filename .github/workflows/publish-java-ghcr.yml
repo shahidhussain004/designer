@@ -16,20 +16,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: temurin
-
-      - name: Cache Maven packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
       - name: Check for Java project
         id: check_project
         run: |
@@ -40,6 +26,22 @@ jobs:
             echo "has_java_project=false" >> $GITHUB_OUTPUT
             echo "⚠ No Java project found - skipping Maven build"
           fi
+
+      - name: Set up JDK 17
+        if: steps.check_project.outputs.has_java_project == 'true'
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: temurin
+
+      - name: Cache Maven packages
+        if: steps.check_project.outputs.has_java_project == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
 
       - name: Build JAR (Maven)
         if: steps.check_project.outputs.has_java_project == 'true'
