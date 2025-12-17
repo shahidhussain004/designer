@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review, converted_to_draft, labeled]
   push:
-    branches: [main, develop]
+    branches: ['**']  # Trigger on all branches
   issues:
     types: [opened, labeled]
 
