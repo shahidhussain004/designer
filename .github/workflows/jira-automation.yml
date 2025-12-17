@@ -25,6 +25,11 @@ jobs:
       ticket_found: ${{ steps.extract.outputs.ticket_found }}
       event_type: ${{ steps.detect_event.outputs.event_type }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Detect event type
         id: detect_event
         run: |
