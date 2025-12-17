@@ -82,14 +82,13 @@ jobs:
             -H "Content-Type: application/json" \
             -d '{"transition":{"id":"31"}}' \
             "https://$JIRA_DOMAIN.atlassian.net/rest/api/3/issue/$TICKET_KEY/transitions" \
-            -w "%{http_code}" \
-            -o /tmp/jira_response.txt \
-            -s)
+            -w '%{http_code}' \
+            -o /tmp/jira_response.txt)
           echo "Response:"
           cat /tmp/jira_response.txt || echo "No response body"
           echo ""
           echo "HTTP Status: $HTTP_CODE"
-          if [ "$HTTP_CODE" == "204" ] || [ "$HTTP_CODE" == "200" ]; then
+          if [ "$HTTP_CODE" = "204" ] || [ "$HTTP_CODE" = "200" ]; then
             echo "✅ Successfully moved $TICKET_KEY to In Review"
           else
             echo "⚠ Failed to transition. HTTP Status: $HTTP_CODE"
@@ -127,14 +126,13 @@ jobs:
             -H "Content-Type: application/json" \
             -d '{"transition":{"id":"41"}}' \
             "https://$JIRA_DOMAIN.atlassian.net/rest/api/3/issue/$TICKET_KEY/transitions" \
-            -w "%{http_code}" \
-            -o /tmp/jira_response.txt \
-            -s)
+            -w '%{http_code}' \
+            -o /tmp/jira_response.txt)
           echo "Response:"
           cat /tmp/jira_response.txt || echo "No response body"
           echo ""
           echo "HTTP Status: $HTTP_CODE"
-          if [ "$HTTP_CODE" == "204" ] || [ "$HTTP_CODE" == "200" ]; then
+          if [ "$HTTP_CODE" = "204" ] || [ "$HTTP_CODE" = "200" ]; then
             echo "✅ Successfully moved $TICKET_KEY to In Test"
           else
             echo "⚠ Failed to transition. HTTP Status: $HTTP_CODE"
@@ -173,14 +171,13 @@ jobs:
             -H "Content-Type: application/json" \
             -d '{"transition":{"id":"51"}}' \
             "https://$JIRA_DOMAIN.atlassian.net/rest/api/3/issue/$TICKET_KEY/transitions" \
-            -w "%{http_code}" \
-            -o /tmp/jira_response.txt \
-            -s)
+            -w '%{http_code}' \
+            -o /tmp/jira_response.txt)
           echo "Response:"
           cat /tmp/jira_response.txt || echo "No response body"
           echo ""
           echo "HTTP Status: $HTTP_CODE"
-          if [ "$HTTP_CODE" == "204" ] || [ "$HTTP_CODE" == "200" ]; then
+          if [ "$HTTP_CODE" = "204" ] || [ "$HTTP_CODE" = "200" ]; then
             echo "✅ Successfully moved $TICKET_KEY to Done"
           else
             echo "⚠ Failed to transition. HTTP Status: $HTTP_CODE"
