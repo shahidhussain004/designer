@@ -54,7 +54,7 @@ jobs:
   on-pr-opened:
     name: Move to In Review (PR Opened)
     needs: extract-ticket
-    if: needs.extract-ticket.outputs.ticket_found == 'true' && (github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened'))
+    if: needs.extract-ticket.outputs.ticket_found == 'true' && github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened' || github.event.action == 'synchronize')
     runs-on: ubuntu-latest
     steps:
       - name: Debug Info
@@ -177,7 +177,7 @@ jobs:
   update-pr-description:
     name: Add Jira Link to PR
     needs: extract-ticket
-    if: needs.extract-ticket.outputs.ticket_found == 'true' && (github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened'))
+    if: needs.extract-ticket.outputs.ticket_found == 'true' && github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened' || github.event.action == 'synchronize')
     runs-on: ubuntu-latest
     steps:
       - name: Debug Info
