@@ -77,19 +77,23 @@ jobs:
             exit 1
           fi
           AUTH=$(echo -n "$JIRA_EMAIL:$JIRA_API_TOKEN" | base64)
-          RESPONSE=$(curl -X POST \
+          HTTP_CODE=$(curl -X POST \
             -H "Authorization: Basic $AUTH" \
             -H "Content-Type: application/json" \
             -d '{"transition":{"id":"31"}}' \
             "https://$JIRA_DOMAIN.atlassian.net/rest/api/3/issue/$TICKET_KEY/transitions" \
-            -w "\nStatus: %{http_code}\n" \
+            -w "%{http_code}" \
+            -o /tmp/jira_response.txt \
             -s)
-          echo "$RESPONSE"
-          STATUS=$(echo "$RESPONSE" | tail -n1 | cut -d' ' -f2)
-          if [ "$STATUS" == "204" ] || [ "$STATUS" == "200" ]; then
-            echo "✅ Successfully moved $TICKET_KEY to In Review (Status: $STATUS)"
+          echo "Response:"
+          cat /tmp/jira_response.txt || echo "No response body"
+          echo ""
+          echo "HTTP Status: $HTTP_CODE"
+          if [ "$HTTP_CODE" == "204" ] || [ "$HTTP_CODE" == "200" ]; then
+            echo "✅ Successfully moved $TICKET_KEY to In Review"
           else
-            echo "⚠ Failed to transition. Status: $STATUS"
+            echo "⚠ Failed to transition. HTTP Status: $HTTP_CODE"
+            exit 1
           fi
 
   on-labeled-test:
@@ -118,19 +122,24 @@ jobs:
             exit 1
           fi
           AUTH=$(echo -n "$JIRA_EMAIL:$JIRA_API_TOKEN" | base64)
-          RESPONSE=$(curl -X POST \
+          HTTP_CODE=$(curl -X POST \
             -H "Authorization: Basic $AUTH" \
             -H "Content-Type: application/json" \
             -d '{"transition":{"id":"41"}}' \
             "https://$JIRA_DOMAIN.atlassian.net/rest/api/3/issue/$TICKET_KEY/transitions" \
-            -w "\nStatus: %{http_code}\n" \
+            -w "%{http_code}" \
+            -o /tmp/jira_response.txt \
             -s)
-          echo "$RESPONSE"
-          STATUS=$(echo "$RESPONSE" | tail -n1 | cut -d' ' -f2)
-          if [ "$STATUS" == "204" ] || [ "$STATUS" == "200" ]; then
-            echo "✅ Successfully moved $TICKET_KEY to In Test (Status: $STATUS)"
+          echo "Response:"
+          cat /tmp/jira_response.txt || echo "No response body"
+          echo ""
+          echo "HTTP Status: $HTTP_CODE"
+          if [ "$HTTP_CODE" == "204" ] || [ "$HTTP_CODE" == "200" ]; then
+            echo "✅ Successfully moved $TICKET_KEY to In Test"
           else
-            echo "⚠ Failed to transition. Status: $STATUS"
+            echo "⚠ Failed to transition. HTTP Status: $HTTP_CODE"
+            exit 1
+          fi
           fi
 
   on-pr-merged:
@@ -159,19 +168,23 @@ jobs:
             exit 1
           fi
           AUTH=$(echo -n "$JIRA_EMAIL:$JIRA_API_TOKEN" | base64)
-          RESPONSE=$(curl -X POST \
+          HTTP_CODE=$(curl -X POST \
             -H "Authorization: Basic $AUTH" \
             -H "Content-Type: application/json" \
             -d '{"transition":{"id":"51"}}' \
             "https://$JIRA_DOMAIN.atlassian.net/rest/api/3/issue/$TICKET_KEY/transitions" \
-            -w "\nStatus: %{http_code}\n" \
+            -w "%{http_code}" \
+            -o /tmp/jira_response.txt \
             -s)
-          echo "$RESPONSE"
-          STATUS=$(echo "$RESPONSE" | tail -n1 | cut -d' ' -f2)
-          if [ "$STATUS" == "204" ] || [ "$STATUS" == "200" ]; then
-            echo "✅ Successfully moved $TICKET_KEY to Done (Status: $STATUS)"
+          echo "Response:"
+          cat /tmp/jira_response.txt || echo "No response body"
+          echo ""
+          echo "HTTP Status: $HTTP_CODE"
+          if [ "$HTTP_CODE" == "204" ] || [ "$HTTP_CODE" == "200" ]; then
+            echo "✅ Successfully moved $TICKET_KEY to Done"
           else
-            echo "⚠ Failed to transition. Status: $STATUS"
+            echo "⚠ Failed to transition. HTTP Status: $HTTP_CODE"
+            exit 1
           fi
 
   update-pr-description:
