@@ -50,16 +50,35 @@ jobs:
             # If not in branch name, try commit message (for merges to main)
             COMMIT_MSG="${{ github.event.head_commit.message }}"
             echo "Commit message: $COMMIT_MSG"
+            
+            # First try to find KAN-XX directly in commit message
             if [[ $COMMIT_MSG =~ (KAN-[0-9]+) ]]; then
               TICKET="${BASH_REMATCH[1]}"
               echo "✓ Found ticket in commit message: $TICKET"
               echo "ticket_key=$TICKET" >> $GITHUB_OUTPUT
               echo "ticket_found=true" >> $GITHUB_OUTPUT
+            # If not found, try to extract PR number and fetch branch name
+            elif [[ $COMMIT_MSG =~ \(#([0-9]+)\) ]]; then
+              PR_NUM="${BASH_REMATCH[1]}"
+              echo "Found PR #$PR_NUM, fetching branch name..."
+              PR_BRANCH=$(gh pr view $PR_NUM --json headRefName --jq '.headRefName' 2>/dev/null || echo "")
+              echo "PR branch: $PR_BRANCH"
+              if [[ $PR_BRANCH =~ (KAN-[0-9]+) ]]; then
+                TICKET="${BASH_REMATCH[1]}"
+                echo "✓ Found ticket in PR branch: $TICKET"
+                echo "ticket_key=$TICKET" >> $GITHUB_OUTPUT
+                echo "ticket_found=true" >> $GITHUB_OUTPUT
+              else
+                echo "⚠ No ticket found in PR branch"
+                echo "ticket_found=false" >> $GITHUB_OUTPUT
+              fi
             else
               echo "⚠ No ticket found in branch name or commit message"
               echo "ticket_found=false" >> $GITHUB_OUTPUT
             fi
           fi
+        env:
+          GH_TOKEN: ${{ github.token }}
 
   on-pr-opened:
     name: Move to In Review (PR Opened)
