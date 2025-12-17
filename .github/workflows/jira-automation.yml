@@ -85,6 +85,46 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
+  on-branch-push:
+    name: Move to In Progress (Branch Pushed)
+    needs: extract-ticket
+    if: needs.extract-ticket.outputs.ticket_found == 'true' && github.event_name == 'push' && github.ref != 'refs/heads/main' && github.ref != 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Debug Info
+        run: |
+          echo "🔍 Branch Push Debug"
+          echo "Event: ${{ github.event_name }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Ticket: ${{ needs.extract-ticket.outputs.ticket_key }}"
+
+      - name: Transition ticket to In Progress
+        env:
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_EMAIL: shahidhussain004@gmail.com
+          TICKET_KEY: ${{ needs.extract-ticket.outputs.ticket_key }}
+        run: |
+          echo "🚀 Moving $TICKET_KEY to In Progress..."
+          if [ -z "$JIRA_API_TOKEN" ]; then
+            echo "❌ JIRA_API_TOKEN is not set!"
+            exit 1
+          fi
+          RESPONSE=$(curl -X POST \
+            -u "$JIRA_EMAIL:$JIRA_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"transition":{"id":"21"}}' \
+            "https://$JIRA_DOMAIN.atlassian.net/rest/api/3/issue/$TICKET_KEY/transitions" \
+            -w '\nHTTP_CODE:%{http_code}')
+          echo "$RESPONSE"
+          HTTP_CODE=$(echo "$RESPONSE" | grep "HTTP_CODE" | cut -d':' -f2)
+          if [ "$HTTP_CODE" = "204" ] || [ "$HTTP_CODE" = "200" ]; then
+            echo "✅ Successfully moved $TICKET_KEY to In Progress"
+          else
+            echo "⚠ Failed to transition. HTTP Status: $HTTP_CODE"
+            exit 1
+          fi
+
   on-pr-opened:
     name: Move to In Review (PR Opened)
     needs: extract-ticket
