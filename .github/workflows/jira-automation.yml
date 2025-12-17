@@ -76,9 +76,8 @@ jobs:
             echo "❌ JIRA_API_TOKEN is not set!"
             exit 1
           fi
-          AUTH=$(echo -n "$JIRA_EMAIL:$JIRA_API_TOKEN" | base64)
           RESPONSE=$(curl -X POST \
-            -H "Authorization: Basic $AUTH" \
+            -u "$JIRA_EMAIL:$JIRA_API_TOKEN" \
             -H "Content-Type: application/json" \
             -d '{"transition":{"id":"31"}}' \
             "https://$JIRA_DOMAIN.atlassian.net/rest/api/3/issue/$TICKET_KEY/transitions" \
@@ -117,9 +116,8 @@ jobs:
             echo "❌ JIRA_API_TOKEN is not set!"
             exit 1
           fi
-          AUTH=$(echo -n "$JIRA_EMAIL:$JIRA_API_TOKEN" | base64)
           RESPONSE=$(curl -X POST \
-            -H "Authorization: Basic $AUTH" \
+            -u "$JIRA_EMAIL:$JIRA_API_TOKEN" \
             -H "Content-Type: application/json" \
             -d '{"transition":{"id":"41"}}' \
             "https://$JIRA_DOMAIN.atlassian.net/rest/api/3/issue/$TICKET_KEY/transitions" \
@@ -159,9 +157,8 @@ jobs:
             echo "❌ JIRA_API_TOKEN is not set!"
             exit 1
           fi
-          AUTH=$(echo -n "$JIRA_EMAIL:$JIRA_API_TOKEN" | base64)
           RESPONSE=$(curl -X POST \
-            -H "Authorization: Basic $AUTH" \
+            -u "$JIRA_EMAIL:$JIRA_API_TOKEN" \
             -H "Content-Type: application/json" \
             -d '{"transition":{"id":"51"}}' \
             "https://$JIRA_DOMAIN.atlassian.net/rest/api/3/issue/$TICKET_KEY/transitions" \
