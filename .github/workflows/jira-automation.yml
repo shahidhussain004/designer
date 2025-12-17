@@ -130,7 +130,6 @@ jobs:
             echo "⚠ Failed to transition. HTTP Status: $HTTP_CODE"
             exit 1
           fi
-          fi
 
   on-pr-merged:
     name: Move to Done (PR Merged to Main)
