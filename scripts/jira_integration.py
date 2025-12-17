@@ -9,6 +9,45 @@ import requests
 import json
 from typing import Optional, Dict, List
 
+
+def get_transitions(domain: str, email: str, token: str, ticket_key: str) -> Optional[dict]:
+    """Get available transitions for a ticket."""
+    url = f"https://{domain}.atlassian.net/rest/api/3/issue/{ticket_key}/transitions"
+    auth = (email, token)
+    headers = {"Accept": "application/json"}
+    try:
+        resp = requests.get(url, auth=auth, headers=headers)
+        if resp.status_code == 200:
+            return resp.json()
+        else:
+            print(f"✗ Failed to fetch transitions: {resp.status_code}")
+            print(f"  Response: {resp.text[:200]}")
+            return None
+    except Exception as e:
+        print(f"✗ Error: {e}")
+        return None
+
+
+def display_transitions(transitions_data: dict) -> None:
+    """Display available transitions in a readable format."""
+    transitions = transitions_data.get("transitions", [])
+    if not transitions:
+        print("✗ No transitions available")
+        return
+    print("\n" + "="*60)
+    print("AVAILABLE TRANSITIONS")
+    print("="*60)
+    for t in transitions:
+        status_name = t.get("to", {}).get("name", "Unknown")
+        transition_id = t.get("id", "N/A")
+        print(f"\n→ {status_name}")
+        print(f"  ID: {transition_id}")
+        print(f"  Name: {t.get('name', 'N/A')}")
+    print("\n" + "="*60)
+    print("UPDATE YOUR WORKFLOW")
+    print("="*60)
+    print("\nIn .github/workflows/jira-automation.yml, update the transition IDs:")
+
 class JiraIntegration:
     def __init__(self, domain: str, email: str, token: str, project_key: str):
         self.domain = domain
@@ -587,6 +626,7 @@ def main():
     parser.add_argument("--assign-phase1", action="store_true", help="Assign and transition Phase 1 tasks to the provided --email user")
     parser.add_argument("--clean-board", action="store_true", help="Delete all issues in the project (DESTRUCTIVE)")
     parser.add_argument("--rebuild-board", action="store_true", help="Delete all issues and rebuild with fresh Epics, Features, and Tasks (fully automated)")
+    parser.add_argument("transitions", nargs="?", help="Detect available transitions for a ticket (subcommand). Provide ticket key or will prompt.")
     
     args = parser.parse_args()
     
@@ -596,6 +636,21 @@ def main():
         token=args.token,
         project_key=args.project_key
     )
+    # If user supplied the transitions "subcommand"
+    if args.transitions is not None:
+        ticket = args.transitions.strip() if args.transitions else None
+        if not ticket:
+            ticket = input("Ticket key to check (e.g., KAN-43): ").strip().upper()
+        if not ticket:
+            print("✗ Missing ticket key for transitions detection")
+            return
+        transitions = get_transitions(args.domain, args.email, args.token, ticket)
+        if transitions:
+            display_transitions(transitions)
+        else:
+            print("✗ Could not fetch transitions")
+        return
+
     if args.list_epics:
         integration.list_epics()
     elif args.assign_phase1:

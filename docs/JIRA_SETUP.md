@@ -6,19 +6,25 @@ Your email is the one you use to log into Jira at: https://designercompk.atlassi
 
 ## Step 2: Install Python Dependencies
 
+Install dependencies from the repository root:
+
 ```bash
-pip install requests
+python -m pip install --user -r requirements.txt
 ```
 
 ## Step 3: Run the Integration Script
 
-Navigate to the `c:\playground\designer` folder and run:
+Navigate to the `c:\playground\designer` folder and run the script or use the `transitions` subcommand to detect transition IDs:
 
 ```bash
-python jira_integration.py \
+# Detect transitions (subcommand)
+python scripts/jira_integration.py --domain designercompk --email YOU@example.com --token <API_TOKEN> transitions KAN-43
+
+# Run full integration (non-destructive by default):
+python scripts/jira_integration.py \
   --domain designercompk \
   --email YOUR_ATLASSIAN_EMAIL@example.com \
-  --token designer.com.pk_API_AI_Token \
+  --token <API_TOKEN> \
   --project-key KAN
 ```
 
@@ -29,7 +35,7 @@ python jira_integration.py \
 
 ### Example:
 ```bash
-python jira_integration.py \
+python scripts/jira_integration.py \
   --domain designercompk \
   --email john@company.com \
   --token designer.com.pk_API_AI_Token \

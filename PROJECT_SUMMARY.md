@@ -28,7 +28,7 @@
 | Database schema | init.sql | ✅ |
 | API Gateway | nginx.conf | ✅ |
 | Monitoring | prometheus.yml | ✅ |
-| Documentation | PHASE_1_SETUP.md | ✅ |
+| Documentation | docs/PROJECT_TIMELINE_TRACKER.md | ✅ |
 
 **Status:** ✅ READY TO DEPLOY (after path updates)
 
@@ -201,8 +201,8 @@ Only after all tests pass
 
 ### Start Here
 1. **docs/INDEX.md** - Master index (where everything points to)
-2. **NEXT_STEPS.md** - 30-minute deployment plan
-3. **INFRASTRUCTURE_STATUS.md** - Honest current status
+2. **docs/PROJECT_TIMELINE_TRACKER.md** - 30-minute deployment plan and checklists
+3. **docs/JIRA_SETUP.md** - Jira integration and automation status
 
 ### For Development
 1. **docs/PROJECT_TIMELINE_TRACKER.md** - All 141 tasks
@@ -210,8 +210,8 @@ Only after all tests pass
 3. **Jira board** - Track progress on 19 HIGH priority tasks
 
 ### For Reference
-1. **docs/PHASE_1_SETUP.md** - Detailed guides
-2. **docs/PHASE_1_QUICK_CHECKLIST.md** - Verification steps
+1. **docs/PROJECT_TIMELINE_TRACKER.md** - Detailed guides and verification steps
+2. **docs/JIRA_SETUP.md** - Jira integration notes
 3. **config/README.md** - Configuration reference
 
 ---

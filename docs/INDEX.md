@@ -100,7 +100,7 @@ Prometheus → Grafana
 - [docker-compose.yml](docker-compose.yml)
 - [init.sql](init.sql)
 - [nginx.conf](nginx.conf)
-- [PHASE_1_SETUP.md](PHASE_1_SETUP.md)
+- [PROJECT_TIMELINE_TRACKER.md](PROJECT_TIMELINE_TRACKER.md)
 
 ### Phase 2: Messaging + Admin (Weeks 9-12)
 **Status:** Planning 📋 | Development 🔲
@@ -133,13 +133,13 @@ Prometheus → Grafana
 ## 🔗 Key Documentation Links
 
 ### Quick Access
-- 📋 **Quick Checklist:** [PHASE_1_QUICK_CHECKLIST.md](PHASE_1_QUICK_CHECKLIST.md)
+- 📋 **Quick Checklist:** See `PROJECT_TIMELINE_TRACKER.md` (includes checklists)
 - 📊 **Timeline:** [PROJECT_TIMELINE_TRACKER.md](PROJECT_TIMELINE_TRACKER.md)
 - 🏗️ **Architecture:** [marketplace_design.md](marketplace_design.md) (Section 6)
 - 🔐 **Security:** [SECURITY_RECOMMENDATION.md](SECURITY_RECOMMENDATION.md)
 
 ### Detailed Guides
-- 🚀 **Setup Guide:** [PHASE_1_SETUP.md](PHASE_1_SETUP.md)
+- 🚀 **Setup Guide:** See `marketplace_design.md` and `PROJECT_TIMELINE_TRACKER.md` for setup notes
 - 📚 **Events & Pipelines:** [kafka_beam_security_section.md](kafka_beam_security_section.md)
 - 🤖 **Jira Integration:** [JIRA_SETUP.md](JIRA_SETUP.md)
 

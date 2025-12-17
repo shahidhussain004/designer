@@ -9,9 +9,8 @@ This folder contains all project documentation.
 - **[README.md](../README.md)** - Project overview (in root)
 
 ### Phase 1: Core Marketplace
-- **[PHASE_1_WEEK_1_SUMMARY.md](PHASE_1_WEEK_1_SUMMARY.md)** - Session summary with deliverables
-- **[PHASE_1_SETUP.md](PHASE_1_SETUP.md)** - Complete setup guide with troubleshooting
-- **[PHASE_1_QUICK_CHECKLIST.md](PHASE_1_QUICK_CHECKLIST.md)** - Quick verification checklist
+- **[PROJECT_TIMELINE_TRACKER.md](PROJECT_TIMELINE_TRACKER.md)** - Phase tasks and timeline (includes checklists)
+- **[marketplace_design.md](marketplace_design.md)** - Detailed Phase 1 specification and setup notes
 
 ### Planning & Timeline
 - **[PROJECT_TIMELINE_TRACKER.md](PROJECT_TIMELINE_TRACKER.md)** - 141 tasks across 6 months
@@ -23,6 +22,11 @@ This folder contains all project documentation.
 
 ### Integration
 - **[JIRA_SETUP.md](JIRA_SETUP.md)** - Jira integration guide
+- **[JIRA_AUTOMATION_QUICKSTART.md](JIRA_AUTOMATION_QUICKSTART.md)** - Quick start for Jira automation with GitHub Actions
+- **[JIRA_AUTOMATION_SETUP.md](JIRA_AUTOMATION_SETUP.md)** - Full setup and advanced configuration for Jira automation
+
+### Dashboard & Reports
+- **[DASHBOARD.md](DASHBOARD.md)** - Monitoring dashboard and reporting notes
 
 ---
 
@@ -49,6 +53,11 @@ This folder contains all project documentation.
 - **Jira Board:** https://designercompk.atlassian.net/jira/software/projects/KAN/boards/2
 - **Marketplace Design:** See `marketplace_design.md` Section 6-8
 - **API Endpoints:** See `marketplace_design.md` Section 8
+
+## 🧰 Scripts & Requirements
+
+- See `scripts/README.md` for administration scripts (Jira integration, transitions detection, rebuild).
+- Repository-wide Python dependencies are listed in `requirements.txt` (root) and `docs/requirements.txt` (docs-specific notes).
 
 ---
 
