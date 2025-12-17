@@ -2,7 +2,7 @@ name: Jira Automation - Ticket Status Transitions
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]
+    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft, labeled]
   push:
     branches: [main, develop]
   issues:
@@ -23,7 +23,16 @@ jobs:
     outputs:
       ticket_key: ${{ steps.extract.outputs.ticket_key }}
       ticket_found: ${{ steps.extract.outputs.ticket_found }}
+      event_type: ${{ steps.detect_event.outputs.event_type }}
     steps:
+      - name: Detect event type
+        id: detect_event
+        run: |
+          EVENT="${{ github.event_name }}"
+          ACTION="${{ github.event.action }}"
+          echo "Event: $EVENT, Action: $ACTION"
+          echo "event_type=$EVENT" >> $GITHUB_OUTPUT
+
       - name: Extract ticket from branch name
         id: extract
         run: |
@@ -45,9 +54,17 @@ jobs:
   on-pr-opened:
     name: Move to In Review (PR Opened)
     needs: extract-ticket
-    if: github.event_name == 'pull_request' && github.event.action == 'opened' && needs.extract-ticket.outputs.ticket_found == 'true'
+    if: needs.extract-ticket.outputs.ticket_found == 'true' && (github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened'))
     runs-on: ubuntu-latest
     steps:
+      - name: Debug Info
+        run: |
+          echo "🔍 PR Event Debug"
+          echo "Event: ${{ github.event_name }}"
+          echo "Action: ${{ github.event.action }}"
+          echo "Ticket: ${{ needs.extract-ticket.outputs.ticket_key }}"
+          echo "Ticket Found: ${{ needs.extract-ticket.outputs.ticket_found }}"
+
       - name: Transition ticket to In Review
         env:
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
@@ -55,21 +72,40 @@ jobs:
           TICKET_KEY: ${{ needs.extract-ticket.outputs.ticket_key }}
         run: |
           echo "🔄 Moving $TICKET_KEY to In Review..."
+          if [ -z "$JIRA_API_TOKEN" ]; then
+            echo "❌ JIRA_API_TOKEN is not set!"
+            exit 1
+          fi
           AUTH=$(echo -n "$JIRA_EMAIL:$JIRA_API_TOKEN" | base64)
-          curl -X POST \
+          RESPONSE=$(curl -X POST \
             -H "Authorization: Basic $AUTH" \
             -H "Content-Type: application/json" \
             -d '{"transition":{"id":"31"}}' \
             "https://$JIRA_DOMAIN.atlassian.net/rest/api/3/issue/$TICKET_KEY/transitions" \
             -w "\nStatus: %{http_code}\n" \
-            || echo "⚠ Could not transition ticket (transition ID may differ)"
+            -s)
+          echo "$RESPONSE"
+          STATUS=$(echo "$RESPONSE" | tail -n1 | cut -d' ' -f2)
+          if [ "$STATUS" == "204" ] || [ "$STATUS" == "200" ]; then
+            echo "✅ Successfully moved $TICKET_KEY to In Review (Status: $STATUS)"
+          else
+            echo "⚠ Failed to transition. Status: $STATUS"
+          fi
 
   on-labeled-test:
     name: Move to In Test (Test Label Added)
     needs: extract-ticket
-    if: github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'test') && needs.extract-ticket.outputs.ticket_found == 'true'
+    if: needs.extract-ticket.outputs.ticket_found == 'true' && (github.event_name == 'pull_request' && github.event.action == 'labeled' && github.event.label.name == 'test')
     runs-on: ubuntu-latest
     steps:
+      - name: Debug Info
+        run: |
+          echo "🔍 Label Event Debug"
+          echo "Event: ${{ github.event_name }}"
+          echo "Action: ${{ github.event.action }}"
+          echo "Label: ${{ github.event.label.name }}"
+          echo "Ticket: ${{ needs.extract-ticket.outputs.ticket_key }}"
+
       - name: Transition ticket to In Test
         env:
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
@@ -77,55 +113,79 @@ jobs:
           TICKET_KEY: ${{ needs.extract-ticket.outputs.ticket_key }}
         run: |
           echo "🧪 Moving $TICKET_KEY to In Test..."
+          if [ -z "$JIRA_API_TOKEN" ]; then
+            echo "❌ JIRA_API_TOKEN is not set!"
+            exit 1
+          fi
           AUTH=$(echo -n "$JIRA_EMAIL:$JIRA_API_TOKEN" | base64)
-          curl -X POST \
+          RESPONSE=$(curl -X POST \
             -H "Authorization: Basic $AUTH" \
             -H "Content-Type: application/json" \
             -d '{"transition":{"id":"41"}}' \
             "https://$JIRA_DOMAIN.atlassian.net/rest/api/3/issue/$TICKET_KEY/transitions" \
             -w "\nStatus: %{http_code}\n" \
-            || echo "⚠ Could not transition ticket (transition ID may differ)"
+            -s)
+          echo "$RESPONSE"
+          STATUS=$(echo "$RESPONSE" | tail -n1 | cut -d' ' -f2)
+          if [ "$STATUS" == "204" ] || [ "$STATUS" == "200" ]; then
+            echo "✅ Successfully moved $TICKET_KEY to In Test (Status: $STATUS)"
+          else
+            echo "⚠ Failed to transition. Status: $STATUS"
+          fi
 
   on-pr-merged:
     name: Move to Done (PR Merged to Main)
     needs: extract-ticket
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.extract-ticket.outputs.ticket_found == 'true'
+    if: needs.extract-ticket.outputs.ticket_found == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - name: Extract ticket from commit message
-        id: commit_ticket
+      - name: Debug Info
         run: |
-          COMMIT_MSG="${{ github.event.head_commit.message }}"
-          echo "Commit: $COMMIT_MSG"
-          if [[ $COMMIT_MSG =~ (KAN-[0-9]+) ]]; then
-            TICKET="${BASH_REMATCH[1]}"
-            echo "✓ Found ticket in commit: $TICKET"
-            echo "ticket_key=$TICKET" >> $GITHUB_OUTPUT
-          fi
+          echo "🔍 Push/Merge Event Debug"
+          echo "Event: ${{ github.event_name }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "Commit Message: ${{ github.event.head_commit.message }}"
+          echo "Ticket: ${{ needs.extract-ticket.outputs.ticket_key }}"
 
       - name: Transition ticket to Done
-        if: steps.commit_ticket.outputs.ticket_key
         env:
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
           JIRA_EMAIL: shahidhussain004@gmail.com
-          TICKET_KEY: ${{ steps.commit_ticket.outputs.ticket_key }}
+          TICKET_KEY: ${{ needs.extract-ticket.outputs.ticket_key }}
         run: |
           echo "✅ Moving $TICKET_KEY to Done..."
+          if [ -z "$JIRA_API_TOKEN" ]; then
+            echo "❌ JIRA_API_TOKEN is not set!"
+            exit 1
+          fi
           AUTH=$(echo -n "$JIRA_EMAIL:$JIRA_API_TOKEN" | base64)
-          curl -X POST \
+          RESPONSE=$(curl -X POST \
             -H "Authorization: Basic $AUTH" \
             -H "Content-Type: application/json" \
             -d '{"transition":{"id":"51"}}' \
             "https://$JIRA_DOMAIN.atlassian.net/rest/api/3/issue/$TICKET_KEY/transitions" \
             -w "\nStatus: %{http_code}\n" \
-            || echo "⚠ Could not transition ticket (transition ID may differ)"
+            -s)
+          echo "$RESPONSE"
+          STATUS=$(echo "$RESPONSE" | tail -n1 | cut -d' ' -f2)
+          if [ "$STATUS" == "204" ] || [ "$STATUS" == "200" ]; then
+            echo "✅ Successfully moved $TICKET_KEY to Done (Status: $STATUS)"
+          else
+            echo "⚠ Failed to transition. Status: $STATUS"
+          fi
 
   update-pr-description:
     name: Add Jira Link to PR
     needs: extract-ticket
-    if: github.event_name == 'pull_request' && github.event.action == 'opened' && needs.extract-ticket.outputs.ticket_found == 'true'
+    if: needs.extract-ticket.outputs.ticket_found == 'true' && (github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened'))
     runs-on: ubuntu-latest
     steps:
+      - name: Debug Info
+        run: |
+          echo "🔍 PR Description Update Debug"
+          echo "Ticket: ${{ needs.extract-ticket.outputs.ticket_key }}"
+          echo "PR Number: ${{ github.event.number }}"
+
       - name: Update PR with Jira link
         uses: actions/github-script@v7
         continue-on-error: true
@@ -136,6 +196,10 @@ jobs:
               const jiraLink = `https://designercompk.atlassian.net/browse/${ticket}`;
               const body = context.payload.pull_request.body || '';
               
+              console.log(`📝 Attempting to add Jira link to PR #${context.issue.number}`);
+              console.log(`Ticket: ${ticket}`);
+              console.log(`Current body length: ${body.length}`);
+              
               if (!body.includes(jiraLink)) {
                 const newBody = `${body}\n\n---\n**Jira Ticket:** [${ticket}](${jiraLink})`;
                 await github.rest.pulls.update({
@@ -144,7 +208,9 @@ jobs:
                   pull_number: context.issue.number,
                   body: newBody
                 });
-                console.log(`✓ Added Jira link to PR: ${jiraLink}`);
+                console.log(`✅ Added Jira link to PR: ${jiraLink}`);
+              } else {
+                console.log(`ℹ Jira link already present in PR description`);
               }
             } catch (error) {
               console.log(`⚠ Could not update PR (may lack permissions): ${error.message}`);
@@ -156,9 +222,17 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
+      - name: Debug Info
+        run: |
+          echo "🔍 Post-Merge Debug"
+          echo "Event: ${{ github.event_name }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "Commit ID: ${{ github.event.head_commit.id }}"
+
       - name: Post deployment message
         run: |
           echo "✅ Deployment to production initiated"
           echo "Commit: ${{ github.event.head_commit.id }}"
           echo "Author: ${{ github.event.head_commit.author.name }}"
           echo "Message: ${{ github.event.head_commit.message }}"
+          echo "Timestamp: $(date)"
