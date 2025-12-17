@@ -441,7 +441,7 @@ PRODUCTION PHASE        ░░░░░░░░░░░░░░░░░░�
 
 ## 🚀 NEXT ACTION
 
-**Step 1:** Open `NEXT_STEPS.md`  
+**Step 1:** Open `docs/PROJECT_TIMELINE_TRACKER.md`  
 **Step 2:** Update `docker-compose.yml` (3 lines, 5 min)  
 **Step 3:** Run `docker-compose up -d` (2 min)  
 **Step 4:** Verify with `docker-compose ps` (10 min)  
@@ -452,6 +452,6 @@ PRODUCTION PHASE        ░░░░░░░░░░░░░░░░░░�
 **Generated:** December 17, 2025  
 **Status:** READY FOR DEPLOYMENT ✅  
 **Confidence:** HIGH 💪  
-**Next Step:** Follow NEXT_STEPS.md 🚀
+**Next Step:** Follow docs/PROJECT_TIMELINE_TRACKER.md 🚀
 
 📊 **Dashboard Status: Green ✅** - All systems operational

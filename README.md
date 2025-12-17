@@ -9,19 +9,18 @@
 
 ### About Deployment
 - ✅ 30-minute time estimate is accurate
-- ✅ Follow NEXT_STEPS.md exactly
-- ✅ Use DEPLOYMENT_CHECKLIST.md to verify
+- ✅ Follow docs/PROJECT_TIMELINE_TRACKER.md and docs/JIRA_AUTOMATION_QUICKSTART.md
 ---
 
 ## 📞 QUICK REFERENCE
 
 ### Most Important Files
 ```
-Read First:     NEXT_STEPS.md
-Then:           DEPLOYMENT_CHECKLIST.md
-Reference:      INFRASTRUCTURE_STATUS.md
+Read First:     docs/PROJECT_TIMELINE_TRACKER.md
+Then:           docs/JIRA_AUTOMATION_QUICKSTART.md
+Reference:      docs/JIRA_SETUP.md
 Overview:       PROJECT_SUMMARY.md
-Navigation:     FOLDER_STRUCTURE.md
+Navigation:     docs/INDEX.md
 Timeline:       docs/PROJECT_TIMELINE_TRACKER.md
 Specification:  docs/marketplace_design.md
 ```

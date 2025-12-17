@@ -18,10 +18,10 @@ Settings → Secrets and variables → Actions
 
 ## 3️⃣ Find Your Transition IDs (IMPORTANT!)
 
-Run this script to detect your exact transition IDs:
+Run the integrated subcommand to detect your exact transition IDs:
 
 ```bash
-python scripts/find_jira_transitions.py
+python scripts/jira_integration.py --domain designercompk --email you@domain.com --token <API_TOKEN> transitions KAN-43
 ```
 
 Follow the prompts:
@@ -107,7 +107,7 @@ Examples:
 
 **Q: Ticket not updating?**
 - A: Check `JIRA_API_TOKEN` is set in GitHub Secrets
-- A: Verify transition IDs are correct (run `find_jira_transitions.py`)
+- A: Verify transition IDs are correct (run the integrated `transitions` subcommand in `scripts/jira_integration.py`)
 
 **Q: "Not authorized" error?**
 - A: Check token is valid and not expired
