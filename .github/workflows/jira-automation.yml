@@ -1,0 +1,145 @@
+name: Jira Automation - Ticket Status Transitions
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]
+  push:
+    branches: [main, develop]
+  issues:
+    types: [opened, labeled]
+
+env:
+  JIRA_DOMAIN: designercompk
+  JIRA_PROJECT: KAN
+
+jobs:
+  extract-ticket:
+    name: Extract Jira Ticket from Branch/PR
+    runs-on: ubuntu-latest
+    outputs:
+      ticket_key: ${{ steps.extract.outputs.ticket_key }}
+      ticket_found: ${{ steps.extract.outputs.ticket_found }}
+    steps:
+      - name: Extract ticket from branch name
+        id: extract
+        run: |
+          # Extract from branch name (e.g., feature/KAN-43-user-auth)
+          BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
+          echo "Branch: $BRANCH_NAME"
+          
+          # Try to match KAN-XX pattern
+          if [[ $BRANCH_NAME =~ (KAN-[0-9]+) ]]; then
+            TICKET="${BASH_REMATCH[1]}"
+            echo "✓ Found ticket: $TICKET"
+            echo "ticket_key=$TICKET" >> $GITHUB_OUTPUT
+            echo "ticket_found=true" >> $GITHUB_OUTPUT
+          else
+            echo "⚠ No ticket found in branch name"
+            echo "ticket_found=false" >> $GITHUB_OUTPUT
+          fi
+
+  on-pr-opened:
+    name: Move to In Review (PR Opened)
+    needs: extract-ticket
+    if: github.event_name == 'pull_request' && github.event.action == 'opened' && needs.extract-ticket.outputs.ticket_found == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Transition ticket to In Review
+        env:
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          TICKET_KEY: ${{ needs.extract-ticket.outputs.ticket_key }}
+        run: |
+          echo "🔄 Moving $TICKET_KEY to In Review..."
+          curl -X POST \
+            -H "Authorization: Bearer $JIRA_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"transition":{"id":"31"}}' \
+            "https://$JIRA_DOMAIN.atlassian.net/rest/api/3/issue/$TICKET_KEY/transitions" \
+            || echo "⚠ Could not transition ticket (transition ID may differ)"
+
+  on-labeled-test:
+    name: Move to In Test (Test Label Added)
+    needs: extract-ticket
+    if: github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'test') && needs.extract-ticket.outputs.ticket_found == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Transition ticket to In Test
+        env:
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          TICKET_KEY: ${{ needs.extract-ticket.outputs.ticket_key }}
+        run: |
+          echo "🧪 Moving $TICKET_KEY to In Test..."
+          curl -X POST \
+            -H "Authorization: Bearer $JIRA_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"transition":{"id":"41"}}' \
+            "https://$JIRA_DOMAIN.atlassian.net/rest/api/3/issue/$TICKET_KEY/transitions" \
+            || echo "⚠ Could not transition ticket (transition ID may differ)"
+
+  on-pr-merged:
+    name: Move to Done (PR Merged to Main)
+    needs: extract-ticket
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.extract-ticket.outputs.ticket_found == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract ticket from commit message
+        id: commit_ticket
+        run: |
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          echo "Commit: $COMMIT_MSG"
+          if [[ $COMMIT_MSG =~ (KAN-[0-9]+) ]]; then
+            TICKET="${BASH_REMATCH[1]}"
+            echo "✓ Found ticket in commit: $TICKET"
+            echo "ticket_key=$TICKET" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Transition ticket to Done
+        if: steps.commit_ticket.outputs.ticket_key
+        env:
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          TICKET_KEY: ${{ steps.commit_ticket.outputs.ticket_key }}
+        run: |
+          echo "✅ Moving $TICKET_KEY to Done..."
+          curl -X POST \
+            -H "Authorization: Bearer $JIRA_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"transition":{"id":"51"}}' \
+            "https://$JIRA_DOMAIN.atlassian.net/rest/api/3/issue/$TICKET_KEY/transitions" \
+            || echo "⚠ Could not transition ticket (transition ID may differ)"
+
+  update-pr-description:
+    name: Add Jira Link to PR
+    needs: extract-ticket
+    if: github.event_name == 'pull_request' && github.event.action == 'opened' && needs.extract-ticket.outputs.ticket_found == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update PR with Jira link
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const ticket = '${{ needs.extract-ticket.outputs.ticket_key }}';
+            const jiraLink = `https://designercompk.atlassian.net/browse/${ticket}`;
+            const body = context.payload.pull_request.body || '';
+            
+            if (!body.includes(jiraLink)) {
+              const newBody = `${body}\n\n---\n**Jira Ticket:** [${ticket}](${jiraLink})`;
+              github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number,
+                body: newBody
+              });
+              console.log(`✓ Added Jira link to PR: ${jiraLink}`);
+            }
+
+  post-merge-comment:
+    name: Post Merge Comment with Deployment Info
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post deployment message
+        run: |
+          echo "✅ Deployment to production initiated"
+          echo "Commit: ${{ github.event.head_commit.id }}"
+          echo "Author: ${{ github.event.head_commit.author.name }}"
+          echo "Message: ${{ github.event.head_commit.message }}"
