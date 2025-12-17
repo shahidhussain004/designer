@@ -51,14 +51,17 @@ jobs:
       - name: Transition ticket to In Review
         env:
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_EMAIL: shahidhussain004@gmail.com
           TICKET_KEY: ${{ needs.extract-ticket.outputs.ticket_key }}
         run: |
           echo "🔄 Moving $TICKET_KEY to In Review..."
+          AUTH=$(echo -n "$JIRA_EMAIL:$JIRA_API_TOKEN" | base64)
           curl -X POST \
-            -H "Authorization: Bearer $JIRA_API_TOKEN" \
+            -H "Authorization: Basic $AUTH" \
             -H "Content-Type: application/json" \
             -d '{"transition":{"id":"31"}}' \
             "https://$JIRA_DOMAIN.atlassian.net/rest/api/3/issue/$TICKET_KEY/transitions" \
+            -w "\nStatus: %{http_code}\n" \
             || echo "⚠ Could not transition ticket (transition ID may differ)"
 
   on-labeled-test:
@@ -70,14 +73,17 @@ jobs:
       - name: Transition ticket to In Test
         env:
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_EMAIL: shahidhussain004@gmail.com
           TICKET_KEY: ${{ needs.extract-ticket.outputs.ticket_key }}
         run: |
           echo "🧪 Moving $TICKET_KEY to In Test..."
+          AUTH=$(echo -n "$JIRA_EMAIL:$JIRA_API_TOKEN" | base64)
           curl -X POST \
-            -H "Authorization: Bearer $JIRA_API_TOKEN" \
+            -H "Authorization: Basic $AUTH" \
             -H "Content-Type: application/json" \
             -d '{"transition":{"id":"41"}}' \
             "https://$JIRA_DOMAIN.atlassian.net/rest/api/3/issue/$TICKET_KEY/transitions" \
+            -w "\nStatus: %{http_code}\n" \
             || echo "⚠ Could not transition ticket (transition ID may differ)"
 
   on-pr-merged:
@@ -101,14 +107,17 @@ jobs:
         if: steps.commit_ticket.outputs.ticket_key
         env:
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_EMAIL: shahidhussain004@gmail.com
           TICKET_KEY: ${{ steps.commit_ticket.outputs.ticket_key }}
         run: |
           echo "✅ Moving $TICKET_KEY to Done..."
+          AUTH=$(echo -n "$JIRA_EMAIL:$JIRA_API_TOKEN" | base64)
           curl -X POST \
-            -H "Authorization: Bearer $JIRA_API_TOKEN" \
+            -H "Authorization: Basic $AUTH" \
             -H "Content-Type: application/json" \
             -d '{"transition":{"id":"51"}}' \
             "https://$JIRA_DOMAIN.atlassian.net/rest/api/3/issue/$TICKET_KEY/transitions" \
+            -w "\nStatus: %{http_code}\n" \
             || echo "⚠ Could not transition ticket (transition ID may differ)"
 
   update-pr-description:
