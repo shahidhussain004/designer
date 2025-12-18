@@ -9,8 +9,8 @@ Java Spring Boot REST API service for the Designer Marketplace platform. Provide
 
 ## Tech Stack
 
-- **Java 17**
-- **Spring Boot 3.2.1**
+- **Java 21**
+- **Spring Boot 3.3.0**
 - **PostgreSQL 15** (via Docker)
 - **Redis** (caching & sessions)
 - **Kafka** (event streaming)
@@ -44,7 +44,7 @@ marketplace-service/
 
 ## Prerequisites
 
-- Java 17 or higher
+- Java 21 or higher
 - Maven 3.8+
 - Docker (for PostgreSQL, Redis, Kafka)
 - IDE (IntelliJ IDEA recommended)

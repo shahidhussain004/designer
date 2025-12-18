@@ -41,7 +41,7 @@ public class Proposal {
     @Column(name = "cover_letter", nullable = false, columnDefinition = "TEXT")
     private String coverLetter;
 
-    @Column(name = "proposed_rate", nullable = false, precision = 10, scale = 2)
+    @Column(name = "proposed_rate", nullable = false, columnDefinition = "NUMERIC(10,2)")
     private Double proposedRate;
 
     @Column(name = "estimated_duration")
