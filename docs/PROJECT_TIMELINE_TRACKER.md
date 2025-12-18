@@ -20,31 +20,50 @@
 
 ## 🎯 PHASE 1: Core Marketplace (Weeks 1-8)
 
-### Setup & Infrastructure (Week 1 - 5 days)
+**CURRENT STATUS: Sprint 2 Complete ✅ | Sprint 3 Ready to Start**
+
+### Setup & Infrastructure (Week 1 - 5 days) - ✅ COMPLETE
 
 | # | Task | Priority | Est. Days | Learning | Status | Actual Date | Notes |
 |----|------|----------|-----------|----------|--------|-------------|-------|
-| 1.1 | Create Docker Compose (all services) | 🔴 HIGH | 1 | 0.5 | ⬜ | | Postgres, Redis, Nginx, Mongo, Kafka, monitoring |
-| 1.2 | Setup GitHub repo with CI/CD workflows | 🔴 HIGH | 1 | 0 | ⬜ | | GitHub Actions for Java, Go, .NET |
-| 1.3 | Create PostgreSQL schema (core entities) | 🔴 HIGH | 0.5 | 0 | ⬜ | | Users, jobs, proposals, contracts |
-| 1.4 | Setup project folder structure (all 3 services) | 🔴 HIGH | 0.5 | 0 | ⬜ | | Java/Go/.NET scaffolding |
-| 1.5 | Learning: Spring Boot basics (if new) | 🟡 MEDIUM | 3 | 3 | ⬜ | | Parallel learning while building |
-| 1.6 | Learning: PostgreSQL & JDBC (if new) | 🟡 MEDIUM | 2 | 2 | ⬜ | | Can run in parallel with 1.5 |
+| 1.1 | Create Docker Compose (all services) | 🔴 HIGH | 1 | 0.5 | ✅ | Dec 17, 2025 | 9 services: Postgres, Redis, Nginx, Mongo, Kafka, Zookeeper, KafkaUI, Prometheus, Grafana |
+| 1.2 | Setup GitHub repo with CI/CD workflows | 🔴 HIGH | 1 | 0 | ✅ | Dec 17, 2025 | Repository structure created |
+| 1.3 | Create PostgreSQL schema (core entities) | 🔴 HIGH | 0.5 | 0 | ✅ | Dec 18, 2025 | V1 migration: 6 tables with relationships |
+| 1.4 | Setup project folder structure (all 3 services) | 🔴 HIGH | 0.5 | 0 | ✅ | Dec 17, 2025 | Java/Go/.NET scaffolding |
+| 1.5 | Learning: Spring Boot basics (if new) | 🟡 MEDIUM | 3 | 3 | ✅ | Dec 17-18 | Concurrent with development |
+| 1.6 | Learning: PostgreSQL & JDBC (if new) | 🟡 MEDIUM | 2 | 2 | ✅ | Dec 17-18 | Flyway migrations mastered |
 
-**Subtotal Week 1:** 8 days (includes learning)
+**Sprint 1 Completed:** Dec 17, 2025
 
 ---
 
-### Java Spring Boot Service (Weeks 1-5)
+### Java Spring Boot Service - Authentication (Sprint 2) - ✅ COMPLETE
 
 | # | Task | Priority | Est. Days | Learning | Status | Actual Date | Notes |
 |----|------|----------|-----------|----------|--------|-------------|-------|
-| 1.7 | Java: Setup Spring Boot project + Maven | 🔴 HIGH | 1 | 0.5 | ⬜ | | Include dependencies (security, JPA, Stripe) |
-| 1.8 | Java: Implement bcrypt password hashing | 🔴 HIGH | 1 | 0 | ⬜ | | Spring Security, User registration |
-| 1.9 | Java: Implement JWT authentication | 🔴 HIGH | 2 | 1 | ⬜ | | Token generation, refresh, validation |
-| 1.10 | Java: Create JPA entities (users, jobs, etc) | 🔴 HIGH | 2 | 0.5 | ⬜ | | Relations, annotations, validations |
-| 1.11 | Java: Implement User APIs (register, login, profile) | 🔴 HIGH | 2 | 0 | ⬜ | | CRUD + search |
-| 1.12 | Java: Implement Job APIs (CRUD + search) | 🔴 HIGH | 2 | 0 | ⬜ | | Full-text search on Postgres |
+| 1.7 | Java: Setup Spring Boot project + Maven | 🔴 HIGH | 1 | 0.5 | ✅ | Dec 18, 2025 | Spring Boot 3.3.0, Maven 3.9.x |
+| 1.8 | Java: Implement bcrypt password hashing | 🔴 HIGH | 1 | 0 | ✅ | Dec 18, 2025 | BCrypt strength 12, V3 migration fixed hashes |
+| 1.9 | Java: Implement JWT authentication | 🔴 HIGH | 2 | 1 | ✅ | Dec 18, 2025 | HS512 algorithm, 1-hour expiry, refresh tokens |
+| 1.10 | Java: Create JPA entities (users, jobs, etc) | 🔴 HIGH | 2 | 0.5 | ✅ | Dec 18, 2025 | User, Job, Proposal entities with relations |
+| 1.11 | Java: Implement User APIs (register, login, profile) | 🔴 HIGH | 2 | 0 | ✅ | Dec 18, 2025 | POST /register, POST /login, POST /refresh |
+| 1.11a | Java: Database seed data | 🔴 HIGH | 0.5 | 0 | ✅ | Dec 18, 2025 | V2 migration: 50 users, 10 jobs, 13 proposals |
+| 1.11b | Java: Fix password hashes | 🔴 HIGH | 0.5 | 0 | ✅ | Dec 18, 2025 | V3 migration: Corrected BCrypt hashes |
+| 1.11c | Java: Database consolidation | 🔴 HIGH | 0.5 | 0 | ✅ | Dec 18, 2025 | Removed init.sql, Flyway-only approach |
+
+**Sprint 2 Completed:** Dec 18, 2025 (2 hours)  
+**Authentication Status:** ✅ 100% Working - Login via email/username, JWT tokens issued  
+**Test Results:** 6/6 scenarios passing  
+
+---
+
+### Java Spring Boot Service - CRUD Endpoints (Sprint 3) - 🟠 READY TO START
+
+| # | Task | Priority | Est. Days | Learning | Status | Actual Date | Notes |
+|----|------|----------|-----------|----------|--------|-------------|-------|
+| 1.12 | Java: Implement Job APIs (CRUD + search) | 🔴 HIGH | 2 | 0 | ⏳ | | GET all with filters, POST, PUT, DELETE |
+| 1.13 | Java: Implement Proposal APIs | 🟡 MEDIUM | 2 | 0 | ⏳ | | Create, accept, reject, list by job |
+| 1.13a | Java: Implement User Management APIs | 🔴 HIGH | 1 | 0 | ⏳ | | GET /me, GET /:id, PUT, list (admin) |
+| 1.13b | Java: Implement Dashboard APIs | 🔴 HIGH | 2 | 0 | ⏳ | | Client/freelancer stats, recent activity |
 | 1.13 | Java: Implement Proposal APIs | 🟡 MEDIUM | 2 | 0 | ⬜ | | Create, accept, reject |
 | 1.14 | Java: Implement Contract & Milestone APIs | 🟡 MEDIUM | 2 | 0 | ⬜ | | Prepare for Stripe integration |
 | 1.15 | Java: Integrate Stripe API (test mode) | 🔴 HIGH | 3 | 2 | ⬜ | | Payment intent, webhooks, escrow |

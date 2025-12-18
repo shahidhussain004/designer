@@ -47,7 +47,7 @@ public class Job {
     @Column(name = "required_skills", columnDefinition = "TEXT[]")
     private String[] requiredSkills;
 
-    @Column(precision = 10, scale = 2)
+    @Column(name = "budget", columnDefinition = "NUMERIC(10,2)")
     private Double budget;
 
     @Enumerated(EnumType.STRING)
