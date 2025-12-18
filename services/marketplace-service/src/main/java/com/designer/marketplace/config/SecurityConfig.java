@@ -67,16 +67,25 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS with proper config
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
+                        // Public endpoints - must be first
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
+                        // GET requests for jobs are public (browsing)
+                        .requestMatchers(HttpMethod.GET, "/api/jobs").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/jobs/").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/jobs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users/*/profile").permitAll()
+                        // Authenticated endpoints - dashboards require authentication with role check
+                        // via @PreAuthorize
+                        .requestMatchers("/api/dashboard/**").authenticated()
+                        .requestMatchers("/api/notifications").authenticated()
                         // All other endpoints require authentication
                         .anyRequest().authenticated())
+                .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -85,14 +94,18 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+        // For development: Allow localhost origins explicitly (wildcards don't work
+        // with credentials)
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:3000",
                 "http://localhost:3001",
+                "http://localhost:8080",
                 "http://127.0.0.1:3000",
-                "http://127.0.0.1:3001"));
+                "http://127.0.0.1:3001",
+                "http://127.0.0.1:8080"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentials(true);
+        configuration.setAllowCredentials(false); // Changed to false to allow broader testing
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
