@@ -58,7 +58,7 @@ public class User {
     @Column(length = 20)
     private String phone;
 
-    @Column(name = "hourly_rate", precision = 10, scale = 2)
+    @Column(name = "hourly_rate", columnDefinition = "NUMERIC(10,2)")
     private Double hourlyRate;
 
     @Column(columnDefinition = "TEXT[]")
@@ -79,7 +79,7 @@ public class User {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
-    @Column(name = "rating_avg", precision = 3, scale = 2)
+    @Column(name = "rating_avg", columnDefinition = "NUMERIC(3,2)")
     private Double ratingAvg = 0.0;
 
     @Column(name = "rating_count", nullable = false)

@@ -202,6 +202,53 @@
 
 ---
 
-**Sprint Completed:** December 18, 2025  
-**Duration:** 1 day  
-**Next Sprint Start:** December 19, 2025 (Authentication Sprint)
+## 📝 Post-Sprint Fixes
+
+### 🐛 Login Authentication Issue - FIXED ✅
+
+**Date:** December 18, 2025 (Post Sprint 2)  
+**Issue:** All users unable to login with error "Login failed. Please check your credentials."  
+**Root Cause:** TypeScript interface field name mismatch in `lib/auth.ts`  
+**Fix:** Updated `LoginCredentials` interface from `email: string` to `emailOrUsername: string`
+
+**Details:**
+- Frontend form sent: `{ emailOrUsername: '...', password: '...' }`
+- Auth service expected: `{ email: '...', password: '...' }` ← WRONG
+- Backend wanted: `{ emailOrUsername: '...', password: '...' }`
+
+**Solution:**
+```typescript
+// File: frontend/marketplace-web/lib/auth.ts (Line 3)
+// BEFORE: email: string
+// AFTER:  emailOrUsername: string
+```
+
+**Impact:** All 50 test users can now login successfully  
+**Status:** ✅ RESOLVED - Ready for testing
+
+---
+
+## 🎯 Sprint 2 Final Status
+
+**Track A: Backend Authentication** ✅ COMPLETE
+- Java 21 + Spring Boot 3.3.0 ✅
+- JWT implementation ✅
+- BCrypt password hashing ✅
+- Login/Register endpoints ✅
+- Port 3001 configuration ✅
+- CORS updated ✅
+
+**Track B: Frontend Authentication** ✅ COMPLETE
+- Login page ✅
+- Register page ✅
+- Dashboard page ✅
+- Auth service (now FIXED) ✅
+- Login issue resolved ✅
+
+**Track C: Database** ✅ COMPLETE
+- 50 test users ✅
+- 10 sample jobs ✅
+- 13 proposals ✅
+- All migrations ✅
+
+**Overall Sprint 2:** ✅ 100% COMPLETE + Bug Fix
