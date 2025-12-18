@@ -16,6 +16,7 @@
 
 ### Most Important Files
 ```
+Next Steps:     docs/INDEX.md (🎯 NEXT STEPS section - check first!)
 Read First:     docs/PROJECT_TIMELINE_TRACKER.md
 Then:           docs/JIRA_AUTOMATION_QUICKSTART.md
 Reference:      docs/JIRA_SETUP.md
@@ -24,6 +25,34 @@ Navigation:     docs/INDEX.md
 Timeline:       docs/PROJECT_TIMELINE_TRACKER.md
 Specification:  docs/marketplace_design.md
 ```
+
+### 📝 Development Workflow
+
+**Before Starting Work:**
+1. Check `docs/INDEX.md` → **🎯 NEXT STEPS** section
+2. Review current sprint tasks and priorities
+3. Check `PROJECT_SUMMARY.md` for latest status
+
+**During Development:**
+- Focus on tasks marked 🔄 IN PROGRESS
+- Keep detailed notes for summary
+
+**After Completing Tasks:**
+1. ✅ Update status in `docs/INDEX.md` (NEXT STEPS)
+2. ✅ Update `PROJECT_SUMMARY.md` (phase progress)
+3. ✅ Update `docs/PROJECT_TIMELINE_TRACKER.md` (mark ✅)
+4. 📄 Save detailed completion summary to `plan-progress-files/sprint-N-summary.md`
+5. 🎯 Update NEXT STEPS with upcoming tasks
+
+**Status Files (Update These):**
+- `docs/INDEX.md` - Current sprint & next steps
+- `PROJECT_SUMMARY.md` - Overall progress
+- `docs/PROJECT_TIMELINE_TRACKER.md` - Task checkboxes
+
+**Detail Files (Save Summaries Here):**
+- `plan-progress-files/` - Sprint summaries, completion reports
+- One file per major milestone or sprint
+- Referenced from main docs, not duplicated
 
 ### Commands to Remember
 ```bash
