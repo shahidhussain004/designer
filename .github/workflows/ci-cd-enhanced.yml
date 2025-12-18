@@ -55,7 +55,7 @@ jobs:
         working-directory: ./frontend/marketplace-web
         run: |
           echo "🔨 Installing dependencies..."
-          npm ci
+          npm install
           echo "🔍 Running linter..."
           npm run lint || echo "⚠️ Lint warnings present (non-blocking)"
           echo "✅ Lint check complete"
@@ -106,7 +106,7 @@ jobs:
         working-directory: ./frontend/marketplace-web
         run: |
           echo "🧪 Running frontend unit tests..."
-          npm ci
+          npm install
           npm test -- --passWithNoTests --coverage --testPathIgnorePatterns="integration" 2>&1 | tee /tmp/frontend-test.log || true
           echo "✅ Frontend tests complete"
 
@@ -236,7 +236,7 @@ jobs:
         working-directory: ./frontend/marketplace-web
         run: |
           echo "📦 Installing dependencies..."
-          npm ci
+          npm install
           echo "✅ Dependencies installed"
 
       - name: 🎯 Run E2E Tests (Jest Integration Tests)
