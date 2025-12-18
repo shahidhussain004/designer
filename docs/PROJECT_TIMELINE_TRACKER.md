@@ -56,8 +56,6 @@
 
 ---
 
-### Java Spring Boot Service - CRUD Endpoints (Sprint 3) - ✅ COMPLETE
-
 | # | Task | Priority | Est. Days | Learning | Status | Actual Date | Notes |
 |----|------|----------|-----------|----------|--------|-------------|-------|
 | 1.12 | Java: Implement Job APIs (CRUD + search) | 🔴 HIGH | 2 | 0 | ✅ | Dec 18, 2025 | GET all with filters, POST, PUT, DELETE |
