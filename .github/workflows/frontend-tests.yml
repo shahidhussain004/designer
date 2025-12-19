@@ -25,6 +25,12 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Downgrade to stable npm version
+        run: npm install -g npm@10.2.5
+
+      - name: Verify npm version
+        run: npm --version
+
       - name: Clear npm cache
         run: npm cache clean --force
 
