@@ -4,6 +4,7 @@ import com.designer.marketplace.dto.CreateProposalRequest;
 import com.designer.marketplace.dto.ProposalResponse;
 import com.designer.marketplace.dto.UpdateProposalStatusRequest;
 import com.designer.marketplace.entity.Job;
+import com.designer.marketplace.entity.Notification;
 import com.designer.marketplace.entity.Proposal;
 import com.designer.marketplace.entity.User;
 import com.designer.marketplace.repository.JobRepository;
@@ -26,6 +27,7 @@ public class ProposalService {
     private final ProposalRepository proposalRepository;
     private final JobRepository jobRepository;
     private final UserService userService;
+    private final NotificationService notificationService;
 
     /**
      * Task 3.12: Get user's proposals
@@ -99,6 +101,16 @@ public class ProposalService {
         job.setProposalCount(job.getProposalCount() + 1);
         jobRepository.save(job);
 
+        // Create notification for job owner
+        notificationService.createNotification(
+                job.getClient(),
+                Notification.NotificationType.PROPOSAL_RECEIVED,
+                "New Proposal Received",
+                String.format("%s submitted a proposal for your job: %s",
+                        currentUser.getFullName(), job.getTitle()),
+                "PROPOSAL",
+                savedProposal.getId());
+
         log.info("Proposal created with id: {}", savedProposal.getId());
 
         return ProposalResponse.fromEntity(savedProposal);
@@ -135,6 +147,24 @@ public class ProposalService {
             job.setStatus(Job.JobStatus.IN_PROGRESS);
             jobRepository.save(job);
             log.info("Job {} marked as IN_PROGRESS", job.getId());
+
+            // Notify freelancer
+            notificationService.createNotification(
+                    proposal.getFreelancer(),
+                    Notification.NotificationType.PROPOSAL_ACCEPTED,
+                    "Proposal Accepted!",
+                    String.format("Your proposal for '%s' has been accepted!", job.getTitle()),
+                    "PROPOSAL",
+                    proposalId);
+        } else if (newStatus == Proposal.ProposalStatus.REJECTED) {
+            // Notify freelancer
+            notificationService.createNotification(
+                    proposal.getFreelancer(),
+                    Notification.NotificationType.PROPOSAL_REJECTED,
+                    "Proposal Update",
+                    String.format("Your proposal for '%s' status has been updated", proposal.getJob().getTitle()),
+                    "PROPOSAL",
+                    proposalId);
         }
 
         Proposal updatedProposal = proposalRepository.save(proposal);
@@ -170,5 +200,25 @@ public class ProposalService {
                 .orElseThrow(() -> new RuntimeException("Proposal not found with id: " + proposalId));
         User currentUser = userService.getCurrentUser();
         return proposal.getJob().getClient().getId().equals(currentUser.getId());
+    }
+
+    /**
+     * Accept a proposal (convenience method)
+     */
+    @Transactional
+    public ProposalResponse acceptProposal(Long proposalId) {
+        UpdateProposalStatusRequest request = new UpdateProposalStatusRequest();
+        request.setStatus("ACCEPTED");
+        return updateProposalStatus(proposalId, request);
+    }
+
+    /**
+     * Reject a proposal (convenience method)
+     */
+    @Transactional
+    public ProposalResponse rejectProposal(Long proposalId) {
+        UpdateProposalStatusRequest request = new UpdateProposalStatusRequest();
+        request.setStatus("REJECTED");
+        return updateProposalStatus(proposalId, request);
     }
 }
