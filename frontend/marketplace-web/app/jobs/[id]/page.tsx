@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { authService } from '@/lib/auth';
 import Link from 'next/link';
+import { User } from '@/types';
 
 interface Job {
   id: number;
@@ -16,13 +17,6 @@ interface Job {
   status: string;
   createdAt: string;
   updatedAt: string;
-}
-
-interface User {
-  id: number;
-  fullName: string;
-  email: string;
-  username: string;
 }
 
 interface ProposalRequest {

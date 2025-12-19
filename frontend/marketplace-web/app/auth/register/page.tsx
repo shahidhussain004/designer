@@ -7,7 +7,13 @@ import { authService } from '@/lib/auth';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    email: string;
+    username: string;
+    password: string;
+    fullName: string;
+    role: 'CLIENT' | 'FREELANCER';
+  }>({
     email: '',
     username: '',
     password: '',
@@ -134,7 +140,7 @@ export default function RegisterPage() {
                     name="role"
                     value="FREELANCER"
                     checked={formData.role === 'FREELANCER'}
-                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value as 'CLIENT' | 'FREELANCER' })}
                     className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
                   />
                   <span className="ml-3">
@@ -148,7 +154,7 @@ export default function RegisterPage() {
                     name="role"
                     value="CLIENT"
                     checked={formData.role === 'CLIENT'}
-                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value as 'CLIENT' | 'FREELANCER' })}
                     className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
                   />
                   <span className="ml-3">

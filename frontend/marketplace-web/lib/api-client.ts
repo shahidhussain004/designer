@@ -3,6 +3,15 @@ import logger from './logger';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
 
+// Extend Axios config to include metadata for logging
+declare module 'axios' {
+  export interface InternalAxiosRequestConfig {
+    metadata?: {
+      startTime: number;
+    };
+  }
+}
+
 /**
  * Axios instance configured for Designer Marketplace API
  * Automatically includes JWT token in Authorization header

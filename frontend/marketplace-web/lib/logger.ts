@@ -163,15 +163,22 @@ class Logger {
    * Log API response
    */
   apiResponse(method: string, url: string, status: number, duration: number) {
-    const level = status >= 400 ? 'error' : status >= 300 ? 'warn' : 'info';
-    this[level](`API Response: ${method} ${url} - ${status}`, {
+    const context: LogContext = {
       component: 'API',
       action: 'response',
       method,
       url,
       status,
       duration: `${duration}ms`,
-    });
+    };
+    
+    if (status >= 400) {
+      this.error(`API Response: ${method} ${url} - ${status}`, undefined, context);
+    } else if (status >= 300) {
+      this.warn(`API Response: ${method} ${url} - ${status}`, context);
+    } else {
+      this.info(`API Response: ${method} ${url} - ${status}`, context);
+    }
   }
 
   /**
