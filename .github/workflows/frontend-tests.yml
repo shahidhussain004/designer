@@ -41,7 +41,7 @@ jobs:
         working-directory: ./frontend/marketplace-web
         run: |
           echo "=== Attempting npm install with verbose logging ==="
-          npm install --legacy-peer-deps --verbose --no-progress --no-audit --no-fund 2>&1 | tail -n 100
+          npm install --legacy-peer-deps --loglevel=verbose --no-progress --no-audit --no-fund
         continue-on-error: true
         id: npm-install-1
 
