@@ -25,28 +25,65 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Enable Corepack
-        run: corepack enable
+      - name: Clear npm cache
+        run: npm cache clean --force
 
-      - name: Install dependencies
+      - name: Verify npm cache
+        run: npm cache verify
+
+      - name: Install dependencies with npm (attempt 1 - verbose)
         working-directory: ./frontend/marketplace-web
-        run: yarn install --frozen-lockfile || yarn install
+        run: |
+          echo "=== Attempting npm install with verbose logging ==="
+          npm install --legacy-peer-deps --verbose --no-progress --no-audit --no-fund 2>&1 | tail -n 100
+        continue-on-error: true
+        id: npm-install-1
+
+      - name: Install dependencies with npm (attempt 2 - clean retry)
+        if: steps.npm-install-1.outcome == 'failure'
+        working-directory: ./frontend/marketplace-web
+        run: |
+          echo "=== First attempt failed, clearing cache and retrying ==="
+          npm cache clean --force
+          rm -rf node_modules package-lock.json 2>/dev/null || true
+          npm install --legacy-peer-deps --loglevel=verbose
+        continue-on-error: true
+        id: npm-install-2
+
+      - name: Install dependencies with npm (attempt 3 - different strategy)
+        if: steps.npm-install-2.outcome == 'failure'
+        working-directory: ./frontend/marketplace-web
+        run: |
+          echo "=== Second attempt failed, trying with prefer-offline ==="
+          npm install --legacy-peer-deps --prefer-offline --no-audit
+        continue-on-error: true
+        id: npm-install-3
+
+      - name: Verify installation
+        working-directory: ./frontend/marketplace-web
+        run: |
+          echo "=== Checking if node_modules exists ==="
+          ls -la node_modules/.bin/ | head -20
+          echo "=== Verifying next command ==="
+          npx next --version || echo "Next.js not found!"
+          echo "=== Verifying jest command ==="
+          npx jest --version || echo "Jest not found!"
 
       - name: Run linter
         working-directory: ./frontend/marketplace-web
-        run: yarn lint || echo "⚠️ Lint warnings present (non-blocking)"
+        run: npx next lint || echo "⚠️ Lint warnings present (non-blocking)"
         continue-on-error: true
 
       - name: Run tests
         working-directory: ./frontend/marketplace-web
-        run: yarn test -- --passWithNoTests --coverage
+        run: npx jest --coverage --passWithNoTests
         continue-on-error: true
 
       - name: Build application
         working-directory: ./frontend/marketplace-web
-        run: yarn build
+        run: npx next build
 
       - name: Type check
         working-directory: ./frontend/marketplace-web
-        run: yarn type-check
+        run: npx tsc --noEmit
         continue-on-error: true
