@@ -1,0 +1,94 @@
+{
+  "dashboard": {
+    "title": "Marketplace Backend Metrics",
+    "tags": ["marketplace", "spring-boot", "backend"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "HTTP Requests Rate",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "rate(http_server_requests_seconds_count{application=\"marketplace-service\"}[1m])",
+            "legendFormat": "{{method}} {{uri}} - {{status}}"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "HTTP Request Duration",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{application=\"marketplace-service\"}[1m])) by (le, uri, method))",
+            "legendFormat": "p95 {{method}} {{uri}}"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "JVM Memory Used",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "targets": [
+          {
+            "expr": "jvm_memory_used_bytes{application=\"marketplace-service\"}",
+            "legendFormat": "{{area}} - {{id}}"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "JVM GC Pause",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "targets": [
+          {
+            "expr": "rate(jvm_gc_pause_seconds_sum{application=\"marketplace-service\"}[1m])",
+            "legendFormat": "{{action}} - {{cause}}"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Database Connections",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+        "targets": [
+          {
+            "expr": "hikaricp_connections_active{application=\"marketplace-service\"}",
+            "legendFormat": "Active Connections"
+          },
+          {
+            "expr": "hikaricp_connections_idle{application=\"marketplace-service\"}",
+            "legendFormat": "Idle Connections"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "System CPU Usage",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+        "targets": [
+          {
+            "expr": "system_cpu_usage{application=\"marketplace-service\"}",
+            "legendFormat": "System CPU"
+          },
+          {
+            "expr": "process_cpu_usage{application=\"marketplace-service\"}",
+            "legendFormat": "Process CPU"
+          }
+        ]
+      }
+    ],
+    "refresh": "10s",
+    "time": {
+      "from": "now-15m",
+      "to": "now"
+    }
+  }
+}
