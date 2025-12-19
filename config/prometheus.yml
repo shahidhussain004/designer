@@ -38,6 +38,12 @@ scrape_configs:
       - targets: ['nginx:80']
     metrics_path: '/metrics'
 
+  - job_name: 'marketplace-backend'
+    static_configs:
+      - targets: ['host.docker.internal:8080']
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 5s
+
   # Will be added once services come online
   # - job_name: 'java-service'
   #   static_configs:

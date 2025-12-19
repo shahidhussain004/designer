@@ -66,6 +66,28 @@ server:
     enabled: true
     mime-types: application/json,application/xml,text/html,text/xml,text/plain
 
+# Actuator & Metrics
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+    tags:
+      application: ${spring.application.name}
+
 # JWT Configuration
 jwt:
   secret: ${JWT_SECRET:your-256-bit-secret-change-this-in-production-please-make-it-secure}
