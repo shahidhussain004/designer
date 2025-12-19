@@ -63,6 +63,8 @@ jobs:
       - name: 📝 Frontend Build
         working-directory: ./frontend/marketplace-web
         run: |
+          echo "🔨 Ensuring dependencies are installed..."
+          npm install --legacy-peer-deps
           echo "🔨 Building frontend..."
           npm run build
           echo "✅ Frontend build successful"
