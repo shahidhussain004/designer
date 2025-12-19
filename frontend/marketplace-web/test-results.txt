@@ -1,0 +1,46 @@
+npm verbose cli C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js
+npm info using npm@10.9.2
+npm info using node@v23.11.0
+npm verbose title npm test tests/integration.test.ts
+npm verbose argv "test" "tests/integration.test.ts" "--runInBand" "--loglevel" "verbose"
+npm verbose logfile logs-max:10 dir:C:\temp\nodejs\npm-cache\_logs\2025-12-19T23_12_59_492Z-
+npm verbose logfile C:\temp\nodejs\npm-cache\_logs\2025-12-19T23_12_59_492Z-debug-0.log
+
+> marketplace-web@1.0.0 test
+> jest --coverage --passWithNoTests tests/integration.test.ts
+
+ ΓÜá Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\playground\package-lock.json as the root directory.
+ To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+ Detected additional lockfiles: 
+   * C:\playground\designer\frontend\marketplace-web\package-lock.json
+
+ ΓÜá Found lockfile missing swc dependencies, patching...
+npm verbose cli C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js
+npm info using npm@10.9.2
+npm info using node@v23.11.0
+npm verbose title npm config get registry
+npm verbose argv "config" "get" "registry" "--no-workspaces"
+npm verbose logfile logs-max:10 dir:C:\temp\nodejs\npm-cache\_logs\2025-12-19T23_13_39_018Z-
+npm verbose logfile C:\temp\nodejs\npm-cache\_logs\2025-12-19T23_13_39_018Z-debug-0.log
+npm verbose cwd C:\playground\designer\frontend\marketplace-web
+npm verbose os Windows_NT 10.0.26100
+npm verbose node v23.11.0
+npm verbose npm  v10.9.2
+npm verbose exit 0
+npm info ok
+ Γ¿» Failed to patch lockfile, please try uninstalling and reinstalling next in this workspace
+[TypeError: Cannot read properties of undefined (reading 'os')]
+No tests found, exiting with code 0
+----------|---------|----------|---------|---------|-------------------
+File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+----------|---------|----------|---------|---------|-------------------
+All files |       0 |        0 |       0 |       0 |                   
+----------|---------|----------|---------|---------|-------------------
+npm verbose cwd C:\playground\designer\frontend\marketplace-web
+npm verbose os Windows_NT 10.0.26100
+npm verbose node v23.11.0
+npm verbose npm  v10.9.2
+npm verbose exit 0
+npm info ok

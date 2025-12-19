@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService } from '@/lib/auth';
+import { getDashboardData, ClientDashboard, FreelancerDashboard } from '@/lib/dashboard';
 import Link from 'next/link';
 
 interface User {
@@ -13,21 +14,12 @@ interface User {
   role: string;
 }
 
-interface Job {
-  id: number;
-  title: string;
-  description: string;
-  budget: number;
-  category: string;
-  experienceLevel: string;
-}
-
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
-  const [jobs, setJobs] = useState<Job[]>([]);
+  const [dashboardData, setDashboardData] = useState<ClientDashboard | FreelancerDashboard | null>(null);
   const [loading, setLoading] = useState(true);
-  const [jobsLoading, setJobsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authService.isAuthenticated()) {
@@ -39,27 +31,24 @@ export default function DashboardPage() {
     if (currentUser) {
       setUser(currentUser);
     }
-    setLoading(false);
   }, [router]);
 
   useEffect(() => {
-    const fetchJobs = async () => {
+    const fetchDashboard = async () => {
+      if (!user) return;
+
       try {
-        const response = await fetch('http://localhost:8080/api/jobs');
-        if (response.ok) {
-          const data = await response.json();
-          setJobs(data.content || data || []);
-        }
-      } catch (error) {
-        console.error('Error fetching jobs:', error);
+        const data = await getDashboardData();
+        setDashboardData(data);
+      } catch (err: any) {
+        console.error('Error fetching dashboard:', err);
+        setError(err.message || 'Failed to load dashboard');
       } finally {
-        setJobsLoading(false);
+        setLoading(false);
       }
     };
 
-    if (user) {
-      fetchJobs();
-    }
+    fetchDashboard();
   }, [user]);
 
   const handleLogout = () => {
@@ -70,12 +59,20 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg text-gray-600">Loading...</div>
+        <div className="text-lg text-gray-600">Loading dashboard...</div>
       </div>
     );
   }
 
-  if (!user) {
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg text-red-600">{error}</div>
+      </div>
+    );
+  }
+
+  if (!user || !dashboardData) {
     return null;
   }
 
@@ -149,9 +146,9 @@ export default function DashboardPage() {
 
           {/* Role-Specific Dashboard */}
           {user.role === 'CLIENT' ? (
-            <ClientDashboardContent jobs={jobs} jobsLoading={jobsLoading} />
+            <ClientDashboardContent data={dashboardData as ClientDashboard} />
           ) : (
-            <FreelancerDashboardContent jobs={jobs} jobsLoading={jobsLoading} />
+            <FreelancerDashboardContent data={dashboardData as FreelancerDashboard} />
           )}
         </div>
       </main>
@@ -159,12 +156,13 @@ export default function DashboardPage() {
   );
 }
 
-interface DashboardContentProps {
-  jobs: Job[];
-  jobsLoading: boolean;
+interface ClientDashboardProps {
+  data: ClientDashboard;
 }
 
-function ClientDashboardContent({ jobs, jobsLoading }: DashboardContentProps) {
+function ClientDashboardContent({ data }: ClientDashboardProps) {
+  const { stats, activeJobs, recentProposals } = data;
+
   return (
     <div className="space-y-6">
       {/* Stats */}
@@ -172,29 +170,29 @@ function ClientDashboardContent({ jobs, jobsLoading }: DashboardContentProps) {
         <div className="bg-white overflow-hidden shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
             <dt className="text-sm font-medium text-gray-500 truncate">Active Jobs</dt>
-            <dd className="mt-1 text-3xl font-extrabold text-gray-900">-</dd>
+            <dd className="mt-1 text-3xl font-extrabold text-gray-900">{stats.activeJobs || 0}</dd>
           </div>
         </div>
         <div className="bg-white overflow-hidden shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
             <dt className="text-sm font-medium text-gray-500 truncate">Proposals Received</dt>
-            <dd className="mt-1 text-3xl font-extrabold text-gray-900">-</dd>
+            <dd className="mt-1 text-3xl font-extrabold text-gray-900">{stats.totalProposalsReceived || 0}</dd>
           </div>
         </div>
         <div className="bg-white overflow-hidden shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
-            <dt className="text-sm font-medium text-gray-500 truncate">Active Contracts</dt>
-            <dd className="mt-1 text-3xl font-extrabold text-gray-900">-</dd>
+            <dt className="text-sm font-medium text-gray-500 truncate">Completed Jobs</dt>
+            <dd className="mt-1 text-3xl font-extrabold text-gray-900">{stats.completedJobs || 0}</dd>
           </div>
         </div>
       </div>
 
-      {/* Recent Jobs */}
+      {/* Active Jobs */}
       <div className="bg-white shadow overflow-hidden sm:rounded-lg">
         <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
           <div>
-            <h3 className="text-lg leading-6 font-medium text-gray-900">Available Jobs</h3>
-            <p className="mt-1 max-w-2xl text-sm text-gray-500">Browse jobs for freelancers</p>
+            <h3 className="text-lg leading-6 font-medium text-gray-900">Your Active Jobs</h3>
+            <p className="mt-1 max-w-2xl text-sm text-gray-500">Jobs you have posted</p>
           </div>
           <Link
             href="/jobs/create"
@@ -204,13 +202,11 @@ function ClientDashboardContent({ jobs, jobsLoading }: DashboardContentProps) {
           </Link>
         </div>
         <div className="border-t border-gray-200">
-          {jobsLoading ? (
-            <div className="px-4 py-5 sm:px-6 text-gray-600">Loading jobs...</div>
-          ) : jobs.length === 0 ? (
-            <div className="px-4 py-5 sm:px-6 text-gray-600">No jobs available.</div>
+          {activeJobs.length === 0 ? (
+            <div className="px-4 py-5 sm:px-6 text-gray-600">No active jobs.</div>
           ) : (
             <ul className="divide-y divide-gray-200">
-              {jobs.slice(0, 5).map((job) => (
+              {activeJobs.map((job) => (
                 <li key={job.id}>
                   <Link
                     href={`/jobs/${job.id}`}
@@ -221,6 +217,9 @@ function ClientDashboardContent({ jobs, jobsLoading }: DashboardContentProps) {
                         <p className="text-sm font-medium text-gray-900 truncate">{job.title}</p>
                         <p className="mt-1 text-sm text-gray-500 line-clamp-1">
                           {job.description}
+                        </p>
+                        <p className="mt-1 text-xs text-gray-500">
+                          {job.proposalCount} proposals
                         </p>
                       </div>
                       <div className="ml-4 flex-shrink-0">
@@ -238,27 +237,33 @@ function ClientDashboardContent({ jobs, jobsLoading }: DashboardContentProps) {
   );
 }
 
-function FreelancerDashboardContent({ jobs, jobsLoading }: DashboardContentProps) {
+interface FreelancerDashboardProps {
+  data: FreelancerDashboard;
+}
+
+function FreelancerDashboardContent({ data }: FreelancerDashboardProps) {
+  const { stats, myProposals, availableJobs } = data;
+
   return (
     <div className="space-y-6">
       {/* Stats */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
         <div className="bg-white overflow-hidden shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
-            <dt className="text-sm font-medium text-gray-500 truncate">Profile Rating</dt>
-            <dd className="mt-1 text-3xl font-extrabold text-yellow-500">4.8 ★</dd>
+            <dt className="text-sm font-medium text-gray-500 truncate">Proposals Submitted</dt>
+            <dd className="mt-1 text-3xl font-extrabold text-gray-900">{stats.proposalsSubmitted || 0}</dd>
           </div>
         </div>
         <div className="bg-white overflow-hidden shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
-            <dt className="text-sm font-medium text-gray-500 truncate">Jobs Completed</dt>
-            <dd className="mt-1 text-3xl font-extrabold text-gray-900">-</dd>
+            <dt className="text-sm font-medium text-gray-500 truncate">Proposals Accepted</dt>
+            <dd className="mt-1 text-3xl font-extrabold text-gray-900">{stats.proposalsAccepted || 0}</dd>
           </div>
         </div>
         <div className="bg-white overflow-hidden shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
-            <dt className="text-sm font-medium text-gray-500 truncate">Total Earnings</dt>
-            <dd className="mt-1 text-3xl font-extrabold text-green-600">$-</dd>
+            <dt className="text-sm font-medium text-gray-500 truncate">Completed Projects</dt>
+            <dd className="mt-1 text-3xl font-extrabold text-gray-900">{stats.completedProjects || 0}</dd>
           </div>
         </div>
       </div>
@@ -280,13 +285,11 @@ function FreelancerDashboardContent({ jobs, jobsLoading }: DashboardContentProps
           </Link>
         </div>
         <div className="border-t border-gray-200">
-          {jobsLoading ? (
-            <div className="px-4 py-5 sm:px-6 text-gray-600">Loading jobs...</div>
-          ) : jobs.length === 0 ? (
+          {availableJobs.length === 0 ? (
             <div className="px-4 py-5 sm:px-6 text-gray-600">No jobs available at the moment.</div>
           ) : (
             <ul className="divide-y divide-gray-200">
-              {jobs.slice(0, 5).map((job) => (
+              {availableJobs.slice(0, 5).map((job) => (
                 <li key={job.id}>
                   <Link
                     href={`/jobs/${job.id}`}

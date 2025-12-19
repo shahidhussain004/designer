@@ -201,4 +201,15 @@ public class JobService {
         User currentUser = userService.getCurrentUser();
         return job.getClient().getId().equals(currentUser.getId());
     }
+
+    /**
+     * Get current user's jobs
+     */
+    @Transactional(readOnly = true)
+    public Page<JobResponse> getMyJobs(Pageable pageable) {
+        User currentUser = userService.getCurrentUser();
+        log.info("Getting jobs for user: {}", currentUser.getUsername());
+        Page<Job> jobs = jobRepository.findByClientId(currentUser.getId(), pageable);
+        return jobs.map(JobResponse::fromEntity);
+    }
 }
