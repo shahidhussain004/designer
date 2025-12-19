@@ -82,4 +82,15 @@ public class UserController {
         Page<UserResponse> users = userService.getAllUsers(pageable);
         return ResponseEntity.ok(users);
     }
+
+    /**
+     * Get user profile (public endpoint)
+     * GET /api/users/{id}/profile
+     */
+    @GetMapping("/{id}/profile")
+    public ResponseEntity<UserResponse> getUserProfile(@PathVariable Long id) {
+        log.info("Getting user profile: {}", id);
+        UserResponse user = userService.getUserById(id);
+        return ResponseEntity.ok(user);
+    }
 }

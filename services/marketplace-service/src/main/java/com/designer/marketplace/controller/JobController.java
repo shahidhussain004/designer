@@ -125,4 +125,20 @@ public class JobController {
         Page<JobResponse> jobs = jobService.searchJobs(q, pageable);
         return ResponseEntity.ok(jobs);
     }
+
+    /**
+     * Get current user's jobs (client)
+     * GET /api/jobs/my-jobs
+     */
+    @GetMapping("/my-jobs")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<Page<JobResponse>> getMyJobs(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+
+        log.info("Getting current user's jobs");
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<JobResponse> jobs = jobService.getMyJobs(pageable);
+        return ResponseEntity.ok(jobs);
+    }
 }

@@ -104,4 +104,44 @@ public class ProposalController {
         ProposalResponse proposal = proposalService.getProposalById(id);
         return ResponseEntity.ok(proposal);
     }
+
+    /**
+     * Get current user's proposals (alias for /api/proposals)
+     * GET /api/proposals/my-proposals
+     */
+    @GetMapping("/proposals/my-proposals")
+    @PreAuthorize("hasRole('FREELANCER')")
+    public ResponseEntity<Page<ProposalResponse>> getMyProposals(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+
+        log.info("Getting current user's proposals");
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<ProposalResponse> proposals = proposalService.getUserProposals(pageable);
+        return ResponseEntity.ok(proposals);
+    }
+
+    /**
+     * Accept a proposal (convenience endpoint)
+     * PUT /api/proposals/{id}/accept
+     */
+    @PutMapping("/proposals/{id}/accept")
+    @PreAuthorize("isAuthenticated() and @proposalService.isJobOwnerForProposal(#id)")
+    public ResponseEntity<ProposalResponse> acceptProposal(@PathVariable Long id) {
+        log.info("Accepting proposal: {}", id);
+        ProposalResponse proposal = proposalService.acceptProposal(id);
+        return ResponseEntity.ok(proposal);
+    }
+
+    /**
+     * Reject a proposal (convenience endpoint)
+     * PUT /api/proposals/{id}/reject
+     */
+    @PutMapping("/proposals/{id}/reject")
+    @PreAuthorize("isAuthenticated() and @proposalService.isJobOwnerForProposal(#id)")
+    public ResponseEntity<ProposalResponse> rejectProposal(@PathVariable Long id) {
+        log.info("Rejecting proposal: {}", id);
+        ProposalResponse proposal = proposalService.rejectProposal(id);
+        return ResponseEntity.ok(proposal);
+    }
 }
