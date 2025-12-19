@@ -71,19 +71,19 @@ jobs:
 
       - name: Run linter
         working-directory: ./frontend/marketplace-web
-        run: npx next lint || echo "⚠️ Lint warnings present (non-blocking)"
+        run: npm run lint || echo "⚠️ Lint warnings present (non-blocking)"
         continue-on-error: true
 
       - name: Run tests
         working-directory: ./frontend/marketplace-web
-        run: npx jest --coverage --passWithNoTests
+        run: npm run test -- --passWithNoTests --coverage
         continue-on-error: true
 
       - name: Build application
         working-directory: ./frontend/marketplace-web
-        run: npx next build
+        run: npm run build
 
       - name: Type check
         working-directory: ./frontend/marketplace-web
-        run: npx tsc --noEmit
+        run: npm run type-check
         continue-on-error: true
