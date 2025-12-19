@@ -25,25 +25,28 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Install dependencies
         working-directory: ./frontend/marketplace-web
-        run: npm install --legacy-peer-deps
+        run: yarn install --frozen-lockfile || yarn install
 
       - name: Run linter
         working-directory: ./frontend/marketplace-web
-        run: npm run lint || echo "⚠️ Lint warnings present (non-blocking)"
+        run: yarn lint || echo "⚠️ Lint warnings present (non-blocking)"
         continue-on-error: true
 
       - name: Run tests
         working-directory: ./frontend/marketplace-web
-        run: npm test -- --passWithNoTests --coverage
+        run: yarn test -- --passWithNoTests --coverage
         continue-on-error: true
 
       - name: Build application
         working-directory: ./frontend/marketplace-web
-        run: npm run build
+        run: yarn build
 
       - name: Type check
         working-directory: ./frontend/marketplace-web
-        run: npm run type-check
+        run: yarn type-check
         continue-on-error: true
