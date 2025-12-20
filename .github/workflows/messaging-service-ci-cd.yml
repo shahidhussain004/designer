@@ -199,8 +199,13 @@ jobs:
         run: |
           echo "Waiting for PostgreSQL..."
           until pg_isready -h localhost -p 5432; do sleep 2; done
+          echo "PostgreSQL ready!"
+          
           echo "Waiting for Redis..."
+          sudo apt-get update && sudo apt-get install -y redis-tools
           until redis-cli -h localhost -p 6379 ping; do sleep 2; done
+          echo "Redis ready!"
+          
           echo "All services ready!"
 
       - name: Run integration tests

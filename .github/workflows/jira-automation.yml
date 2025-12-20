@@ -1,4 +1,4 @@
-name: Jira Automation - Ticket Status Transitions
+name: Jira Ticket Status Transitions
 
 on:
   pull_request:
