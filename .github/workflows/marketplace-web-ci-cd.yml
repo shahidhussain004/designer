@@ -321,7 +321,6 @@ jobs:
         with:
           urls: |
             http://localhost:3001
-          uploadArtifacts: true
           temporaryPublicStorage: true
 
   # ============================================
