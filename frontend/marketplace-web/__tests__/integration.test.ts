@@ -31,6 +31,7 @@ interface TestJob {
   category: string;
   experienceLevel: string;
   timelineWeeks: number;
+  clientId?: number;
 }
 
 // Utility functions
@@ -465,7 +466,7 @@ describe('Designer Marketplace API - Integration Tests', () => {
         throw new Error('Should have thrown error');
       } catch (error) {
         const axiosError = error as import('axios').AxiosError;
-        expect(error.response?.status).toBe(403);
+        expect(axiosError.response?.status).toBe(403);
       }
     });
 
@@ -611,4 +612,3 @@ describe('Designer Marketplace API - Integration Tests', () => {
 // Export for testing frameworks (using export type for isolatedModules)
 export type { TestUser, TestJob };
 export { registerUser, login, getAuthHeader };
-
