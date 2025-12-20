@@ -1,31 +1,49 @@
 # Apache Beam Data Pipelines
 
-This directory contains Apache Beam pipelines for data processing in the Designer Marketplace platform.
+**Phase 4: Data Processing & Analytics** (Future - After Phase 1-3)  
+**Status:** 📋 Planning Phase (Not Yet Started)  
+**Last Updated:** December 20, 2025
 
-## Pipelines
+## Overview
+
+Apache Beam pipelines for data processing and analytics in the Designer Marketplace platform. These will be implemented in Phase 4 after core marketplace features (Phases 1-3) are complete.
+
+**Current Focus:** Phases 1-3 (Core Marketplace, LMS, Security) - ✅ COMPLETE  
+**Next Steps:** Proceed with Phase 2 (Messaging, Admin UI, Go Service) → Then Phase 4
+
+## Planned Pipelines
 
 ### 1. Blog Feed Aggregation Pipeline
 - Fetches RSS feeds from 100+ sources
 - Parses and deduplicates content
 - Stores aggregated posts in database
 - **Location**: `blog_aggregation/`
+- **Status**: 📋 Not started
+- **Estimated:** 3 days
 
 ### 2. Analytics Pipeline
-- Processes Kafka events
-- Aggregates metrics
+- Processes Kafka events from marketplace
+- Aggregates metrics (users, jobs, revenue)
 - Feeds data to Grafana dashboards
 - **Location**: `analytics/`
+- **Status**: 📋 Not started
+- **Estimated:** 2 days
 
 ### 3. ML Training Pipeline
 - Extracts features from job/user data
 - Generates training datasets for matching algorithm
+- Trains ML models for recommendations
 - **Location**: `ml_training/`
+- **Status**: 📋 Not started
+- **Estimated:** 3 days
 
 ### 4. GDPR Export Pipeline
-- Queries all databases
-- Merges user data
+- Queries all databases (PostgreSQL, MongoDB)
+- Merges user data across services
 - Exports as JSON for compliance
 - **Location**: `gdpr_export/`
+- **Status**: 📋 Not started
+- **Estimated:** 2 days
 
 ## Setup
 

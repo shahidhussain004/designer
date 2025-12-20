@@ -1,9 +1,6 @@
 package com.designer.marketplace.security;
 
 import com.designer.marketplace.entity.User;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,9 +12,6 @@ import java.util.Collections;
  * UserPrincipal - Spring Security UserDetails implementation
  * Represents the authenticated user
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class UserPrincipal implements UserDetails {
 
     private Long id;
@@ -26,6 +20,30 @@ public class UserPrincipal implements UserDetails {
     private String password;
     private String role;
     private boolean isActive;
+
+    public UserPrincipal() {}
+
+    public UserPrincipal(Long id, String email, String username, String password, String role, boolean isActive) {
+        this.id = id;
+        this.email = email;
+        this.username = username;
+        this.password = password;
+        this.role = role;
+        this.isActive = isActive;
+    }
+
+    // Getters
+    public Long getId() { return id; }
+    public String getEmail() { return email; }
+    public String getRole() { return role; }
+    
+    // Setters
+    public void setId(Long id) { this.id = id; }
+    public void setEmail(String email) { this.email = email; }
+    public void setUsername(String username) { this.username = username; }
+    public void setPassword(String password) { this.password = password; }
+    public void setRole(String role) { this.role = role; }
+    public void setActive(boolean isActive) { this.isActive = isActive; }
 
     /**
      * Create UserPrincipal from User entity

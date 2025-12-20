@@ -57,6 +57,11 @@ spring:
       properties:
         spring.json.trusted.packages: com.designer.marketplace
 
+  # MongoDB for LMS
+  data.mongodb:
+    uri: mongodb://${MONGO_USER:mongo_user}:${MONGO_PASSWORD:mongo_pass_dev}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/${MONGO_DB:lms_db}?authSource=admin
+    auto-index-creation: true
+
 server:
   port: ${SERVER_PORT:8080}
   error:
@@ -98,6 +103,12 @@ jwt:
 stripe:
   api-key: ${STRIPE_API_KEY:sk_test_your_test_key}
   webhook-secret: ${STRIPE_WEBHOOK_SECRET:whsec_your_webhook_secret}
+
+# Payment Configuration
+payment:
+  platform:
+    fee:
+      percent: ${PLATFORM_FEE_PERCENT:10}
 
 # API Documentation
 springdoc:
