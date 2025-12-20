@@ -592,11 +592,7 @@ describe('Designer Marketplace API - Integration Tests', () => {
   });
 });
 
-// Export for testing frameworks
-export {
-  registerUser,
-  login,
-  getAuthHeader,
-  TestUser,
-  TestJob,
-};
+// Export for testing frameworks (using export type for isolatedModules)
+export type { TestUser, TestJob };
+export { registerUser, login, getAuthHeader };
+

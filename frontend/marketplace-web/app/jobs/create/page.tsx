@@ -241,7 +241,7 @@ export default function CreateJobPage() {
             <li className="flex items-start">
               <span className="inline-block w-6 h-6 bg-primary-600 text-white rounded-full text-center text-sm font-bold mr-4 flex-shrink-0">3</span>
               <div>
-                <strong>Include Examples:</strong> Provide references or examples of what you're looking for.
+                <strong>Include Examples:</strong> Provide references or examples of what you&apos;re looking for.
               </div>
             </li>
             <li className="flex items-start">

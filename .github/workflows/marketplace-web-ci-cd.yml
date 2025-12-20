@@ -42,7 +42,7 @@ jobs:
 
       - name: Run ESLint
         working-directory: ./frontend/marketplace-web
-        run: npm run lint
+        run: npm run lint:ci
 
       - name: Check TypeScript types
         working-directory: ./frontend/marketplace-web
@@ -111,7 +111,7 @@ jobs:
 
       - name: Run unit tests
         working-directory: ./frontend/marketplace-web
-        run: npm test
+        run: npm run test:unit
 
       - name: Upload test coverage
         uses: actions/upload-artifact@v4
