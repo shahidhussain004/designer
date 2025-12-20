@@ -38,7 +38,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./frontend/marketplace-web
-        run: npm ci
+        run: npm ci || npm install --legacy-peer-deps
 
       - name: Run ESLint
         working-directory: ./frontend/marketplace-web
@@ -69,7 +69,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./frontend/marketplace-web
-        run: npm ci
+        run: npm ci || npm install --legacy-peer-deps
 
       - name: Build Next.js application
         working-directory: ./frontend/marketplace-web
@@ -107,7 +107,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./frontend/marketplace-web
-        run: npm ci
+        run: npm ci || npm install --legacy-peer-deps
 
       - name: Run unit tests
         working-directory: ./frontend/marketplace-web
@@ -142,7 +142,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./frontend/marketplace-web
-        run: npm ci
+        run: npm ci || npm install --legacy-peer-deps
 
       - name: Run integration tests
         working-directory: ./frontend/marketplace-web
