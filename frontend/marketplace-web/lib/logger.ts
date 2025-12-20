@@ -215,7 +215,7 @@ class Logger {
   /**
    * Log user action
    */
-  userAction(action: string, details?: any) {
+  userAction(action: string, details?: unknown) {
     this.info(`User Action: ${action}`, {
       component: 'User',
       action,
