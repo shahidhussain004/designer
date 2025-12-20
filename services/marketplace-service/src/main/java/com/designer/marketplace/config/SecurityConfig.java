@@ -3,7 +3,7 @@ package com.designer.marketplace.config;
 import com.designer.marketplace.security.CustomUserDetailsService;
 import com.designer.marketplace.security.JwtAuthenticationFilter;
 import com.designer.marketplace.security.JwtTokenProvider;
-import lombok.RequiredArgsConstructor;
+import com.designer.marketplace.security.RateLimitFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -29,16 +29,24 @@ import java.util.List;
 
 /**
  * Spring Security Configuration
- * Configured with JWT authentication and CORS support
+ * Configured with JWT authentication, CORS support, and rate limiting
  */
 @Configuration
-@RequiredArgsConstructor
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtTokenProvider tokenProvider;
+    private final RateLimitFilter rateLimitFilter;
+
+    public SecurityConfig(CustomUserDetailsService customUserDetailsService, 
+                         JwtTokenProvider tokenProvider,
+                         RateLimitFilter rateLimitFilter) {
+        this.customUserDetailsService = customUserDetailsService;
+        this.tokenProvider = tokenProvider;
+        this.rateLimitFilter = rateLimitFilter;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -74,11 +82,22 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
+                        // Stripe webhooks must be accessible without authentication
+                        .requestMatchers("/api/webhooks/**").permitAll()
                         // GET requests for jobs are public (browsing)
                         .requestMatchers(HttpMethod.GET, "/api/jobs").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/jobs/").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/jobs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users/*/profile").permitAll()
+                        // LMS public course browsing
+                        .requestMatchers(HttpMethod.GET, "/api/lms/courses").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/lms/courses/popular").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/lms/courses/top-rated").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/lms/courses/newest").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/lms/courses/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/lms/courses/slug/*").permitAll()
+                        // Certificate verification (public)
+                        .requestMatchers(HttpMethod.GET, "/api/lms/quizzes/certificates/verify/*").permitAll()
                         // Authenticated endpoints - dashboards require authentication with role check
                         // via @PreAuthorize
                         .requestMatchers("/api/dashboard/**").authenticated()
@@ -86,6 +105,8 @@ public class SecurityConfig {
                         // All other endpoints require authentication
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())
+                // Add rate limiting filter before other security filters
+                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -94,8 +115,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // For development: Allow localhost origins explicitly (wildcards don't work
-        // with credentials)
+        // For production: Only allow specific origins
+        // For development: Allow localhost origins explicitly (wildcards don't work with credentials)
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:3000",
                 "http://localhost:3001",
@@ -104,8 +125,9 @@ public class SecurityConfig {
                 "http://127.0.0.1:3001",
                 "http://127.0.0.1:8080"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentials(false); // Changed to false to allow broader testing
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+        configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

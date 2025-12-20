@@ -1,7 +1,21 @@
 # Designer Marketplace Service - Java Spring Boot
 
-**Phase 1: Core Marketplace Backend**  
-**Status:** In Development (Dec 18, 2025)
+**Phase 1-3: Core Marketplace + Payment + LMS + Admin + Security**  
+**Status:** ✅ Production Ready (Dec 20, 2025)  
+**Last Updated:** December 20, 2025
+
+## Overview
+
+Java Spring Boot REST API service for the Designer Marketplace platform with comprehensive features:
+- ✅ Authentication (JWT + BCrypt)
+- ✅ User Management & Profiles
+- ✅ Job Marketplace (CRUD, search, filtering)
+- ✅ Proposals & Contracts
+- ✅ Payment Integration (Stripe)
+- ✅ Learning Management System (MongoDB, courses, quizzes, certificates)
+- ✅ Admin Portal (dashboard, moderation, user management)
+- ✅ Security Hardening (rate limiting, brute force protection, audit logging)
+- ✅ Production Deployment (Docker, SSL/TLS, optimized configs)
 
 ## Overview
 
@@ -11,12 +25,17 @@ Java Spring Boot REST API service for the Designer Marketplace platform. Provide
 
 - **Java 21**
 - **Spring Boot 3.3.0**
-- **PostgreSQL 15** (via Docker)
+- **Spring Security 6.1.8** (JWT + BCrypt)
+- **PostgreSQL 15** (via Docker) - 74 users, 18 jobs
+- **MongoDB 7** (LMS content storage)
 - **Redis** (caching & sessions)
 - **Kafka** (event streaming)
-- **Flyway** (database migrations)
-- **JWT** (authentication)
-- **Stripe API** (payments)
+- **Flyway** (database migrations - V1-V3)
+- **JWT** (HS512 authentication)
+- **Stripe API** (payment integration)
+- **Bucket4j** (rate limiting)
+- **Jakarta Validation** (input validation)
+- **Lombok** (1.18.32) - code generation
 
 ## Project Structure
 

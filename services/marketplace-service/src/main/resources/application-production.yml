@@ -1,0 +1,154 @@
+# ==========================================================================
+# Production Configuration
+# Use with: SPRING_PROFILES_ACTIVE=production
+# ==========================================================================
+
+spring:
+  application:
+    name: marketplace-service
+  
+  # Database Configuration - Use environment variables from Docker/K8s secrets
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_NAME:marketplace_db}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 20000
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      leak-detection-threshold: 60000
+  
+  jpa:
+    hibernate:
+      ddl-auto: validate  # Never use 'update' or 'create' in production
+    show-sql: false  # Disable SQL logging in production
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+        use_sql_comments: false
+        jdbc.batch_size: 20
+        order_inserts: true
+        order_updates: true
+    open-in-view: false
+  
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    validate-on-migrate: true
+    locations: classpath:db/migration
+    schemas: public
+  
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 16
+          max-idle: 8
+          min-idle: 4
+  
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+      compression-type: lz4
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      group-id: marketplace-service
+      auto-offset-reset: earliest
+      properties:
+        spring.json.trusted.packages: com.designer.marketplace
+  
+  # MongoDB for LMS
+  data.mongodb:
+    uri: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST:mongodb}:${MONGO_PORT:27017}/${MONGO_DB:lms_db}?authSource=admin
+    auto-index-creation: true
+
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: never  # Never expose internal error messages in production
+    include-binding-errors: never
+    include-stacktrace: never
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+  forward-headers-strategy: native  # Support X-Forwarded-* headers from reverse proxy
+  tomcat:
+    threads:
+      max: 200
+      min-spare: 10
+    connection-timeout: 20s
+    max-connections: 10000
+    max-http-form-post-size: 2MB
+
+# Actuator & Metrics - Restricted for production
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus  # Only expose essential endpoints
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized  # Hide details from unauthenticated users
+      probes:
+        enabled: true  # Enable Kubernetes liveness/readiness probes
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+    tags:
+      application: ${spring.application.name}
+      environment: production
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET}  # MUST be set via environment variable
+  expiration: 900000  # 15 minutes
+  refresh-expiration: 604800000  # 7 days
+
+# Stripe Configuration
+stripe:
+  api-key: ${STRIPE_API_KEY}
+  webhook-secret: ${STRIPE_WEBHOOK_SECRET}
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.designer.marketplace: INFO
+    org.springframework.web: WARN
+    org.springframework.security: WARN
+    org.hibernate: WARN
+    org.hibernate.SQL: OFF
+    org.hibernate.type.descriptor.sql.BasicBinder: OFF
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: /app/logs/marketplace-service.log
+    max-size: 100MB
+    max-history: 30
+    total-size-cap: 3GB
+
+# Security Headers
+security:
+  require-ssl: true
+  headers:
+    content-security-policy: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'"

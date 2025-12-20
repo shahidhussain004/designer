@@ -45,4 +45,7 @@ public interface ProposalRepository extends JpaRepository<Proposal, Long> {
 
     @Query("SELECT p FROM Proposal p WHERE p.freelancer.id = :freelancerId ORDER BY p.createdAt DESC")
     List<Proposal> findTopByFreelancerId(@Param("freelancerId") Long freelancerId, Pageable pageable);
+    
+    // Admin queries
+    long countByStatus(Proposal.ProposalStatus status);
 }

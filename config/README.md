@@ -1,29 +1,35 @@
 # ⚙️ Configuration Files
 
-This folder contains all infrastructure configuration files.
+**Last Updated:** December 20, 2025  
+**Status:** ✅ Production Ready (Sprints 1-15 Complete)
 
-## 📄 Configuration Files
+This folder contains all infrastructure configuration files for development and production deployments.
 
-### Docker & Services
-- **[docker-compose.yml](docker-compose.yml)** - All 9 services configuration
-  - PostgreSQL, MongoDB, Redis, Kafka, Zookeeper, Prometheus, Grafana, Nginx, Kafka UI
+## 📁 File Structure
+
+### Core Configuration
+- **[docker-compose.yml](docker-compose.yml)** - Development environment (9 services)
+- **[docker-compose.prod.yml](docker-compose.prod.yml)** - Production environment (NEW - Sprint 15)
+- **[nginx.conf](nginx.conf)** - Development Nginx configuration
+- **[nginx.prod.conf](nginx.prod.conf)** - Production Nginx with SSL/TLS (NEW - Sprint 15)
+
+### Application Configuration
+- **[application-production.yml](application-production.yml)** - Production Spring Boot profile (NEW - Sprint 15)
+- **[example.env](example.env)** - Development environment variables template
+- **[env.production.template](env.production.template)** - Production environment variables template (NEW - Sprint 15)
 
 ### Database
-- **[init.sql](init.sql)** - PostgreSQL schema
-  - 15 production-ready tables
-  - Indexes and relationships
-  - Trigger functions
-
-### API Gateway
-- **[nginx.conf](nginx.conf)** - Nginx configuration
-  - Rate limiting
-  - CORS configuration
-  - Upstream service routing
+- **[init.sql](init.sql)** - PostgreSQL schema (deprecated - use Flyway migrations)
+- **[init.sql/ folder](init.sql/)** - Legacy initialization scripts
 
 ### Monitoring
-- **[prometheus.yml](prometheus.yml)** - Prometheus configuration
-  - Metrics scrape configuration
-  - Service targets
+- **[prometheus.yml](prometheus.yml)** - Prometheus metrics collection config
+
+### SSL/TLS
+- **[ssl/ folder](ssl/)** - SSL certificates for local development
+
+### Grafana
+- **[grafana/ folder](grafana/)** - Grafana provisioning and dashboards
 
 ---
 

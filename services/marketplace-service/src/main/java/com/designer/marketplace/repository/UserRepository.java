@@ -1,9 +1,15 @@
 package com.designer.marketplace.repository;
 
 import com.designer.marketplace.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -19,4 +25,23 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
 
     boolean existsByUsername(String username);
+    
+    // Admin dashboard queries
+    long countByRole(User.UserRole role);
+    
+    long countByCreatedAtAfter(LocalDateTime date);
+    
+    Page<User> findByRole(User.UserRole role, Pageable pageable);
+    
+    Page<User> findByIsActive(boolean isActive, Pageable pageable);
+    
+    Page<User> findByRoleAndIsActive(User.UserRole role, boolean isActive, Pageable pageable);
+    
+    @Query("SELECT u FROM User u WHERE LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')) " +
+           "OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :search, '%')) " +
+           "OR LOWER(u.username) LIKE LOWER(CONCAT('%', :search, '%'))")
+    Page<User> searchUsers(@Param("search") String search, Pageable pageable);
+    
+    @Query("SELECT u FROM User u ORDER BY u.createdAt DESC")
+    List<User> findRecentUsers(Pageable pageable);
 }
