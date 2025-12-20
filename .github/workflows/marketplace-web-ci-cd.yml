@@ -299,12 +299,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: frontend/marketplace-web/package-lock.json
+
+      - name: Remove old lockfile
+        working-directory: ./frontend/marketplace-web
+        run: rm -f package-lock.json
 
       - name: Install dependencies
         working-directory: ./frontend/marketplace-web
-        run: npm ci
+        run: npm install --legacy-peer-deps --no-audit --no-fund
 
       - name: Build and start server
         working-directory: ./frontend/marketplace-web
