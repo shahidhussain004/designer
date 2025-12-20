@@ -323,7 +323,10 @@ func (db *PostgresDB) GetMessages(ctx context.Context, threadID uuid.UUID, limit
 			msg.SenderAvatar = senderAvatar.String
 		}
 
-		json.Unmarshal(attachmentsJSON, &msg.Attachments)
+		if err := json.Unmarshal(attachmentsJSON, &msg.Attachments); err != nil {
+			// If attachments can't be parsed, log and continue with empty attachments
+			msg.Attachments = nil
+		}
 		messages = append(messages, msg)
 	}
 

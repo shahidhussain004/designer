@@ -192,7 +192,9 @@ func (c *Client) handleTyping(payload interface{}) {
 	}
 
 	// Update typing status in Redis
-	c.hub.redis.SetTyping(ctx, typing.ThreadID.String(), c.UserID, typing.IsTyping)
+	if err := c.hub.redis.SetTyping(ctx, typing.ThreadID.String(), c.UserID, typing.IsTyping); err != nil {
+		log.Printf("Failed to set typing in Redis: %v", err)
+	}
 
 	// Broadcast typing indicator
 	c.hub.SendTypingIndicator(typing.ThreadID, c.UserID, thread.Participants, typing.IsTyping)
@@ -278,7 +280,9 @@ func (c *Client) handleChatMessage(payload interface{}) {
 	}
 
 	// Clear typing indicator
-	c.hub.redis.SetTyping(ctx, msgRequest.ThreadID.String(), c.UserID, false)
+	if err := c.hub.redis.SetTyping(ctx, msgRequest.ThreadID.String(), c.UserID, false); err != nil {
+		log.Printf("Failed to clear typing indicator: %v", err)
+	}
 }
 
 // sendError sends an error message to the client

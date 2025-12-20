@@ -92,10 +92,14 @@ func (h *Hub) registerClient(client *Client) {
 
 	// Set user as online in Redis
 	ctx := context.Background()
-	h.redis.SetUserOnline(ctx, client.UserID, "available")
+	if err := h.redis.SetUserOnline(ctx, client.UserID, "available"); err != nil {
+		log.Printf("Failed to set user online in Redis: %v", err)
+	}
 
 	// Publish presence update
-	h.redis.PublishPresenceUpdate(ctx, client.UserID, true)
+	if err := h.redis.PublishPresenceUpdate(ctx, client.UserID, true); err != nil {
+		log.Printf("Failed to publish presence update: %v", err)
+	}
 
 	log.Printf("Client registered: user %d, total connections: %d", client.UserID, len(h.clients[client.UserID]))
 }
@@ -120,8 +124,12 @@ func (h *Hub) unregisterClient(client *Client) {
 				delete(h.clients, client.UserID)
 
 				ctx := context.Background()
-				h.redis.SetUserOffline(ctx, client.UserID)
-				h.redis.PublishPresenceUpdate(ctx, client.UserID, false)
+				if err := h.redis.SetUserOffline(ctx, client.UserID); err != nil {
+					log.Printf("Failed to set user offline in Redis: %v", err)
+				}
+				if err := h.redis.PublishPresenceUpdate(ctx, client.UserID, false); err != nil {
+					log.Printf("Failed to publish presence update: %v", err)
+				}
 			}
 
 			log.Printf("Client unregistered: user %d", client.UserID)

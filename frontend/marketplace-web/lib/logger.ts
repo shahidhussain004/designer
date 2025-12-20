@@ -16,7 +16,7 @@ interface LogContext {
 class Logger {
   private isDevelopment = process.env.NODE_ENV === 'development';
   private enableConsole = true;
-   private logHistory: Array<{
+  private logHistory: Array<{
     timestamp: string;
     level: LogLevel;
     message: string;
@@ -58,17 +58,25 @@ class Logger {
     message: string,
     context?: LogContext,
     error?: Error
-  ) {
+  ): {
+    timestamp: string;
+    level: LogLevel;
+    message: string;
+    context?: LogContext;
+    error?: { name: string; message: string; stack?: string };
+  } {
     const entry = {
       timestamp: this.getTimestamp(),
       level,
       message,
       context,
-      error: error ? {
-        name: error.name,
-        message: error.message,
-        stack: error.stack,
-      } : undefined,
+      error: error
+        ? {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+          }
+        : undefined,
     };
 
     // Add to history
@@ -159,7 +167,7 @@ class Logger {
   /**
    * Log API request
    */
-  apiRequest(method: string, url: string, data?: any) {
+  apiRequest(method: string, url: string, data?: unknown) {
     this.info(`API Request: ${method} ${url}`, {
       component: 'API',
       action: 'request',

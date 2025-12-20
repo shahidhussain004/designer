@@ -24,7 +24,6 @@ const (
 // Client wraps Redis client with messaging-specific methods
 type Client struct {
 	*redis.Client
-	pubsub *redis.PubSub
 }
 
 // NewClient creates a new Redis client
