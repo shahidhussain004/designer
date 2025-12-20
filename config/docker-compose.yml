@@ -160,45 +160,64 @@ services:
       retries: 5
 
   # Java Spring Boot Service (Port 8080)
-  # To be added once built locally
-  # java-service:
-  #   build:
-  #     context: ./services/marketplace-service
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "8080:8080"
-  #   environment:
-  #     SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/marketplace_db
-  #     SPRING_DATASOURCE_USERNAME: marketplace_user
-  #     SPRING_DATASOURCE_PASSWORD: marketplace_pass_dev
-  #     SPRING_REDIS_HOST: redis
-  #     SPRING_REDIS_PORT: 6379
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #     redis:
-  #       condition: service_healthy
-  #   networks:
-  #     - marketplace-network
+  marketplace-service:
+    build:
+      context: ../services/marketplace-service
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/marketplace_db
+      SPRING_DATASOURCE_USERNAME: marketplace_user
+      SPRING_DATASOURCE_PASSWORD: marketplace_pass_dev
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SPRING_DATA_MONGODB_URI: mongodb://mongo_user:mongo_pass_dev@mongodb:27017/lms_db?authSource=admin
+      JWT_SECRET: your-256-bit-secret-change-this-in-production-please-make-it-secure
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - marketplace-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   # Go Messaging Service (Port 8081)
-  # To be added in Phase 2
-  # go-service:
-  #   build:
-  #     context: ./services/messaging-service
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "8081:8081"
-  #   environment:
-  #     DATABASE_URL: postgres://marketplace_user:marketplace_pass_dev@postgres:5432/marketplace_db
-  #     REDIS_URL: redis://redis:6379
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #     redis:
-  #       condition: service_healthy
-  #   networks:
-  #     - marketplace-network
+  messaging-service:
+    build:
+      context: ../services/messaging-service
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      PORT: "8081"
+      DATABASE_URL: postgres://marketplace_user:marketplace_pass_dev@postgres:5432/marketplace_db?sslmode=disable
+      REDIS_URL: redis:6379
+      KAFKA_BROKERS: kafka:29092
+      JWT_SECRET: your-256-bit-secret-change-this-in-production-please-make-it-secure
+      ALLOWED_ORIGINS: http://localhost:3000,http://localhost:3001
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - marketplace-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   # .NET Core LMS Service (Port 8082)
   # To be added in Phase 3
