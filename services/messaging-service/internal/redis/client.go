@@ -29,10 +29,20 @@ type Client struct {
 
 // NewClient creates a new Redis client
 func NewClient(redisURL string) (*Client, error) {
-	// Parse Redis URL
-	opt, err := redis.ParseURL(redisURL)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse Redis URL: %w", err)
+	var opt *redis.Options
+	var err error
+
+	// Check if URL has a scheme, if not treat as host:port
+	if strings.HasPrefix(redisURL, "redis://") || strings.HasPrefix(redisURL, "rediss://") {
+		opt, err = redis.ParseURL(redisURL)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse Redis URL: %w", err)
+		}
+	} else {
+		// Treat as host:port
+		opt = &redis.Options{
+			Addr: redisURL,
+		}
 	}
 
 	client := redis.NewClient(opt)
