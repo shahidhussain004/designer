@@ -42,7 +42,7 @@ jobs:
 
       - name: Run ESLint
         working-directory: ./frontend/marketplace-web
-        run: npm run lint:ci
+        run: npx eslint . --ext .js,.jsx,.ts,.tsx --max-warnings 50
 
       - name: Check TypeScript types
         working-directory: ./frontend/marketplace-web
