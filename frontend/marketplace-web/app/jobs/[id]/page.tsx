@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { authService } from '@/lib/auth';
 import Link from 'next/link';
 import { User } from '@/types';
@@ -28,7 +28,6 @@ interface ProposalRequest {
 
 export default function JobDetailsPage() {
   const params = useParams();
-  const router = useRouter();
   const jobId = params.id as string;
 
   const [job, setJob] = useState<Job | null>(null);

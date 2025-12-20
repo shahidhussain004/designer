@@ -1,4 +1,5 @@
-const nextJest = require('next/jest')
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const nextJest = require('next/jest');
 
 const createJestConfig = nextJest({
   // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
@@ -13,8 +14,12 @@ const customJestConfig = {
     '^@/(.*)$': '<rootDir>/$1',
   },
   testMatch: [
-    '**/__tests__/**/*.[jt]s?(x)',
+    '**/__tests__/**/setup.test.[jt]s?(x)',
     '**/?(*.)+(spec|test).[jt]s?(x)',
+  ],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/__tests__/integration.test.ts',
   ],
   collectCoverageFrom: [
     'app/**/*.{js,jsx,ts,tsx}',

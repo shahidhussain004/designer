@@ -348,7 +348,7 @@ IN 6 MONTHS
 [ ] Verify services (10 min)
 [ ] Celebrate! 🎉
 ```
-
+ 
 ### Day 2 (Tomorrow) - Choose One
 ```
 [ ] Start Java Spring Boot backend

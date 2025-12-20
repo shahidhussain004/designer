@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/designer/messaging-service/internal/db"
 	"github.com/designer/messaging-service/internal/models"
@@ -411,21 +410,4 @@ messaging_service_up 1
 	}
 }
 
-// parseToken parses JWT token from Authorization header
-func parseToken(authHeader, secret string) (*jwt.Token, error) {
-	if authHeader == "" {
-		return nil, fmt.Errorf("no authorization header")
-	}
-
-	parts := strings.Split(authHeader, " ")
-	if len(parts) != 2 || parts[0] != "Bearer" {
-		return nil, fmt.Errorf("invalid authorization header format")
-	}
-
-	return jwt.Parse(parts[1], func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-		return []byte(secret), nil
-	})
-}
+// NOTE: parseToken removed - token parsing is handled inline where needed
