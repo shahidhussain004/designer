@@ -233,7 +233,7 @@ describe('Designer Marketplace API - Integration Tests', () => {
       const response = await api.get('/jobs?category=WEB_DEVELOPMENT');
 
       expect(Array.isArray(response.data)).toBe(true);
-      response.data.forEach((job: any) => {
+      response.data.forEach((job: TestJob) => {
         expect(job.category).toBe('WEB_DEVELOPMENT');
       });
     });
@@ -242,7 +242,7 @@ describe('Designer Marketplace API - Integration Tests', () => {
       const response = await api.get('/jobs?minBudget=1000&maxBudget=5000');
 
       expect(Array.isArray(response.data)).toBe(true);
-      response.data.forEach((job: any) => {
+      response.data.forEach((job: TestJob) => {
         expect(job.budget).toBeGreaterThanOrEqual(1000);
         expect(job.budget).toBeLessThanOrEqual(5000);
       });
@@ -306,7 +306,7 @@ describe('Designer Marketplace API - Integration Tests', () => {
       const response = await api.get('/jobs/my-jobs', getAuthHeader(clientUser.token!));
 
       expect(Array.isArray(response.data)).toBe(true);
-      response.data.forEach((job: any) => {
+      response.data.forEach((job: TestJob) => {
         expect(job.clientId).toBe(clientUser.id);
       });
     });
@@ -346,7 +346,7 @@ describe('Designer Marketplace API - Integration Tests', () => {
 
       expect(Array.isArray(response.data)).toBe(true);
       expect(response.data.length).toBeGreaterThan(0);
-      const proposal = response.data.find((p: any) => p.id === createdProposal.id);
+      const proposal = response.data.find((p: TestProposal) => p.id === createdProposal.id);
       expect(proposal).toBeDefined();
       expect(proposal.freelancerId).toBe(freelancerUser.id);
     });
@@ -358,7 +358,7 @@ describe('Designer Marketplace API - Integration Tests', () => {
       );
 
       expect(Array.isArray(response.data)).toBe(true);
-      const proposal = response.data.find((p: any) => p.id === createdProposal.id);
+      const proposal = response.data.find((p: TestProposal) => p.id === createdProposal.id);
       expect(proposal).toBeDefined();
       expect(proposal.freelancerId).toBe(freelancerUser.id);
     });
@@ -484,8 +484,9 @@ describe('Designer Marketplace API - Integration Tests', () => {
           getAuthHeader(freelancerUser.token!)
         );
         throw new Error('Should have thrown error');
-      } catch (error: any) {
-        expect(error.response?.status).toBe(403);
+      } catch (error) {
+        const axiosError = error as import('axios').AxiosError;
+        expect(axiosError.response?.status).toBe(403);
       }
     });
 
