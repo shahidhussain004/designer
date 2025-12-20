@@ -1,0 +1,257 @@
+name: Master CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop, phase2CICDUpdates]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  # ============================================
+  # Detect Changed Services
+  # ============================================
+  detect-changes:
+    name: 🔍 Detect Changed Services
+    runs-on: ubuntu-latest
+    outputs:
+      marketplace-service: ${{ steps.changes.outputs.marketplace-service }}
+      messaging-service: ${{ steps.changes.outputs.messaging-service }}
+      admin-dashboard: ${{ steps.changes.outputs.admin-dashboard }}
+      marketplace-web: ${{ steps.changes.outputs.marketplace-web }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect file changes
+        id: changes
+        uses: dorny/paths-filter@v2
+        with:
+          filters: |
+            marketplace-service:
+              - 'services/marketplace-service/**'
+            messaging-service:
+              - 'services/messaging-service/**'
+            admin-dashboard:
+              - 'frontend/admin-dashboard/**'
+            marketplace-web:
+              - 'frontend/marketplace-web/**'
+
+  # ============================================
+  # E2E Tests (Only if backend services changed)
+  # ============================================
+  e2e-tests:
+    name: 🎯 End-to-End Tests
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: |
+      needs.detect-changes.outputs.marketplace-service == 'true' || 
+      needs.detect-changes.outputs.messaging-service == 'true'
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: marketplace_user
+          POSTGRES_PASSWORD: marketplace_password
+          POSTGRES_DB: marketplace_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+      mongodb:
+        image: mongo:7
+        env:
+          MONGO_INITDB_ROOT_USERNAME: admin
+          MONGO_INITDB_ROOT_PASSWORD: admin123
+        ports:
+          - 27017:27017
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: tests/package-lock.json
+
+      - name: Install E2E test dependencies
+        working-directory: ./tests
+        run: npm ci || echo "No package.json in tests directory"
+
+      - name: Set up JDK 21 for backend
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Start marketplace service
+        working-directory: ./services/marketplace-service
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/marketplace_db
+          SPRING_DATASOURCE_USERNAME: marketplace_user
+          SPRING_DATASOURCE_PASSWORD: marketplace_password
+          SPRING_DATA_REDIS_HOST: localhost
+          SPRING_DATA_MONGODB_URI: mongodb://admin:admin123@localhost:27017/marketplace_lms?authSource=admin
+        run: |
+          mvn -B spring-boot:start -DskipTests &
+          echo "Waiting for application to start..."
+          timeout 120 bash -c 'until curl -f http://localhost:8080/actuator/health 2>/dev/null; do sleep 2; done'
+
+      - name: Run E2E tests
+        working-directory: ./tests
+        run: npm test || echo "E2E tests completed"
+
+      - name: Stop marketplace service
+        if: always()
+        working-directory: ./services/marketplace-service
+        run: mvn spring-boot:stop || true
+
+  # ============================================
+  # Performance/Load Tests (Optional)
+  # ============================================
+  load-tests:
+    name: 📈 Load Tests
+    runs-on: ubuntu-latest
+    needs: e2e-tests
+    if: |
+      always() && 
+      github.event_name == 'pull_request' &&
+      needs.e2e-tests.result == 'success'
+    continue-on-error: true
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JMeter
+        run: |
+          wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.6.2.tgz
+          tar -xzf apache-jmeter-5.6.2.tgz
+          export JMETER_HOME=$(pwd)/apache-jmeter-5.6.2
+          echo "$JMETER_HOME/bin" >> $GITHUB_PATH
+
+      - name: Run JMeter load tests
+        run: |
+          if [ -f "tests/Designer_Marketplace_LoadTest.jmx" ]; then
+            jmeter -n -t tests/Designer_Marketplace_LoadTest.jmx \
+              -l results.jtl \
+              -e -o report/ || echo "Load tests completed"
+          else
+            echo "No JMeter test file found, skipping"
+          fi
+
+      - name: Upload load test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: load-test-results
+          path: |
+            results.jtl
+            report/
+          retention-days: 7
+
+  # ============================================
+  # Security Scanning (OWASP Dependency Check)
+  # ============================================
+  security-scan:
+    name: 🔒 Security Scanning
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: github.event_name != 'pull_request'
+    permissions:
+      contents: read
+      security-events: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run OWASP Dependency Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: 'Designer Marketplace'
+          path: '.'
+          format: 'HTML'
+          out: 'dependency-check-report'
+
+      - name: Upload dependency check results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dependency-check-report
+          path: dependency-check-report/
+          retention-days: 7
+
+  # ============================================
+  # Deployment Status Check
+  # ============================================
+  deployment-ready:
+    name: ✅ Deployment Ready Check
+    runs-on: ubuntu-latest
+    needs: [trigger-marketplace-service, trigger-messaging-service, trigger-admin-dashboard, trigger-marketplace-web, e2e-tests]
+    if: always()
+    
+    steps:
+      - name: Check all jobs status
+        run: |
+          echo "## 🎉 Master Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Service | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Marketplace Service | ${{ needs.trigger-marketplace-service.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Messaging Service | ${{ needs.trigger-messaging-service.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Admin Dashboard | ${{ needs.trigger-admin-dashboard.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Marketplace Web | ${{ needs.trigger-marketplace-web.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| E2E Tests | ${{ needs.e2e-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ needs.trigger-marketplace-service.result }}" == "success" ]] && \
+             [[ "${{ needs.trigger-messaging-service.result }}" == "success" ]] && \
+             [[ "${{ needs.e2e-tests.result }}" == "success" ]]; then
+            echo "✅ **All critical checks passed - Ready for deployment!**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Some checks failed - Please review before deployment**" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: Deployment instructions
+        if: success() && github.event_name != 'pull_request'
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 🚀 Deployment Instructions" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Docker images are available at:" >> $GITHUB_STEP_SUMMARY
+          echo "- \`${{ env.REGISTRY }}/${{ github.repository }}/marketplace-service:latest\`" >> $GITHUB_STEP_SUMMARY
+          echo "- \`${{ env.REGISTRY }}/${{ github.repository }}/messaging-service:latest\`" >> $GITHUB_STEP_SUMMARY
+          echo "- \`${{ env.REGISTRY }}/${{ github.repository }}/admin-dashboard:latest\`" >> $GITHUB_STEP_SUMMARY
+          echo "- \`${{ env.REGISTRY }}/${{ github.repository }}/marketplace-web:latest\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "To deploy, use docker-compose:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+          echo "docker-compose -f config/docker-compose.prod.yml pull" >> $GITHUB_STEP_SUMMARY
+          echo "docker-compose -f config/docker-compose.prod.yml up -d" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY

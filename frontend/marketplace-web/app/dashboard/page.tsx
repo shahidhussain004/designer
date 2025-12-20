@@ -40,9 +40,9 @@ export default function DashboardPage() {
       try {
         const data = await getDashboardData();
         setDashboardData(data);
-      } catch (err: any) {
+      } catch (err) {
         console.error('Error fetching dashboard:', err);
-        setError(err.message || 'Failed to load dashboard');
+        setError(err instanceof Error ? err.message : 'Failed to load dashboard');
       } finally {
         setLoading(false);
       }
@@ -161,7 +161,7 @@ interface ClientDashboardProps {
 }
 
 function ClientDashboardContent({ data }: ClientDashboardProps) {
-  const { stats, activeJobs, recentProposals } = data;
+  const { stats, activeJobs } = data;
 
   return (
     <div className="space-y-6">
@@ -242,7 +242,7 @@ interface FreelancerDashboardProps {
 }
 
 function FreelancerDashboardContent({ data }: FreelancerDashboardProps) {
-  const { stats, myProposals, availableJobs } = data;
+  const { stats, availableJobs } = data;
 
   return (
     <div className="space-y-6">

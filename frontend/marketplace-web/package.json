@@ -6,9 +6,13 @@
     "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start -p 3001",
-    "lint": "next lint",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:ci": "eslint . --ext .js,.jsx,.ts,.tsx --max-warnings 50",
+    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "type-check": "tsc --noEmit",
-    "test": "jest --coverage --passWithNoTests",
+    "test": "jest --passWithNoTests",
+    "test:unit": "jest --passWithNoTests --coverage",
+    "test:integration": "jest --config jest.integration.config.js",
     "test:watch": "jest --watch"
   },
   "dependencies": {
