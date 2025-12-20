@@ -28,7 +28,6 @@ interface ProposalRequest {
 
 export default function JobDetailsPage() {
   const params = useParams();
-  const router = useRouter();
   const jobId = params.id as string;
 
   const [job, setJob] = useState<Job | null>(null);

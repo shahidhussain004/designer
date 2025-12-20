@@ -5,14 +5,8 @@ import { useRouter } from 'next/navigation';
 import { authService } from '@/lib/auth';
 import Link from 'next/link';
 
-interface User {
-  role: string;
-  id: number;
-}
-
 export default function CreateJobPage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +25,7 @@ export default function CreateJobPage() {
       router.push('/auth/login');
       return;
     }
-    setUser(currentUser);
+    // Remove: setUser(currentUser);
     setLoading(false);
   }, [router]);
 

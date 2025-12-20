@@ -10,13 +10,23 @@ interface LogContext {
   component?: string;
   action?: string;
   userId?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 class Logger {
   private isDevelopment = process.env.NODE_ENV === 'development';
   private enableConsole = true;
-  private logHistory: any[] = [];
+   private logHistory: Array<{
+    timestamp: string;
+    level: LogLevel;
+    message: string;
+    context?: LogContext;
+    error?: {
+      name: string;
+      message: string;
+      stack?: string;
+    };
+  }> = [];
   private maxHistorySize = 100;
 
   /**
