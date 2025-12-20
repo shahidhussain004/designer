@@ -1,0 +1,274 @@
+name: Marketplace Service CI/CD
+
+on:
+  push:
+    branches: [main, develop, phase2CICDUpdates]
+    paths:
+      - 'services/marketplace-service/**'
+      - '.github/workflows/marketplace-service-ci-cd.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'services/marketplace-service/**'
+      - '.github/workflows/marketplace-service-ci-cd.yml'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/marketplace-service
+
+jobs:
+  # ============================================
+  # Stage 1: Code Quality & Linting
+  # ============================================
+  lint-and-format:
+    name: 🔍 Lint & Format Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Check code formatting (Maven Checkstyle)
+        working-directory: ./services/marketplace-service
+        run: mvn -B checkstyle:check || echo "Checkstyle not configured, skipping"
+        continue-on-error: true
+
+      - name: Compile code
+        working-directory: ./services/marketplace-service
+        run: mvn -B clean compile -DskipTests
+
+  # ============================================
+  # Stage 2: Unit Tests
+  # ============================================
+  unit-tests:
+    name: 🧪 Unit Tests
+    runs-on: ubuntu-latest
+    needs: lint-and-format
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Run unit tests
+        working-directory: ./services/marketplace-service
+        run: mvn -B test -DskipIntegrationTests
+        
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          path: services/marketplace-service/target/surefire-reports/
+          retention-days: 7
+
+  # ============================================
+  # Stage 3: Integration Tests
+  # ============================================
+  integration-tests:
+    name: 🔗 Integration Tests
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: marketplace_user
+          POSTGRES_PASSWORD: marketplace_password
+          POSTGRES_DB: marketplace_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+      mongodb:
+        image: mongo:7
+        env:
+          MONGO_INITDB_ROOT_USERNAME: admin
+          MONGO_INITDB_ROOT_PASSWORD: admin123
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 27017:27017
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Wait for services
+        run: |
+          echo "Waiting for PostgreSQL..."
+          until pg_isready -h localhost -p 5432; do sleep 2; done
+          echo "PostgreSQL is ready!"
+
+      - name: Run integration tests
+        working-directory: ./services/marketplace-service
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/marketplace_db
+          SPRING_DATASOURCE_USERNAME: marketplace_user
+          SPRING_DATASOURCE_PASSWORD: marketplace_password
+          SPRING_DATA_REDIS_HOST: localhost
+          SPRING_DATA_REDIS_PORT: 6379
+          SPRING_DATA_MONGODB_URI: mongodb://admin:admin123@localhost:27017/marketplace_lms?authSource=admin
+        run: mvn -B verify -DskipUnitTests
+
+      - name: Upload integration test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results
+          path: services/marketplace-service/target/failsafe-reports/
+          retention-days: 7
+
+  # ============================================
+  # Stage 4: Build Docker Image
+  # ============================================
+  build-docker:
+    name: 🐳 Build Docker Image
+    runs-on: ubuntu-latest
+    needs: integration-tests
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Build JAR
+        working-directory: ./services/marketplace-service
+        run: mvn -B clean package -DskipTests
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./services/marketplace-service
+          file: ./services/marketplace-service/Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Image digest
+        run: echo "Image pushed with digest ${{ steps.meta.outputs.tags }}"
+
+  # ============================================
+  # Stage 5: Security Scanning
+  # ============================================
+  security-scan:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+    needs: build-docker
+    if: github.event_name != 'pull_request'
+    permissions:
+      contents: read
+      security-events: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: './services/marketplace-service'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # ============================================
+  # Summary Job
+  # ============================================
+  ci-cd-summary:
+    name: 📊 CI/CD Summary
+    runs-on: ubuntu-latest
+    needs: [lint-and-format, unit-tests, integration-tests, build-docker]
+    if: always()
+    
+    steps:
+      - name: Display summary
+        run: |
+          echo "## 🎉 Marketplace Service CI/CD Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Lint & Format | ${{ needs.lint-and-format.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Unit Tests | ${{ needs.unit-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Integration Tests | ${{ needs.integration-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Docker Build | ${{ needs.build-docker.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Actor:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY

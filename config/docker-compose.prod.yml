@@ -1,17 +1,21 @@
 # Production Docker Compose for Designer Marketplace Platform
 # Use with: docker-compose -f docker-compose.prod.yml up -d
+# 
+# Prerequisites:
+# 1. Set environment variables in .env file
+# 2. Authenticate to GHCR: echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
+# 3. Pull latest images: docker-compose -f docker-compose.prod.yml pull
+# 4. Start services: docker-compose -f docker-compose.prod.yml up -d
 
 version: '3.8'
 
 services:
   # ==========================================================================
-  # Core Application
+  # Core Application Services
   # ==========================================================================
   
   marketplace-api:
-    build:
-      context: ../services/marketplace-service
-      dockerfile: Dockerfile
+    image: ${MARKETPLACE_IMAGE:-ghcr.io/OWNER/REPO/marketplace-service:latest}
     container_name: marketplace-api
     restart: unless-stopped
     environment:
@@ -68,6 +72,97 @@ services:
         reservations:
           cpus: '0.5'
           memory: 512M
+
+  # Messaging Service (WebSocket, Real-time chat)
+  messaging-service:
+    image: ${MESSAGING_IMAGE:-ghcr.io/OWNER/REPO/messaging-service:latest}
+    container_name: messaging-service
+    restart: unless-stopped
+    environment:
+      PORT: 8081
+      DATABASE_URL: postgres://${DB_USER:-marketplace_user}:${DB_PASSWORD}@postgres:5432/marketplace_db?sslmode=disable
+      REDIS_URL: redis:6379
+      KAFKA_BROKERS: kafka:29092
+      JWT_SECRET: ${JWT_SECRET}
+      ALLOWED_ORIGINS: https://yourdomain.com,https://admin.yourdomain.com
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    networks:
+      - marketplace-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+  # Admin Dashboard (React SPA)
+  admin-dashboard:
+    image: ${ADMIN_DASHBOARD_IMAGE:-ghcr.io/OWNER/REPO/admin-dashboard:latest}
+    container_name: admin-dashboard
+    restart: unless-stopped
+    ports:
+      - "3001:80"
+    depends_on:
+      - marketplace-api
+    networks:
+      - marketplace-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+
+  # Marketplace Web (Next.js)
+  marketplace-web:
+    image: ${MARKETPLACE_WEB_IMAGE:-ghcr.io/OWNER/REPO/marketplace-web:latest}
+    container_name: marketplace-web
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: https://api.yourdomain.com
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    depends_on:
+      - marketplace-api
+    networks:
+      - marketplace-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
 
   # ==========================================================================
   # Databases
@@ -204,6 +299,9 @@ services:
       - nginx_logs:/var/log/nginx
     depends_on:
       - marketplace-api
+      - messaging-service
+      - admin-dashboard
+      - marketplace-web
     networks:
       - marketplace-network
     deploy:
