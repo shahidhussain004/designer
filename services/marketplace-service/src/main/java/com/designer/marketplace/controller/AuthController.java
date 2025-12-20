@@ -1,24 +1,39 @@
 package com.designer.marketplace.controller;
 
 import com.designer.marketplace.dto.*;
+import com.designer.marketplace.security.LoginAttemptService;
+import com.designer.marketplace.security.SecurityAuditService;
 import com.designer.marketplace.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * Authentication REST Controller
  * Endpoints: /api/auth/*
+ * Enhanced with security features: brute force protection, audit logging
  */
-@Slf4j
 @RestController
 @RequestMapping("/api/auth")
-@RequiredArgsConstructor
 public class AuthController {
 
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
+    
     private final AuthService authService;
+    private final LoginAttemptService loginAttemptService;
+    private final SecurityAuditService securityAuditService;
+    
+    public AuthController(AuthService authService, 
+                         LoginAttemptService loginAttemptService,
+                         SecurityAuditService securityAuditService) {
+        this.authService = authService;
+        this.loginAttemptService = loginAttemptService;
+        this.securityAuditService = securityAuditService;
+    }
 
     /**
      * TEMP TEST - Simple health check
@@ -34,10 +49,19 @@ public class AuthController {
      * Register a new user
      */
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request,
+                                                 HttpServletRequest httpRequest) {
+        String clientIp = getClientIp(httpRequest);
         log.info("==== POST /api/auth/register called - Email: {}, Username: {}, Role: {} ====",
                 request.getEmail(), request.getUsername(), request.getRole());
+        
         AuthResponse response = authService.register(request);
+        
+        securityAuditService.logRegistration(
+                response.getUser().getId(), 
+                response.getUser().getEmail(), 
+                clientIp);
+        
         log.info("==== Registration successful for user: {} ====", response.getUser().getUsername());
         return ResponseEntity.ok(response);
     }
@@ -45,13 +69,57 @@ public class AuthController {
     /**
      * POST /api/auth/login
      * Login user and return JWT tokens
+     * Includes brute force protection
      */
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
-        log.info("==== POST /api/auth/login called - EmailOrUsername: {} ====", request.getEmailOrUsername());
-        AuthResponse response = authService.login(request);
-        log.info("==== Login successful for user: {} ====", response.getUser().getUsername());
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request,
+                                   HttpServletRequest httpRequest) {
+        String clientIp = getClientIp(httpRequest);
+        String loginKey = request.getEmailOrUsername().toLowerCase();
+        
+        log.info("==== POST /api/auth/login called - EmailOrUsername: {} from IP: {} ====", 
+                request.getEmailOrUsername(), clientIp);
+        
+        // Check if account is locked due to failed attempts
+        if (loginAttemptService.isBlocked(loginKey)) {
+            log.warn("Login attempt for locked account: {}", loginKey);
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                    .body(new ErrorResponse("Account temporarily locked due to too many failed attempts. Please try again later."));
+        }
+        
+        // Check if IP is blocked
+        if (loginAttemptService.isIpBlocked(clientIp)) {
+            log.warn("Login attempt from blocked IP: {}", clientIp);
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                    .body(new ErrorResponse("Too many failed attempts from this location. Please try again later."));
+        }
+        
+        try {
+            AuthResponse response = authService.login(request);
+            
+            // Successful login - reset failed attempts
+            loginAttemptService.loginSucceeded(loginKey);
+            securityAuditService.logLoginSuccess(
+                    response.getUser().getId(), 
+                    response.getUser().getEmail(), 
+                    clientIp);
+            
+            log.info("==== Login successful for user: {} ====", response.getUser().getUsername());
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            // Failed login - record attempt
+            loginAttemptService.loginFailed(loginKey, clientIp);
+            securityAuditService.logLoginFailure(loginKey, e.getMessage(), clientIp);
+            
+            int remaining = loginAttemptService.getRemainingAttempts(loginKey);
+            String message = remaining > 0 
+                    ? "Invalid credentials. " + remaining + " attempts remaining."
+                    : "Account locked due to too many failed attempts.";
+            
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse(message));
+        }
     }
 
     /**
@@ -64,5 +132,35 @@ public class AuthController {
         AuthResponse response = authService.refreshToken(request.getRefreshToken());
         log.info("==== Token refresh successful ====");
         return ResponseEntity.ok(response);
+    }
+    
+    /**
+     * Extract client IP address, handling proxies
+     */
+    private String getClientIp(HttpServletRequest request) {
+        String xForwardedFor = request.getHeader("X-Forwarded-For");
+        if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
+            return xForwardedFor.split(",")[0].trim();
+        }
+        String xRealIp = request.getHeader("X-Real-IP");
+        if (xRealIp != null && !xRealIp.isEmpty()) {
+            return xRealIp;
+        }
+        return request.getRemoteAddr();
+    }
+    
+    /**
+     * Simple error response DTO
+     */
+    public static class ErrorResponse {
+        private String error;
+        
+        public ErrorResponse(String error) {
+            this.error = error;
+        }
+        
+        public String getError() {
+            return error;
+        }
     }
 }

@@ -1,8 +1,8 @@
 {
-  "dashboard": {
-    "title": "Marketplace Backend Metrics",
-    "tags": ["marketplace", "spring-boot", "backend"],
-    "timezone": "browser",
+  "uid": "marketplace-backend",
+  "title": "Marketplace Backend Metrics",
+  "tags": ["marketplace", "spring-boot", "backend"],
+  "timezone": "browser",
     "panels": [
       {
         "id": 1,
@@ -82,13 +82,10 @@
             "expr": "process_cpu_usage{application=\"marketplace-service\"}",
             "legendFormat": "Process CPU"
           }
-        ]
-      }
     ],
     "refresh": "10s",
     "time": {
       "from": "now-15m",
       "to": "now"
     }
-  }
 }

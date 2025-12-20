@@ -185,6 +185,7 @@ public class ProposalService {
     /**
      * Check if user is owner of the proposal
      */
+    @Transactional(readOnly = true)
     public boolean isProposalOwner(Long proposalId) {
         Proposal proposal = proposalRepository.findById(proposalId)
                 .orElseThrow(() -> new RuntimeException("Proposal not found with id: " + proposalId));
@@ -195,6 +196,7 @@ public class ProposalService {
     /**
      * Check if user is owner of the job associated with the proposal
      */
+    @Transactional(readOnly = true)
     public boolean isJobOwnerForProposal(Long proposalId) {
         Proposal proposal = proposalRepository.findById(proposalId)
                 .orElseThrow(() -> new RuntimeException("Proposal not found with id: " + proposalId));

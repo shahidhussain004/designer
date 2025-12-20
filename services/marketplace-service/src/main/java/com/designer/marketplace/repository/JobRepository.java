@@ -54,4 +54,10 @@ public interface JobRepository extends JpaRepository<Job, Long> {
     List<Job> findTopByClientIdAndStatusIn(@Param("clientId") Long clientId,
             @Param("statuses") List<Job.JobStatus> statuses,
             Pageable pageable);
+    
+    // Admin queries
+    long countByStatus(Job.JobStatus status);
+    
+    @Query(value = "SELECT j FROM Job j ORDER BY j.createdAt DESC")
+    List<Job> findRecentJobs(Pageable pageable);
 }
