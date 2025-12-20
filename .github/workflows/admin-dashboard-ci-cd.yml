@@ -134,6 +134,7 @@ jobs:
           name: test-results
           path: frontend/admin-dashboard/coverage/
           retention-days: 7
+          if-no-files-found: ignore
 
   # ============================================
   # Stage 4: Build Docker Image (Optional)

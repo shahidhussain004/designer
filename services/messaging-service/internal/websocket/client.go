@@ -57,12 +57,18 @@ func (c *Client) ReadPump() {
 	}()
 
 	c.conn.SetReadLimit(maxMessageSize)
-	c.conn.SetReadDeadline(time.Now().Add(pongWait))
+	if err := c.conn.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
+		log.Printf("Failed to set read deadline: %v", err)
+	}
 	c.conn.SetPongHandler(func(string) error {
-		c.conn.SetReadDeadline(time.Now().Add(pongWait))
+		if err := c.conn.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
+			log.Printf("Failed to set read deadline in pong handler: %v", err)
+		}
 		// Refresh presence TTL on pong
 		ctx := context.Background()
-		c.hub.redis.RefreshPresence(ctx, c.UserID)
+		if err := c.hub.redis.RefreshPresence(ctx, c.UserID); err != nil {
+			log.Printf("Failed to refresh presence: %v", err)
+		}
 		return nil
 	})
 
@@ -90,7 +96,10 @@ func (c *Client) WritePump() {
 	for {
 		select {
 		case message, ok := <-c.send:
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			if err := c.conn.SetWriteDeadline(time.Now().Add(writeWait)); err != nil {
+				log.Printf("Failed to set write deadline: %v", err)
+				return
+			}
 			if !ok {
 				// The hub closed the channel
 				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
@@ -101,13 +110,24 @@ func (c *Client) WritePump() {
 			if err != nil {
 				return
 			}
-			w.Write(message)
+			if _, err := w.Write(message); err != nil {
+				log.Printf("Failed to write message: %v", err)
+				return
+			}
 
 			// Add queued messages to the current WebSocket message
 			n := len(c.send)
 			for i := 0; i < n; i++ {
-				w.Write([]byte{'\n'})
-				w.Write(<-c.send)
+				if _, err := w.Write([]byte{'\n'}); err != nil {
+					log.Printf("Failed to write newline: %v", err)
+					w.Close()
+					return
+				}
+				if _, err := w.Write(<-c.send); err != nil {
+					log.Printf("Failed to write queued message: %v", err)
+					w.Close()
+					return
+				}
 			}
 
 			if err := w.Close(); err != nil {
@@ -115,7 +135,10 @@ func (c *Client) WritePump() {
 			}
 
 		case <-ticker.C:
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			if err := c.conn.SetWriteDeadline(time.Now().Add(writeWait)); err != nil {
+				log.Printf("Failed to set write deadline: %v", err)
+				return
+			}
 			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
 			}
@@ -127,6 +150,7 @@ func (c *Client) WritePump() {
 func (c *Client) handleMessage(data []byte) {
 	var wsMessage models.WSMessage
 	if err := json.Unmarshal(data, &wsMessage); err != nil {
+		log.Printf("Failed to unmarshal message: %v", err)
 		c.sendError("Invalid message format")
 		return
 	}

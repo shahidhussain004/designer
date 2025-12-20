@@ -100,8 +100,7 @@ jobs:
           path: |
             frontend/marketplace-web/.next/
             frontend/marketplace-web/public/
-          retention-days: 7
-
+          retention-days: 7          if-no-files-found: ignore
   # ============================================
   # Stage 3: Unit Tests
   # ============================================

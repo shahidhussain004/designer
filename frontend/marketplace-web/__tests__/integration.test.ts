@@ -70,11 +70,20 @@ function getAuthHeader(token: string) {
 }
 
 // Test Suites
+interface TestProposal {
+  id?: number;
+  jobId: number;
+  freelancerId: number;
+  bidAmount: number;
+  coverLetter: string;
+  estimatedDays: number;
+}
+
 describe('Designer Marketplace API - Integration Tests', () => {
   let clientUser: TestUser;
   let freelancerUser: TestUser;
   let createdJob: TestJob;
-  let createdProposal: any;
+  let createdProposal: TestProposal;
 
   // Setup
   beforeAll(async () => {
@@ -148,8 +157,9 @@ describe('Designer Marketplace API - Integration Tests', () => {
           password: 'wrongpassword',
         });
         throw new Error('Should have thrown error');
-      } catch (error: any) {
-        expect(error.response?.status).toBe(401);
+      } catch (error) {
+        const axiosError = error as import('axios').AxiosError;
+        expect(axiosError.response?.status).toBe(401);
       }
     });
 
@@ -439,8 +449,9 @@ describe('Designer Marketplace API - Integration Tests', () => {
       try {
         await api.get('/users/me');
         throw new Error('Should have thrown error');
-      } catch (error: any) {
-        expect(error.response?.status).toBe(403);
+      } catch (error) {
+        const axiosError = error as import('axios').AxiosError;
+        expect(axiosError.response?.status).toBe(403);
       }
     });
 
@@ -452,7 +463,8 @@ describe('Designer Marketplace API - Integration Tests', () => {
           },
         });
         throw new Error('Should have thrown error');
-      } catch (error: any) {
+      } catch (error) {
+        const axiosError = error as import('axios').AxiosError;
         expect(error.response?.status).toBe(403);
       }
     });
@@ -494,8 +506,9 @@ describe('Designer Marketplace API - Integration Tests', () => {
       try {
         await api.get('/jobs/999999');
         throw new Error('Should have thrown error');
-      } catch (error: any) {
-        expect(error.response?.status).toBe(403);
+      } catch (error) {
+        const axiosError = error as import('axios').AxiosError;
+        expect(axiosError.response?.status).toBe(403);
       }
     });
 
@@ -507,8 +520,9 @@ describe('Designer Marketplace API - Integration Tests', () => {
           getAuthHeader(clientUser.token!)
         );
         throw new Error('Should have thrown error');
-      } catch (error: any) {
-        expect(error.response?.status).toBeGreaterThanOrEqual(400);
+      } catch (error) {
+        const axiosError = error as import('axios').AxiosError;
+        expect(axiosError.response?.status).toBeGreaterThanOrEqual(400);
       }
     });
 
@@ -516,8 +530,9 @@ describe('Designer Marketplace API - Integration Tests', () => {
       try {
         await registerUser(clientUser);
         throw new Error('Should have thrown error');
-      } catch (error: any) {
-        expect(error.response?.status).toBeGreaterThanOrEqual(400);
+      } catch (error) {
+        const axiosError = error as import('axios').AxiosError;
+        expect(axiosError.response?.status).toBeGreaterThanOrEqual(400);
       }
     });
   });

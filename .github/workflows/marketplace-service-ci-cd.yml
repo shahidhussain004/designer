@@ -74,6 +74,7 @@ jobs:
           name: unit-test-results
           path: services/marketplace-service/target/surefire-reports/
           retention-days: 7
+          if-no-files-found: ignore
 
   # ============================================
   # Stage 3: Integration Tests
@@ -156,6 +157,7 @@ jobs:
           name: integration-test-results
           path: services/marketplace-service/target/failsafe-reports/
           retention-days: 7
+          if-no-files-found: ignore
 
   # ============================================
   # Stage 4: Build Docker Image
