@@ -25,7 +25,7 @@ Successfully implemented **comprehensive CI/CD pipelines** for the Designer Mark
 
 ### **1. Service-Specific CI/CD Pipelines**
 
-#### **Marketplace Service** (`marketplace-service-ci-cd.yml`)
+#### **Marketplace Service** (`marketplace-service.yml`)
 - **Language:** Java 21 + Spring Boot 3.3.0
 - **Build Tool:** Maven
 - **Stages:**
@@ -37,7 +37,7 @@ Successfully implemented **comprehensive CI/CD pipelines** for the Designer Mark
 - **Total Time:** ~16 minutes
 - **Docker Image:** `ghcr.io/{owner}/{repo}/marketplace-service:latest`
 
-#### **Messaging Service** (`messaging-service-ci-cd.yml`)
+#### **Messaging Service** (`marketplace-messaging-service.yml`)
 - **Language:** Go 1.21
 - **Stages:**
   1. Lint & Format (1 min) - golangci-lint, gofmt, go vet
@@ -60,7 +60,7 @@ Successfully implemented **comprehensive CI/CD pipelines** for the Designer Mark
 - **Total Time:** ~8 minutes
 - **Docker Image:** `ghcr.io/{owner}/{repo}/admin-dashboard:latest`
 
-#### **Marketplace Web** (`marketplace-web-ci-cd.yml`)
+#### **Marketplace Web** (`marketplace-web.yml`)
 - **Language:** TypeScript + Next.js
 - **Stages:**
   1. Lint & Format (1 min) - ESLint, TypeScript
