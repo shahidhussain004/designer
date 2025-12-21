@@ -1,16 +1,16 @@
-name: Marketplace Service CI/CD
+name: Marketplace Service
 
 on:
   push:
     branches: [main, develop, phase2CICDUpdates]
     paths:
       - 'services/marketplace-service/**'
-      - '.github/workflows/marketplace-service-ci-cd.yml'
+      - '.github/workflows/marketplace-service.yml'
   pull_request:
     branches: [main, develop]
     paths:
       - 'services/marketplace-service/**'
-      - '.github/workflows/marketplace-service-ci-cd.yml'
+      - '.github/workflows/marketplace-service.yml'
 
 env:
   REGISTRY: ghcr.io
@@ -262,7 +262,7 @@ jobs:
     steps:
       - name: Display summary
         run: |
-          echo "## 🎉 Marketplace Service CI/CD Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## 🎉 Marketplace Service Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY

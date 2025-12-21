@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import PWARegister from './PWARegister'
@@ -9,16 +9,17 @@ export const metadata: Metadata = {
   title: 'Designer Marketplace - Find Freelance Talent',
   description: 'Connect with top designers and developers for your projects',
   manifest: '/manifest.json',
-  themeColor: '#3B82F6',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-  },
   icons: {
     icon: '/favicon.ico',
     apple: '/icon-192.png',
   },
+}
+
+export const viewport: Viewport = {
+  themeColor: '#3B82F6',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
 }
 
 export default function RootLayout({

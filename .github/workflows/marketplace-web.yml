@@ -5,12 +5,12 @@ on:
     branches: [main, develop, phase2CICDUpdates]
     paths:
       - 'frontend/marketplace-web/**'
-      - '.github/workflows/marketplace-web-ci-cd.yml'
+      - '.github/workflows/marketplace-web.yml'
   pull_request:
     branches: [main, develop]
     paths:
       - 'frontend/marketplace-web/**'
-      - '.github/workflows/marketplace-web-ci-cd.yml'
+      - '.github/workflows/marketplace-web.yml'
 
 env:
   NODE_VERSION: '20'
