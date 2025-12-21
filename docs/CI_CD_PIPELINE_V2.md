@@ -160,7 +160,7 @@ Tags:
 
 ### 3. Messaging Service Pipeline
 
-**File:** `.github/workflows/marketplace-messaging-service-ci-cd.yml`  
+**File:** `.github/workflows/messaging-service-ci-cd.yml`  
 **Language:** Go 1.21  
 **Type:** WebSocket + Kafka Consumer
 

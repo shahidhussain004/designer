@@ -99,7 +99,7 @@
      - Trivy security scan
      - Execution: ~16 minutes
 
-  2. **Messaging Service** (`marketplace-messaging-service-ci-cd.yml`)
+  2. **Messaging Service** (`messaging-service-ci-cd.yml`)
      - Go linting (golangci-lint)
      - Unit tests with race detector
      - Integration tests (Kafka, Redis, PostgreSQL)
