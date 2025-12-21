@@ -1,16 +1,16 @@
-name: Messaging Service CI/CD
+name: Marketplace Messaging Service
 
 on:
   push:
     branches: [main, develop, phase2CICDUpdates]
     paths:
       - 'services/messaging-service/**'
-      - '.github/workflows/messaging-service-ci-cd.yml'
+      - '.github/workflows/marketplace-messaging-service.yml'
   pull_request:
     branches: [main, develop]
     paths:
       - 'services/messaging-service/**'
-      - '.github/workflows/messaging-service-ci-cd.yml'
+      - '.github/workflows/marketplace-messaging-service.yml'
 
 env:
   REGISTRY: ghcr.io
@@ -326,7 +326,7 @@ jobs:
     steps:
       - name: Display summary
         run: |
-          echo "## 🎉 Messaging Service CI/CD Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## 🎉 Marketplace Messaging Service Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY

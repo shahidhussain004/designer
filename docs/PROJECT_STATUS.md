@@ -92,14 +92,14 @@
   - Deployment validation
 
 - **Service-Specific Pipelines:**
-  1. **Marketplace Service** (`marketplace-service-ci-cd.yml`)
+  1. **Marketplace Service** (`marketplace-service.yml`)
      - Maven build & test
      - PostgreSQL/Redis/MongoDB integration
      - Docker build & push to GHCR
      - Trivy security scan
      - Execution: ~16 minutes
 
-  2. **Messaging Service** (`messaging-service-ci-cd.yml`)
+  2. **Messaging Service** (`marketplace-messaging-service.yml`)
      - Go linting (golangci-lint)
      - Unit tests with race detector
      - Integration tests (Kafka, Redis, PostgreSQL)
@@ -114,7 +114,7 @@
      - Nginx-based Docker image
      - Execution: ~8 minutes
 
-  4. **Marketplace Web** (`marketplace-web-ci-cd.yml`)
+  4. **Marketplace Web** (`marketplace-web.yml`)
      - Next.js build
      - TypeScript checking
      - Lighthouse performance audit
