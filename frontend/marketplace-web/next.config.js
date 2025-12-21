@@ -20,7 +20,7 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['@tanstack/react-query', 'axios', 'zustand', 'jwt-decode'],
   },
-  webpack: (config, { isServer }) => {
+  webpack: (config, { _isServer }) => {
     // Enable code splitting for better chunk optimization
     config.optimization.splitChunks.cacheGroups = {
       ...config.optimization.splitChunks.cacheGroups,
