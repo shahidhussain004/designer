@@ -69,7 +69,7 @@ KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 JWT_SECRET: your-secret-key
 ```
 
-### 3. Messaging Service Pipeline (`marketplace-messaging-service-ci-cd.yml`)
+### 3. Messaging Service Pipeline (`messaging-service-ci-cd.yml`)
 
 **Purpose:** Build, test, and package Go WebSocket service
 
