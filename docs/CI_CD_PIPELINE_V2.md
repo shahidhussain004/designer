@@ -228,7 +228,7 @@ Push To: ghcr.io/{owner}/{repo}/messaging-service:latest
 
 ### 4. Admin Dashboard Pipeline
 
-**File:** `.github/workflows/admin-dashboard-ci-cd.yml`  
+**File:** `.github/workflows/marketplace-admin-dashboard-ci-cd.yml`  
 **Language:** TypeScript + React  
 **Build Tool:** Vite
 

@@ -107,7 +107,7 @@
      - Gosec security scan
      - Execution: ~14 minutes
 
-  3. **Admin Dashboard** (`admin-dashboard-ci-cd.yml`)
+  3. **Admin Dashboard** (`marketplace-admin-dashboard-ci-cd.yml`)
      - TypeScript checking
      - Vite production build
      - Jest tests
