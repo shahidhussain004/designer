@@ -1,16 +1,16 @@
-name: Marketplace Web CI/CD
+name: Web UI ClientCI/CD Pipeline
 
 on:
   push:
     branches: [main, develop, phase2CICDUpdates]
     paths:
       - 'frontend/marketplace-web/**'
-      - '.github/workflows/marketplace-web.yml'
+      - '.github/workflows/web-ui-client-ci-cd.yml'
   pull_request:
     branches: [main, develop]
     paths:
       - 'frontend/marketplace-web/**'
-      - '.github/workflows/marketplace-web.yml'
+      - '.github/workflows/web-ui-client-ci-cd.yml'
 
 env:
   NODE_VERSION: '20'
@@ -336,7 +336,7 @@ jobs:
     steps:
       - name: Display summary
         run: |
-          echo "## 🎉 Marketplace Web CI/CD Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## 🎉 Marketplace Web Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY

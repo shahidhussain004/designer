@@ -49,7 +49,7 @@ def display_transitions(transitions_data: dict):
     print("\n" + "="*60)
     print("UPDATE YOUR WORKFLOW")
     print("="*60)
-    print("\nIn .github/workflows/jira-ticket-status-transitions.yml, update the transition IDs:")
+    print("\nIn .github/workflows/jira-ticket-status-transitions-ci-cd.yml, update the transition IDs:")
     print("\nExample:")
     for t in transitions:
         status_name = t.get("to", {}).get("name", "").replace(" ", "")
@@ -80,7 +80,7 @@ def main():
         display_transitions(transitions)
         
         print("\n💡 TIP: Copy the transition IDs and update your workflow file:")
-        print("   .github/workflows/jira-ticket-status-transitions.yml")
+        print("   .github/workflows/jira-ticket-status-transitions-ci-cd.yml")
         print("\n✓ Done!")
     else:
         print("✗ Could not fetch transitions")
