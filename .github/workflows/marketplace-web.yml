@@ -1,4 +1,4 @@
-name: Marketplace Web CI/CD
+name: Marketplace Web
 
 on:
   push:
@@ -336,7 +336,7 @@ jobs:
     steps:
       - name: Display summary
         run: |
-          echo "## 🎉 Marketplace Web CI/CD Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## 🎉 Marketplace Web Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
