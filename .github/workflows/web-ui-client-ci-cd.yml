@@ -1,16 +1,16 @@
-name: Marketplace Web
+name: Web UI ClientCI/CD Pipeline
 
 on:
   push:
     branches: [main, develop, phase2CICDUpdates]
     paths:
       - 'frontend/marketplace-web/**'
-      - '.github/workflows/marketplace-web.yml'
+      - '.github/workflows/web-ui-client-ci-cd.yml'
   pull_request:
     branches: [main, develop]
     paths:
       - 'frontend/marketplace-web/**'
-      - '.github/workflows/marketplace-web.yml'
+      - '.github/workflows/web-ui-client-ci-cd.yml'
 
 env:
   NODE_VERSION: '20'

@@ -1,16 +1,16 @@
-name: Marketplace Service
+name: Web Service CI/CD Pipeline
 
 on:
   push:
     branches: [main, develop, phase2CICDUpdates]
     paths:
       - 'services/marketplace-service/**'
-      - '.github/workflows/marketplace-service.yml'
+      - '.github/workflows/web-service-ci-cd.yml'
   pull_request:
     branches: [main, develop]
     paths:
       - 'services/marketplace-service/**'
-      - '.github/workflows/marketplace-service.yml'
+      - '.github/workflows/web-service-ci-cd.yml'
 
 env:
   REGISTRY: ghcr.io

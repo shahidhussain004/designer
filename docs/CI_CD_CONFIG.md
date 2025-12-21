@@ -30,7 +30,7 @@ This document provides comprehensive configuration details for the Designer Mark
 5. **security-scan** - OWASP dependency check
 6. **deployment-ready** - Final status check
 
-### 2. Marketplace Service Pipeline (`marketplace-service.yml`)
+### 2. Marketplace Service Pipeline (`web-service-ci-cd.yml`)
 
 **Purpose:** Build, test, and package Java Spring Boot service
 
@@ -69,7 +69,7 @@ KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 JWT_SECRET: your-secret-key
 ```
 
-### 3. Messaging Service Pipeline (`marketplace-messaging-service.yml`)
+### 3. Messaging Service Pipeline (`marketplace-messaging-service-ci-cd.yml`)
 
 **Purpose:** Build, test, and package Go WebSocket service
 
@@ -111,7 +111,7 @@ JWT_SECRET: your-secret-key
 ALLOWED_ORIGINS: http://localhost:3000,http://localhost:3001
 ```
 
-### 4. Admin Dashboard Pipeline (`marketplace-admin-dashboard-ci-cd.yml`)
+### 4. Admin Dashboard Pipeline (`admin-dashboard-ci-cd.yml`)
 
 **Purpose:** Build and deploy React admin interface
 
@@ -285,7 +285,7 @@ curl https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
 act -l
 
 # Run specific workflow
-act -W .github/workflows/marketplace-service.yml
+act -W .github/workflows/web-service-ci-cd.yml
 
 # Run with secrets
 act -s GITHUB_TOKEN=your-token

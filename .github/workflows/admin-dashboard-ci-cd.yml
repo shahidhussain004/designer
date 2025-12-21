@@ -1,16 +1,16 @@
-name: Marketplace Admin Dashboard
+name: Admin Dashboard CI/CD Pipeline
 
 on:
   push:
     branches: [main, develop, phase2CICDUpdates]
     paths:
       - 'frontend/admin-dashboard/**'
-      - '.github/workflows/marketplace-admin-dashboard-ci-cd.yml'
+      - '.github/workflows/admin-dashboard-ci-cd.yml'
   pull_request:
     branches: [main, develop]
     paths:
       - 'frontend/admin-dashboard/**'
-      - '.github/workflows/marketplace-admin-dashboard-ci-cd.yml'
+      - '.github/workflows/admin-dashboard-ci-cd.yml'
 
 env:
   NODE_VERSION: '20'

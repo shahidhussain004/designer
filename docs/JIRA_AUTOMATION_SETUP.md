@@ -74,7 +74,7 @@ Look for the `"id"` values in the response and update the workflow accordingly.
 
 ## Step 4: Configure Workflow (Optional)
 
-The workflow file at `.github/workflows/jira-ticket-status-transitions.yml` is pre-configured. You can customize:
+The workflow file at `.github/workflows/jira-ticket-status-transitions-ci-cd.yml` is pre-configured. You can customize:
 
 - **Transition IDs:** Edit the `id` values in the curl commands
 - **Branch patterns:** Add additional branch types (chore, docs, etc.)

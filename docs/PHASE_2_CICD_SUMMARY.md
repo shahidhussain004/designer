@@ -25,7 +25,7 @@ Successfully implemented **comprehensive CI/CD pipelines** for the Designer Mark
 
 ### **1. Service-Specific CI/CD Pipelines**
 
-#### **Marketplace Service** (`marketplace-service.yml`)
+#### **Marketplace Service** (`web-service-ci-cd.yml`)
 - **Language:** Java 21 + Spring Boot 3.3.0
 - **Build Tool:** Maven
 - **Stages:**
@@ -37,7 +37,7 @@ Successfully implemented **comprehensive CI/CD pipelines** for the Designer Mark
 - **Total Time:** ~16 minutes
 - **Docker Image:** `ghcr.io/{owner}/{repo}/marketplace-service:latest`
 
-#### **Messaging Service** (`marketplace-messaging-service.yml`)
+#### **Messaging Service** (`marketplace-messaging-service-ci-cd.yml`)
 - **Language:** Go 1.21
 - **Stages:**
   1. Lint & Format (1 min) - golangci-lint, gofmt, go vet
@@ -49,7 +49,7 @@ Successfully implemented **comprehensive CI/CD pipelines** for the Designer Mark
 - **Total Time:** ~14 minutes
 - **Docker Image:** `ghcr.io/{owner}/{repo}/messaging-service:latest`
 
-#### **Admin Dashboard** (`marketplace-admin-dashboard-ci-cd.yml`)
+#### **Admin Dashboard** (`admin-dashboard-ci-cd.yml`)
 - **Language:** TypeScript + React
 - **Build Tool:** Vite
 - **Stages:**
@@ -60,7 +60,7 @@ Successfully implemented **comprehensive CI/CD pipelines** for the Designer Mark
 - **Total Time:** ~8 minutes
 - **Docker Image:** `ghcr.io/{owner}/{repo}/admin-dashboard:latest`
 
-#### **Marketplace Web** (`marketplace-web.yml`)
+#### **Marketplace Web** (`web-ui-client-ci-cd.yml`)
 - **Language:** TypeScript + Next.js
 - **Stages:**
   1. Lint & Format (1 min) - ESLint, TypeScript
