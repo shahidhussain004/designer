@@ -1,4 +1,4 @@
-name: Admin Dashboard CI/CD
+name: Marketplace Admin Dashboard
 
 on:
   push:
@@ -243,7 +243,7 @@ jobs:
     steps:
       - name: Display summary
         run: |
-          echo "## 🎉 Admin Dashboard CI/CD Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## 🎉 Marketplace Admin Dashboard Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
