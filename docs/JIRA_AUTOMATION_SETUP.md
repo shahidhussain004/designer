@@ -74,7 +74,7 @@ Look for the `"id"` values in the response and update the workflow accordingly.
 
 ## Step 4: Configure Workflow (Optional)
 
-The workflow file at `.github/workflows/jira-automation.yml` is pre-configured. You can customize:
+The workflow file at `.github/workflows/jira-ticket-status-transitions.yml` is pre-configured. You can customize:
 
 - **Transition IDs:** Edit the `id` values in the curl commands
 - **Branch patterns:** Add additional branch types (chore, docs, etc.)
@@ -204,8 +204,6 @@ You can extend this workflow to:
 3. **Create subtasks** for code reviews
 4. **Post to Slack** when tickets are done
 5. **Generate release notes** from merged tickets
-
-Examples available in `.github/workflows/jira-automation-advanced.yml` (optional).
 
 ## Reference
 

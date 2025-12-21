@@ -42,7 +42,7 @@ This will output your transition IDs like:
 
 ## 4️⃣ Update Workflow with Your IDs
 
-Edit `.github/workflows/jira-automation.yml` and replace the transition IDs:
+Edit `.github/workflows/jira-ticket-status-transitions.yml` and replace the transition IDs:
 
 **Current (default):**
 ```yaml
