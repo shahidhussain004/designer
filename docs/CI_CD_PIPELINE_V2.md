@@ -97,7 +97,7 @@ on:
 
 ### 2. Marketplace Service Pipeline
 
-**File:** `.github/workflows/marketplace-service.yml`  
+**File:** `.github/workflows/web-service-ci-cd.yml`  
 **Language:** Java 21 + Spring Boot 3.3.0  
 **Build Tool:** Maven
 
@@ -160,7 +160,7 @@ Tags:
 
 ### 3. Messaging Service Pipeline
 
-**File:** `.github/workflows/marketplace-messaging-service.yml`  
+**File:** `.github/workflows/marketplace-messaging-service-ci-cd.yml`  
 **Language:** Go 1.21  
 **Type:** WebSocket + Kafka Consumer
 
@@ -228,7 +228,7 @@ Push To: ghcr.io/{owner}/{repo}/messaging-service:latest
 
 ### 4. Admin Dashboard Pipeline
 
-**File:** `.github/workflows/marketplace-admin-dashboard-ci-cd.yml`  
+**File:** `.github/workflows/admin-dashboard-ci-cd.yml`  
 **Language:** TypeScript + React  
 **Build Tool:** Vite
 
@@ -277,7 +277,7 @@ Push To: ghcr.io/{owner}/{repo}/admin-dashboard:latest
 
 ### 5. Marketplace Web Pipeline
 
-**File:** `.github/workflows/marketplace-web.yml`  
+**File:** `.github/workflows/web-ui-client-ci-cd.yml`  
 **Language:** TypeScript + Next.js  
 **Build Tool:** Next.js + npm
 

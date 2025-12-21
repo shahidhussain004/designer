@@ -80,7 +80,7 @@ Phase 5 represents the final evolution of the Designer Marketplace platform from
 - Docker build (Nginx-based)
 - Execution time: ~8 minutes
 
-✅ **Marketplace Web CI/CD**
+✅ **Marketplace Web**
 - Next.js linting & type checking
 - Production build with standalone output
 - Jest + integration tests

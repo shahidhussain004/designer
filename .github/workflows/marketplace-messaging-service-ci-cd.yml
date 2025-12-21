@@ -5,12 +5,12 @@ on:
     branches: [main, develop, phase2CICDUpdates]
     paths:
       - 'services/messaging-service/**'
-      - '.github/workflows/marketplace-messaging-service.yml'
+      - '.github/workflows/marketplace-messaging-service-ci-cd.yml'
   pull_request:
     branches: [main, develop]
     paths:
       - 'services/messaging-service/**'
-      - '.github/workflows/marketplace-messaging-service.yml'
+      - '.github/workflows/marketplace-messaging-service-ci-cd.yml'
 
 env:
   REGISTRY: ghcr.io
