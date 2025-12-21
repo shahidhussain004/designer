@@ -12,6 +12,27 @@ const nextConfig = {
       },
     ],
   },
+  // Performance optimizations
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  experimental: {
+    optimizePackageImports: ['@tanstack/react-query', 'axios', 'zustand'],
+  },
+  // PWA configuration
+  async headers() {
+    return [
+      {
+        source: '/manifest.json',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/manifest+json',
+          },
+        ],
+      },
+    ];
+  },
 }
 
 module.exports = nextConfig
