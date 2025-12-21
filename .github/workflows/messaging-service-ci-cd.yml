@@ -1,16 +1,16 @@
-name: Marketplace Messaging Service
+name: Messaging Service CI/CD Pipeline
 
 on:
   push:
     branches: [main, develop, phase2CICDUpdates]
     paths:
       - 'services/messaging-service/**'
-      - '.github/workflows/marketplace-messaging-service-ci-cd.yml'
+      - '.github/workflows/messaging-service-ci-cd.yml'
   pull_request:
     branches: [main, develop]
     paths:
       - 'services/messaging-service/**'
-      - '.github/workflows/marketplace-messaging-service-ci-cd.yml'
+      - '.github/workflows/messaging-service-ci-cd.yml'
 
 env:
   REGISTRY: ghcr.io

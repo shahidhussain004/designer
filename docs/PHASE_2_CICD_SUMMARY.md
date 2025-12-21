@@ -37,7 +37,7 @@ Successfully implemented **comprehensive CI/CD pipelines** for the Designer Mark
 - **Total Time:** ~16 minutes
 - **Docker Image:** `ghcr.io/{owner}/{repo}/marketplace-service:latest`
 
-#### **Messaging Service** (`marketplace-messaging-service-ci-cd.yml`)
+#### **Messaging Service** (`messaging-service-ci-cd.yml`)
 - **Language:** Go 1.21
 - **Stages:**
   1. Lint & Format (1 min) - golangci-lint, gofmt, go vet
