@@ -111,7 +111,7 @@ JWT_SECRET: your-secret-key
 ALLOWED_ORIGINS: http://localhost:3000,http://localhost:3001
 ```
 
-### 4. Admin Dashboard Pipeline (`admin-dashboard-ci-cd.yml`)
+### 4. Admin Dashboard Pipeline (`marketplace-admin-dashboard-ci-cd.yml`)
 
 **Purpose:** Build and deploy React admin interface
 

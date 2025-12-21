@@ -49,7 +49,7 @@ Successfully implemented **comprehensive CI/CD pipelines** for the Designer Mark
 - **Total Time:** ~14 minutes
 - **Docker Image:** `ghcr.io/{owner}/{repo}/messaging-service:latest`
 
-#### **Admin Dashboard** (`admin-dashboard-ci-cd.yml`)
+#### **Admin Dashboard** (`marketplace-admin-dashboard-ci-cd.yml`)
 - **Language:** TypeScript + React
 - **Build Tool:** Vite
 - **Stages:**
