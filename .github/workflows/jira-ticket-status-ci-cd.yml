@@ -1,4 +1,4 @@
-name: Jira Ticket Status Transitions CI/CD Pipeline
+name: Jira Ticket Status CI/CD Pipeline
 
 on:
   pull_request:

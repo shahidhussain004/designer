@@ -46,7 +46,7 @@ def display_transitions(transitions_data: dict) -> None:
     print("\n" + "="*60)
     print("UPDATE YOUR WORKFLOW")
     print("="*60)
-    print("\nIn .github/workflows/jira-ticket-status-transitions-ci-cd.yml, update the transition IDs:")
+    print("\nIn .github/workflows/jira-ticket-status-ci-cd.yml, update the transition IDs:")
 
 class JiraIntegration:
     def __init__(self, domain: str, email: str, token: str, project_key: str):
