@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { 
   getCourses, 
   Course, 
@@ -30,9 +31,9 @@ export default function CoursesPage() {
 
   useEffect(() => {
     fetchCourses();
-  }, [selectedCategory, selectedSkillLevel, priceRange, sortBy, page]);
+  }, [fetchCourses]);
 
-  const fetchCourses = async () => {
+  const fetchCourses = useCallback(async () => {
     try {
       setLoading(true);
       const result = await getCourses({
@@ -53,7 +54,7 @@ export default function CoursesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedCategory, selectedSkillLevel, priceRange, sortBy, page, searchQuery, pageSize]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -353,10 +354,11 @@ function CourseCard({ course }: { course: Course }) {
         {/* Thumbnail */}
         <div className="aspect-video bg-gray-200 relative">
           {course.thumbnailUrl ? (
-            <img
+            <Image
               src={course.thumbnailUrl}
               alt={course.title}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-gray-400">
