@@ -70,7 +70,7 @@ New to the project? Start here:
   - Job/Proposal/Contract management
 
 - **Real-time & Event-Driven** (100%)
-  - Go 1.21 Messaging Service (WebSocket + chat)
+  - Go 1.24 Messaging Service (WebSocket + chat)
   - Kafka 7.4.0 event streaming (11 topics)
   - React Admin Dashboard (6 pages)
   - Redis presence tracking
@@ -160,7 +160,7 @@ A: See [TESTING_GUIDE.md](TESTING_GUIDE.md) for complete testing instructions.
 
 **Q: What technology stack is used?**  
 A: 
-- Backend: Java 21 (Spring Boot 3.3.0), Go 1.21, Python 3.12
+- Backend: Java 21 (Spring Boot 3.3.0), Go 1.24, Python 3.12
 - Frontend: Next.js 15+, React 19, Vite
 - Databases: PostgreSQL 15, MongoDB, Redis
 - Infrastructure: Docker, Kafka 7.4.0, Nginx, Prometheus, Grafana
