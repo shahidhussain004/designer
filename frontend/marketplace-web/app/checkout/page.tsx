@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -44,16 +44,7 @@ function CheckoutContent() {
   const [cardName, setCardName] = useState('');
   const [saveCard, setSaveCard] = useState(true);
 
-  useEffect(() => {
-    if (!authService.isAuthenticated()) {
-      router.push(`/auth/login?redirect=/checkout?${searchParams.toString()}`);
-      return;
-    }
-
-    initializeCheckout();
-  }, [router, searchParams]);
-
-  const initializeCheckout = async () => {
+  const initializeCheckout = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -85,7 +76,16 @@ function CheckoutContent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [type, itemId, amount, title]);
+
+  useEffect(() => {
+    if (!authService.isAuthenticated()) {
+      router.push(`/auth/login?redirect=/checkout?${searchParams.toString()}`);
+      return;
+    }
+
+    initializeCheckout();
+  }, [router, searchParams, initializeCheckout]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

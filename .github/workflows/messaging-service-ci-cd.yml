@@ -38,7 +38,7 @@ jobs:
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.62.2
+          version: latest
           working-directory: services/messaging-service
           args: --timeout=5m
         continue-on-error: true

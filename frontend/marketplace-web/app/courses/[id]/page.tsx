@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { 
   getCourseById, 
   getCourseLessons, 
@@ -25,13 +26,7 @@ export default function CourseDetailPage() {
   const [isEnrolling, setIsEnrolling] = useState(false);
   const [showAllLessons, setShowAllLessons] = useState(false);
 
-  useEffect(() => {
-    if (courseId) {
-      fetchCourseData();
-    }
-  }, [courseId]);
-
-  const fetchCourseData = async () => {
+  const fetchCourseData = useCallback(async () => {
     try {
       setLoading(true);
       const [courseData, lessonsData] = await Promise.all([
@@ -46,7 +41,13 @@ export default function CourseDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [courseId]);
+
+  useEffect(() => {
+    if (courseId) {
+      fetchCourseData();
+    }
+  }, [courseId, fetchCourseData]);
 
   const handleEnroll = async () => {
     if (!authService.isAuthenticated()) {
@@ -167,10 +168,11 @@ export default function CourseDetailPage() {
                 {/* Course Thumbnail */}
                 <div className="aspect-video bg-gray-200 relative">
                   {course.thumbnailUrl ? (
-                    <img
+                    <Image
                       src={course.thumbnailUrl}
                       alt={course.title}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">

@@ -299,7 +299,7 @@ export default function MilestoneList({
         </div>
         
         <div className="divide-y">
-          {milestones.sort((a, b) => a.orderIndex - b.orderIndex).map((milestone, index) => (
+          {milestones.sort((a, b) => a.orderIndex - b.orderIndex).map((milestone) => (
             <div key={milestone.id} className="p-6">
               <div className="flex items-start gap-4">
                 {/* Progress Icon */}
