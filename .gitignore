@@ -1,12 +1,274 @@
-/.idea
-/.vscode
+# ============================================================================
+# IDE & Editor
+# ============================================================================
+.idea/
+.vscode/
+.vs/
+.vscode/extensions/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ============================================================================
+# Environment & Configuration
+# ============================================================================
 .env
-node_modules/
-target/
+.env.local
+.env.*.local
+.env.production
+.env.test
+.env.development
+
+# ============================================================================
+# Backend - Java/Spring Boot (Marketplace Service)
+# ============================================================================
+services/marketplace-service/target/
+services/marketplace-service/build/
+services/marketplace-service/.gradle/
+services/marketplace-service/*.jar
+services/marketplace-service/*.war
+services/marketplace-service/.classpath
+services/marketplace-service/.project
+services/marketplace-service/.settings/
+services/marketplace-service/bin/
+services/marketplace-service/.factorypath
+
+# ============================================================================
+# Backend - .NET 8 (LMS Service)
+# ============================================================================
+services/lms-service/bin/
+services/lms-service/obj/
+services/lms-service/.vs/
+services/lms-service/.vscode/
+services/lms-service/*.user
+services/lms-service/appsettings.*.json
+!services/lms-service/appsettings.json
+!services/lms-service/appsettings.Development.json
+services/lms-service/Properties/launchSettings.json
+services/lms-service/.bowerrc
+services/lms-service/bower_components/
+services/lms-service/.nuget/
+services/lms-service/packages/
+services/lms-service/*.nupkg
+
+# ============================================================================
+# Backend - Go (Messaging Service)
+# ============================================================================
+services/messaging-service/bin/
+services/messaging-service/vendor/
+services/messaging-service/dist/
+services/messaging-service/*.exe
+services/messaging-service/*.dll
+services/messaging-service/*.so
+services/messaging-service/*.dylib
+services/messaging-service/go.sum
+
+# ============================================================================
+# Backend - Python (Apache Beam Pipelines)
+# ============================================================================
+services/beam-pipelines/venv/
+services/beam-pipelines/env/
+services/beam-pipelines/.venv/
+services/beam-pipelines/__pycache__/
+services/beam-pipelines/*.pyc
+services/beam-pipelines/*.pyo
+services/beam-pipelines/*.egg-info/
+services/beam-pipelines/dist/
+services/beam-pipelines/build/
+services/beam-pipelines/.pytest_cache/
+services/beam-pipelines/.coverage
+services/beam-pipelines/htmlcov/
+services/beam-pipelines/.tox/
+services/beam-pipelines/*.egg
+services/beam-pipelines/.Python
+services/beam-pipelines/pip-log.txt
+services/beam-pipelines/pip-delete-this-directory.txt
+
+# ============================================================================
+# Frontend - Next.js (Marketplace Web)
+# ============================================================================
+frontend/marketplace-web/node_modules/
+frontend/marketplace-web/.next/
+frontend/marketplace-web/out/
+frontend/marketplace-web/dist/
+frontend/marketplace-web/build/
+frontend/marketplace-web/.env.local
+frontend/marketplace-web/.env.*.local
+frontend/marketplace-web/.npm/
+frontend/marketplace-web/.cache/
+frontend/marketplace-web/.turbo/
+frontend/marketplace-web/npm-debug.log*
+frontend/marketplace-web/yarn-debug.log*
+frontend/marketplace-web/yarn-error.log*
+frontend/marketplace-web/.vercel
+
+# ============================================================================
+# Frontend - React (Admin Dashboard)
+# ============================================================================
+frontend/admin-dashboard/node_modules/
+frontend/admin-dashboard/dist/
+frontend/admin-dashboard/build/
+frontend/admin-dashboard/.env.local
+frontend/admin-dashboard/.env.*.local
+frontend/admin-dashboard/.vite/
+frontend/admin-dashboard/.cache/
+frontend/admin-dashboard/npm-debug.log*
+frontend/admin-dashboard/yarn-debug.log*
+frontend/admin-dashboard/yarn-error.log*
+
+# ============================================================================
+# Logs
+# ============================================================================
+logs/
 *.log
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ============================================================================
+# Dependencies
+# ============================================================================
+node_modules/
+yarn.lock
+package-lock.json
+pnpm-lock.yaml
+*/package-lock.json
+
+# ============================================================================
+# Testing
+# ============================================================================
+coverage/
+.nyc_output/
+test-results/
+.jmeter/
+*.jtl
+
+# ============================================================================
+# Docker & Container
+# ============================================================================
+.docker/
+docker-compose.override.yml
+
+# ============================================================================
+# Database & Data
+# ============================================================================
+postgres_data/
+mongo_data/
+redis_data/
+data/
+*.sqlite
+*.sqlite3
+*.db
+
+# ============================================================================
+# OS & Temporary
+# ============================================================================
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.Spotlight-V100
+.Trashes
+
+# ============================================================================
+# IDE Specific
+# ============================================================================
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+*.idmu
+
+# VS Code
+.vscode/
+launch.json
+extensions.json
+
+# Visual Studio
+.vs/
+*.vcxproj.user
+*.csproj.user
+
+# Rider
+.idea_modules/
+
+# General
+*.sublime-project
+*.sublime-workspace
+
+# ============================================================================
+# Build Artifacts & Caches
+# ============================================================================
 backups/
-venv/
-__pycache__/
-*.pyc
-.pytest_cache/
 output/
+dist/
+build/
+*.o
+*.so
+*.dylib
+*.dll
+*.exe
+
+# ============================================================================
+# Documentation Builds
+# ============================================================================
+docs/_build/
+docs/.doctrees/
+site/
+
+# ============================================================================
+# Local Development
+# ============================================================================
+.local/
+.tmp/
+temp/
+*.swp
+*.swo
+*~
+.~*
+
+# ============================================================================
+# AWS & Cloud
+# ============================================================================
+.aws/
+.azure/
+.gcp/
+credentials.json
+config.json
+
+# ============================================================================
+# CI/CD
+# ============================================================================
+.github/workflows/secrets.yml
+.gitlab-ci/secrets.yml
+.circleci/config.local.yml
+
+# ============================================================================
+# Load Testing
+# ============================================================================
+tests/results/
+tests/jmeter-report/
+*.jtl
+
+# ============================================================================
+# Postman & API Testing
+# ============================================================================
+postman/variables.json
+postman/*.environment.json
+
+# ============================================================================
+# Misc
+# ============================================================================
+.env.*.json
+secrets/
+private/
+.git-credentials
