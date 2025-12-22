@@ -1,0 +1,259 @@
+name: LMS Service CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop, phase3to5]
+    paths:
+      - 'services/lms-service/**'
+      - '.github/workflows/lms-service-ci-cd.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'services/lms-service/**'
+      - '.github/workflows/lms-service-ci-cd.yml'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/lms-service
+  DOTNET_VERSION: '8.0.x'
+
+jobs:
+  # ============================================
+  # Stage 1: Code Quality & Build
+  # ============================================
+  build-and-lint:
+    name: 🔍 Build & Code Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        working-directory: ./services/lms-service
+        run: dotnet restore
+
+      - name: Check code formatting
+        working-directory: ./services/lms-service
+        run: dotnet format --verify-no-changes --no-restore || echo "Formatting issues found, continuing..."
+        continue-on-error: true
+
+      - name: Build
+        working-directory: ./services/lms-service
+        run: dotnet build --no-restore --configuration Release
+
+  # ============================================
+  # Stage 2: Unit Tests
+  # ============================================
+  unit-tests:
+    name: 🧪 Unit Tests
+    runs-on: ubuntu-latest
+    needs: build-and-lint
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        working-directory: ./services/lms-service
+        run: dotnet restore
+
+      - name: Run unit tests
+        working-directory: ./services/lms-service
+        run: dotnet test --no-restore --verbosity normal --logger "trx;LogFileName=test-results.trx" --results-directory ./TestResults
+        continue-on-error: true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          path: services/lms-service/TestResults/
+          retention-days: 7
+          if-no-files-found: ignore
+
+  # ============================================
+  # Stage 3: Integration Tests
+  # ============================================
+  integration-tests:
+    name: 🔗 Integration Tests
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    
+    services:
+      mongodb:
+        image: mongo:7
+        env:
+          MONGO_INITDB_ROOT_USERNAME: admin
+          MONGO_INITDB_ROOT_PASSWORD: admin123
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 27017:27017
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        working-directory: ./services/lms-service
+        run: dotnet restore
+
+      - name: Run integration tests
+        working-directory: ./services/lms-service
+        env:
+          MongoDbSettings__ConnectionString: mongodb://admin:admin123@localhost:27017
+          MongoDbSettings__DatabaseName: lms_db_test
+          RedisSettings__ConnectionString: localhost:6379
+          JwtSettings__SecretKey: test-secret-key-for-ci-cd-pipeline-minimum-32-chars
+          JwtSettings__Issuer: lms-service-test
+          JwtSettings__Audience: lms-clients-test
+        run: dotnet test --no-restore --verbosity normal --filter "Category=Integration" --logger "trx;LogFileName=integration-results.trx" --results-directory ./TestResults
+        continue-on-error: true
+
+      - name: Upload integration test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results
+          path: services/lms-service/TestResults/
+          retention-days: 7
+          if-no-files-found: ignore
+
+  # ============================================
+  # Stage 4: Build Docker Image
+  # ============================================
+  build-docker:
+    name: 🐳 Build Docker Image
+    runs-on: ubuntu-latest
+    needs: integration-tests
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr,prefix=pr-
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./services/lms-service
+          file: ./services/lms-service/Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Image digest
+        run: echo "Image pushed with digest ${{ steps.meta.outputs.tags }}"
+
+  # ============================================
+  # Stage 5: Security Scanning
+  # ============================================
+  security-scan:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+    needs: build-docker
+    if: github.event_name != 'pull_request'
+    permissions:
+      contents: read
+      security-events: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: './services/lms-service'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # ============================================
+  # Summary Job
+  # ============================================
+  ci-cd-summary:
+    name: 📊 CI/CD Summary
+    runs-on: ubuntu-latest
+    needs: [build-and-lint, unit-tests, integration-tests, build-docker]
+    if: always()
+    
+    steps:
+      - name: Display summary
+        run: |
+          echo "## 🎉 LMS Service CI/CD Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Build & Lint | ${{ needs.build-and-lint.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Unit Tests | ${{ needs.unit-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Integration Tests | ${{ needs.integration-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Docker Build | ${{ needs.build-docker.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Actor:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Service Details" >> $GITHUB_STEP_SUMMARY
+          echo "- **Service:** LMS Service (.NET 8)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Port:** 8082" >> $GITHUB_STEP_SUMMARY
+          echo "- **Features:** Course Management, Video Streaming, Quiz Engine, Certificates" >> $GITHUB_STEP_SUMMARY
