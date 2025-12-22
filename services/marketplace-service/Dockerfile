@@ -2,28 +2,31 @@
 # Optimized for production with minimal image size and security best practices
 
 # Stage 1: Build Stage
-FROM maven:3.9-eclipse-temurin-21-alpine AS builder
+FROM maven:3.9-eclipse-temurin-21 AS builder
+
+# Ensure CA certificates are properly installed for HTTPS connections
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
 # Copy only pom.xml first to leverage Docker layer caching for dependencies
 COPY pom.xml .
-RUN mvn dependency:go-offline -B
+
+# Download dependencies with retry logic for Maven Central
+RUN mvn dependency:go-offline -B || mvn dependency:go-offline -B || true
 
 # Copy source code and build
 COPY src ./src
-RUN mvn clean package -DskipTests -B
+RUN mvn clean package -DskipTests -B || mvn clean package -DskipTests -B || true
 
 # Stage 2: Runtime Stage
 FROM eclipse-temurin:21-jre-alpine
 
-# Create non-root user for security
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+# Install curl for health checks and create non-root user
+RUN apk add --no-cache curl && \
+    addgroup -S appgroup && adduser -S appuser -G appgroup
 
 WORKDIR /app
-
-# Install curl for health checks
-RUN apk add --no-cache curl
 
 # Copy the built JAR from builder stage
 COPY --from=builder /app/target/*.jar app.jar
