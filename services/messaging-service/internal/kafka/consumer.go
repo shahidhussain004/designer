@@ -8,9 +8,8 @@ import (
 	"time"
 
 	"github.com/designer/messaging-service/internal/models"
-	kafka "github.com/segmentio/kafka-go"
 	"github.com/designer/messaging-service/internal/websocket"
-	"github.com/segmentio/kafka-go"
+	segkafka "github.com/segmentio/kafka-go"
 )
 
 // Event topics consumed by the messaging service
@@ -29,7 +28,7 @@ var consumedTopics = []string{
 
 // Consumer handles Kafka message consumption
 type Consumer struct {
-	readers []*kafka.Reader
+	readers []*segkafka.Reader
 	hub     *websocket.Hub
 }
 
@@ -114,17 +113,17 @@ type UserEvent struct {
 
 // NewConsumer creates a new Kafka consumer
 func NewConsumer(brokers []string, groupID string, hub *websocket.Hub) (*Consumer, error) {
-	var readers []*kafka.Reader
+	var readers []*segkafka.Reader
 
 	for _, topic := range consumedTopics {
-		reader := kafka.NewReader(kafka.ReaderConfig{
+		reader := segkafka.NewReader(segkafka.ReaderConfig{
 			Brokers:        brokers,
 			Topic:          topic,
 			GroupID:        groupID,
 			MinBytes:       10e3, // 10KB
 			MaxBytes:       10e6, // 10MB
 			MaxWait:        time.Second,
-			StartOffset:    kafka.LastOffset,
+			StartOffset:    segkafka.LastOffset,
 			CommitInterval: time.Second,
 		})
 		readers = append(readers, reader)
@@ -144,7 +143,7 @@ func (c *Consumer) Start(ctx context.Context) {
 }
 
 // consumeTopic consumes messages from a single topic
-func (c *Consumer) consumeTopic(ctx context.Context, reader *kafka.Reader) {
+func (c *Consumer) consumeTopic(ctx context.Context, reader *segkafka.Reader) {
 	log.Printf("Starting consumer for topic: %s", reader.Config().Topic)
 
 	for {
@@ -173,7 +172,7 @@ func (c *Consumer) consumeTopic(ctx context.Context, reader *kafka.Reader) {
 }
 
 // processMessage handles a single Kafka message
-func (c *Consumer) processMessage(msg kafka.Message) {
+func (c *Consumer) processMessage(msg segkafka.Message) {
 	var event EventMessage
 	if err := json.Unmarshal(msg.Value, &event); err != nil {
 		log.Printf("Error unmarshaling message from %s: %v", msg.Topic, err)
