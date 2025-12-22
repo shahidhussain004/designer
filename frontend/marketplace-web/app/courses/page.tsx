@@ -29,10 +29,6 @@ export default function CoursesPage() {
   const [page, setPage] = useState(0);
   const pageSize = 12;
 
-  useEffect(() => {
-    fetchCourses();
-  }, [fetchCourses]);
-
   const fetchCourses = useCallback(async () => {
     try {
       setLoading(true);
@@ -55,6 +51,10 @@ export default function CoursesPage() {
       setLoading(false);
     }
   }, [selectedCategory, selectedSkillLevel, priceRange, sortBy, page, searchQuery, pageSize]);
+
+  useEffect(() => {
+    fetchCourses();
+  }, [fetchCourses]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
