@@ -36,7 +36,7 @@ Real-time messaging service for the Designer Marketplace platform built with Go.
 
 ## Prerequisites
 
-- Go 1.21+
+- Go 1.24+
 - PostgreSQL 15+
 - Redis 7+
 - Kafka (optional, for event streaming)

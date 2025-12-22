@@ -175,7 +175,7 @@
 - Docker containerization
 
 **Tech Stack:**
-- Go 1.21 with Gin framework
+- Go 1.24 with Gin framework
 - gorilla/websocket for WebSocket
 - go-redis for presence/typing indicators
 - segmentio/kafka-go for event consumption

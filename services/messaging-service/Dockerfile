@@ -1,5 +1,5 @@
 # Build stage
-FROM golang:1.21-alpine AS base
+FROM golang:1.24-alpine AS base
 
 # Install build dependencies (including ca-certificates for SSL verification)
 RUN apk add --no-cache git ca-certificates tzdata build-base

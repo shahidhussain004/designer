@@ -35,11 +35,6 @@ jobs:
           java-version: '21'
           cache: maven
 
-      - name: Check code formatting (Maven Checkstyle)
-        working-directory: ./services/marketplace-service
-        run: mvn -B checkstyle:check || echo "Checkstyle not configured, skipping"
-        continue-on-error: true
-
       - name: Compile code
         working-directory: ./services/marketplace-service
         run: mvn -B clean compile -DskipTests
@@ -89,7 +84,7 @@ jobs:
         image: postgres:15
         env:
           POSTGRES_USER: marketplace_user
-          POSTGRES_PASSWORD: marketplace_password
+          POSTGRES_PASSWORD: marketplace_pass_dev
           POSTGRES_DB: marketplace_db
         options: >-
           --health-cmd pg_isready
