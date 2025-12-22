@@ -1,0 +1,202 @@
+using LmsService.Configuration;
+using LmsService.Models;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
+
+namespace LmsService.Repositories;
+
+public interface ICourseRepository
+{
+    Task<Course?> GetByIdAsync(string id);
+    Task<Course?> GetBySlugAsync(string slug);
+    Task<List<Course>> GetByInstructorIdAsync(long instructorId, int skip, int take);
+    Task<List<Course>> SearchAsync(string? searchTerm, CourseCategory? category, CourseLevel? level, CourseStatus? status, int skip, int take);
+    Task<long> CountAsync(string? searchTerm, CourseCategory? category, CourseLevel? level, CourseStatus? status);
+    Task<Course> CreateAsync(Course course);
+    Task<Course> UpdateAsync(Course course);
+    Task<bool> DeleteAsync(string id);
+    Task<List<Course>> GetPopularCoursesAsync(int take);
+    Task IncrementEnrollmentCountAsync(string courseId);
+    Task UpdateRatingAsync(string courseId, double averageRating, int reviewCount);
+}
+
+public class CourseRepository : ICourseRepository
+{
+    private readonly IMongoCollection<Course> _courses;
+
+    public CourseRepository(IMongoDatabase database, IOptions<MongoDbSettings> settings)
+    {
+        _courses = database.GetCollection<Course>(settings.Value.CoursesCollectionName);
+        CreateIndexes();
+    }
+
+    private void CreateIndexes()
+    {
+        var indexKeys = Builders<Course>.IndexKeys;
+        var indexes = new List<CreateIndexModel<Course>>
+        {
+            new(indexKeys.Ascending(c => c.Slug), new CreateIndexOptions { Unique = true }),
+            new(indexKeys.Ascending(c => c.InstructorId)),
+            new(indexKeys.Ascending(c => c.Category)),
+            new(indexKeys.Ascending(c => c.Level)),
+            new(indexKeys.Ascending(c => c.Status)),
+            new(indexKeys.Text(c => c.Title).Text(c => c.Description))
+        };
+        _courses.Indexes.CreateMany(indexes);
+    }
+
+    public async Task<Course?> GetByIdAsync(string id)
+    {
+        return await _courses.Find(c => c.Id == id).FirstOrDefaultAsync();
+    }
+
+    public async Task<Course?> GetBySlugAsync(string slug)
+    {
+        return await _courses.Find(c => c.Slug == slug).FirstOrDefaultAsync();
+    }
+
+    public async Task<List<Course>> GetByInstructorIdAsync(long instructorId, int skip, int take)
+    {
+        return await _courses
+            .Find(c => c.InstructorId == instructorId)
+            .SortByDescending(c => c.CreatedAt)
+            .Skip(skip)
+            .Limit(take)
+            .ToListAsync();
+    }
+
+    public async Task<List<Course>> SearchAsync(string? searchTerm, CourseCategory? category, CourseLevel? level, CourseStatus? status, int skip, int take)
+    {
+        var filterBuilder = Builders<Course>.Filter;
+        var filters = new List<FilterDefinition<Course>>();
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            filters.Add(filterBuilder.Text(searchTerm));
+        }
+
+        if (category.HasValue)
+        {
+            filters.Add(filterBuilder.Eq(c => c.Category, category.Value));
+        }
+
+        if (level.HasValue)
+        {
+            filters.Add(filterBuilder.Eq(c => c.Level, level.Value));
+        }
+
+        if (status.HasValue)
+        {
+            filters.Add(filterBuilder.Eq(c => c.Status, status.Value));
+        }
+        else
+        {
+            filters.Add(filterBuilder.Eq(c => c.Status, CourseStatus.Published));
+        }
+
+        var combinedFilter = filters.Count > 0 
+            ? filterBuilder.And(filters) 
+            : filterBuilder.Empty;
+
+        return await _courses
+            .Find(combinedFilter)
+            .SortByDescending(c => c.TotalEnrollments)
+            .Skip(skip)
+            .Limit(take)
+            .ToListAsync();
+    }
+
+    public async Task<long> CountAsync(string? searchTerm, CourseCategory? category, CourseLevel? level, CourseStatus? status)
+    {
+        var filterBuilder = Builders<Course>.Filter;
+        var filters = new List<FilterDefinition<Course>>();
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            filters.Add(filterBuilder.Text(searchTerm));
+        }
+
+        if (category.HasValue)
+        {
+            filters.Add(filterBuilder.Eq(c => c.Category, category.Value));
+        }
+
+        if (level.HasValue)
+        {
+            filters.Add(filterBuilder.Eq(c => c.Level, level.Value));
+        }
+
+        if (status.HasValue)
+        {
+            filters.Add(filterBuilder.Eq(c => c.Status, status.Value));
+        }
+        else
+        {
+            filters.Add(filterBuilder.Eq(c => c.Status, CourseStatus.Published));
+        }
+
+        var combinedFilter = filters.Count > 0 
+            ? filterBuilder.And(filters) 
+            : filterBuilder.Empty;
+
+        return await _courses.CountDocumentsAsync(combinedFilter);
+    }
+
+    public async Task<Course> CreateAsync(Course course)
+    {
+        course.Slug = GenerateSlug(course.Title);
+        await _courses.InsertOneAsync(course);
+        return course;
+    }
+
+    public async Task<Course> UpdateAsync(Course course)
+    {
+        course.UpdatedAt = DateTime.UtcNow;
+        await _courses.ReplaceOneAsync(c => c.Id == course.Id, course);
+        return course;
+    }
+
+    public async Task<bool> DeleteAsync(string id)
+    {
+        var result = await _courses.DeleteOneAsync(c => c.Id == id);
+        return result.DeletedCount > 0;
+    }
+
+    public async Task<List<Course>> GetPopularCoursesAsync(int take)
+    {
+        return await _courses
+            .Find(c => c.Status == CourseStatus.Published)
+            .SortByDescending(c => c.TotalEnrollments)
+            .Limit(take)
+            .ToListAsync();
+    }
+
+    public async Task IncrementEnrollmentCountAsync(string courseId)
+    {
+        var update = Builders<Course>.Update.Inc(c => c.TotalEnrollments, 1);
+        await _courses.UpdateOneAsync(c => c.Id == courseId, update);
+    }
+
+    public async Task UpdateRatingAsync(string courseId, double averageRating, int reviewCount)
+    {
+        var update = Builders<Course>.Update
+            .Set(c => c.AverageRating, averageRating)
+            .Set(c => c.ReviewCount, reviewCount);
+        await _courses.UpdateOneAsync(c => c.Id == courseId, update);
+    }
+
+    private static string GenerateSlug(string title)
+    {
+        var slug = title.ToLowerInvariant()
+            .Replace(" ", "-")
+            .Replace("'", "")
+            .Replace("\"", "");
+        
+        // Remove special characters
+        slug = System.Text.RegularExpressions.Regex.Replace(slug, @"[^a-z0-9\-]", "");
+        
+        // Add random suffix to ensure uniqueness
+        var suffix = Guid.NewGuid().ToString("N")[..6];
+        return $"{slug}-{suffix}";
+    }
+}

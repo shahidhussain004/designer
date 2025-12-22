@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: designer-marketplace
+  labels:
+    app.kubernetes.io/name: designer-marketplace
+    app.kubernetes.io/managed-by: kubectl
