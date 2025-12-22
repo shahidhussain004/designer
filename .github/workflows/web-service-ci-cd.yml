@@ -35,11 +35,6 @@ jobs:
           java-version: '21'
           cache: maven
 
-      - name: Check code formatting (Maven Checkstyle)
-        working-directory: ./services/marketplace-service
-        run: mvn -B checkstyle:check || echo "Checkstyle not configured, skipping"
-        continue-on-error: true
-
       - name: Compile code
         working-directory: ./services/marketplace-service
         run: mvn -B clean compile -DskipTests
