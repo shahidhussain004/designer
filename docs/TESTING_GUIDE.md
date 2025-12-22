@@ -404,7 +404,9 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: marketplace_user
+          POSTGRES_PASSWORD: marketplace_pass_dev
+          POSTGRES_DB: marketplace_db
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3

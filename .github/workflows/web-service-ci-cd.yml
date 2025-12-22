@@ -89,7 +89,7 @@ jobs:
         image: postgres:15
         env:
           POSTGRES_USER: marketplace_user
-          POSTGRES_PASSWORD: marketplace_password
+          POSTGRES_PASSWORD: marketplace_pass_dev
           POSTGRES_DB: marketplace_db
         options: >-
           --health-cmd pg_isready

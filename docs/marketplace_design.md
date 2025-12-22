@@ -1002,7 +1002,9 @@ brew services start postgresql@15
 # Download installer: https://www.postgresql.org/download/windows/
 # Or use Docker
 docker run -d \
-  -e POSTGRES_PASSWORD=yourpassword \
+  -e POSTGRES_USER=marketplace_user \
+  -e POSTGRES_PASSWORD=marketplace_pass_dev \
+  -e POSTGRES_DB=marketplace_db \
   -v postgres_data:/var/lib/postgresql/data \
   -p 5432:5432 \
   postgres:15-alpine
@@ -1250,7 +1252,9 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: marketplace_user
+          POSTGRES_PASSWORD: marketplace_pass_dev
+          POSTGRES_DB: marketplace_db
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
