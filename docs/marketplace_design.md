@@ -620,7 +620,7 @@ Signals to collect: skills, portfolio similarity, past success rate, on-time del
 
 **Prerequisites:**
 - Java 17+ (OpenJDK)
-- Go 1.21+
+- Go 1.24+
 - .NET 8 SDK
 - Node.js 20+ (for Next.js, React, Angular)
 - Docker & Docker Compose

@@ -98,8 +98,13 @@ CREATE TABLE invoices (
     
     -- Relationships
     payment_id BIGINT NOT NULL REFERENCES payments(id),
+    milestone_id BIGINT,
     client_id BIGINT NOT NULL REFERENCES users(id),
     freelancer_id BIGINT NOT NULL REFERENCES users(id),
+    job_id BIGINT,
+    
+    -- Invoice type
+    invoice_type VARCHAR(30) DEFAULT 'PAYMENT',
     
     -- Invoice details
     subtotal BIGINT NOT NULL,
@@ -109,24 +114,33 @@ CREATE TABLE invoices (
     currency VARCHAR(3) DEFAULT 'USD',
     
     -- Status
-    status VARCHAR(50) NOT NULL DEFAULT 'DRAFT',
+    status VARCHAR(30) NOT NULL DEFAULT 'DRAFT',
+    
+    -- Billing info (JSON)
+    client_billing_info TEXT,
+    freelancer_billing_info TEXT,
+    line_items TEXT,
+    notes TEXT,
     
     -- PDF storage
     pdf_url TEXT,
     
     -- Timestamps
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    issued_at TIMESTAMP,
+    invoice_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    due_date TIMESTAMP,
     paid_at TIMESTAMP,
-    due_date DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
-    CONSTRAINT chk_invoice_status CHECK (status IN ('DRAFT', 'ISSUED', 'PAID', 'OVERDUE', 'CANCELLED'))
+    CONSTRAINT chk_invoice_type CHECK (invoice_type IN ('PAYMENT', 'MILESTONE', 'REFUND', 'PAYOUT')),
+    CONSTRAINT chk_invoice_status CHECK (status IN ('DRAFT', 'SENT', 'PAID', 'OVERDUE', 'CANCELLED', 'REFUNDED'))
 );
 
 -- Payouts table - for freelancer withdrawals
 CREATE TABLE payouts (
     id BIGSERIAL PRIMARY KEY,
-    stripe_payout_id VARCHAR(255) UNIQUE,
+    payout_reference VARCHAR(50) UNIQUE NOT NULL,
+    stripe_payout_id VARCHAR(255),
     stripe_transfer_id VARCHAR(255),
     
     -- Relationships
@@ -137,23 +151,32 @@ CREATE TABLE payouts (
     currency VARCHAR(3) DEFAULT 'USD',
     
     -- Status
-    status VARCHAR(50) NOT NULL DEFAULT 'PENDING',
+    status VARCHAR(30) NOT NULL DEFAULT 'PENDING',
+    payout_method VARCHAR(30) DEFAULT 'BANK_TRANSFER',
     
-    -- Bank details (masked)
-    bank_account_last4 VARCHAR(4),
-    bank_name VARCHAR(100),
+    -- Destination details (masked)
+    destination_last4 VARCHAR(4),
+    destination_name VARCHAR(100),
+    
+    -- Payout period
+    period_start TIMESTAMP,
+    period_end TIMESTAMP,
+    
+    -- Associated payments
+    included_payments TEXT,
+    payment_count INTEGER DEFAULT 0,
+    
+    -- Error handling
+    failure_reason TEXT,
     
     -- Timestamps
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     initiated_at TIMESTAMP,
     completed_at TIMESTAMP,
-    failed_at TIMESTAMP,
     
-    -- Error handling
-    failure_code VARCHAR(100),
-    failure_message TEXT,
-    
-    CONSTRAINT chk_payout_status CHECK (status IN ('PENDING', 'IN_TRANSIT', 'PAID', 'FAILED', 'CANCELLED'))
+    CONSTRAINT chk_payout_status CHECK (status IN ('PENDING', 'PROCESSING', 'IN_TRANSIT', 'PAID', 'FAILED', 'CANCELLED')),
+    CONSTRAINT chk_payout_method CHECK (payout_method IN ('BANK_TRANSFER', 'PAYPAL', 'STRIPE_CONNECT', 'CHECK', 'WIRE'))
 );
 
 -- Performance indexes

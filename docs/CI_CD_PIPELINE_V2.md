@@ -161,7 +161,7 @@ Tags:
 ### 3. Messaging Service Pipeline
 
 **File:** `.github/workflows/messaging-service-ci-cd.yml`  
-**Language:** Go 1.21  
+**Language:** Go 1.24  
 **Type:** WebSocket + Kafka Consumer
 
 **Stages:**
@@ -207,7 +207,7 @@ Tests:
 
 #### 🐳 Stage 5: Docker Build (3 min)
 ```yaml
-Dockerfile: Multi-stage (golang:1.21-alpine + alpine:3.19)
+Dockerfile: Multi-stage (golang:1.24-alpine + alpine:3.19)
 Security: Non-root user (appuser:1000)
 Platforms: linux/amd64, linux/arm64 (multi-platform)
 Size: ~20MB (minimal)
