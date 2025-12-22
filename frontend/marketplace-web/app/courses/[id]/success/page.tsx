@@ -1,27 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import { useEffect, useState, useCallback } from 'react';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { getCourseById, Course } from '@/lib/courses';
 
 export default function CourseEnrollmentSuccessPage() {
-  const router = useRouter();
   const params = useParams();
-  const searchParams = useSearchParams();
   const courseId = params.id as string;
-  const sessionId = searchParams.get('session_id');
 
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (courseId) {
-      fetchCourse();
-    }
-  }, [courseId]);
-
-  const fetchCourse = async () => {
+  const fetchCourse = useCallback(async () => {
     try {
       const courseData = await getCourseById(courseId);
       setCourse(courseData);
@@ -30,7 +22,13 @@ export default function CourseEnrollmentSuccessPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [courseId]);
+
+  useEffect(() => {
+    if (courseId) {
+      fetchCourse();
+    }
+  }, [courseId, fetchCourse]);
 
   if (loading) {
     return (
@@ -67,12 +65,13 @@ export default function CourseEnrollmentSuccessPage() {
           {course && (
             <div className="bg-gray-50 rounded-lg p-4 mb-6">
               <div className="flex items-center">
-                <div className="w-16 h-12 bg-gray-200 rounded overflow-hidden flex-shrink-0">
+                <div className="w-16 h-12 bg-gray-200 rounded overflow-hidden flex-shrink-0 relative">
                   {course.thumbnailUrl ? (
-                    <img
+                    <Image
                       src={course.thumbnailUrl}
                       alt={course.title}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
