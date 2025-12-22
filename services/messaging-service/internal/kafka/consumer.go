@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/designer/messaging-service/internal/models"
+	kafka "github.com/segmentio/kafka-go"
 	"github.com/designer/messaging-service/internal/websocket"
 	"github.com/segmentio/kafka-go"
 )
