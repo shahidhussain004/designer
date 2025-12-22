@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lms-service
+  namespace: designer-marketplace
+  labels:
+    app: lms-service
+    version: v1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: lms-service
+  template:
+    metadata:
+      labels:
+        app: lms-service
+        version: v1
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8082"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: lms-service
+          image: ghcr.io/your-org/lms-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8082
+              name: http
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: "Production"
+            - name: MongoDbSettings__ConnectionString
+              value: "mongodb://$(MONGODB_USER):$(MONGODB_PASSWORD)@$(MONGODB_HOST):$(MONGODB_PORT)"
+            - name: MongoDbSettings__DatabaseName
+              valueFrom:
+                configMapKeyRef:
+                  name: marketplace-config
+                  key: MONGODB_DATABASE
+            - name: RedisSettings__ConnectionString
+              value: "$(REDIS_HOST):$(REDIS_PORT)"
+            - name: KafkaSettings__BootstrapServers
+              valueFrom:
+                configMapKeyRef:
+                  name: marketplace-config
+                  key: KAFKA_BOOTSTRAP_SERVERS
+            - name: JwtSettings__SecretKey
+              valueFrom:
+                secretKeyRef:
+                  name: marketplace-secrets
+                  key: JWT_SECRET
+            - name: AwsSettings__AccessKey
+              valueFrom:
+                secretKeyRef:
+                  name: marketplace-secrets
+                  key: AWS_ACCESS_KEY_ID
+            - name: AwsSettings__SecretKey
+              valueFrom:
+                secretKeyRef:
+                  name: marketplace-secrets
+                  key: AWS_SECRET_ACCESS_KEY
+            - name: AwsSettings__Region
+              valueFrom:
+                secretKeyRef:
+                  name: marketplace-secrets
+                  key: AWS_REGION
+            - name: MONGODB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: marketplace-secrets
+                  key: MONGODB_USER
+            - name: MONGODB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: marketplace-secrets
+                  key: MONGODB_PASSWORD
+          envFrom:
+            - configMapRef:
+                name: marketplace-config
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /api/health/live
+              port: 8082
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/health/ready
+              port: 8082
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            failureThreshold: 3
+      imagePullSecrets:
+        - name: ghcr-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lms-service
+  namespace: designer-marketplace
+  labels:
+    app: lms-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8082
+      targetPort: 8082
+      protocol: TCP
+      name: http
+  selector:
+    app: lms-service

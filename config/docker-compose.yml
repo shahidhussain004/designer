@@ -220,24 +220,35 @@ services:
       retries: 5
 
   # .NET Core LMS Service (Port 8082)
-  # To be added in Phase 3
-  # dotnet-service:
-  #   build:
-  #     context: ./services/lms-service
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "8082:8082"
-  #   environment:
-  #     ASPNETCORE_ENVIRONMENT: Development
-  #     MONGODB_CONNECTION_STRING: mongodb://mongo_user:mongo_pass_dev@mongodb:27017/lms_db?authSource=admin
-  #     POSTGRES_CONNECTION_STRING: Server=postgres;Port=5432;Database=marketplace_db;User Id=marketplace_user;Password=marketplace_pass_dev;
-  #   depends_on:
-  #     mongodb:
-  #       condition: service_healthy
-  #     postgres:
-  #       condition: service_healthy
-  #   networks:
-  #     - marketplace-network
+  lms-service:
+    build:
+      context: ../services/lms-service
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      MongoDbSettings__ConnectionString: mongodb://mongo_user:mongo_pass_dev@mongodb:27017/lms_db?authSource=admin
+      MongoDbSettings__DatabaseName: lms_db
+      RedisSettings__ConnectionString: redis:6379
+      KafkaSettings__BootstrapServers: kafka:29092
+      JwtSettings__SecretKey: your-256-bit-secret-change-this-in-production-please-make-it-secure
+      JwtSettings__Issuer: designer-marketplace
+      JwtSettings__Audience: designer-marketplace-clients
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - marketplace-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
 volumes:
   postgres_data:
