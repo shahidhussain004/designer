@@ -2,13 +2,18 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { usersApi } from '../lib/api'
 import toast from 'react-hot-toast'
-import clsx from 'clsx'
 import {
-  MagnifyingGlassIcon,
-  FunnelIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-} from '@heroicons/react/24/outline'
+  GdsCard,
+  GdsFlex,
+  GdsGrid,
+  GdsText,
+  GdsButton,
+  GdsInput,
+  GdsDiv,
+  GdsDivider,
+  GdsBadge,
+  GdsSpinner,
+} from '../components/green'
 
 interface User {
   id: number
@@ -61,31 +66,52 @@ export default function Users() {
     user.username?.toLowerCase().includes(search.toLowerCase())
   ) || []
 
+  const getRoleBadgeVariant = (role: string): 'positive' | 'notice' | 'information' | 'information' => {
+    switch (role) {
+      case 'ADMIN':
+        return 'notice'
+      case 'CLIENT':
+        return 'information'
+      case 'FREELANCER':
+        return 'positive'
+      default:
+        return 'information'
+    }
+  }
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Users</h1>
-          <p className="text-gray-500">Manage platform users</p>
-        </div>
-      </div>
+    <GdsFlex flex-direction="column" gap="l">
+      {/* Header */}
+      <GdsFlex justify-content="space-between" align-items="center">
+        <GdsDiv>
+          <GdsText tag="h1" style={{ fontSize: '1.5rem', fontWeight: 700 } as any}>
+            Users
+          </GdsText>
+          <GdsText style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>
+            Manage platform users
+          </GdsText>
+        </GdsDiv>
+      </GdsFlex>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search users..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+      <GdsFlex gap="m" flex-wrap="wrap">
+        <GdsDiv style={{ flex: 1, minWidth: '200px' } as any}>
+          <GdsInput
+            label=""
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onInput={(e: Event) => setSearch((e.target as HTMLInputElement).value)}
           />
-        </div>
-        <div className="flex items-center gap-2">
-          <FunnelIcon className="h-5 w-5 text-gray-400" />
+        </GdsDiv>
+        <GdsDiv>
           <select
-            className="border border-gray-300 rounded-md px-3 py-2 focus:ring-primary-500 focus:border-primary-500"
+            style={{
+              padding: '0.5rem 1rem',
+              border: '1px solid var(--gds-color-l3-border-primary)',
+              borderRadius: '4px',
+              background: 'var(--gds-color-l3-background-secondary)',
+              color: 'var(--gds-color-l3-content-primary)',
+              minHeight: '42px',
+            } as any}
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
           >
@@ -94,166 +120,152 @@ export default function Users() {
             <option value="FREELANCER">Freelancers</option>
             <option value="ADMIN">Admins</option>
           </select>
-        </div>
-      </div>
+        </GdsDiv>
+      </GdsFlex>
 
       {/* Users Table */}
-      <div className="bg-white shadow rounded-lg overflow-hidden">
+      <GdsCard>
         {isLoading ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-          </div>
+          <GdsFlex justify-content="center" align-items="center" padding="3xl">
+            <GdsSpinner />
+          </GdsFlex>
         ) : (
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  User
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Role
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Rating
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Joined
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredUsers.map((user: User) => (
-                <tr key={user.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="h-10 w-10 rounded-full bg-primary-500 flex items-center justify-center text-white font-medium">
-                        {user.fullName?.charAt(0) || 'U'}
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {user.fullName}
-                        </div>
-                        <div className="text-sm text-gray-500">{user.email}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={clsx(
-                        'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                        user.role === 'ADMIN' && 'bg-purple-100 text-purple-800',
-                        user.role === 'CLIENT' && 'bg-blue-100 text-blue-800',
-                        user.role === 'FREELANCER' && 'bg-green-100 text-green-800'
-                      )}
+          <>
+            {/* Table Header */}
+            <GdsGrid columns="2fr 1fr 1fr 1fr 1fr 1fr" gap="m" padding="m" style={{ background: 'var(--gds-color-l3-background-secondary)', borderRadius: '8px 8px 0 0' } as any}>
+              <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>User</GdsText>
+              <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Role</GdsText>
+              <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Status</GdsText>
+              <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Rating</GdsText>
+              <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Joined</GdsText>
+              <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)', textAlign: 'right' } as any}>Actions</GdsText>
+            </GdsGrid>
+
+            {/* Table Body */}
+            {filteredUsers.map((user: User) => (
+              <GdsDiv key={user.id}>
+                <GdsDivider />
+                <GdsGrid columns="2fr 1fr 1fr 1fr 1fr 1fr" gap="m" padding="m" align-items="center" style={{ cursor: 'pointer' } as any}>
+                  {/* User Info */}
+                  <GdsFlex gap="m" align-items="center">
+                    <GdsDiv
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                        background: 'var(--gds-color-l3-background-positive)',
+                        color: 'var(--gds-color-l3-content-positive)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: 600,
+                      } as any}
                     >
-                      {user.role}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {user.isActive ? (
-                      <span className="inline-flex items-center text-green-600">
-                        <CheckCircleIcon className="h-5 w-5 mr-1" />
-                        Active
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center text-red-600">
-                        <XCircleIcon className="h-5 w-5 mr-1" />
-                        Inactive
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {user.fullName?.charAt(0) || 'U'}
+                    </GdsDiv>
+                    <GdsDiv>
+                      <GdsText style={{ fontWeight: 500 } as any}>{user.fullName}</GdsText>
+                      <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>
+                        {user.email}
+                      </GdsText>
+                    </GdsDiv>
+                  </GdsFlex>
+
+                  {/* Role */}
+                  <GdsDiv>
+                    <GdsBadge variant={getRoleBadgeVariant(user.role)}>{user.role}</GdsBadge>
+                  </GdsDiv>
+
+                  {/* Status */}
+                  <GdsDiv>
+                    <GdsBadge variant={user.isActive ? 'positive' : 'negative'}>
+                      {user.isActive ? '✓ Active' : '✗ Inactive'}
+                    </GdsBadge>
+                  </GdsDiv>
+
+                  {/* Rating */}
+                  <GdsText style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>
                     {user.ratingAvg?.toFixed(1) || 'N/A'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  </GdsText>
+
+                  {/* Joined */}
+                  <GdsText style={{ color: 'var(--gds-color-l3-content-tertiary)', fontSize: '0.875rem' } as any}>
                     {new Date(user.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button
+                  </GdsText>
+
+                  {/* Actions */}
+                  <GdsFlex gap="s" justify-content="flex-end">
+                    <GdsButton
+                      size="small"
+                      rank="secondary"
                       onClick={() =>
                         updateStatusMutation.mutate({
                           id: user.id,
                           isActive: !user.isActive,
                         })
                       }
-                      className={clsx(
-                        'mr-3',
-                        user.isActive
-                          ? 'text-yellow-600 hover:text-yellow-900'
-                          : 'text-green-600 hover:text-green-900'
-                      )}
                     >
                       {user.isActive ? 'Suspend' : 'Activate'}
-                    </button>
-                    <button
+                    </GdsButton>
+                    <GdsButton
+                      size="small"
+                      rank="secondary"
                       onClick={() => {
                         if (confirm('Are you sure you want to delete this user?')) {
                           deleteMutation.mutate(user.id)
                         }
                       }}
-                      className="text-red-600 hover:text-red-900"
+                      style={{ color: 'var(--gds-color-l3-content-negative)' } as any}
                     >
                       Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+                    </GdsButton>
+                  </GdsFlex>
+                </GdsGrid>
+              </GdsDiv>
+            ))}
 
-        {/* Pagination */}
-        <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-          <div className="flex-1 flex justify-between sm:hidden">
-            <button
-              onClick={() => setPage(Math.max(0, page - 1))}
-              disabled={page === 0}
-              className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-            >
-              Previous
-            </button>
-            <button
-              onClick={() => setPage(page + 1)}
-              disabled={!data?.hasNext}
-              className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-            >
-              Next
-            </button>
-          </div>
-          <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm text-gray-700">
-                Showing page <span className="font-medium">{page + 1}</span> of{' '}
-                <span className="font-medium">{data?.totalPages || 1}</span>
-              </p>
-            </div>
-            <div>
-              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                <button
+            {/* Pagination */}
+            <GdsDivider />
+            <GdsFlex justify-content="space-between" align-items="center" padding="m">
+              <GdsText style={{ color: 'var(--gds-color-l3-content-tertiary)', fontSize: '0.875rem' } as any}>
+                Showing page {page + 1} of {data?.totalPages || 1}
+              </GdsText>
+              <GdsFlex gap="s">
+                <GdsButton
+                  rank="secondary"
+                  size="small"
                   onClick={() => setPage(Math.max(0, page - 1))}
                   disabled={page === 0}
-                  className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                 >
                   Previous
-                </button>
-                <button
+                </GdsButton>
+                <GdsButton
+                  rank="secondary"
+                  size="small"
                   onClick={() => setPage(page + 1)}
                   disabled={!data?.hasNext}
-                  className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                 >
                   Next
-                </button>
-              </nav>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+                </GdsButton>
+              </GdsFlex>
+            </GdsFlex>
+          </>
+        )}
+      </GdsCard>
+
+      {/* Responsive Table Styles */}
+      <style>{`
+        @media (max-width: 768px) {
+          gds-grid[columns="2fr 1fr 1fr 1fr 1fr 1fr"] {
+            display: flex !important;
+            flex-direction: column;
+            gap: 0.5rem;
+          }
+        }
+      `}</style>
+    </GdsFlex>
   )
 }
+
+
+

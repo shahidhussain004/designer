@@ -1,136 +1,126 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { authService } from '@/lib/auth';
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { authService } from '@/lib/auth'
+import { GdsFlex, GdsCard, GdsText, GdsInput, GdsButton, GdsAlert, GdsDivider, GdsCheckbox, GdsDiv } from '@sebgroup/green-core/react'
+import { PageLayout } from '@/components/layout'
 
 export default function LoginPage() {
-  const router = useRouter();
+  const router = useRouter()
   const [formData, setFormData] = useState({
     emailOrUsername: '',
     password: '',
-  });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  })
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+    e.preventDefault()
+    setError('')
+    setLoading(true)
 
     try {
-      await authService.login(formData);
-      router.push('/dashboard');
+      await authService.login(formData)
+      router.push('/dashboard')
     } catch (err) {
-      const error = err as { response?: { data?: { message?: string } } };
-      setError(error.response?.data?.message || 'Login failed. Please check your credentials.');
+      const error = err as { response?: { data?: { message?: string } } }
+      setError(error.response?.data?.message || 'Login failed. Please check your credentials.')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Or{' '}
-            <Link href="/auth/register" className="font-medium text-primary-600 hover:text-primary-500">
-              create a new account
-            </Link>
-          </p>
-        </div>
+    <PageLayout>
+      <GdsFlex 
+        justify-content="center" 
+        align-items="center" 
+        padding="xl"
+        min-height="calc(100vh - 200px)"
+      >
+        <GdsCard padding="xl" variant="secondary" max-width="400px" width="100%">
+          <GdsFlex flex-direction="column" gap="l">
+            <GdsFlex flex-direction="column" align-items="center" gap="s">
+              <GdsText tag="h1" font="heading-l">Sign in to your account</GdsText>
+              <GdsText font="body-regular-m" color="neutral-02">
+                Or{' '}
+                <Link href="/auth/register" style={{ color: 'var(--gds-sys-color-content-brand-01)' } as any}>
+                  create a new account
+                </Link>
+              </GdsText>
+            </GdsFlex>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="text-sm text-red-800">{error}</div>
-            </div>
-          )}
+            {error && (
+              <GdsAlert variant="negative" role="alert">
+                Error: {error}
+              </GdsAlert>
+            )}
 
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="emailOrUsername" className="sr-only">
-                Email or Username
-              </label>
-              <input
-                id="emailOrUsername"
-                name="emailOrUsername"
-                type="text"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
-                placeholder="Email or Username"
-                value={formData.emailOrUsername}
-                onChange={(e) => setFormData({ ...formData, emailOrUsername: e.target.value })}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              />
-            </div>
-          </div>
+            <form onSubmit={handleSubmit}>
+              <GdsFlex flex-direction="column" gap="m">
+                <GdsInput
+                  label="Email or Username"
+                  value={formData.emailOrUsername}
+                  onInput={(e: unknown) => {
+                    const target = e as { target?: { value?: string } }
+                    setFormData({ ...formData, emailOrUsername: target?.target?.value ?? '' })
+                  }}
+                  required
+                />
+                
+                <GdsInput
+                  label="Password"
+                  type="password"
+                  value={formData.password}
+                  onInput={(e: unknown) => {
+                    const target = e as { target?: { value?: string } }
+                    setFormData({ ...formData, password: target?.target?.value ?? '' })
+                  }}
+                  required
+                />
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                Remember me
-              </label>
-            </div>
+                <GdsFlex justify-content="space-between" align-items="center">
+                  <GdsCheckbox>
+                    <GdsText slot="label">Remember me</GdsText>
+                  </GdsCheckbox>
+                  <Link href="#" style={{ textDecoration: 'none' } as any}>
+                    <GdsText font="body-regular-s" color="brand-01">
+                      Forgot your password?
+                    </GdsText>
+                  </Link>
+                </GdsFlex>
 
-            <div className="text-sm">
-              <a href="#" className="font-medium text-primary-600 hover:text-primary-500">
-                Forgot your password?
-              </a>
-            </div>
-          </div>
+                <GdsButton 
+                  rank="primary" 
+                  type="submit" 
+                  disabled={loading}
+                  width="100%"
+                >
+                  {loading ? 'Signing in...' : 'Sign in'}
+                </GdsButton>
+              </GdsFlex>
+            </form>
 
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Signing in...' : 'Sign in'}
-            </button>
-          </div>
-        </form>
+            <GdsDivider />
 
-        <div className="mt-6">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-50 text-gray-500">Test Credentials</span>
-            </div>
-          </div>
-          <div className="mt-4 text-sm text-gray-600 space-y-1">
-            <p><strong>Client:</strong> client1@example.com / password123</p>
-            <p><strong>Freelancer:</strong> freelancer1@example.com / password123</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+            <GdsDiv>
+              <GdsText font="body-regular-s" color="neutral-02" text-align="center" margin-bottom="s">
+                Test Credentials
+              </GdsText>
+              <GdsFlex flex-direction="column" gap="xs">
+                <GdsText font="body-regular-s" color="neutral-02">
+                  <strong>Client:</strong> client1@example.com / password123
+                </GdsText>
+                <GdsText font="body-regular-s" color="neutral-02">
+                  <strong>Freelancer:</strong> freelancer1@example.com / password123
+                </GdsText>
+              </GdsFlex>
+            </GdsDiv>
+          </GdsFlex>
+        </GdsCard>
+      </GdsFlex>
+    </PageLayout>
+  )
 }

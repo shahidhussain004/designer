@@ -1,12 +1,21 @@
+// Types handled by 'any' casts
 import { useQuery } from '@tanstack/react-query'
 import { adminApi } from '../lib/api'
+import { Link } from 'react-router-dom'
+import {
+  GdsGrid,
+  GdsFlex,
+  GdsCard,
+  GdsText,
+  GdsBadge,
+  GdsSpinner,
+} from '../components/green'
 import {
   UsersIcon,
   BriefcaseIcon,
   CurrencyDollarIcon,
   ClockIcon,
 } from '@heroicons/react/24/outline'
-import clsx from 'clsx'
 
 interface StatCard {
   name: string
@@ -58,127 +67,155 @@ export default function Dashboard() {
     },
   ]
 
+  const getVariant = (changeType: string): 'positive' | 'negative' | 'information' => {
+    switch (changeType) {
+      case 'positive':
+        return 'positive'
+      case 'negative':
+        return 'negative'
+      default:
+        return 'information'
+    }
+  }
+
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
+      <GdsFlex justify-content="center" align-items="center" style={{ height: '256px' } as any}>
+        <GdsSpinner />
+      </GdsFlex>
     )
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-500">Welcome back! Here's what's happening.</p>
-      </div>
+    <GdsFlex flex-direction="column" gap="l">
+      {/* Header */}
+      <GdsFlex flex-direction="column" gap="xs">
+        <GdsText tag="h1" font-size="heading-l">
+          Dashboard
+        </GdsText>
+        <GdsText color="secondary">
+          Welcome back! Here&apos;s what&apos;s happening.
+        </GdsText>
+      </GdsFlex>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <GdsGrid columns="1; s{2}; l{4}" gap="m">
         {statCards.map((stat) => (
-          <div
-            key={stat.name}
-            className="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow"
-          >
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <stat.icon className="h-8 w-8 text-primary-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">{stat.name}</p>
-                <p className="text-2xl font-semibold text-gray-900">
-                  {stat.value}
-                </p>
-              </div>
-            </div>
-            <p
-              className={clsx(
-                'mt-2 text-sm',
-                stat.changeType === 'positive' && 'text-green-600',
-                stat.changeType === 'negative' && 'text-red-600',
-                stat.changeType === 'neutral' && 'text-gray-500'
-              )}
-            >
-              {stat.change}
-            </p>
-          </div>
+          <GdsCard key={stat.name} padding="l">
+            <GdsFlex flex-direction="column" gap="m">
+              <GdsFlex align-items="center" gap="m">
+                <GdsFlex
+                  justify-content="center"
+                  align-items="center"
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '8px',
+                    backgroundColor: 'var(--gds-color-l3-background-positive)',
+                  } as any}
+                >
+                  <stat.icon style={{ width: '24px', height: '24px', color: 'var(--gds-color-l3-content-positive)' }} />
+                </GdsFlex>
+                <GdsFlex flex-direction="column" gap="2xs">
+                  <GdsText font-size="body-s" color="secondary">
+                    {stat.name}
+                  </GdsText>
+                  <GdsText font-size="heading-m" font-weight="book">
+                    {stat.value}
+                  </GdsText>
+                </GdsFlex>
+              </GdsFlex>
+              <GdsBadge variant={getVariant(stat.changeType)}>
+                {stat.change}
+              </GdsBadge>
+            </GdsFlex>
+          </GdsCard>
         ))}
-      </div>
+      </GdsGrid>
 
-      {/* Recent Activity */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900">
-              Recent Activity
-            </h2>
-          </div>
-          <div className="divide-y divide-gray-200">
-            {activity?.slice(0, 5).map((item: any, index: number) => (
-              <div key={index} className="px-6 py-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
+      {/* Bottom Section */}
+      <GdsGrid columns="1; l{2}" gap="l">
+        {/* Recent Activity */}
+        <GdsCard padding="0">
+          <GdsFlex flex-direction="column">
+            <GdsFlex padding="m" style={{ borderBottom: '1px solid var(--gds-color-l3-border-primary)' } as any}>
+              <GdsText font-size="heading-s">Recent Activity</GdsText>
+            </GdsFlex>
+            <GdsFlex flex-direction="column">
+              {activity?.slice(0, 5).map((item: { title: string; description: string; time: string }, index: number) => (
+                <GdsFlex
+                  key={index}
+                  justify-content="space-between"
+                  align-items="center"
+                  padding="m"
+                  style={{
+                    borderBottom: index < 4 ? '1px solid var(--gds-color-l3-border-primary)' : 'none',
+                  } as any}
+                >
+                  <GdsFlex flex-direction="column" gap="2xs">
+                    <GdsText font-size="body-s" font-weight="book">
                       {item.title}
-                    </p>
-                    <p className="text-sm text-gray-500">{item.description}</p>
-                  </div>
-                  <span className="text-xs text-gray-400">{item.time}</span>
-                </div>
-              </div>
-            )) || (
-              <div className="px-6 py-4 text-center text-gray-500">
-                No recent activity
-              </div>
-            )}
-          </div>
-        </div>
+                    </GdsText>
+                    <GdsText font-size="body-s" color="secondary">
+                      {item.description}
+                    </GdsText>
+                  </GdsFlex>
+                  <GdsText font-size="body-s" color="secondary">
+                    {item.time}
+                  </GdsText>
+                </GdsFlex>
+              )) || (
+                <GdsFlex justify-content="center" padding="l">
+                  <GdsText color="secondary">No recent activity</GdsText>
+                </GdsFlex>
+              )}
+            </GdsFlex>
+          </GdsFlex>
+        </GdsCard>
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900">Quick Actions</h2>
-          </div>
-          <div className="p-6 grid grid-cols-2 gap-4">
-            <a
-              href="/users"
-              className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-            >
-              <UsersIcon className="h-5 w-5 mr-2 text-gray-600" />
-              <span className="text-sm font-medium text-gray-700">
-                Manage Users
-              </span>
-            </a>
-            <a
-              href="/jobs"
-              className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-            >
-              <BriefcaseIcon className="h-5 w-5 mr-2 text-gray-600" />
-              <span className="text-sm font-medium text-gray-700">
-                Review Jobs
-              </span>
-            </a>
-            <a
-              href="/disputes"
-              className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-            >
-              <ClockIcon className="h-5 w-5 mr-2 text-gray-600" />
-              <span className="text-sm font-medium text-gray-700">
-                Handle Disputes
-              </span>
-            </a>
-            <a
-              href="/analytics"
-              className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-            >
-              <CurrencyDollarIcon className="h-5 w-5 mr-2 text-gray-600" />
-              <span className="text-sm font-medium text-gray-700">
-                View Analytics
-              </span>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
+        <GdsCard padding="0">
+          <GdsFlex flex-direction="column">
+            <GdsFlex padding="m" style={{ borderBottom: '1px solid var(--gds-color-l3-border-primary)' } as any}>
+              <GdsText font-size="heading-s">Quick Actions</GdsText>
+            </GdsFlex>
+            <GdsGrid columns="2" gap="m" padding="m">
+              <Link to="/users" style={{ textDecoration: 'none' }}>
+                <GdsCard padding="m" variant="secondary" style={{ cursor: 'pointer' } as any}>
+                  <GdsFlex align-items="center" justify-content="center" gap="s">
+                    <UsersIcon style={{ width: '20px', height: '20px' }} />
+                    <GdsText font-size="body-s">Manage Users</GdsText>
+                  </GdsFlex>
+                </GdsCard>
+              </Link>
+              <Link to="/jobs" style={{ textDecoration: 'none' }}>
+                <GdsCard padding="m" variant="secondary" style={{ cursor: 'pointer' } as any}>
+                  <GdsFlex align-items="center" justify-content="center" gap="s">
+                    <BriefcaseIcon style={{ width: '20px', height: '20px' }} />
+                    <GdsText font-size="body-s">Review Jobs</GdsText>
+                  </GdsFlex>
+                </GdsCard>
+              </Link>
+              <Link to="/disputes" style={{ textDecoration: 'none' }}>
+                <GdsCard padding="m" variant="secondary" style={{ cursor: 'pointer' } as any}>
+                  <GdsFlex align-items="center" justify-content="center" gap="s">
+                    <ClockIcon style={{ width: '20px', height: '20px' }} />
+                    <GdsText font-size="body-s">Handle Disputes</GdsText>
+                  </GdsFlex>
+                </GdsCard>
+              </Link>
+              <Link to="/analytics" style={{ textDecoration: 'none' }}>
+                <GdsCard padding="m" variant="secondary" style={{ cursor: 'pointer' } as any}>
+                  <GdsFlex align-items="center" justify-content="center" gap="s">
+                    <CurrencyDollarIcon style={{ width: '20px', height: '20px' }} />
+                    <GdsText font-size="body-s">View Analytics</GdsText>
+                  </GdsFlex>
+                </GdsCard>
+              </Link>
+            </GdsGrid>
+          </GdsFlex>
+        </GdsCard>
+      </GdsGrid>
+    </GdsFlex>
   )
 }

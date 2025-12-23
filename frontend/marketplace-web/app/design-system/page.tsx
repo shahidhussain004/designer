@@ -154,23 +154,19 @@ export default function DesignSystemPage() {
                   <Input
                     label="Email Address"
                     type="email"
-                    placeholder="you@example.com"
                     helperText="We'll never share your email."
                   />
                   <Input
                     label="Password"
                     type="password"
-                    placeholder="••••••••"
                     required
                   />
                   <Input
                     label="With Error"
-                    placeholder="Enter value"
                     error="This field is required"
                   />
                   <Input
                     label="Disabled"
-                    placeholder="Can't edit"
                     disabled
                   />
                 </CardBody>
@@ -183,7 +179,6 @@ export default function DesignSystemPage() {
                 <CardBody>
                   <Textarea
                     label="Your Message"
-                    placeholder="Write your message here..."
                     helperText="Maximum 500 characters"
                     rows={4}
                   />
@@ -200,7 +195,6 @@ export default function DesignSystemPage() {
                     options={selectOptions}
                     value={selectValue}
                     onChange={(v) => setSelectValue(v as string)}
-                    placeholder="Select a framework..."
                     searchable
                   />
                   <Select
@@ -208,7 +202,6 @@ export default function DesignSystemPage() {
                     options={selectOptions}
                     value={multiSelectValue}
                     onChange={(v) => setMultiSelectValue(v as string[])}
-                    placeholder="Select frameworks..."
                     multiple
                   />
                 </CardBody>
@@ -577,7 +570,7 @@ export default function DesignSystemPage() {
                   <div className="space-y-6">
                     <div>
                       <p className="text-sm font-medium text-secondary-700 mb-3">Horizontal Stack</p>
-                      <Stack direction="horizontal" gap={4} align="center">
+                      <Stack flex-direction="horizontal" gap={4} align-items="center">
                         <div className="bg-success-100 p-4 rounded-lg text-success-700">Item 1</div>
                         <div className="bg-success-100 p-6 rounded-lg text-success-700">Item 2</div>
                         <div className="bg-success-100 p-3 rounded-lg text-success-700">Item 3</div>
@@ -586,7 +579,7 @@ export default function DesignSystemPage() {
                     
                     <div>
                       <p className="text-sm font-medium text-secondary-700 mb-3">Vertical Stack</p>
-                      <Stack direction="vertical" gap={3}>
+                      <Stack flex-direction="vertical" gap={3}>
                         <div className="bg-warning-100 p-3 rounded-lg text-warning-700">Item 1</div>
                         <div className="bg-warning-100 p-3 rounded-lg text-warning-700">Item 2</div>
                         <div className="bg-warning-100 p-3 rounded-lg text-warning-700">Item 3</div>

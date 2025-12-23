@@ -1,327 +1,304 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { authService } from '@/lib/auth';
-import { getDashboardData, ClientDashboard, FreelancerDashboard } from '@/lib/dashboard';
-import Link from 'next/link';
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { authService } from '@/lib/auth'
+import { getDashboardData, ClientDashboard, FreelancerDashboard } from '@/lib/dashboard'
+import { GdsFlex, GdsGrid, GdsCard, GdsText, GdsDiv, GdsButton, GdsSpinner, GdsBadge, GdsDivider } from '@sebgroup/green-core/react'
+import { PageLayout } from '@/components/layout'
 
 interface User {
-  id: number;
-  email: string;
-  username: string;
-  fullName: string;
-  role: string;
+  id: number
+  email: string
+  username: string
+  fullName: string
+  role: string
 }
 
 export default function DashboardPage() {
-  const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [dashboardData, setDashboardData] = useState<ClientDashboard | FreelancerDashboard | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const router = useRouter()
+  const [user, setUser] = useState<User | null>(null)
+  const [dashboardData, setDashboardData] = useState<ClientDashboard | FreelancerDashboard | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!authService.isAuthenticated()) {
-      router.push('/auth/login');
-      return;
+      router.push('/auth/login')
+      return
     }
 
-    const currentUser = authService.getCurrentUser();
+    const currentUser = authService.getCurrentUser()
     if (currentUser) {
-      setUser(currentUser);
+      setUser(currentUser)
     }
-  }, [router]);
+  }, [router])
 
   useEffect(() => {
     const fetchDashboard = async () => {
-      if (!user) return;
+      if (!user) return
 
       try {
-        const data = await getDashboardData();
-        setDashboardData(data);
+        const data = await getDashboardData()
+        setDashboardData(data)
       } catch (err) {
-        console.error('Error fetching dashboard:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load dashboard');
+        console.error('Error fetching dashboard:', err)
+        setError(err instanceof Error ? err.message : 'Failed to load dashboard')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchDashboard();
-  }, [user]);
+    fetchDashboard()
+  }, [user])
 
   const handleLogout = () => {
-    authService.logout();
-    router.push('/');
-  };
+    authService.logout()
+    router.push('/')
+  }
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg text-gray-600">Loading dashboard...</div>
-      </div>
-    );
+      <PageLayout>
+        <GdsFlex justify-content="center" align-items="center" min-height="50vh">
+          <GdsSpinner />
+        </GdsFlex>
+      </PageLayout>
+    )
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg text-red-600">{error}</div>
-      </div>
-    );
+      <PageLayout>
+        <GdsFlex justify-content="center" align-items="center" min-height="50vh">
+          <GdsText font="body-regular-l" color="negative-01">{error}</GdsText>
+        </GdsFlex>
+      </PageLayout>
+    )
   }
 
   if (!user || !dashboardData) {
-    return null;
+    return null
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-      <nav className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <h1 className="text-xl font-bold text-primary-600">Designer Marketplace</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">
-                Welcome, <strong>{user.fullName || user.username}</strong>
-              </span>
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700 transition"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
+    <PageLayout>
+      {/* Dashboard Header */}
+      <GdsDiv background="brand-01" padding="l">
+        <GdsFlex 
+          justify-content="space-between" 
+          align-items="center"
+          max-width="1280px"
+          margin="0 auto"
+          width="100%"
+        >
+          <GdsFlex flex-direction="column" gap="xs">
+            <GdsText font="heading-l" color="inversed">Dashboard</GdsText>
+            <GdsText font="body-regular-m" color="inversed">
+              Welcome back, {user.fullName || user.username}
+            </GdsText>
+          </GdsFlex>
+          <GdsButton rank="secondary" onClick={handleLogout}>
+            Logout
+          </GdsButton>
+        </GdsFlex>
+      </GdsDiv>
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          {/* Profile Card */}
-          <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
-            <div className="px-4 py-5 sm:px-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">
-                Your Profile
-              </h3>
-              <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                Personal details and account information
-              </p>
-            </div>
-            <div className="border-t border-gray-200">
-              <dl>
-                <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500">Full name</dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{user.fullName}</dd>
-                </div>
-                <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500">Username</dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{user.username}</dd>
-                </div>
-                <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500">Email address</dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{user.email}</dd>
-                </div>
-                <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500">Role</dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    <span
-                      className={`px-3 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        user.role === 'FREELANCER'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-blue-100 text-blue-800'
-                      }`}
-                    >
-                      {user.role}
-                    </span>
-                  </dd>
-                </div>
-              </dl>
-            </div>
-          </div>
+      {/* Main Content */}
+      <GdsDiv padding="xl l" max-width="1280px" margin="0 auto" width="100%">
+        {/* Profile Card */}
+        <GdsCard padding="l" variant="information" margin-bottom="l">
+          <GdsFlex flex-direction="column" gap="m">
+            <GdsFlex justify-content="space-between" align-items="center">
+              <GdsText font="heading-m">Your Profile</GdsText>
+              <GdsBadge variant={user.role === 'FREELANCER' ? 'positive' : 'notice'}>
+                {user.role}
+              </GdsBadge>
+            </GdsFlex>
+            <GdsDivider opacity="0.2" />
+            <GdsGrid columns="1; m{2}; l{4}" gap="m">
+              <GdsDiv>
+                <GdsText font="detail-regular-s" color="neutral-02">Full Name</GdsText>
+                <GdsText font="body-regular-m">{user.fullName}</GdsText>
+              </GdsDiv>
+              <GdsDiv>
+                <GdsText font="detail-regular-s" color="neutral-02">Username</GdsText>
+                <GdsText font="body-regular-m">{user.username}</GdsText>
+              </GdsDiv>
+              <GdsDiv>
+                <GdsText font="detail-regular-s" color="neutral-02">Email</GdsText>
+                <GdsText font="body-regular-m">{user.email}</GdsText>
+              </GdsDiv>
+              <GdsDiv>
+                <GdsText font="detail-regular-s" color="neutral-02">Role</GdsText>
+                <GdsText font="body-regular-m">{user.role}</GdsText>
+              </GdsDiv>
+            </GdsGrid>
+          </GdsFlex>
+        </GdsCard>
 
-          {/* Role-Specific Dashboard */}
-          {user.role === 'CLIENT' ? (
-            <ClientDashboardContent data={dashboardData as ClientDashboard} />
-          ) : (
-            <FreelancerDashboardContent data={dashboardData as FreelancerDashboard} />
-          )}
-        </div>
-      </main>
-    </div>
-  );
+        {/* Role-Specific Dashboard */}
+        {user.role === 'CLIENT' ? (
+          <ClientDashboardContent data={dashboardData as ClientDashboard} />
+        ) : (
+          <FreelancerDashboardContent data={dashboardData as FreelancerDashboard} />
+        )}
+      </GdsDiv>
+    </PageLayout>
+  )
 }
 
 interface ClientDashboardProps {
-  data: ClientDashboard;
+  data: ClientDashboard
 }
 
 function ClientDashboardContent({ data }: ClientDashboardProps) {
-  const { stats, activeJobs } = data;
+  const { stats, activeJobs } = data
 
   return (
-    <div className="space-y-6">
+    <GdsFlex flex-direction="column" gap="l">
       {/* Stats */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <dt className="text-sm font-medium text-gray-500 truncate">Active Jobs</dt>
-            <dd className="mt-1 text-3xl font-extrabold text-gray-900">{stats.activeJobs || 0}</dd>
-          </div>
-        </div>
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <dt className="text-sm font-medium text-gray-500 truncate">Proposals Received</dt>
-            <dd className="mt-1 text-3xl font-extrabold text-gray-900">{stats.totalProposalsReceived || 0}</dd>
-          </div>
-        </div>
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <dt className="text-sm font-medium text-gray-500 truncate">Completed Jobs</dt>
-            <dd className="mt-1 text-3xl font-extrabold text-gray-900">{stats.completedJobs || 0}</dd>
-          </div>
-        </div>
-      </div>
+      <GdsGrid columns="1; m{3}" gap="m">
+        <GdsCard padding="l" variant="notice">
+          <GdsFlex flex-direction="column" gap="s">
+            <GdsText font="detail-regular-s" color="neutral-02">Active Jobs</GdsText>
+            <GdsText font="heading-xl">{stats.activeJobs || 0}</GdsText>
+          </GdsFlex>
+        </GdsCard>
+        <GdsCard padding="l" variant="information">
+          <GdsFlex flex-direction="column" gap="s">
+            <GdsText font="detail-regular-s" color="neutral-02">Proposals Received</GdsText>
+            <GdsText font="heading-xl">{stats.totalProposalsReceived || 0}</GdsText>
+          </GdsFlex>
+        </GdsCard>
+        <GdsCard padding="l" variant="positive">
+          <GdsFlex flex-direction="column" gap="s">
+            <GdsText font="detail-regular-s" color="neutral-02">Completed Jobs</GdsText>
+            <GdsText font="heading-xl">{stats.completedJobs || 0}</GdsText>
+          </GdsFlex>
+        </GdsCard>
+      </GdsGrid>
 
       {/* Active Jobs */}
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-        <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
-          <div>
-            <h3 className="text-lg leading-6 font-medium text-gray-900">Your Active Jobs</h3>
-            <p className="mt-1 max-w-2xl text-sm text-gray-500">Jobs you have posted</p>
-          </div>
-          <Link
-            href="/jobs/create"
-            className="px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700"
-          >
-            Post New Job
+      <GdsCard padding="l" variant="information">
+        <GdsFlex justify-content="space-between" align-items="center" margin-bottom="m">
+          <GdsFlex flex-direction="column" gap="xs">
+            <GdsText font="heading-m">Your Active Jobs</GdsText>
+            <GdsText font="body-regular-s" color="neutral-02">Jobs you have posted</GdsText>
+          </GdsFlex>
+          <Link href="/jobs/create">
+            <GdsButton rank="primary" size="small">Post New Job</GdsButton>
           </Link>
-        </div>
-        <div className="border-t border-gray-200">
-          {activeJobs.length === 0 ? (
-            <div className="px-4 py-5 sm:px-6 text-gray-600">No active jobs.</div>
-          ) : (
-            <ul className="divide-y divide-gray-200">
-              {activeJobs.map((job) => (
-                <li key={job.id}>
-                  <Link
-                    href={`/jobs/${job.id}`}
-                    className="px-4 py-4 sm:px-6 block hover:bg-gray-50 transition"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-gray-900 truncate">{job.title}</p>
-                        <p className="mt-1 text-sm text-gray-500 line-clamp-1">
-                          {job.description}
-                        </p>
-                        <p className="mt-1 text-xs text-gray-500">
-                          {job.proposalCount} proposals
-                        </p>
-                      </div>
-                      <div className="ml-4 flex-shrink-0">
-                        <p className="text-sm font-semibold text-primary-600">${job.budget}</p>
-                      </div>
-                    </div>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+        </GdsFlex>
+        <GdsDivider opacity="0.2" />
+        {activeJobs.length === 0 ? (
+          <GdsDiv padding="l">
+            <GdsText font="body-regular-m" color="neutral-02">No active jobs.</GdsText>
+          </GdsDiv>
+        ) : (
+          <GdsFlex flex-direction="column">
+            {activeJobs.map((job) => (
+              <Link key={job.id} href={`/jobs/${job.id}`} style={{ textDecoration: 'none' } as any}>
+                <GdsDiv padding="m" border-width="0 0 4xs 0" border-color="subtle-01">
+                  <GdsFlex justify-content="space-between" align-items="flex-start">
+                    <GdsFlex flex-direction="column" gap="xs" flex="1">
+                      <GdsText font="body-medium-m">{job.title}</GdsText>
+                      <GdsText font="body-regular-s" color="neutral-02">
+                        {job.description.substring(0, 100)}...
+                      </GdsText>
+                      <GdsText font="detail-regular-s" color="neutral-02">
+                        {job.proposalCount} proposals
+                      </GdsText>
+                    </GdsFlex>
+                    <GdsText font="heading-s" color="brand-01">${job.budget}</GdsText>
+                  </GdsFlex>
+                </GdsDiv>
+              </Link>
+            ))}
+          </GdsFlex>
+        )}
+      </GdsCard>
+    </GdsFlex>
+  )
 }
 
 interface FreelancerDashboardProps {
-  data: FreelancerDashboard;
+  data: FreelancerDashboard
 }
 
 function FreelancerDashboardContent({ data }: FreelancerDashboardProps) {
-  const { stats, availableJobs } = data;
+  const { stats, availableJobs } = data
 
   return (
-    <div className="space-y-6">
+    <GdsFlex flex-direction="column" gap="l">
       {/* Stats */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <dt className="text-sm font-medium text-gray-500 truncate">Proposals Submitted</dt>
-            <dd className="mt-1 text-3xl font-extrabold text-gray-900">{stats.proposalsSubmitted || 0}</dd>
-          </div>
-        </div>
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <dt className="text-sm font-medium text-gray-500 truncate">Proposals Accepted</dt>
-            <dd className="mt-1 text-3xl font-extrabold text-gray-900">{stats.proposalsAccepted || 0}</dd>
-          </div>
-        </div>
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <dt className="text-sm font-medium text-gray-500 truncate">Completed Projects</dt>
-            <dd className="mt-1 text-3xl font-extrabold text-gray-900">{stats.completedProjects || 0}</dd>
-          </div>
-        </div>
-      </div>
+      <GdsGrid columns="1; m{3}" gap="m">
+        <GdsCard padding="l" variant="notice">
+          <GdsFlex flex-direction="column" gap="s">
+            <GdsText font="detail-regular-s" color="neutral-02">Proposals Submitted</GdsText>
+            <GdsText font="heading-xl">{stats.proposalsSubmitted || 0}</GdsText>
+          </GdsFlex>
+        </GdsCard>
+        <GdsCard padding="l" variant="information">
+          <GdsFlex flex-direction="column" gap="s">
+            <GdsText font="detail-regular-s" color="neutral-02">Proposals Accepted</GdsText>
+            <GdsText font="heading-xl">{stats.proposalsAccepted || 0}</GdsText>
+          </GdsFlex>
+        </GdsCard>
+        <GdsCard padding="l" variant="positive">
+          <GdsFlex flex-direction="column" gap="s">
+            <GdsText font="detail-regular-s" color="neutral-02">Completed Projects</GdsText>
+            <GdsText font="heading-xl">{stats.completedProjects || 0}</GdsText>
+          </GdsFlex>
+        </GdsCard>
+      </GdsGrid>
 
       {/* Available Jobs */}
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-        <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
-          <div>
-            <h3 className="text-lg leading-6 font-medium text-gray-900">Available Jobs</h3>
-            <p className="mt-1 max-w-2xl text-sm text-gray-500">
+      <GdsCard padding="l" variant="information">
+        <GdsFlex justify-content="space-between" align-items="center" margin-bottom="m">
+          <GdsFlex flex-direction="column" gap="xs">
+            <GdsText font="heading-m">Available Jobs</GdsText>
+            <GdsText font="body-regular-s" color="neutral-02">
               Browse and apply for jobs that match your skills
-            </p>
-          </div>
-          <Link
-            href="/jobs"
-            className="text-primary-600 hover:text-primary-700 font-medium"
-          >
-            View All →
+            </GdsText>
+          </GdsFlex>
+          <Link href="/jobs" style={{ textDecoration: 'none' } as any}>
+            <GdsText font="body-regular-m" color="brand-01">View All →</GdsText>
           </Link>
-        </div>
-        <div className="border-t border-gray-200">
-          {availableJobs.length === 0 ? (
-            <div className="px-4 py-5 sm:px-6 text-gray-600">No jobs available at the moment.</div>
-          ) : (
-            <ul className="divide-y divide-gray-200">
-              {availableJobs.slice(0, 5).map((job) => (
-                <li key={job.id}>
-                  <Link
-                    href={`/jobs/${job.id}`}
-                    className="px-4 py-4 sm:px-6 block hover:bg-gray-50 transition"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-gray-900 truncate">{job.title}</p>
-                        <p className="mt-1 text-sm text-gray-500 line-clamp-1">
-                          {job.description}
-                        </p>
-                        <p className="mt-2 text-xs text-gray-600">
-                          {job.category} • {job.experienceLevel}
-                        </p>
-                      </div>
-                      <div className="ml-4 flex-shrink-0 text-right">
-                        <p className="text-sm font-semibold text-primary-600">${job.budget}</p>
-                        <Link
-                          href={`/jobs/${job.id}`}
-                          className="mt-2 inline-block px-3 py-1 text-xs font-medium text-white bg-primary-600 rounded hover:bg-primary-700"
-                        >
-                          View & Propose
-                        </Link>
-                      </div>
-                    </div>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+        </GdsFlex>
+        <GdsDivider opacity="0.2" />
+        {availableJobs.length === 0 ? (
+          <GdsDiv padding="l">
+            <GdsText font="body-regular-m" color="neutral-02">No jobs available at the moment.</GdsText>
+          </GdsDiv>
+        ) : (
+          <GdsFlex flex-direction="column">
+            {availableJobs.slice(0, 5).map((job) => (
+              <Link key={job.id} href={`/jobs/${job.id}`} style={{ textDecoration: 'none' } as any}>
+                <GdsDiv padding="m" border-width="0 0 4xs 0" border-color="subtle-01">
+                  <GdsFlex justify-content="space-between" align-items="flex-start">
+                    <GdsFlex flex-direction="column" gap="xs" flex="1">
+                      <GdsText font="body-medium-m">{job.title}</GdsText>
+                      <GdsText font="body-regular-s" color="neutral-02">
+                        {job.description.substring(0, 100)}...
+                      </GdsText>
+                      <GdsFlex gap="s">
+                        <GdsBadge variant="information">{job.category}</GdsBadge>
+                        <GdsBadge variant="information">{job.experienceLevel}</GdsBadge>
+                      </GdsFlex>
+                    </GdsFlex>
+                    <GdsFlex flex-direction="column" align-items="flex-end" gap="s">
+                      <GdsText font="heading-s" color="brand-01">${job.budget}</GdsText>
+                      <GdsButton rank="primary" size="small">View &amp; Propose</GdsButton>
+                    </GdsFlex>
+                  </GdsFlex>
+                </GdsDiv>
+              </Link>
+            ))}
+          </GdsFlex>
+        )}
+      </GdsCard>
+    </GdsFlex>
+  )
 }
