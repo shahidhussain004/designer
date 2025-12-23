@@ -1,8 +1,12 @@
 'use client'
 
 import Link from 'next/link'
+<<<<<<< HEAD
 import { useEffect, useRef, useState } from 'react'
 import { GdsFlex, GdsGrid, GdsCard, GdsText, GdsDiv, GdsButton, GdsDivider, GdsDialog } from '@sebgroup/green-core/react'
+=======
+import { GdsFlex, GdsGrid, GdsCard, GdsText, GdsDiv, GdsButton, GdsDivider } from '@sebgroup/green-core/react'
+>>>>>>> main
 import { PageLayout } from '@/components/layout'
 
 export default function Home() {
@@ -34,6 +38,7 @@ export default function Home() {
 
   return (
     <PageLayout>
+<<<<<<< HEAD
       {/* Welcome Signup Modal - Auto-opens on page load */}
       <GdsDialog
         ref={dialogRef}
@@ -219,6 +224,8 @@ export default function Home() {
         </GdsFlex>
       </GdsDialog>
 
+=======
+>>>>>>> main
       {/* Hero Section */}
       <GdsDiv background="brand-01" padding="2xl l">
         <GdsFlex 
