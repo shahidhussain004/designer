@@ -1,9 +1,22 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { authService } from '@/lib/auth';
 import Link from 'next/link';
+import {
+  GdsGrid,
+  GdsFlex,
+  GdsCard,
+  GdsText,
+  GdsButton,
+  GdsInput,
+  GdsAlert,
+  GdsBadge,
+  GdsSpinner,
+  GdsDivider,
+} from '@/components/green';
+import { PageLayout } from '@/components/layout';
+import { authService } from '@/lib/auth';
 import { User } from '@/types';
 
 interface Job {
@@ -63,10 +76,8 @@ export default function JobDetailsPage() {
         const data = await response.json();
         setJob(data);
 
-        // Set jobId in proposal data
-        setProposalData(prev => ({ ...prev, jobId: data.id }));
+        setProposalData((prev) => ({ ...prev, jobId: data.id }));
 
-        // Fetch client details
         if (data.clientId) {
           try {
             const clientResponse = await fetch(
@@ -125,221 +136,243 @@ export default function JobDetailsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-gray-600">Loading job details...</p>
-      </div>
+      <PageLayout>
+        <GdsFlex justify-content="center" align-items="center" padding="xl" style={{ minHeight: '50vh' } as any}>
+          <GdsSpinner />
+        </GdsFlex>
+      </PageLayout>
     );
   }
 
   if (error || !job) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 py-12">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+      <PageLayout>
+        <GdsFlex flex-direction="column" padding="l" gap="m">
+          <GdsAlert variant="negative">
             Error: {error || 'Job not found'}
-          </div>
-          <Link href="/jobs" className="mt-4 inline-block text-primary-600 hover:underline">
+          </GdsAlert>
+          <Link href="/jobs" style={{ color: 'var(--gds-color-l3-content-positive)', textDecoration: 'none' } as any}>
             ← Back to Jobs
           </Link>
-        </div>
-      </div>
+        </GdsFlex>
+      </PageLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <PageLayout>
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <Link href="/jobs" className="text-primary-600 hover:underline text-sm mb-4 inline-block">
-            ← Back to Jobs
-          </Link>
-          <h1 className="text-4xl font-bold text-gray-900">{job.title}</h1>
-        </div>
-      </div>
+      <GdsFlex flex-direction="column" gap="s" padding="l" style={{ borderBottom: '1px solid var(--gds-color-l3-border-primary)' } as any}>
+        <Link href="/jobs" style={{ color: 'var(--gds-color-l3-content-positive)', textDecoration: 'none' } as any}>
+          ← Back to Jobs
+        </Link>
+        <GdsText tag="h1" font-size="heading-xl">
+          {job.title}
+        </GdsText>
+      </GdsFlex>
 
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <GdsFlex padding="l">
+        <GdsGrid columns="1; m{3}" gap="l" style={{ width: '100%' } as any}>
           {/* Main Content */}
-          <div className="md:col-span-2">
-            {/* Job Details */}
-            <div className="bg-white rounded-lg shadow-md p-8 mb-6">
-              <h2 className="text-2xl font-semibold mb-4 text-gray-900">Job Description</h2>
-              <div className="prose prose-sm max-w-none">
-                <p className="text-gray-700 whitespace-pre-wrap">{job.description}</p>
-              </div>
-            </div>
+          <GdsFlex flex-direction="column" gap="m" style={{ gridColumn: 'span 2' } as any}>
+            {/* Job Description */}
+            <GdsCard padding="l">
+              <GdsFlex flex-direction="column" gap="m">
+                <GdsText tag="h2" font-size="heading-m">
+                  Job Description
+                </GdsText>
+                <GdsText style={{ whiteSpace: 'pre-wrap' } as any}>
+                  {job.description}
+                </GdsText>
+              </GdsFlex>
+            </GdsCard>
 
             {/* Job Meta */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <p className="text-sm font-medium text-gray-500 mb-2">Category</p>
-                <p className="text-lg font-semibold text-gray-900">{job.category}</p>
-              </div>
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <p className="text-sm font-medium text-gray-500 mb-2">Experience Level</p>
-                <p className="text-lg font-semibold text-gray-900">{job.experienceLevel}</p>
-              </div>
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <p className="text-sm font-medium text-gray-500 mb-2">Status</p>
-                <p className="text-lg font-semibold text-gray-900">{job.status}</p>
-              </div>
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <p className="text-sm font-medium text-gray-500 mb-2">Posted</p>
-                <p className="text-lg font-semibold text-gray-900">
-                  {new Date(job.createdAt).toLocaleDateString()}
-                </p>
-              </div>
-            </div>
+            <GdsGrid columns="2" gap="m">
+              <GdsCard padding="m">
+                <GdsFlex flex-direction="column" gap="xs">
+                  <GdsText font-size="body-s" color="secondary">Category</GdsText>
+                  <GdsText font-size="heading-s">{job.category}</GdsText>
+                </GdsFlex>
+              </GdsCard>
+              <GdsCard padding="m">
+                <GdsFlex flex-direction="column" gap="xs">
+                  <GdsText font-size="body-s" color="secondary">Experience Level</GdsText>
+                  <GdsText font-size="heading-s">{job.experienceLevel}</GdsText>
+                </GdsFlex>
+              </GdsCard>
+              <GdsCard padding="m">
+                <GdsFlex flex-direction="column" gap="xs">
+                  <GdsText font-size="body-s" color="secondary">Status</GdsText>
+                  <GdsBadge variant={job.status === 'OPEN' ? 'positive' : 'information'}>
+                    {job.status}
+                  </GdsBadge>
+                </GdsFlex>
+              </GdsCard>
+              <GdsCard padding="m">
+                <GdsFlex flex-direction="column" gap="xs">
+                  <GdsText font-size="body-s" color="secondary">Posted</GdsText>
+                  <GdsText font-size="heading-s">
+                    {new Date(job.createdAt).toLocaleDateString()}
+                  </GdsText>
+                </GdsFlex>
+              </GdsCard>
+            </GdsGrid>
 
             {/* Client Info */}
             {client && (
-              <div className="bg-white rounded-lg shadow-md p-8">
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900">About the Client</h2>
-                <div className="flex items-start space-x-4">
-                  <div className="flex-1">
-                    <p className="text-lg font-semibold text-gray-900">{client.fullName}</p>
-                    <p className="text-gray-600">@{client.username}</p>
-                    <p className="text-gray-600">{client.email}</p>
-                  </div>
-                  <Link
-                    href={`/users/${client.id}/profile`}
-                    className="text-primary-600 hover:text-primary-700 font-medium"
-                  >
-                    View Profile →
-                  </Link>
-                </div>
-              </div>
+              <GdsCard padding="l">
+                <GdsFlex flex-direction="column" gap="m">
+                  <GdsText tag="h2" font-size="heading-m">
+                    About the Client
+                  </GdsText>
+                  <GdsFlex justify-content="space-between" align-items="center">
+                    <GdsFlex flex-direction="column" gap="xs">
+                      <GdsText font-size="heading-s">{client.fullName}</GdsText>
+                      <GdsText font-size="body-s" color="secondary">@{client.username}</GdsText>
+                      <GdsText font-size="body-s" color="secondary">{client.email}</GdsText>
+                    </GdsFlex>
+                    <Link
+                      href={`/users/${client.id}/profile`}
+                      style={{ color: 'var(--gds-color-l3-content-positive)', textDecoration: 'none' } as any}
+                    >
+                      View Profile →
+                    </Link>
+                  </GdsFlex>
+                </GdsFlex>
+              </GdsCard>
             )}
-          </div>
+          </GdsFlex>
 
           {/* Sidebar */}
-          <div className="md:col-span-1">
+          <GdsFlex flex-direction="column" gap="m">
             {/* Budget Card */}
-            <div className="bg-primary-600 text-white rounded-lg shadow-md p-8 mb-6">
-              <p className="text-sm font-medium text-primary-100 mb-2">Budget</p>
-              <p className="text-4xl font-bold mb-6">${job.budget}</p>
-              {user && user.role === 'FREELANCER' && user.id !== job.clientId ? (
-                <button
-                  onClick={() => setProposalOpen(!proposalOpen)}
-                  className="w-full bg-white text-primary-600 font-semibold py-3 px-4 rounded-md hover:bg-gray-100 transition"
-                >
-                  {proposalOpen ? 'Cancel' : 'Send Proposal'}
-                </button>
-              ) : user && user.id === job.clientId ? (
-                <div className="bg-blue-500 bg-opacity-50 py-3 px-4 rounded-md text-center">
-                  <p className="text-sm">This is your job posting</p>
-                </div>
-              ) : (
-                <Link
-                  href="/auth/login"
-                  className="block w-full bg-white text-primary-600 font-semibold py-3 px-4 rounded-md hover:bg-gray-100 transition text-center"
-                >
-                  Sign In to Propose
-                </Link>
-              )}
-            </div>
+            <GdsCard padding="l" variant="positive">
+              <GdsFlex flex-direction="column" gap="m">
+                <GdsFlex flex-direction="column" gap="xs">
+                  <GdsText font-size="body-s">Budget</GdsText>
+                  <GdsText font-size="heading-xl">${job.budget}</GdsText>
+                </GdsFlex>
+                
+                {user && user.role === 'FREELANCER' && user.id !== job.clientId ? (
+                  <GdsButton
+                    variant={proposalOpen ? 'neutral' : 'brand'}
+                    onClick={() => setProposalOpen(!proposalOpen)}
+                  >
+                    {proposalOpen ? 'Cancel' : 'Send Proposal'}
+                  </GdsButton>
+                ) : user && user.id === job.clientId ? (
+                  <GdsCard padding="m" variant="information">
+                    <GdsText font-size="body-s" style={{ textAlign: 'center' } as any}>
+                      This is your job posting
+                    </GdsText>
+                  </GdsCard>
+                ) : (
+                  <Link href="/auth/login">
+                    <GdsButton rank="secondary" style={{ width: '100%' } as any}>
+                      Sign In to Propose
+                    </GdsButton>
+                  </Link>
+                )}
+              </GdsFlex>
+            </GdsCard>
 
             {/* Proposal Form */}
             {proposalOpen && user && user.role === 'FREELANCER' && (
-              <form
-                onSubmit={handleProposalSubmit}
-                className="bg-white rounded-lg shadow-md p-6 mb-6"
-              >
-                <h3 className="text-lg font-semibold mb-4 text-gray-900">Submit Your Proposal</h3>
+              <GdsCard padding="l">
+                <form onSubmit={handleProposalSubmit}>
+                  <GdsFlex flex-direction="column" gap="m">
+                    <GdsText tag="h3" font-size="heading-s">
+                      Submit Your Proposal
+                    </GdsText>
 
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Your Proposed Rate
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-3 text-gray-500">$</span>
-                    <input
+                    <GdsInput
+                      label="Your Proposed Rate ($)"
                       type="number"
-                      value={proposalData.proposedRate}
-                      onChange={(e) =>
+                      value={proposalData.proposedRate.toString()}
+                      onInput={(e: Event) =>
                         setProposalData({
                           ...proposalData,
-                          proposedRate: parseFloat(e.target.value),
+                          proposedRate: parseFloat((e.target as HTMLInputElement).value),
                         })
                       }
-                      placeholder="Enter your proposed rate"
-                      className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+                      required
                     />
-                  </div>
-                </div>
 
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Estimated Duration (days)
-                  </label>
-                  <input
-                    type="number"
-                    value={proposalData.estimatedDuration || 30}
-                    onChange={(e) =>
-                      setProposalData({
-                        ...proposalData,
-                        estimatedDuration: parseInt(e.target.value),
-                      })
-                    }
-                    placeholder="30"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                  />
-                </div>
+                    <GdsInput
+                      label="Estimated Duration (days)"
+                      type="number"
+                      value={(proposalData.estimatedDuration || 30).toString()}
+                      onInput={(e: Event) =>
+                        setProposalData({
+                          ...proposalData,
+                          estimatedDuration: parseInt((e.target as HTMLInputElement).value),
+                        })
+                      }
+                    />
 
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Cover Letter
-                  </label>
-                  <textarea
-                    value={proposalData.coverLetter}
-                    onChange={(e) =>
-                      setProposalData({
-                        ...proposalData,
-                        coverLetter: e.target.value,
-                      })
-                    }
-                    placeholder="Tell the client why you're the right fit for this job..."
-                    rows={6}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                  />
-                </div>
+                    <GdsFlex flex-direction="column" gap="xs">
+                      <GdsText font-size="body-s" font-weight="book">
+                        Cover Letter
+                      </GdsText>
+                      <textarea
+                        value={proposalData.coverLetter}
+                        onChange={(e) =>
+                          setProposalData({
+                            ...proposalData,
+                            coverLetter: e.target.value,
+                          })
+                        }
+                        rows={6}
+                        style={{
+                          padding: '0.75rem',
+                          borderRadius: '4px',
+                          border: '1px solid var(--gds-color-l3-border-primary)',
+                          backgroundColor: 'var(--gds-color-l3-background-primary)',
+                          color: 'var(--gds-color-l3-content-primary)',
+                          fontSize: '0.875rem',
+                          width: '100%',
+                          resize: 'vertical',
+                        } as any}
+                      />
+                    </GdsFlex>
 
-                <button
-                  type="submit"
-                  disabled={submittingProposal}
-                  className="w-full bg-primary-600 hover:bg-primary-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-md transition"
-                >
-                  {submittingProposal ? 'Submitting...' : 'Submit Proposal'}
-                </button>
-              </form>
+                    <GdsButton type="submit" disabled={submittingProposal}>
+                      {submittingProposal ? 'Submitting...' : 'Submit Proposal'}
+                    </GdsButton>
+                  </GdsFlex>
+                </form>
+              </GdsCard>
             )}
 
             {/* Quick Stats */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900">Quick Stats</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Budget</span>
-                  <span className="font-semibold">${job.budget}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Status</span>
-                  <span className={`font-semibold ${
-                    job.status === 'OPEN' ? 'text-green-600' : 'text-gray-600'
-                  }`}>
-                    {job.status}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm pt-3 border-t">
-                  <span className="text-gray-600">Posted</span>
-                  <span>{new Date(job.createdAt).toLocaleDateString()}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+            <GdsCard padding="l">
+              <GdsFlex flex-direction="column" gap="m">
+                <GdsText tag="h3" font-size="heading-s">
+                  Quick Stats
+                </GdsText>
+                <GdsFlex flex-direction="column" gap="s">
+                  <GdsFlex justify-content="space-between">
+                    <GdsText color="secondary">Budget</GdsText>
+                    <GdsText font-weight="book">${job.budget}</GdsText>
+                  </GdsFlex>
+                  <GdsFlex justify-content="space-between">
+                    <GdsText color="secondary">Status</GdsText>
+                    <GdsBadge variant={job.status === 'OPEN' ? 'positive' : 'information'}>
+                      {job.status}
+                    </GdsBadge>
+                  </GdsFlex>
+                  <GdsDivider />
+                  <GdsFlex justify-content="space-between">
+                    <GdsText font-size="body-s" color="secondary">Posted</GdsText>
+                    <GdsText font-size="body-s">{new Date(job.createdAt).toLocaleDateString()}</GdsText>
+                  </GdsFlex>
+                </GdsFlex>
+              </GdsFlex>
+            </GdsCard>
+          </GdsFlex>
+        </GdsGrid>
+      </GdsFlex>
+    </PageLayout>
   );
 }

@@ -1,266 +1,351 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import Link from 'next/link';
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import {
+  GdsGrid,
+  GdsFlex,
+  GdsCard,
+  GdsText,
+  GdsButton,
+  GdsInput,
+  GdsBadge,
+  GdsSpinner,
+  GdsDivider,
+} from '@/components/green';
+import { PageLayout } from '@/components/layout';
 
 interface Job {
-  id: number;
+  id: string;
   title: string;
   description: string;
-  budget: number;
   category: string;
   experienceLevel: string;
-  clientId?: number;
-  createdAt?: string;
+  budget: number;
+  status: string;
+  createdAt: string;
+  employer: {
+    id: string;
+    name: string;
+  };
 }
 
-export default function JobsBrowsePage() {
+const categories = [
+  { value: '', label: 'All Categories' },
+  { value: 'WEB_DESIGN', label: 'Web Design' },
+  { value: 'GRAPHIC_DESIGN', label: 'Graphic Design' },
+  { value: 'UI_UX', label: 'UI/UX Design' },
+  { value: 'BRANDING', label: 'Branding' },
+  { value: 'ILLUSTRATION', label: 'Illustration' },
+  { value: 'MOTION_GRAPHICS', label: 'Motion Graphics' },
+];
+
+const experienceLevels = [
+  { value: '', label: 'All Levels' },
+  { value: 'BEGINNER', label: 'Beginner' },
+  { value: 'INTERMEDIATE', label: 'Intermediate' },
+  { value: 'EXPERT', label: 'Expert' },
+];
+
+function JobsPageContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState({
-    category: '',
-    experienceLevel: '',
-    minBudget: '',
-    maxBudget: '',
-    searchTerm: '',
-  });
+  
+  // Filter states
+  const [category, setCategory] = useState(searchParams.get('category') || '');
+  const [experienceLevel, setExperienceLevel] = useState(searchParams.get('experienceLevel') || '');
+  const [minBudget, setMinBudget] = useState(searchParams.get('minBudget') || '');
+  const [maxBudget, setMaxBudget] = useState(searchParams.get('maxBudget') || '');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
 
   const fetchJobs = useCallback(async () => {
     setLoading(true);
     setError(null);
+    
     try {
       const params = new URLSearchParams();
-      if (filters.category) params.append('category', filters.category);
-      if (filters.experienceLevel) params.append('experienceLevel', filters.experienceLevel);
-      if (filters.minBudget) params.append('minBudget', filters.minBudget);
-      if (filters.maxBudget) params.append('maxBudget', filters.maxBudget);
-      if (filters.searchTerm) params.append('search', filters.searchTerm);
-
-      const response = await fetch(
-        `http://localhost:8080/api/jobs?${params.toString()}`
-      );
-
+      if (category) params.append('category', category);
+      if (experienceLevel) params.append('experienceLevel', experienceLevel);
+      if (minBudget) params.append('minBudget', minBudget);
+      if (maxBudget) params.append('maxBudget', maxBudget);
+      if (searchQuery) params.append('search', searchQuery);
+      
+      const response = await fetch(`/api/jobs?${params.toString()}`);
+      
       if (!response.ok) {
         throw new Error('Failed to fetch jobs');
       }
-
+      
       const data = await response.json();
-      setJobs(data.content || data || []);
+      setJobs(data.jobs || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [category, experienceLevel, minBudget, maxBudget, searchQuery]);
 
   useEffect(() => {
     fetchJobs();
   }, [fetchJobs]);
 
-  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const handleApplyFilters = () => {
+    const params = new URLSearchParams();
+    if (category) params.append('category', category);
+    if (experienceLevel) params.append('experienceLevel', experienceLevel);
+    if (minBudget) params.append('minBudget', minBudget);
+    if (maxBudget) params.append('maxBudget', maxBudget);
+    if (searchQuery) params.append('search', searchQuery);
+    
+    router.push(`/jobs?${params.toString()}`);
   };
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    handleFilterChange(e);
+  const handleClearFilters = () => {
+    setCategory('');
+    setExperienceLevel('');
+    setMinBudget('');
+    setMaxBudget('');
+    setSearchQuery('');
+    router.push('/jobs');
+  };
+
+  const getCategoryLabel = (value: string) => {
+    return categories.find(c => c.value === value)?.label || value;
+  };
+
+  const getExperienceLabel = (value: string) => {
+    return experienceLevels.find(e => e.value === value)?.label || value;
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-primary-600 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-4xl font-bold mb-4">Browse Jobs</h1>
-          <p className="text-lg text-primary-100">
-            Find the perfect project that matches your skills
-          </p>
-        </div>
-      </div>
+    <PageLayout>
+      <GdsFlex flex-direction="column" gap="l" padding="l">
+        {/* Page Header */}
+        <GdsFlex flex-direction="column" gap="s">
+          <GdsText tag="h1" font-size="heading-l">
+            Browse Jobs
+          </GdsText>
+          <GdsText color="secondary">
+            Find your next design opportunity from our curated job listings
+          </GdsText>
+        </GdsFlex>
 
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {/* Search Bar */}
+        <GdsCard padding="m" variant="information">
+          <GdsFlex gap="m" align-items="flex-end">
+            <GdsFlex flex="1">
+              <GdsInput
+                label="Search Jobs"
+                value={searchQuery}
+                onInput={(e: Event) => setSearchQuery((e.target as HTMLInputElement).value)}
+              />
+            </GdsFlex>
+            <GdsButton onClick={handleApplyFilters}>
+              Search
+            </GdsButton>
+          </GdsFlex>
+        </GdsCard>
+
+        <GdsGrid columns="1; m{4}" gap="l">
           {/* Filters Sidebar */}
-          <div className="bg-white rounded-lg shadow-md p-6 h-fit">
-            <h2 className="text-lg font-semibold mb-4">Filters</h2>
+          <GdsCard padding="l">
+            <GdsFlex flex-direction="column" gap="m">
+              <GdsText tag="h3" font-size="heading-s">
+                Filters
+              </GdsText>
+              
+              <GdsDivider />
 
-            {/* Search */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Search Jobs
-              </label>
-              <input
-                type="text"
-                name="searchTerm"
-                value={filters.searchTerm}
-                onChange={handleSearch}
-                placeholder="Keywords..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-              />
-            </div>
+              {/* Category Filter */}
+              <GdsFlex flex-direction="column" gap="xs">
+                <GdsText font-size="body-s" font-weight="book">
+                  Category
+                </GdsText>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  style={{
+                    padding: '0.75rem',
+                    borderRadius: '4px',
+                    border: '1px solid var(--gds-color-l3-border-primary)',
+                    backgroundColor: 'var(--gds-color-l3-background-primary)',
+                    color: 'var(--gds-color-l3-content-primary)',
+                    fontSize: '0.875rem',
+                    width: '100%',
+                  } as any}
+                >
+                  {categories.map((cat) => (
+                    <option key={cat.value} value={cat.value}>
+                      {cat.label}
+                    </option>
+                  ))}
+                </select>
+              </GdsFlex>
 
-            {/* Category */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Category
-              </label>
-              <select
-                name="category"
-                value={filters.category}
-                onChange={handleFilterChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-              >
-                <option value="">All Categories</option>
-                <option value="WEB_DESIGN">Web Design</option>
-                <option value="GRAPHIC_DESIGN">Graphic Design</option>
-                <option value="MOBILE_DEV">Mobile Development</option>
-                <option value="WEB_DEV">Web Development</option>
-                <option value="DATA_ENTRY">Data Entry</option>
-                <option value="WRITING">Writing</option>
-              </select>
-            </div>
+              {/* Experience Level Filter */}
+              <GdsFlex flex-direction="column" gap="xs">
+                <GdsText font-size="body-s" font-weight="book">
+                  Experience Level
+                </GdsText>
+                <select
+                  value={experienceLevel}
+                  onChange={(e) => setExperienceLevel(e.target.value)}
+                  style={{
+                    padding: '0.75rem',
+                    borderRadius: '4px',
+                    border: '1px solid var(--gds-color-l3-border-primary)',
+                    backgroundColor: 'var(--gds-color-l3-background-primary)',
+                    color: 'var(--gds-color-l3-content-primary)',
+                    fontSize: '0.875rem',
+                    width: '100%',
+                  } as any}
+                >
+                  {experienceLevels.map((level) => (
+                    <option key={level.value} value={level.value}>
+                      {level.label}
+                    </option>
+                  ))}
+                </select>
+              </GdsFlex>
 
-            {/* Experience Level */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Experience Level
-              </label>
-              <select
-                name="experienceLevel"
-                value={filters.experienceLevel}
-                onChange={handleFilterChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-              >
-                <option value="">All Levels</option>
-                <option value="BEGINNER">Beginner</option>
-                <option value="INTERMEDIATE">Intermediate</option>
-                <option value="EXPERT">Expert</option>
-              </select>
-            </div>
+              {/* Budget Range */}
+              <GdsFlex flex-direction="column" gap="xs">
+                <GdsText font-size="body-s" font-weight="book">
+                  Budget Range
+                </GdsText>
+                <GdsFlex gap="s">
+                  <GdsInput
+                    label="Min"
+                    type="number"
+                    value={minBudget}
+                    onInput={(e: Event) => setMinBudget((e.target as HTMLInputElement).value)}
+                  />
+                  <GdsInput
+                    label="Max"
+                    type="number"
+                    value={maxBudget}
+                    onInput={(e: Event) => setMaxBudget((e.target as HTMLInputElement).value)}
+                  />
+                </GdsFlex>
+              </GdsFlex>
 
-            {/* Budget Range */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Min Budget
-              </label>
-              <input
-                type="number"
-                name="minBudget"
-                value={filters.minBudget}
-                onChange={handleFilterChange}
-                placeholder="0"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-              />
-            </div>
+              <GdsDivider />
 
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Max Budget
-              </label>
-              <input
-                type="number"
-                name="maxBudget"
-                value={filters.maxBudget}
-                onChange={handleFilterChange}
-                placeholder="10000"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-              />
-            </div>
-
-            <button
-              onClick={() =>
-                setFilters({
-                  category: '',
-                  experienceLevel: '',
-                  minBudget: '',
-                  maxBudget: '',
-                  searchTerm: '',
-                })
-              }
-              className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded-md transition text-sm font-medium"
-            >
-              Clear Filters
-            </button>
-          </div>
+              {/* Filter Actions */}
+              <GdsFlex flex-direction="column" gap="s">
+                <GdsButton onClick={handleApplyFilters}>
+                  Apply Filters
+                </GdsButton>
+                <GdsButton rank="secondary" onClick={handleClearFilters}>
+                  Clear Filters
+                </GdsButton>
+              </GdsFlex>
+            </GdsFlex>
+          </GdsCard>
 
           {/* Jobs List */}
-          <div className="md:col-span-3">
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-6">
-                Error: {error}
-              </div>
-            )}
-
+          <GdsFlex flex-direction="column" gap="m" style={{ gridColumn: 'span 3' } as any}>
             {loading ? (
-              <div className="bg-white rounded-lg shadow-md p-12 text-center">
-                <p className="text-gray-600">Loading jobs...</p>
-              </div>
+              <GdsFlex justify-content="center" padding="xl">
+                <GdsSpinner />
+              </GdsFlex>
+            ) : error ? (
+              <GdsCard padding="l" variant="negative">
+                <GdsText color="negative">{error}</GdsText>
+              </GdsCard>
             ) : jobs.length === 0 ? (
-              <div className="bg-white rounded-lg shadow-md p-12 text-center">
-                <p className="text-gray-600">No jobs found matching your criteria.</p>
-              </div>
+              <GdsCard padding="xl">
+                <GdsFlex flex-direction="column" align-items="center" gap="m">
+                  <GdsText font-size="heading-s" color="secondary">
+                    No jobs found
+                  </GdsText>
+                  <GdsText color="secondary">
+                    Try adjusting your filters or search query
+                  </GdsText>
+                  <GdsButton rank="secondary" onClick={handleClearFilters}>
+                    Clear All Filters
+                  </GdsButton>
+                </GdsFlex>
+              </GdsCard>
             ) : (
-              <div className="space-y-4">
-                <p className="text-sm text-gray-600 mb-4">
-                  Showing {jobs.length} job(s)
-                </p>
+              <>
+                <GdsText font-size="body-s" color="secondary">
+                  Found {jobs.length} job{jobs.length !== 1 ? 's' : ''}
+                </GdsText>
+                
                 {jobs.map((job) => (
-                  <div
-                    key={job.id}
-                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition border-l-4 border-primary-600"
-                  >
-                    <Link href={`/jobs/${job.id}`}>
-                      <h3 className="text-lg font-semibold text-gray-900 hover:text-primary-600 mb-2 cursor-pointer">
-                        {job.title}
-                      </h3>
-                    </Link>
+                  <GdsCard key={job.id} padding="l">
+                    <GdsFlex flex-direction="column" gap="m">
+                      <GdsFlex justify-content="space-between" align-items="flex-start">
+                        <GdsFlex flex-direction="column" gap="xs">
+                          <GdsText tag="h3" font-size="heading-s">
+                            {job.title}
+                          </GdsText>
+                          <GdsText font-size="body-s" color="secondary">
+                            Posted by {job.employer.name} • {formatDate(job.createdAt)}
+                          </GdsText>
+                        </GdsFlex>
+                        <GdsText font-size="heading-s" color="positive">
+                          ${job.budget.toLocaleString()}
+                        </GdsText>
+                      </GdsFlex>
 
-                    <p className="text-gray-600 mb-4 line-clamp-2">
-                      {job.description}
-                    </p>
+                      <GdsText>
+                        {job.description.length > 200
+                          ? `${job.description.substring(0, 200)}...`
+                          : job.description}
+                      </GdsText>
 
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {job.category && (
-                        <span className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full">
-                          {job.category}
-                        </span>
-                      )}
-                      {job.experienceLevel && (
-                        <span className="inline-block bg-yellow-100 text-yellow-800 text-xs font-semibold px-3 py-1 rounded-full">
-                          {job.experienceLevel}
-                        </span>
-                      )}
-                    </div>
+                      <GdsFlex gap="s" align-items="center">
+                        <GdsBadge variant="notice">
+                          {getCategoryLabel(job.category)}
+                        </GdsBadge>
+                        <GdsBadge variant="information">
+                          {getExperienceLabel(job.experienceLevel)}
+                        </GdsBadge>
+                        <GdsBadge variant={job.status === 'OPEN' ? 'positive' : 'information'}>
+                          {job.status}
+                        </GdsBadge>
+                      </GdsFlex>
 
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="text-2xl font-bold text-primary-600">
-                          ${job.budget}
-                        </p>
-                        {job.createdAt && (
-                          <p className="text-xs text-gray-500 mt-1">
-                            Posted {new Date(job.createdAt).toLocaleDateString()}
-                          </p>
-                        )}
-                      </div>
-                      <Link
-                        href={`/jobs/${job.id}`}
-                        className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-2 rounded-md transition font-medium"
-                      >
-                        View Details
-                      </Link>
-                    </div>
-                  </div>
+                      <GdsDivider />
+
+                      <GdsFlex justify-content="flex-end">
+                        <GdsButton
+                          rank="secondary"
+                          onClick={() => router.push(`/jobs/${job.id}`)}
+                        >
+                          View Details
+                        </GdsButton>
+                      </GdsFlex>
+                    </GdsFlex>
+                  </GdsCard>
                 ))}
-              </div>
+              </>
             )}
-          </div>
-        </div>
-      </div>
-    </div>
+          </GdsFlex>
+        </GdsGrid>
+      </GdsFlex>
+    </PageLayout>
+  );
+}
+
+export default function JobsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <JobsPageContent />
+    </Suspense>
   );
 }

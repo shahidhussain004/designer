@@ -1,8 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import {
+  GdsFlex,
+  GdsCard,
+  GdsText,
+  GdsButton,
+  GdsInput,
+  GdsAlert,
+  GdsDivider,
+} from '@/components/green';
 import { authService } from '@/lib/auth';
 
 export default function RegisterPage() {
@@ -40,148 +49,155 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Create your account
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Already have an account?{' '}
-            <Link href="/auth/login" className="font-medium text-primary-600 hover:text-primary-500">
-              Sign in
-            </Link>
-          </p>
-        </div>
+    <GdsFlex
+      justify-content="center"
+      align-items="center"
+      padding="l"
+      style={{ minHeight: '100vh', backgroundColor: 'var(--gds-color-l3-background-secondary)' } as any}
+    >
+      <GdsCard padding="xl" style={{ maxWidth: '480px', width: '100%' } as any}>
+        <GdsFlex flex-direction="column" gap="l">
+          {/* Header */}
+          <GdsFlex flex-direction="column" align-items="center" gap="s">
+            <GdsText tag="h1" font-size="heading-l">
+              Create your account
+            </GdsText>
+            <GdsText color="secondary">
+              Already have an account?{' '}
+              <Link href="/auth/login" style={{ color: 'var(--gds-color-l3-content-positive)' } as any}>
+                Sign in
+              </Link>
+            </GdsText>
+          </GdsFlex>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <GdsDivider />
+
+          {/* Error Alert */}
           {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="text-sm text-red-800">{error}</div>
-            </div>
+            <GdsAlert variant="negative">
+              {error}
+            </GdsAlert>
           )}
 
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
-                Full Name
-              </label>
-              <input
-                id="fullName"
-                name="fullName"
-                type="text"
-                required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                placeholder="John Doe"
+          {/* Form */}
+          <form onSubmit={handleSubmit}>
+            <GdsFlex flex-direction="column" gap="m">
+              <GdsInput
+                label="Full Name"
                 value={formData.fullName}
-                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                onInput={(e: Event) =>
+                  setFormData({ ...formData, fullName: (e.target as HTMLInputElement).value })
+                }
+                required
               />
-            </div>
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email Address
-              </label>
-              <input
-                id="email"
-                name="email"
+              <GdsInput
+                label="Email Address"
                 type="email"
-                required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                placeholder="you@example.com"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                Username
-              </label>
-              <input
-                id="username"
-                name="username"
-                type="text"
+                onInput={(e: Event) =>
+                  setFormData({ ...formData, email: (e.target as HTMLInputElement).value })
+                }
                 required
-                pattern="^[a-zA-Z0-9_]{3,50}$"
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                placeholder="johndoe"
-                value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
               />
-              <p className="mt-1 text-sm text-gray-500">Letters, numbers, and underscores only (3-50 characters)</p>
-            </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                minLength={8}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                placeholder="••••••••"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              />
-              <p className="mt-1 text-sm text-gray-500">Minimum 8 characters</p>
-            </div>
+              <GdsFlex flex-direction="column" gap="xs">
+                <GdsInput
+                  label="Username"
+                  value={formData.username}
+                  onInput={(e: Event) =>
+                    setFormData({ ...formData, username: (e.target as HTMLInputElement).value })
+                  }
+                  required
+                />
+                <GdsText font-size="body-s" color="secondary">
+                  Letters, numbers, and underscores only (3-50 characters)
+                </GdsText>
+              </GdsFlex>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                I want to:
-              </label>
-              <div className="space-y-2">
-                <label className="flex items-center p-3 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-50">
-                  <input
-                    type="radio"
-                    name="role"
-                    value="FREELANCER"
-                    checked={formData.role === 'FREELANCER'}
-                    onChange={(e) => setFormData({ ...formData, role: e.target.value as 'CLIENT' | 'FREELANCER' })}
-                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
-                  />
-                  <span className="ml-3">
-                    <span className="block text-sm font-medium text-gray-900">Work as a Freelancer</span>
-                    <span className="block text-sm text-gray-500">Find jobs and get hired</span>
-                  </span>
-                </label>
-                <label className="flex items-center p-3 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-50">
-                  <input
-                    type="radio"
-                    name="role"
-                    value="CLIENT"
-                    checked={formData.role === 'CLIENT'}
-                    onChange={(e) => setFormData({ ...formData, role: e.target.value as 'CLIENT' | 'FREELANCER' })}
-                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
-                  />
-                  <span className="ml-3">
-                    <span className="block text-sm font-medium text-gray-900">Hire as a Client</span>
-                    <span className="block text-sm text-gray-500">Post jobs and find talent</span>
-                  </span>
-                </label>
-              </div>
-            </div>
-          </div>
+              <GdsFlex flex-direction="column" gap="xs">
+                <GdsInput
+                  label="Password"
+                  type="password"
+                  value={formData.password}
+                  onInput={(e: Event) =>
+                    setFormData({ ...formData, password: (e.target as HTMLInputElement).value })
+                  }
+                  required
+                />
+                <GdsText font-size="body-s" color="secondary">
+                  Minimum 8 characters
+                </GdsText>
+              </GdsFlex>
 
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Creating account...' : 'Create account'}
-            </button>
-          </div>
+              <GdsDivider />
 
-          <p className="text-xs text-center text-gray-500">
-            By creating an account, you agree to our Terms of Service and Privacy Policy
-          </p>
-        </form>
-      </div>
-    </div>
+              {/* Role Selection */}
+              <GdsFlex flex-direction="column" gap="s">
+                <GdsText font-weight="book">I want to:</GdsText>
+                
+                <GdsCard
+                  padding="m"
+                  variant={formData.role === 'FREELANCER' ? 'positive' : 'secondary'}
+                  onClick={() => setFormData({ ...formData, role: 'FREELANCER' })}
+                  style={{ cursor: 'pointer' } as any}
+                >
+                  <GdsFlex align-items="center" gap="m">
+                    <input
+                      type="radio"
+                      name="role"
+                      value="FREELANCER"
+                      checked={formData.role === 'FREELANCER'}
+                      onChange={() => setFormData({ ...formData, role: 'FREELANCER' })}
+                      style={{ width: '18px', height: '18px' } as any}
+                    />
+                    <GdsFlex flex-direction="column" gap="2xs">
+                      <GdsText font-weight="book">Work as a Freelancer</GdsText>
+                      <GdsText font-size="body-s" color="secondary">
+                        Find jobs and get hired
+                      </GdsText>
+                    </GdsFlex>
+                  </GdsFlex>
+                </GdsCard>
+
+                <GdsCard
+                  padding="m"
+                  variant={formData.role === 'CLIENT' ? 'positive' : 'secondary'}
+                  onClick={() => setFormData({ ...formData, role: 'CLIENT' })}
+                  style={{ cursor: 'pointer' } as any}
+                >
+                  <GdsFlex align-items="center" gap="m">
+                    <input
+                      type="radio"
+                      name="role"
+                      value="CLIENT"
+                      checked={formData.role === 'CLIENT'}
+                      onChange={() => setFormData({ ...formData, role: 'CLIENT' })}
+                      style={{ width: '18px', height: '18px' } as any}
+                    />
+                    <GdsFlex flex-direction="column" gap="2xs">
+                      <GdsText font-weight="book">Hire as a Client</GdsText>
+                      <GdsText font-size="body-s" color="secondary">
+                        Post jobs and find talent
+                      </GdsText>
+                    </GdsFlex>
+                  </GdsFlex>
+                </GdsCard>
+              </GdsFlex>
+
+              <GdsDivider />
+
+              <GdsButton type="submit" disabled={loading}>
+                {loading ? 'Creating account...' : 'Create account'}
+              </GdsButton>
+
+              <GdsText font-size="body-s" color="secondary" style={{ textAlign: 'center' } as any}>
+                By creating an account, you agree to our Terms of Service and Privacy Policy
+              </GdsText>
+            </GdsFlex>
+          </form>
+        </GdsFlex>
+      </GdsCard>
+    </GdsFlex>
   );
 }

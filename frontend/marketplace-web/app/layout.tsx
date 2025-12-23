@@ -1,10 +1,9 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
+import '@sebgroup/fonts/css/seb-fonts.css'
 import PWARegister from './PWARegister'
 import { SkipLink } from '@/components/ui/Accessibility'
-
-const inter = Inter({ subsets: ['latin'] })
+import { ThemeProvider } from '@/lib/theme'
 
 export const metadata: Metadata = {
   title: 'Designer Marketplace - Find Freelance Talent',
@@ -17,7 +16,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#3B82F6',
+  themeColor: '#003824',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
@@ -31,22 +30,24 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <meta name="theme-color" content="#3B82F6" />
+        <meta name="theme-color" content="#003824" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/favicon.ico" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
-      <body className={inter.className}>
+      <body style={{ fontFamily: "'SEB Sans Serif', system-ui, -apple-system, sans-serif", margin: 0 } as any}>
         {/* Skip Link for keyboard accessibility - WCAG 2.4.1 */}
         <SkipLink targetId="main-content" />
         
         <PWARegister />
         
-        {/* Main content wrapper with ARIA landmark */}
-        <div id="main-content" role="main" tabIndex={-1}>
-          {children}
-        </div>
+        <ThemeProvider>
+          {/* Main content wrapper with ARIA landmark */}
+          <div id="main-content" role="main" tabIndex={-1}>
+            {children}
+          </div>
+        </ThemeProvider>
         
         {/* Live region for dynamic announcements */}
         <div

@@ -1,22 +1,29 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import {
+  GdsFlex,
+  GdsCard,
+  GdsText,
+  GdsButton,
+  GdsSpinner,
+  GdsDivider,
+} from '@/components/green';
 import { formatCurrency } from '@/lib/payments';
 
 function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
-  
+
   const type = searchParams.get('type') || 'payment';
   const itemId = searchParams.get('id');
   const amount = parseInt(searchParams.get('amount') || '0', 10);
 
-  const [confetti, setConfetti] = useState(true);
+  const [showConfetti, setShowConfetti] = useState(true);
 
   useEffect(() => {
-    // Hide confetti after 3 seconds
-    const timer = setTimeout(() => setConfetti(false), 3000);
+    const timer = setTimeout(() => setShowConfetti(false), 3000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -26,7 +33,8 @@ function CheckoutSuccessContent() {
         return {
           icon: '🎯',
           title: 'Milestone Funded!',
-          description: 'The funds have been securely deposited into escrow. The freelancer has been notified and can begin work.',
+          description:
+            'The funds have been securely deposited into escrow. The freelancer has been notified and can begin work.',
           primaryAction: { label: 'View Milestone', href: `/jobs/${itemId}/milestones` },
           secondaryAction: { label: 'Go to Dashboard', href: '/dashboard' },
         };
@@ -60,137 +68,136 @@ function CheckoutSuccessContent() {
   const details = getTypeDetails();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-gray-50 flex items-center justify-center p-4">
-      {/* Confetti Animation */}
-      {confetti && (
-        <div className="fixed inset-0 pointer-events-none overflow-hidden">
-          {[...Array(50)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute animate-confetti"
-              style={{
-                left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${3 + Math.random() * 2}s`,
-              }}
-            >
-              <div
-                className="w-3 h-3 rounded-sm"
-                style={{
-                  backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'][
-                    Math.floor(Math.random() * 5)
-                  ],
-                  transform: `rotate(${Math.random() * 360}deg)`,
-                }}
-              />
-            </div>
-          ))}
+    <GdsFlex
+      justify-content="center"
+      align-items="center"
+      padding="l"
+      style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, var(--gds-color-l3-background-positive) 0%, var(--gds-color-l3-background-secondary) 100%)',
+      } as any}
+    >
+      {/* Confetti Effect - simple version */}
+      {showConfetti && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, pointerEvents: 'none', textAlign: 'center' } as any}>
+          <GdsText font-size="heading-xl">🎉 🎊 ✨ 🎉 🎊 ✨ 🎉</GdsText>
         </div>
       )}
 
-      <div className="max-w-md w-full">
-        <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
-          {/* Success Animation */}
-          <div className="relative w-24 h-24 mx-auto mb-6">
-            <div className="absolute inset-0 bg-green-100 rounded-full animate-ping opacity-25"></div>
-            <div className="relative w-24 h-24 bg-green-100 rounded-full flex items-center justify-center">
-              <span className="text-4xl">{details.icon}</span>
-            </div>
-          </div>
+      <GdsCard padding="xl" style={{ maxWidth: '480px', width: '100%', textAlign: 'center' } as any}>
+        <GdsFlex flex-direction="column" gap="l" align-items="center">
+          {/* Success Icon */}
+          <GdsFlex
+            justify-content="center"
+            align-items="center"
+            style={{
+              width: '96px',
+              height: '96px',
+              borderRadius: '50%',
+              backgroundColor: 'var(--gds-color-l3-background-positive)',
+            } as any}
+          >
+            <GdsText font-size="heading-xl">{details.icon}</GdsText>
+          </GdsFlex>
 
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          <GdsText tag="h1" font-size="heading-l">
             {details.title}
-          </h1>
-          
-          <p className="text-gray-600 mb-6">
+          </GdsText>
+
+          <GdsText color="secondary" style={{ textAlign: 'center' } as any}>
             {details.description}
-          </p>
+          </GdsText>
 
           {/* Amount Confirmation */}
           {amount > 0 && (
-            <div className="bg-gray-50 rounded-lg p-4 mb-6">
-              <p className="text-sm text-gray-500 mb-1">Amount Paid</p>
-              <p className="text-3xl font-bold text-gray-900">{formatCurrency(amount)}</p>
-            </div>
+            <GdsCard padding="m" variant="secondary" style={{ width: '100%' } as any}>
+              <GdsFlex flex-direction="column" gap="xs" align-items="center">
+                <GdsText font-size="body-s" color="secondary">
+                  Amount Paid
+                </GdsText>
+                <GdsText font-size="heading-xl">{formatCurrency(amount)}</GdsText>
+              </GdsFlex>
+            </GdsCard>
           )}
 
           {/* Transaction Details */}
-          <div className="text-left border rounded-lg p-4 mb-6">
-            <h3 className="font-medium text-gray-900 mb-2">Transaction Details</h3>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-500">Transaction ID</span>
-                <span className="font-mono text-gray-700">TXN-{Date.now().toString(36).toUpperCase()}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">Date</span>
-                <span className="text-gray-700">{new Date().toLocaleDateString()}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">Payment Method</span>
-                <span className="text-gray-700">•••• 4242</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">Status</span>
-                <span className="text-green-600 font-medium">Completed</span>
-              </div>
-            </div>
-          </div>
+          <GdsCard padding="m" style={{ width: '100%', textAlign: 'left' } as any}>
+            <GdsFlex flex-direction="column" gap="m">
+              <GdsText font-weight="book">Transaction Details</GdsText>
+              <GdsFlex flex-direction="column" gap="s">
+                <GdsFlex justify-content="space-between">
+                  <GdsText font-size="body-s" color="secondary">
+                    Transaction ID
+                  </GdsText>
+                  <GdsText font-size="body-s" style={{ fontFamily: 'monospace' } as any}>
+                    TXN-{Date.now().toString(36).toUpperCase()}
+                  </GdsText>
+                </GdsFlex>
+                <GdsFlex justify-content="space-between">
+                  <GdsText font-size="body-s" color="secondary">
+                    Date
+                  </GdsText>
+                  <GdsText font-size="body-s">{new Date().toLocaleDateString()}</GdsText>
+                </GdsFlex>
+                <GdsFlex justify-content="space-between">
+                  <GdsText font-size="body-s" color="secondary">
+                    Payment Method
+                  </GdsText>
+                  <GdsText font-size="body-s">•••• 4242</GdsText>
+                </GdsFlex>
+                <GdsFlex justify-content="space-between">
+                  <GdsText font-size="body-s" color="secondary">
+                    Status
+                  </GdsText>
+                  <GdsText font-size="body-s" color="positive">
+                    Completed
+                  </GdsText>
+                </GdsFlex>
+              </GdsFlex>
+            </GdsFlex>
+          </GdsCard>
+
+          <GdsDivider />
 
           {/* Actions */}
-          <div className="space-y-3">
-            <Link
-              href={details.primaryAction.href}
-              className="block w-full py-3 px-4 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition"
-            >
-              {details.primaryAction.label}
+          <GdsFlex flex-direction="column" gap="s" style={{ width: '100%' } as any}>
+            <Link href={details.primaryAction.href} style={{ width: '100%', textDecoration: 'none' } as any}>
+              <GdsButton style={{ width: '100%' } as any}>{details.primaryAction.label}</GdsButton>
             </Link>
-            
-            <Link
-              href={details.secondaryAction.href}
-              className="block w-full py-3 px-4 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition"
-            >
-              {details.secondaryAction.label}
+            <Link href={details.secondaryAction.href} style={{ width: '100%', textDecoration: 'none' } as any}>
+              <GdsButton rank="secondary" style={{ width: '100%' } as any}>
+                {details.secondaryAction.label}
+              </GdsButton>
             </Link>
-          </div>
-        </div>
+          </GdsFlex>
 
-        {/* Receipt Link */}
-        <div className="text-center mt-6 space-y-2">
-          <p className="text-sm text-gray-500">
-            A receipt has been sent to your email address.
-          </p>
-          <Link href="/dashboard/invoices" className="text-sm text-primary-600 hover:underline">
-            View all invoices →
-          </Link>
-        </div>
-      </div>
-
-      {/* Confetti CSS */}
-      <style jsx>{`
-        @keyframes confetti-fall {
-          0% {
-            transform: translateY(-100vh) rotate(0deg);
-            opacity: 1;
-          }
-          100% {
-            transform: translateY(100vh) rotate(720deg);
-            opacity: 0;
-          }
-        }
-        .animate-confetti {
-          animation: confetti-fall linear forwards;
-        }
-      `}</style>
-    </div>
+          {/* Receipt Link */}
+          <GdsFlex flex-direction="column" gap="xs" align-items="center">
+            <GdsText font-size="body-s" color="secondary">
+              A receipt has been sent to your email address.
+            </GdsText>
+            <Link
+              href="/dashboard/invoices"
+              style={{ color: 'var(--gds-color-l3-content-positive)', textDecoration: 'none' } as any}
+            >
+              <GdsText font-size="body-s">View all invoices →</GdsText>
+            </Link>
+          </GdsFlex>
+        </GdsFlex>
+      </GdsCard>
+    </GdsFlex>
   );
 }
 
 function SuccessLoading() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-    </div>
+    <GdsFlex
+      justify-content="center"
+      align-items="center"
+      style={{ minHeight: '100vh' } as any}
+    >
+      <GdsSpinner />
+    </GdsFlex>
   );
 }
 

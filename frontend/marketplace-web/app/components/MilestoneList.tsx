@@ -365,7 +365,6 @@ export default function MilestoneList({
             <textarea
               value={deliverables}
               onChange={(e) => setDeliverables(e.target.value)}
-              placeholder="Describe what you've completed, include links to deliverables, etc."
               className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 min-h-32"
             />
             <div className="flex justify-end gap-3 mt-4">
@@ -401,7 +400,6 @@ export default function MilestoneList({
             <textarea
               value={revisionReason}
               onChange={(e) => setRevisionReason(e.target.value)}
-              placeholder="Describe the changes or corrections needed..."
               className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 min-h-32"
             />
             <div className="flex justify-end gap-3 mt-4">

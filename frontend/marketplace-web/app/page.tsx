@@ -1,168 +1,239 @@
-import Link from 'next/link';
+'use client'
+
+import Link from 'next/link'
+import { GdsFlex, GdsGrid, GdsCard, GdsText, GdsDiv, GdsButton, GdsDivider } from '@sebgroup/green-core/react'
+import { PageLayout } from '@/components/layout'
 
 export default function Home() {
   return (
-    <main className="min-h-screen">
-      {/* Navigation */}
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center space-x-8">
-              <Link href="/" className="text-xl font-bold text-primary-600">
-                Designer Marketplace
-              </Link>
-              <div className="hidden md:flex space-x-6">
-                <Link href="/jobs" className="text-gray-600 hover:text-gray-900">Jobs</Link>
-                <Link href="/courses" className="text-gray-600 hover:text-gray-900">Courses</Link>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/auth/login" className="text-gray-600 hover:text-gray-900">Login</Link>
-              <Link 
-                href="/auth/register" 
-                className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition"
-              >
-                Sign Up
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <div className="p-8">
-        <div className="max-w-7xl mx-auto">
-          <header className="text-center mb-12">
-            <h1 className="text-5xl font-bold text-primary-600 mb-4">
-              Designer Marketplace
-            </h1>
-            <p className="text-xl text-gray-600">
-              Find talented freelancers for your next project or learn new skills
-            </p>
-          </header>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-            <Link href="/jobs/new" className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-              <h2 className="text-2xl font-semibold mb-3">Post a Job</h2>
-              <p className="text-gray-600 mb-4">
-                Describe your project and find the perfect freelancer
-              </p>
-              <span className="inline-block bg-primary-600 text-white px-6 py-2 rounded-md hover:bg-primary-700 transition">
+    <PageLayout>
+      {/* Hero Section */}
+      <GdsDiv background="brand-01" padding="2xl l">
+        <GdsFlex 
+          flex-direction="column" 
+          align-items="center" 
+          gap="l"
+          max-width="1280px"
+          margin="0 auto"
+        >
+          <GdsText tag="h1" font="heading-2xl" color="inversed" text-align="center">
+            Designer Marketplace
+          </GdsText>
+          <GdsText font="body-regular-l" color="inversed" text-align="center">
+            Find talented freelancers for your next project or learn new skills
+          </GdsText>
+          <GdsFlex gap="m">
+            <Link href="/jobs">
+              <GdsButton rank="primary" variant="neutral">
+                Browse Jobs
+              </GdsButton>
+            </Link>
+            <Link href="/auth/register">
+              <GdsButton rank="secondary" variant="neutral">
                 Get Started
-              </span>
+              </GdsButton>
             </Link>
+          </GdsFlex>
+        </GdsFlex>
+      </GdsDiv>
 
-            <Link href="/freelancers" className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-              <h2 className="text-2xl font-semibold mb-3">Browse Talent</h2>
-              <p className="text-gray-600 mb-4">
-                Explore profiles of skilled designers and developers
-              </p>
-              <span className="inline-block bg-primary-600 text-white px-6 py-2 rounded-md hover:bg-primary-700 transition">
-                Find Talent
-              </span>
-            </Link>
+      {/* Main Content */}
+      <GdsDiv padding="xl l" max-width="1280px" margin="0 auto" width="100%">
+        {/* Feature Cards */}
+        <GdsGrid columns="1; m{2}; l{4}" gap="m" margin-bottom="xl">
+          <Link href="/jobs/create" style={{ textDecoration: 'none' } as any}>
+            <GdsCard padding="l" variant="secondary" height="100%">
+              <GdsFlex flex-direction="column" gap="m" height="100%">
+                <GdsText font="heading-m">Post a Job</GdsText>
+                <GdsText font="body-regular-m" color="neutral-02">
+                  Describe your project and find the perfect freelancer
+                </GdsText>
+                <GdsDiv margin-top="auto">
+                  <GdsButton rank="primary" size="small">
+                    Get Started
+                  </GdsButton>
+                </GdsDiv>
+              </GdsFlex>
+            </GdsCard>
+          </Link>
 
-            <Link href="/jobs" className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-              <h2 className="text-2xl font-semibold mb-3">Find Work</h2>
-              <p className="text-gray-600 mb-4">
-                Browse available jobs and submit proposals
-              </p>
-              <span className="inline-block bg-primary-600 text-white px-6 py-2 rounded-md hover:bg-primary-700 transition">
-                View Jobs
-              </span>
-            </Link>
+          <Link href="/freelancers" style={{ textDecoration: 'none' } as any}>
+            <GdsCard padding="l" variant="secondary" height="100%">
+              <GdsFlex flex-direction="column" gap="m" height="100%">
+                <GdsText font="heading-m">Browse Talent</GdsText>
+                <GdsText font="body-regular-m" color="neutral-02">
+                  Explore profiles of skilled designers and developers
+                </GdsText>
+                <GdsDiv margin-top="auto">
+                  <GdsButton rank="primary" size="small">
+                    Find Talent
+                  </GdsButton>
+                </GdsDiv>
+              </GdsFlex>
+            </GdsCard>
+          </Link>
 
-            <Link href="/courses" className="bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg shadow-md p-6 hover:shadow-lg transition text-white">
-              <h2 className="text-2xl font-semibold mb-3">Learn Skills</h2>
-              <p className="text-white text-opacity-90 mb-4">
-                Take courses from industry experts
-              </p>
-              <span className="inline-block bg-white text-primary-600 px-6 py-2 rounded-md hover:bg-gray-100 transition">
-                Browse Courses
-              </span>
-            </Link>
-          </div>
+          <Link href="/jobs" style={{ textDecoration: 'none' } as any}>
+            <GdsCard padding="l" variant="secondary" height="100%">
+              <GdsFlex flex-direction="column" gap="m" height="100%">
+                <GdsText font="heading-m">Find Work</GdsText>
+                <GdsText font="body-regular-m" color="neutral-02">
+                  Browse available jobs and submit proposals
+                </GdsText>
+                <GdsDiv margin-top="auto">
+                  <GdsButton rank="primary" size="small">
+                    View Jobs
+                  </GdsButton>
+                </GdsDiv>
+              </GdsFlex>
+            </GdsCard>
+          </Link>
 
-          <div className="bg-gray-50 rounded-lg p-8">
-          <h3 className="text-2xl font-semibold mb-6 text-center">How it Works</h3>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 bg-primary-100 rounded-full flex items-center justify-center">
-                <span className="text-2xl font-bold text-primary-600">1</span>
-              </div>
-              <h4 className="text-lg font-semibold mb-2">Post Your Project</h4>
-              <p className="text-gray-600">Describe what you need and set your budget</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 bg-primary-100 rounded-full flex items-center justify-center">
-                <span className="text-2xl font-bold text-primary-600">2</span>
-              </div>
-              <h4 className="text-lg font-semibold mb-2">Review Proposals</h4>
-              <p className="text-gray-600">Get bids from qualified freelancers</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 bg-primary-100 rounded-full flex items-center justify-center">
-                <span className="text-2xl font-bold text-primary-600">3</span>
-              </div>
-              <h4 className="text-lg font-semibold mb-2">Fund Milestones</h4>
-              <p className="text-gray-600">Securely deposit funds into escrow</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 bg-primary-100 rounded-full flex items-center justify-center">
-                <span className="text-2xl font-bold text-primary-600">4</span>
-              </div>
-              <h4 className="text-lg font-semibold mb-2">Approve & Pay</h4>
-              <p className="text-gray-600">Release payment when work is complete</p>
-            </div>
-          </div>
-        </div>
+          <Link href="/courses" style={{ textDecoration: 'none' } as any}>
+            <GdsCard padding="l" variant="notice" height="100%">
+              <GdsFlex flex-direction="column" gap="m" height="100%">
+                <GdsText font="heading-m">Learn Skills</GdsText>
+                <GdsText font="body-regular-m" color="neutral-02">
+                  Take courses from industry experts
+                </GdsText>
+                <GdsDiv margin-top="auto">
+                  <GdsButton rank="secondary" variant="notice" size="small">
+                    Browse Courses
+                  </GdsButton>
+                </GdsDiv>
+              </GdsFlex>
+            </GdsCard>
+          </Link>
+        </GdsGrid>
+
+        {/* How it Works Section */}
+        <GdsCard padding="xl" variant="tertiary" margin-bottom="xl">
+          <GdsText tag="h2" font="heading-l" text-align="center" margin-bottom="l">
+            How it Works
+          </GdsText>
+          <GdsGrid columns="1; m{2}; l{4}" gap="l">
+            <GdsFlex flex-direction="column" align-items="center" gap="m" text-align="center">
+              <GdsFlex 
+                width="4xl" 
+                height="4xl" 
+                background="brand-01" 
+                border-radius="max"
+                align-items="center"
+                justify-content="center"
+              >
+                <GdsText font="heading-m" color="inversed">1</GdsText>
+              </GdsFlex>
+              <GdsText font="heading-s">Post Your Project</GdsText>
+              <GdsText font="body-regular-s" color="neutral-02">
+                Describe what you need and set your budget
+              </GdsText>
+            </GdsFlex>
+
+            <GdsFlex flex-direction="column" align-items="center" gap="m" text-align="center">
+              <GdsFlex 
+                width="4xl" 
+                height="4xl" 
+                background="brand-01" 
+                border-radius="max"
+                align-items="center"
+                justify-content="center"
+              >
+                <GdsText font="heading-m" color="inversed">2</GdsText>
+              </GdsFlex>
+              <GdsText font="heading-s">Review Proposals</GdsText>
+              <GdsText font="body-regular-s" color="neutral-02">
+                Get bids from qualified freelancers
+              </GdsText>
+            </GdsFlex>
+
+            <GdsFlex flex-direction="column" align-items="center" gap="m" text-align="center">
+              <GdsFlex 
+                width="4xl" 
+                height="4xl" 
+                background="brand-01" 
+                border-radius="max"
+                align-items="center"
+                justify-content="center"
+              >
+                <GdsText font="heading-m" color="inversed">3</GdsText>
+              </GdsFlex>
+              <GdsText font="heading-s">Fund Milestones</GdsText>
+              <GdsText font="body-regular-s" color="neutral-02">
+                Securely deposit funds into escrow
+              </GdsText>
+            </GdsFlex>
+
+            <GdsFlex flex-direction="column" align-items="center" gap="m" text-align="center">
+              <GdsFlex 
+                width="4xl" 
+                height="4xl" 
+                background="brand-01" 
+                border-radius="max"
+                align-items="center"
+                justify-content="center"
+              >
+                <GdsText font="heading-m" color="inversed">4</GdsText>
+              </GdsFlex>
+              <GdsText font="heading-s">Approve &amp; Pay</GdsText>
+              <GdsText font="body-regular-s" color="neutral-02">
+                Release payment when work is complete
+              </GdsText>
+            </GdsFlex>
+          </GdsGrid>
+        </GdsCard>
 
         {/* Featured Courses Section */}
-          <div className="mt-12">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-2xl font-semibold">Learn New Skills</h3>
-            <Link href="/courses" className="text-primary-600 hover:underline">
-              View all courses →
+        <GdsDiv margin-bottom="xl">
+          <GdsFlex justify-content="space-between" align-items="center" margin-bottom="l">
+            <GdsText tag="h2" font="heading-l">Learn New Skills</GdsText>
+            <Link href="/courses" style={{ textDecoration: 'none' } as any}>
+              <GdsText font="body-regular-m" color="brand-01">
+                View all courses →
+              </GdsText>
             </Link>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
-              <div className="aspect-video bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-                <span className="text-white text-4xl">🎨</span>
-              </div>
-              <div className="p-4">
-                <p className="text-sm text-primary-600 font-medium">UI/UX Design</p>
-                <h4 className="font-semibold mt-1">Master Modern UI Design</h4>
-                <p className="text-sm text-gray-500 mt-2">12 lessons • 4h 30m</p>
-              </div>
-            </div>
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
-              <div className="aspect-video bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
-                <span className="text-white text-4xl">💻</span>
-              </div>
-              <div className="p-4">
-                <p className="text-sm text-primary-600 font-medium">Web Development</p>
-                <h4 className="font-semibold mt-1">React & Next.js Fundamentals</h4>
-                <p className="text-sm text-gray-500 mt-2">20 lessons • 8h 15m</p>
-              </div>
-            </div>
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
-              <div className="aspect-video bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
-                <span className="text-white text-4xl">📱</span>
-              </div>
-              <div className="p-4">
-                <p className="text-sm text-primary-600 font-medium">Mobile Development</p>
-                <h4 className="font-semibold mt-1">Build iOS & Android Apps</h4>
-                <p className="text-sm text-gray-500 mt-2">18 lessons • 7h 45m</p>
-              </div>
-            </div>
-          </div>
-        </div>
+          </GdsFlex>
+          <GdsGrid columns="1; m{2}; l{3}" gap="m">
+            <GdsCard padding="0" variant="secondary" overflow="hidden">
+              <GdsDiv background="notice-01" padding="xl" display="flex" align-items="center" justify-content="center">
+                <GdsText font="heading-2xl">🎨</GdsText>
+              </GdsDiv>
+              <GdsDiv padding="l">
+                <GdsText font="detail-regular-s" color="brand-01">UI/UX Design</GdsText>
+                <GdsText font="heading-s" margin-top="xs">Master Modern UI Design</GdsText>
+                <GdsText font="body-regular-s" color="neutral-02" margin-top="s">
+                  12 lessons • 4h 30m
+                </GdsText>
+              </GdsDiv>
+            </GdsCard>
 
-          <footer className="mt-12 text-center text-gray-500">
-            <p>© 2025 Designer Marketplace. Connecting talent with opportunity.</p>
-          </footer>
-        </div>
-      </div>
-    </main>
+            <GdsCard padding="0" variant="secondary" overflow="hidden">
+              <GdsDiv background="positive-01" padding="xl" display="flex" align-items="center" justify-content="center">
+                <GdsText font="heading-2xl">💻</GdsText>
+              </GdsDiv>
+              <GdsDiv padding="l">
+                <GdsText font="detail-regular-s" color="brand-01">Web Development</GdsText>
+                <GdsText font="heading-s" margin-top="xs">React &amp; Next.js Fundamentals</GdsText>
+                <GdsText font="body-regular-s" color="neutral-02" margin-top="s">
+                  20 lessons • 8h 15m
+                </GdsText>
+              </GdsDiv>
+            </GdsCard>
+
+            <GdsCard padding="0" variant="secondary" overflow="hidden">
+              <GdsDiv background="warning-01" padding="xl" display="flex" align-items="center" justify-content="center">
+                <GdsText font="heading-2xl">📱</GdsText>
+              </GdsDiv>
+              <GdsDiv padding="l">
+                <GdsText font="detail-regular-s" color="brand-01">Mobile Development</GdsText>
+                <GdsText font="heading-s" margin-top="xs">Build iOS &amp; Android Apps</GdsText>
+                <GdsText font="body-regular-s" color="neutral-02" margin-top="s">
+                  18 lessons • 7h 45m
+                </GdsText>
+              </GdsDiv>
+            </GdsCard>
+          </GdsGrid>
+        </GdsDiv>
+      </GdsDiv>
+    </PageLayout>
   )
 }

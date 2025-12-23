@@ -2,13 +2,18 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { jobsApi } from '../lib/api'
 import toast from 'react-hot-toast'
-import clsx from 'clsx'
 import {
-  MagnifyingGlassIcon,
-  CheckIcon,
-  XMarkIcon,
-  EyeIcon,
-} from '@heroicons/react/24/outline'
+  GdsCard,
+  GdsFlex,
+  GdsGrid,
+  GdsText,
+  GdsButton,
+  GdsInput,
+  GdsDiv,
+  GdsDivider,
+  GdsBadge,
+  GdsSpinner,
+} from '../components/green'
 
 interface Job {
   id: number
@@ -85,326 +90,326 @@ export default function Jobs() {
     job.category?.toLowerCase().includes(search.toLowerCase())
   ) || []
 
-  const getStatusColor = (status: string) => {
+  const getStatusBadgeVariant = (status: string): 'positive' | 'notice' | 'information' | 'information' | 'negative' => {
     switch (status) {
       case 'OPEN':
-        return 'bg-green-100 text-green-800'
+        return 'positive'
       case 'IN_PROGRESS':
-        return 'bg-blue-100 text-blue-800'
+        return 'information'
       case 'COMPLETED':
-        return 'bg-gray-100 text-gray-800'
+        return 'information'
       case 'CANCELLED':
-        return 'bg-red-100 text-red-800'
+        return 'negative'
       case 'DRAFT':
-        return 'bg-yellow-100 text-yellow-800'
+        return 'notice'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'information'
     }
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Jobs</h1>
-          <p className="text-gray-500">Manage job listings and moderation queue</p>
-        </div>
+    <GdsFlex flex-direction="column" gap="l">
+      {/* Header */}
+      <GdsFlex justify-content="space-between" align-items="center" flex-wrap="wrap" gap="m">
+        <GdsDiv>
+          <GdsText tag="h1" style={{ fontSize: '1.5rem', fontWeight: 700 } as any}>
+            Jobs
+          </GdsText>
+          <GdsText style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>
+            Manage job listings and moderation queue
+          </GdsText>
+        </GdsDiv>
         {pendingJobs?.length > 0 && (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
-            {pendingJobs.length} pending review
-          </span>
+          <GdsBadge variant="notice">{pendingJobs.length} pending review</GdsBadge>
         )}
-      </div>
+      </GdsFlex>
 
       {/* Pending Jobs Queue */}
       {pendingJobs?.length > 0 && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <h3 className="text-lg font-medium text-yellow-800 mb-3">
-            Moderation Queue
-          </h3>
-          <div className="space-y-3">
+        <GdsCard style={{ background: 'var(--gds-color-l3-background-notice-dim)', border: '1px solid var(--gds-color-l3-border-notice)' } as any}>
+          <GdsFlex flex-direction="column" gap="m" padding="m">
+            <GdsText style={{ fontWeight: 600, color: 'var(--gds-color-l3-content-notice)' } as any}>
+              Moderation Queue
+            </GdsText>
             {pendingJobs.slice(0, 3).map((job: Job) => (
-              <div
-                key={job.id}
-                className="bg-white rounded-md p-4 flex items-center justify-between"
-              >
-                <div>
-                  <p className="font-medium text-gray-900">{job.title}</p>
-                  <p className="text-sm text-gray-500">
-                    by {job.clientName} • ${job.budget} {job.budgetType}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setSelectedJob(job)}
-                    className="p-2 text-gray-500 hover:text-gray-700"
-                  >
-                    <EyeIcon className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={() => approveMutation.mutate(job.id)}
-                    className="p-2 text-green-600 hover:text-green-800"
-                  >
-                    <CheckIcon className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={() => setSelectedJob(job)}
-                    className="p-2 text-red-600 hover:text-red-800"
-                  >
-                    <XMarkIcon className="h-5 w-5" />
-                  </button>
-                </div>
-              </div>
+              <GdsCard key={job.id}>
+                <GdsFlex justify-content="space-between" align-items="center" padding="m">
+                  <GdsDiv>
+                    <GdsText style={{ fontWeight: 500 } as any}>{job.title}</GdsText>
+                    <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>
+                      by {job.clientName} • ${job.budget} {job.budgetType}
+                    </GdsText>
+                  </GdsDiv>
+                  <GdsFlex gap="s">
+                    <GdsButton size="small" rank="tertiary" onClick={() => setSelectedJob(job)}>
+                      👁️ View
+                    </GdsButton>
+                    <GdsButton size="small" rank="secondary" onClick={() => approveMutation.mutate(job.id)} style={{ color: 'var(--gds-color-l3-content-positive)' } as any}>
+                      ✓ Approve
+                    </GdsButton>
+                    <GdsButton size="small" rank="secondary" onClick={() => setSelectedJob(job)} style={{ color: 'var(--gds-color-l3-content-negative)' } as any}>
+                      ✗ Reject
+                    </GdsButton>
+                  </GdsFlex>
+                </GdsFlex>
+              </GdsCard>
             ))}
-          </div>
-        </div>
+          </GdsFlex>
+        </GdsCard>
       )}
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search jobs..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+      <GdsFlex gap="m" flex-wrap="wrap">
+        <GdsDiv style={{ flex: 1, minWidth: '200px' } as any}>
+          <GdsInput
+            label=""
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onInput={(e: Event) => setSearch((e.target as HTMLInputElement).value)}
           />
-        </div>
-        <select
-          className="border border-gray-300 rounded-md px-3 py-2 focus:ring-primary-500 focus:border-primary-500"
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
-          <option value="">All Status</option>
-          <option value="OPEN">Open</option>
-          <option value="IN_PROGRESS">In Progress</option>
-          <option value="COMPLETED">Completed</option>
-          <option value="CANCELLED">Cancelled</option>
-          <option value="DRAFT">Draft</option>
-        </select>
-      </div>
+        </GdsDiv>
+        <GdsDiv>
+          <select
+            style={{
+              padding: '0.5rem 1rem',
+              border: '1px solid var(--gds-color-l3-border-primary)',
+              borderRadius: '4px',
+              background: 'var(--gds-color-l3-background-secondary)',
+              color: 'var(--gds-color-l3-content-primary)',
+              minHeight: '42px',
+            } as any}
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="">All Status</option>
+            <option value="OPEN">Open</option>
+            <option value="IN_PROGRESS">In Progress</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="CANCELLED">Cancelled</option>
+            <option value="DRAFT">Draft</option>
+          </select>
+        </GdsDiv>
+      </GdsFlex>
 
       {/* Jobs Table */}
-      <div className="bg-white shadow rounded-lg overflow-hidden">
+      <GdsCard>
         {isLoading ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-          </div>
+          <GdsFlex justify-content="center" align-items="center" padding="3xl">
+            <GdsSpinner />
+          </GdsFlex>
         ) : (
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Job
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Category
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Budget
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Proposals
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Posted
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredJobs.map((job: Job) => (
-                <tr key={job.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">
-                    <div className="text-sm font-medium text-gray-900">
-                      {job.title}
-                    </div>
-                    <div className="text-sm text-gray-500">
+          <>
+            {/* Table Header */}
+            <GdsGrid columns="2fr 1fr 1fr 1fr 1fr 1fr 1fr" gap="m" padding="m" style={{ background: 'var(--gds-color-l3-background-secondary)', borderRadius: '8px 8px 0 0' } as any}>
+              <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Job</GdsText>
+              <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Category</GdsText>
+              <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Budget</GdsText>
+              <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Status</GdsText>
+              <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Proposals</GdsText>
+              <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Posted</GdsText>
+              <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)', textAlign: 'right' } as any}>Actions</GdsText>
+            </GdsGrid>
+
+            {/* Table Body */}
+            {filteredJobs.map((job: Job) => (
+              <GdsDiv key={job.id}>
+                <GdsDivider />
+                <GdsGrid columns="2fr 1fr 1fr 1fr 1fr 1fr 1fr" gap="m" padding="m" align-items="center">
+                  {/* Job Info */}
+                  <GdsDiv>
+                    <GdsText style={{ fontWeight: 500 } as any}>{job.title}</GdsText>
+                    <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>
                       by {job.clientName}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    </GdsText>
+                  </GdsDiv>
+
+                  {/* Category */}
+                  <GdsText style={{ color: 'var(--gds-color-l3-content-tertiary)', fontSize: '0.875rem' } as any}>
                     {job.category}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  </GdsText>
+
+                  {/* Budget */}
+                  <GdsText style={{ fontWeight: 500 } as any}>
                     ${job.budget?.toLocaleString()} {job.budgetType}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={clsx(
-                        'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                        getStatusColor(job.status)
-                      )}
-                    >
-                      {job.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  </GdsText>
+
+                  {/* Status */}
+                  <GdsDiv>
+                    <GdsBadge variant={getStatusBadgeVariant(job.status)}>{job.status}</GdsBadge>
+                  </GdsDiv>
+
+                  {/* Proposals */}
+                  <GdsText style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>
                     {job.proposalCount}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  </GdsText>
+
+                  {/* Posted */}
+                  <GdsText style={{ color: 'var(--gds-color-l3-content-tertiary)', fontSize: '0.875rem' } as any}>
                     {new Date(job.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button
-                      onClick={() => setSelectedJob(job)}
-                      className="text-primary-600 hover:text-primary-900 mr-3"
-                    >
+                  </GdsText>
+
+                  {/* Actions */}
+                  <GdsFlex gap="s" justify-content="flex-end">
+                    <GdsButton size="small" rank="tertiary" onClick={() => setSelectedJob(job)}>
                       View
-                    </button>
-                    <button
+                    </GdsButton>
+                    <GdsButton
+                      size="small"
+                      rank="secondary"
                       onClick={() => {
                         if (confirm('Are you sure you want to delete this job?')) {
                           deleteMutation.mutate(job.id)
                         }
                       }}
-                      className="text-red-600 hover:text-red-900"
+                      style={{ color: 'var(--gds-color-l3-content-negative)' } as any}
                     >
                       Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+                    </GdsButton>
+                  </GdsFlex>
+                </GdsGrid>
+              </GdsDiv>
+            ))}
 
-        {/* Pagination */}
-        <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-          <div className="flex-1 flex justify-between">
-            <button
-              onClick={() => setPage(Math.max(0, page - 1))}
-              disabled={page === 0}
-              className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-            >
-              Previous
-            </button>
-            <button
-              onClick={() => setPage(page + 1)}
-              disabled={!data?.hasNext}
-              className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      </div>
+            {/* Pagination */}
+            <GdsDivider />
+            <GdsFlex justify-content="space-between" align-items="center" padding="m">
+              <GdsButton
+                rank="secondary"
+                size="small"
+                onClick={() => setPage(Math.max(0, page - 1))}
+                disabled={page === 0}
+              >
+                Previous
+              </GdsButton>
+              <GdsButton
+                rank="secondary"
+                size="small"
+                onClick={() => setPage(page + 1)}
+                disabled={!data?.hasNext}
+              >
+                Next
+              </GdsButton>
+            </GdsFlex>
+          </>
+        )}
+      </GdsCard>
 
       {/* Job Detail Modal */}
       {selectedJob && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">
-                {selectedJob.title}
-              </h3>
-            </div>
-            <div className="px-6 py-4 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-500">
-                  Description
-                </label>
-                <p className="mt-1 text-sm text-gray-900">
-                  {selectedJob.description}
-                </p>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-500">
-                    Client
-                  </label>
-                  <p className="mt-1 text-sm text-gray-900">
-                    {selectedJob.clientName}
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-500">
-                    Category
-                  </label>
-                  <p className="mt-1 text-sm text-gray-900">
-                    {selectedJob.category}
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-500">
-                    Budget
-                  </label>
-                  <p className="mt-1 text-sm text-gray-900">
-                    ${selectedJob.budget} {selectedJob.budgetType}
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-500">
-                    Status
-                  </label>
-                  <span
-                    className={clsx(
-                      'mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                      getStatusColor(selectedJob.status)
-                    )}
-                  >
+        <GdsDiv
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 50,
+            padding: '1rem',
+          } as any}
+        >
+          <GdsCard style={{ maxWidth: '600px', width: '100%', maxHeight: '80vh', overflow: 'auto' } as any}>
+            <GdsFlex flex-direction="column" gap="l" padding="l">
+              {/* Modal Header */}
+              <GdsDiv>
+                <GdsText tag="h2" style={{ fontSize: '1.25rem', fontWeight: 600 } as any}>
+                  {selectedJob.title}
+                </GdsText>
+              </GdsDiv>
+
+              <GdsDivider />
+
+              {/* Modal Content */}
+              <GdsDiv>
+                <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Description</GdsText>
+                <GdsText style={{ marginTop: '0.25rem' } as any}>{selectedJob.description}</GdsText>
+              </GdsDiv>
+
+              <GdsGrid columns="1; m{2}" gap="m">
+                <GdsDiv>
+                  <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Client</GdsText>
+                  <GdsText style={{ marginTop: '0.25rem' } as any}>{selectedJob.clientName}</GdsText>
+                </GdsDiv>
+                <GdsDiv>
+                  <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Category</GdsText>
+                  <GdsText style={{ marginTop: '0.25rem' } as any}>{selectedJob.category}</GdsText>
+                </GdsDiv>
+                <GdsDiv>
+                  <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Budget</GdsText>
+                  <GdsText style={{ marginTop: '0.25rem' } as any}>${selectedJob.budget} {selectedJob.budgetType}</GdsText>
+                </GdsDiv>
+                <GdsDiv>
+                  <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Status</GdsText>
+                  <GdsBadge variant={getStatusBadgeVariant(selectedJob.status)} style={{ marginTop: '0.25rem' } as any}>
                     {selectedJob.status}
-                  </span>
-                </div>
-              </div>
+                  </GdsBadge>
+                </GdsDiv>
+              </GdsGrid>
 
               {selectedJob.status === 'DRAFT' && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-500 mb-1">
+                <GdsDiv>
+                  <GdsText style={{ fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' } as any}>
                     Rejection Reason (if rejecting)
-                  </label>
+                  </GdsText>
                   <textarea
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-primary-500 focus:border-primary-500"
-                    rows={3}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem',
+                      border: '1px solid var(--gds-color-l3-border-primary)',
+                      borderRadius: '4px',
+                      minHeight: '80px',
+                      background: 'var(--gds-color-l3-background-secondary)',
+                      color: 'var(--gds-color-l3-content-primary)',
+                    } as any}
                     value={rejectReason}
                     onChange={(e) => setRejectReason(e.target.value)}
-                    placeholder="Enter reason for rejection..."
                   />
-                </div>
+                </GdsDiv>
               )}
-            </div>
-            <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
-              <button
-                onClick={() => {
-                  setSelectedJob(null)
-                  setRejectReason('')
-                }}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
-                Close
-              </button>
-              {selectedJob.status === 'DRAFT' && (
-                <>
-                  <button
-                    onClick={() =>
-                      rejectMutation.mutate({
-                        id: selectedJob.id,
-                        reason: rejectReason,
-                      })
-                    }
-                    className="px-4 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700"
-                  >
-                    Reject
-                  </button>
-                  <button
-                    onClick={() => approveMutation.mutate(selectedJob.id)}
-                    className="px-4 py-2 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700"
-                  >
-                    Approve
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
+
+              <GdsDivider />
+
+              {/* Modal Footer */}
+              <GdsFlex justify-content="flex-end" gap="m">
+                <GdsButton
+                  rank="secondary"
+                  onClick={() => {
+                    setSelectedJob(null)
+                    setRejectReason('')
+                  }}
+                >
+                  Close
+                </GdsButton>
+                {selectedJob.status === 'DRAFT' && (
+                  <>
+                    <GdsButton
+                      rank="secondary"
+                      onClick={() =>
+                        rejectMutation.mutate({
+                          id: selectedJob.id,
+                          reason: rejectReason,
+                        })
+                      }
+                      style={{ background: 'var(--gds-color-l3-background-negative)', color: 'white' } as any}
+                    >
+                      Reject
+                    </GdsButton>
+                    <GdsButton
+                      rank="primary"
+                      onClick={() => approveMutation.mutate(selectedJob.id)}
+                      style={{ background: 'var(--gds-color-l3-background-positive)' } as any}
+                    >
+                      Approve
+                    </GdsButton>
+                  </>
+                )}
+              </GdsFlex>
+            </GdsFlex>
+          </GdsCard>
+        </GdsDiv>
       )}
-    </div>
+    </GdsFlex>
   )
 }
+
+
+
