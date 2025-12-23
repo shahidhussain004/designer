@@ -261,6 +261,16 @@ export default function Home() {
           </GdsGrid>
         </GdsDiv>
       </GdsDiv>
+
+      {/* Modal Dialog */}
+      <GdsDialog ref={dialogRef} heading="Welcome to Designer Marketplace">
+        <GdsText font="body-regular-m">
+          Welcome! This is your marketplace to find talented freelancers or post your projects.
+        </GdsText>
+        <GdsButton rank="primary" onClick={handleCloseModal} style={{ marginTop: '20px' } as any}>
+          Get Started
+        </GdsButton>
+      </GdsDialog>
     </PageLayout>
   )
 }
