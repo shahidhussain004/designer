@@ -263,13 +263,104 @@ export default function Home() {
       </GdsDiv>
 
       {/* Modal Dialog */}
-      <GdsDialog ref={dialogRef} heading="Welcome to Designer Marketplace">
-        <GdsText font="body-regular-m">
-          Welcome! This is your marketplace to find talented freelancers or post your projects.
-        </GdsText>
-        <GdsButton rank="primary" onClick={handleCloseModal} style={{ marginTop: '20px' } as any}>
-          Get Started
-        </GdsButton>
+      <GdsDialog ref={dialogRef}>
+        <GdsGrid columns="s{1} m{2}" gap="0" width="100%">
+          {/* Left Panel */}
+          <GdsDiv background="brand-01" color="inversed" padding="s{l} m{2xl}" display="s{none} m{flex}" flex-direction="column" justify-content="center" align-items="flex-start">
+            <GdsFlex flex-direction="column" gap="l" align-items="flex-start">
+              <GdsText tag="h2" font="heading-l" color="inversed" text-align="start">
+                Success starts here
+              </GdsText>
+              
+              {/* Features List */}
+              <GdsFlex flex-direction="column" gap="m">
+                {/* Feature 1 */}
+                <GdsFlex gap="m" align-items="flex-start">
+                  <GdsDiv width="24px" height="24px" display="flex" align-items="center" justify-content="center" flex-shrink="0">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ color: 'currentColor' }}>
+                      <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </GdsDiv>
+                  <GdsText font="body-regular-m" color="inversed">
+                    Over 700 categories
+                  </GdsText>
+                </GdsFlex>
+
+                {/* Feature 2 */}
+                <GdsFlex gap="m" align-items="flex-start">
+                  <GdsDiv width="24px" height="24px" display="flex" align-items="center" justify-content="center" flex-shrink="0">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ color: 'currentColor' }}>
+                      <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </GdsDiv>
+                  <GdsText font="body-regular-m" color="inversed">
+                    Quality work done faster
+                  </GdsText>
+                </GdsFlex>
+
+                {/* Feature 3 */}
+                <GdsFlex gap="m" align-items="flex-start">
+                  <GdsDiv width="24px" height="24px" display="flex" align-items="center" justify-content="center" flex-shrink="0">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ color: 'currentColor' }}>
+                      <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </GdsDiv>
+                  <GdsText font="body-regular-m" color="inversed">
+                    Global talent and opportunities
+                  </GdsText>
+                </GdsFlex>
+              </GdsFlex>
+            </GdsFlex>
+          </GdsDiv>
+
+          {/* Right Panel */}
+          <GdsDiv padding="s{l} m{2xl}" display="flex" flex-direction="column" justify-content="center" align-items="center">
+            <GdsFlex flex-direction="column" gap="l" align-items="center" width="100%">
+              <GdsFlex flex-direction="column" gap="m" width="100%" align-items="flex-start">
+                <GdsText tag="h2" font="heading-m">
+                  Create your account
+                </GdsText>
+                <GdsText font="body-regular-m" color="neutral-02">
+                  Join thousands of freelancers and clients worldwide
+                </GdsText>
+              </GdsFlex>
+
+              {/* Action Buttons */}
+              <GdsFlex flex-direction="column" gap="m" width="100%">
+                <GdsButton rank="primary" width="100%" onClick={handleCloseModal}>
+                  Get Started
+                </GdsButton>
+                <GdsButton rank="tertiary" variant="neutral" width="100%" onClick={handleCloseModal}>
+                  Browse as guest
+                </GdsButton>
+              </GdsFlex>
+
+              {/* Divider */}
+              <GdsFlex gap="m" align-items="center" width="100%">
+                <GdsDiv flex="1" height="1px" background="subtle-01" />
+                <GdsText font="detail-regular-s" color="neutral-02">
+                  OR
+                </GdsText>
+                <GdsDiv flex="1" height="1px" background="subtle-01" />
+              </GdsFlex>
+
+              {/* Social Buttons */}
+              <GdsFlex flex-direction="column" gap="s" width="100%">
+                <GdsButton rank="secondary" variant="neutral" width="100%">
+                  Continue with Google
+                </GdsButton>
+                <GdsButton rank="secondary" variant="neutral" width="100%">
+                  Continue with Email
+                </GdsButton>
+              </GdsFlex>
+
+              {/* Terms Text */}
+              <GdsText font="detail-regular-s" color="neutral-02" text-align="center">
+                By joining, you agree to our Terms of Service and Privacy Policy
+              </GdsText>
+            </GdsFlex>
+          </GdsDiv>
+        </GdsGrid>
       </GdsDialog>
     </PageLayout>
   )
