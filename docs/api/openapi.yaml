@@ -1,0 +1,1877 @@
+openapi: 3.1.0
+info:
+  title: Designer Marketplace API
+  description: |
+    # Designer Marketplace API Documentation
+    
+    The Designer Marketplace API provides programmatic access to the platform's features,
+    enabling developers to integrate with designer profiles, gig listings, orders, messaging,
+    and more.
+    
+    ## Authentication
+    
+    Most endpoints require authentication using JWT Bearer tokens. Obtain tokens through
+    the `/api/auth/login` endpoint.
+    
+    ```
+    Authorization: Bearer <your-jwt-token>
+    ```
+    
+    ## Rate Limiting
+    
+    - **Authenticated requests**: 1000 requests per hour
+    - **Unauthenticated requests**: 100 requests per hour
+    
+    Rate limit headers are included in all responses:
+    - `X-RateLimit-Limit`: Maximum requests allowed
+    - `X-RateLimit-Remaining`: Requests remaining
+    - `X-RateLimit-Reset`: Unix timestamp when limit resets
+    
+    ## Pagination
+    
+    List endpoints support pagination using `page` and `size` parameters:
+    - `page`: Page number (0-indexed, default: 0)
+    - `size`: Items per page (default: 20, max: 100)
+    
+    ## Error Handling
+    
+    All errors follow a consistent format:
+    ```json
+    {
+      "error": "Error type",
+      "message": "Human-readable message",
+      "code": "ERROR_CODE",
+      "timestamp": "2024-01-15T10:30:00Z"
+    }
+    ```
+    
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: api-support@designermarketplace.com
+    url: https://docs.designermarketplace.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8080/api
+    description: Local development server
+  - url: https://api.staging.designermarketplace.com
+    description: Staging server
+  - url: https://api.designermarketplace.com
+    description: Production server
+
+tags:
+  - name: Authentication
+    description: User authentication and authorization
+  - name: Users
+    description: User management operations
+  - name: Designers
+    description: Designer profile management
+  - name: Gigs
+    description: Gig listings and search
+  - name: Orders
+    description: Order management
+  - name: Messages
+    description: Direct messaging between users
+  - name: Reviews
+    description: Reviews and ratings
+  - name: Categories
+    description: Service categories
+  - name: Admin
+    description: Administrative operations
+
+security:
+  - bearerAuth: []
+
+paths:
+  # ===========================================================================
+  # AUTHENTICATION
+  # ===========================================================================
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      description: Create a new user account. Email verification is required before login.
+      operationId: registerUser
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+            example:
+              email: "john.doe@example.com"
+              password: "SecureP@ss123"
+              firstName: "John"
+              lastName: "Doe"
+              userType: "BUYER"
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Email already registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticate user and receive JWT tokens
+      operationId: loginUser
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              email: "john.doe@example.com"
+              password: "SecureP@ss123"
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Account not verified or disabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      description: Exchange a refresh token for a new access token
+      operationId: refreshToken
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refreshToken
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: User logout
+      description: Invalidate the current session and tokens
+      operationId: logoutUser
+      responses:
+        '204':
+          description: Logout successful
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/forgot-password:
+    post:
+      tags:
+        - Authentication
+      summary: Request password reset
+      description: Send password reset email to user
+      operationId: forgotPassword
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Password reset email sent
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ===========================================================================
+  # USERS
+  # ===========================================================================
+  /users/me:
+    get:
+      tags:
+        - Users
+      summary: Get current user profile
+      description: Retrieve the authenticated user's profile information
+      operationId: getCurrentUser
+      responses:
+        '200':
+          description: User profile retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    
+    put:
+      tags:
+        - Users
+      summary: Update current user profile
+      description: Update the authenticated user's profile information
+      operationId: updateCurrentUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: User profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /users/{userId}:
+    get:
+      tags:
+        - Users
+      summary: Get user by ID
+      description: Retrieve a user's public profile by their ID
+      operationId: getUserById
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      responses:
+        '200':
+          description: User profile retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPublic'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ===========================================================================
+  # DESIGNERS
+  # ===========================================================================
+  /designers:
+    get:
+      tags:
+        - Designers
+      summary: List designers
+      description: Get a paginated list of designers with optional filtering
+      operationId: listDesigners
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
+        - name: category
+          in: query
+          description: Filter by category ID
+          schema:
+            type: string
+        - name: skills
+          in: query
+          description: Filter by skills (comma-separated)
+          schema:
+            type: string
+        - name: minRating
+          in: query
+          description: Minimum average rating
+          schema:
+            type: number
+            format: float
+            minimum: 0
+            maximum: 5
+        - name: sortBy
+          in: query
+          description: Sort field
+          schema:
+            type: string
+            enum: [rating, orders, joined, name]
+            default: rating
+        - name: sortOrder
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: Designers retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DesignerPage'
+
+  /designers/{designerId}:
+    get:
+      tags:
+        - Designers
+      summary: Get designer profile
+      description: Get detailed designer profile including portfolio and stats
+      operationId: getDesigner
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/designerId'
+      responses:
+        '200':
+          description: Designer profile retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Designer'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /designers/me:
+    get:
+      tags:
+        - Designers
+      summary: Get my designer profile
+      description: Get the authenticated user's designer profile
+      operationId: getMyDesignerProfile
+      responses:
+        '200':
+          description: Designer profile retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Designer'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: User is not a designer
+
+    put:
+      tags:
+        - Designers
+      summary: Update my designer profile
+      description: Update the authenticated user's designer profile
+      operationId: updateMyDesignerProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDesignerRequest'
+      responses:
+        '200':
+          description: Designer profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Designer'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ===========================================================================
+  # GIGS
+  # ===========================================================================
+  /gigs:
+    get:
+      tags:
+        - Gigs
+      summary: Search gigs
+      description: Search and filter gigs with various criteria
+      operationId: searchGigs
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
+        - name: q
+          in: query
+          description: Search query
+          schema:
+            type: string
+        - name: category
+          in: query
+          description: Category ID
+          schema:
+            type: string
+        - name: subCategory
+          in: query
+          description: Sub-category ID
+          schema:
+            type: string
+        - name: minPrice
+          in: query
+          description: Minimum price
+          schema:
+            type: number
+            format: float
+        - name: maxPrice
+          in: query
+          description: Maximum price
+          schema:
+            type: number
+            format: float
+        - name: deliveryTime
+          in: query
+          description: Maximum delivery time in days
+          schema:
+            type: integer
+        - name: designerId
+          in: query
+          description: Filter by designer ID
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            enum: [relevance, price, rating, orders, newest]
+            default: relevance
+      responses:
+        '200':
+          description: Gigs retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GigPage'
+
+    post:
+      tags:
+        - Gigs
+      summary: Create a new gig
+      description: Create a new gig listing (designers only)
+      operationId: createGig
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGigRequest'
+      responses:
+        '201':
+          description: Gig created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Gig'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /gigs/{gigId}:
+    get:
+      tags:
+        - Gigs
+      summary: Get gig details
+      description: Get detailed information about a specific gig
+      operationId: getGig
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/gigId'
+      responses:
+        '200':
+          description: Gig details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Gig'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Gigs
+      summary: Update gig
+      description: Update an existing gig (owner only)
+      operationId: updateGig
+      parameters:
+        - $ref: '#/components/parameters/gigId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateGigRequest'
+      responses:
+        '200':
+          description: Gig updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Gig'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Gigs
+      summary: Delete gig
+      description: Delete a gig (owner only)
+      operationId: deleteGig
+      parameters:
+        - $ref: '#/components/parameters/gigId'
+      responses:
+        '204':
+          description: Gig deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ===========================================================================
+  # ORDERS
+  # ===========================================================================
+  /orders:
+    get:
+      tags:
+        - Orders
+      summary: List my orders
+      description: Get paginated list of orders (as buyer or seller)
+      operationId: listMyOrders
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
+        - name: role
+          in: query
+          description: Filter by role
+          schema:
+            type: string
+            enum: [buyer, seller]
+        - name: status
+          in: query
+          description: Filter by status
+          schema:
+            type: string
+            enum: [pending, active, delivered, completed, cancelled, disputed]
+      responses:
+        '200':
+          description: Orders retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      tags:
+        - Orders
+      summary: Create order
+      description: Place a new order for a gig
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /orders/{orderId}:
+    get:
+      tags:
+        - Orders
+      summary: Get order details
+      description: Get detailed information about an order
+      operationId: getOrder
+      parameters:
+        - $ref: '#/components/parameters/orderId'
+      responses:
+        '200':
+          description: Order details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /orders/{orderId}/deliver:
+    post:
+      tags:
+        - Orders
+      summary: Deliver order
+      description: Mark order as delivered (seller only)
+      operationId: deliverOrder
+      parameters:
+        - $ref: '#/components/parameters/orderId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeliveryRequest'
+      responses:
+        '200':
+          description: Order delivered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /orders/{orderId}/accept:
+    post:
+      tags:
+        - Orders
+      summary: Accept delivery
+      description: Accept order delivery and complete order (buyer only)
+      operationId: acceptDelivery
+      parameters:
+        - $ref: '#/components/parameters/orderId'
+      responses:
+        '200':
+          description: Order completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /orders/{orderId}/revise:
+    post:
+      tags:
+        - Orders
+      summary: Request revision
+      description: Request revision on delivered order (buyer only)
+      operationId: requestRevision
+      parameters:
+        - $ref: '#/components/parameters/orderId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - message
+              properties:
+                message:
+                  type: string
+                  maxLength: 2000
+      responses:
+        '200':
+          description: Revision requested
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ===========================================================================
+  # MESSAGES
+  # ===========================================================================
+  /conversations:
+    get:
+      tags:
+        - Messages
+      summary: List conversations
+      description: Get all conversations for the authenticated user
+      operationId: listConversations
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
+      responses:
+        '200':
+          description: Conversations retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /conversations/{conversationId}:
+    get:
+      tags:
+        - Messages
+      summary: Get conversation
+      description: Get conversation details and messages
+      operationId: getConversation
+      parameters:
+        - $ref: '#/components/parameters/conversationId'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
+      responses:
+        '200':
+          description: Conversation retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /conversations/{conversationId}/messages:
+    post:
+      tags:
+        - Messages
+      summary: Send message
+      description: Send a new message in a conversation
+      operationId: sendMessage
+      parameters:
+        - $ref: '#/components/parameters/conversationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequest'
+      responses:
+        '201':
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /messages/new:
+    post:
+      tags:
+        - Messages
+      summary: Start new conversation
+      description: Start a new conversation with another user
+      operationId: startConversation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - recipientId
+                - message
+              properties:
+                recipientId:
+                  type: string
+                message:
+                  type: string
+                  maxLength: 2000
+      responses:
+        '201':
+          description: Conversation started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ===========================================================================
+  # REVIEWS
+  # ===========================================================================
+  /reviews:
+    post:
+      tags:
+        - Reviews
+      summary: Create review
+      description: Create a review for a completed order
+      operationId: createReview
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReviewRequest'
+      responses:
+        '201':
+          description: Review created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /gigs/{gigId}/reviews:
+    get:
+      tags:
+        - Reviews
+      summary: Get gig reviews
+      description: Get reviews for a specific gig
+      operationId: getGigReviews
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/gigId'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
+        - name: rating
+          in: query
+          description: Filter by rating
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 5
+      responses:
+        '200':
+          description: Reviews retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewPage'
+
+  /designers/{designerId}/reviews:
+    get:
+      tags:
+        - Reviews
+      summary: Get designer reviews
+      description: Get all reviews for a designer
+      operationId: getDesignerReviews
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/designerId'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
+      responses:
+        '200':
+          description: Reviews retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewPage'
+
+  # ===========================================================================
+  # CATEGORIES
+  # ===========================================================================
+  /categories:
+    get:
+      tags:
+        - Categories
+      summary: List categories
+      description: Get all service categories with subcategories
+      operationId: listCategories
+      security: []
+      responses:
+        '200':
+          description: Categories retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+
+  # ===========================================================================
+  # ADMIN
+  # ===========================================================================
+  /admin/users:
+    get:
+      tags:
+        - Admin
+      summary: List all users
+      description: Get paginated list of all users (admin only)
+      operationId: adminListUsers
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, suspended, pending]
+      responses:
+        '200':
+          description: Users retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAdminPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/users/{userId}/status:
+    patch:
+      tags:
+        - Admin
+      summary: Update user status
+      description: Activate, suspend, or ban a user (admin only)
+      operationId: adminUpdateUserStatus
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum: [active, suspended, banned]
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: User status updated
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/dashboard/stats:
+    get:
+      tags:
+        - Admin
+      summary: Get dashboard statistics
+      description: Get platform statistics and metrics (admin only)
+      operationId: adminGetStats
+      responses:
+        '200':
+          description: Statistics retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardStats'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ===========================================================================
+  # HEALTH
+  # ===========================================================================
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: Check API health status
+      operationId: healthCheck
+      security: []
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "healthy"
+                  timestamp:
+                    type: string
+                    format: date-time
+                  version:
+                    type: string
+                    example: "1.0.0"
+
+# ==============================================================================
+# COMPONENTS
+# ==============================================================================
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token
+
+  parameters:
+    page:
+      name: page
+      in: query
+      description: Page number (0-indexed)
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    
+    size:
+      name: size
+      in: query
+      description: Number of items per page
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    
+    userId:
+      name: userId
+      in: path
+      required: true
+      description: User ID
+      schema:
+        type: string
+        format: uuid
+    
+    designerId:
+      name: designerId
+      in: path
+      required: true
+      description: Designer ID
+      schema:
+        type: string
+        format: uuid
+    
+    gigId:
+      name: gigId
+      in: path
+      required: true
+      description: Gig ID
+      schema:
+        type: string
+        format: uuid
+    
+    orderId:
+      name: orderId
+      in: path
+      required: true
+      description: Order ID
+      schema:
+        type: string
+        format: uuid
+    
+    conversationId:
+      name: conversationId
+      in: path
+      required: true
+      description: Conversation ID
+      schema:
+        type: string
+        format: uuid
+
+  responses:
+    BadRequest:
+      description: Bad request - invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    Unauthorized:
+      description: Unauthorized - invalid or missing authentication
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    Forbidden:
+      description: Forbidden - insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+    # -------------------------------------------------------------------------
+    # Common
+    # -------------------------------------------------------------------------
+    Error:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        code:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    PageInfo:
+      type: object
+      properties:
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+        first:
+          type: boolean
+        last:
+          type: boolean
+
+    # -------------------------------------------------------------------------
+    # Authentication
+    # -------------------------------------------------------------------------
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+        - firstName
+        - lastName
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        firstName:
+          type: string
+          maxLength: 50
+        lastName:
+          type: string
+          maxLength: 50
+        userType:
+          type: string
+          enum: [BUYER, SELLER]
+          default: BUYER
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    AuthResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        tokenType:
+          type: string
+          default: Bearer
+        expiresIn:
+          type: integer
+          description: Token expiry in seconds
+        user:
+          $ref: '#/components/schemas/User'
+
+    # -------------------------------------------------------------------------
+    # User
+    # -------------------------------------------------------------------------
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        firstName:
+          type: string
+        lastName:
+          type: string
+        displayName:
+          type: string
+        avatarUrl:
+          type: string
+          format: uri
+        userType:
+          type: string
+          enum: [BUYER, SELLER, ADMIN]
+        isVerified:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UserPublic:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        displayName:
+          type: string
+        avatarUrl:
+          type: string
+          format: uri
+        userType:
+          type: string
+        memberSince:
+          type: string
+          format: date-time
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+          maxLength: 50
+        lastName:
+          type: string
+          maxLength: 50
+        displayName:
+          type: string
+          maxLength: 100
+        bio:
+          type: string
+          maxLength: 500
+        avatarUrl:
+          type: string
+          format: uri
+
+    UserAdminPage:
+      allOf:
+        - $ref: '#/components/schemas/PageInfo'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/User'
+
+    # -------------------------------------------------------------------------
+    # Designer
+    # -------------------------------------------------------------------------
+    Designer:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        displayName:
+          type: string
+        bio:
+          type: string
+        avatarUrl:
+          type: string
+          format: uri
+        skills:
+          type: array
+          items:
+            type: string
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+        portfolio:
+          type: array
+          items:
+            $ref: '#/components/schemas/PortfolioItem'
+        stats:
+          $ref: '#/components/schemas/DesignerStats'
+        isOnline:
+          type: boolean
+        lastActiveAt:
+          type: string
+          format: date-time
+        memberSince:
+          type: string
+          format: date-time
+
+    DesignerStats:
+      type: object
+      properties:
+        totalGigs:
+          type: integer
+        completedOrders:
+          type: integer
+        avgRating:
+          type: number
+          format: float
+        totalReviews:
+          type: integer
+        responseTime:
+          type: string
+          description: Average response time (e.g., "1 hour")
+
+    PortfolioItem:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        imageUrl:
+          type: string
+          format: uri
+        category:
+          type: string
+
+    UpdateDesignerRequest:
+      type: object
+      properties:
+        bio:
+          type: string
+          maxLength: 1000
+        skills:
+          type: array
+          items:
+            type: string
+          maxItems: 15
+        categoryIds:
+          type: array
+          items:
+            type: string
+
+    DesignerPage:
+      allOf:
+        - $ref: '#/components/schemas/PageInfo'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/Designer'
+
+    # -------------------------------------------------------------------------
+    # Gig
+    # -------------------------------------------------------------------------
+    Gig:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        designer:
+          $ref: '#/components/schemas/UserPublic'
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          $ref: '#/components/schemas/Category'
+        packages:
+          type: array
+          items:
+            $ref: '#/components/schemas/GigPackage'
+        images:
+          type: array
+          items:
+            type: string
+            format: uri
+        tags:
+          type: array
+          items:
+            type: string
+        stats:
+          $ref: '#/components/schemas/GigStats'
+        status:
+          type: string
+          enum: [draft, active, paused, deleted]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    GigPackage:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [basic, standard, premium]
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: float
+        deliveryDays:
+          type: integer
+        revisions:
+          type: integer
+        features:
+          type: array
+          items:
+            type: string
+
+    GigStats:
+      type: object
+      properties:
+        views:
+          type: integer
+        orders:
+          type: integer
+        avgRating:
+          type: number
+          format: float
+        totalReviews:
+          type: integer
+
+    CreateGigRequest:
+      type: object
+      required:
+        - title
+        - description
+        - categoryId
+        - packages
+      properties:
+        title:
+          type: string
+          minLength: 10
+          maxLength: 100
+        description:
+          type: string
+          minLength: 100
+          maxLength: 5000
+        categoryId:
+          type: string
+        subCategoryId:
+          type: string
+        packages:
+          type: array
+          items:
+            $ref: '#/components/schemas/GigPackage'
+          minItems: 1
+          maxItems: 3
+        tags:
+          type: array
+          items:
+            type: string
+          maxItems: 5
+        imageUrls:
+          type: array
+          items:
+            type: string
+            format: uri
+          maxItems: 5
+
+    UpdateGigRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 10
+          maxLength: 100
+        description:
+          type: string
+          minLength: 100
+          maxLength: 5000
+        packages:
+          type: array
+          items:
+            $ref: '#/components/schemas/GigPackage'
+        tags:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [active, paused]
+
+    GigPage:
+      allOf:
+        - $ref: '#/components/schemas/PageInfo'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/Gig'
+
+    # -------------------------------------------------------------------------
+    # Order
+    # -------------------------------------------------------------------------
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        gig:
+          $ref: '#/components/schemas/Gig'
+        buyer:
+          $ref: '#/components/schemas/UserPublic'
+        seller:
+          $ref: '#/components/schemas/UserPublic'
+        packageType:
+          type: string
+          enum: [basic, standard, premium]
+        price:
+          type: number
+          format: float
+        serviceFee:
+          type: number
+          format: float
+        total:
+          type: number
+          format: float
+        status:
+          type: string
+          enum: [pending, active, delivered, revision, completed, cancelled, disputed]
+        requirements:
+          type: string
+        deliveryDeadline:
+          type: string
+          format: date-time
+        deliveries:
+          type: array
+          items:
+            $ref: '#/components/schemas/Delivery'
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+
+    Delivery:
+      type: object
+      properties:
+        id:
+          type: string
+        message:
+          type: string
+        attachments:
+          type: array
+          items:
+            type: string
+            format: uri
+        deliveredAt:
+          type: string
+          format: date-time
+
+    CreateOrderRequest:
+      type: object
+      required:
+        - gigId
+        - packageType
+      properties:
+        gigId:
+          type: string
+          format: uuid
+        packageType:
+          type: string
+          enum: [basic, standard, premium]
+        requirements:
+          type: string
+          maxLength: 5000
+
+    DeliveryRequest:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          maxLength: 2000
+        attachmentUrls:
+          type: array
+          items:
+            type: string
+            format: uri
+          maxItems: 10
+
+    OrderPage:
+      allOf:
+        - $ref: '#/components/schemas/PageInfo'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/Order'
+
+    # -------------------------------------------------------------------------
+    # Messages
+    # -------------------------------------------------------------------------
+    Conversation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserPublic'
+        lastMessage:
+          $ref: '#/components/schemas/Message'
+        unreadCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sender:
+          $ref: '#/components/schemas/UserPublic'
+        content:
+          type: string
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Attachment'
+        readAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+
+    Attachment:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [image, file]
+        url:
+          type: string
+          format: uri
+        name:
+          type: string
+        size:
+          type: integer
+
+    SendMessageRequest:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
+          maxLength: 2000
+        attachmentIds:
+          type: array
+          items:
+            type: string
+
+    ConversationPage:
+      allOf:
+        - $ref: '#/components/schemas/PageInfo'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/Conversation'
+
+    # -------------------------------------------------------------------------
+    # Reviews
+    # -------------------------------------------------------------------------
+    Review:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        orderId:
+          type: string
+          format: uuid
+        reviewer:
+          $ref: '#/components/schemas/UserPublic'
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+        response:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    CreateReviewRequest:
+      type: object
+      required:
+        - orderId
+        - rating
+      properties:
+        orderId:
+          type: string
+          format: uuid
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+          maxLength: 1000
+
+    ReviewPage:
+      allOf:
+        - $ref: '#/components/schemas/PageInfo'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/Review'
+
+    # -------------------------------------------------------------------------
+    # Categories
+    # -------------------------------------------------------------------------
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        slug:
+          type: string
+        icon:
+          type: string
+        description:
+          type: string
+        subCategories:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              slug:
+                type: string
+
+    # -------------------------------------------------------------------------
+    # Admin
+    # -------------------------------------------------------------------------
+    DashboardStats:
+      type: object
+      properties:
+        totalUsers:
+          type: integer
+        totalDesigners:
+          type: integer
+        totalGigs:
+          type: integer
+        totalOrders:
+          type: integer
+        revenue:
+          type: object
+          properties:
+            total:
+              type: number
+              format: float
+            thisMonth:
+              type: number
+              format: float
+            growth:
+              type: number
+              format: float
+        recentOrders:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+        topDesigners:
+          type: array
+          items:
+            $ref: '#/components/schemas/Designer'
