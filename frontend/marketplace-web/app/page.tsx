@@ -8,13 +8,23 @@ import { PageLayout } from '@/components/layout'
 export default function Home() {
   const dialogRef = useRef<any>(null)
   const [hasShownModal, setHasShownModal] = useState(false)
+  const [isClient, setIsClient] = useState(false)
+
+  // Ensure we only run on client to avoid hydration mismatch
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   useEffect(() => {
-    if (!hasShownModal && dialogRef.current) {
-      dialogRef.current.show()
-      setHasShownModal(true)
+    if (isClient && !hasShownModal && dialogRef.current) {
+      // Small delay to ensure web components are registered
+      const timer = setTimeout(() => {
+        dialogRef.current.show()
+        setHasShownModal(true)
+      }, 100)
+      return () => clearTimeout(timer)
     }
-  }, [hasShownModal])
+  }, [isClient, hasShownModal])
 
   const handleCloseModal = () => {
     if (dialogRef.current) {
@@ -181,14 +191,14 @@ export default function Home() {
               {/* Terms & Privacy */}
               <GdsText font="body-regular-s" color="neutral-02">
                 By joining, you agree to the Designer Marketplace{' '}
-                <Link href="#" text-decoration="underline">
-                  <GdsText color="brand-01" font="body-regular-s">
+                <Link href="#">
+                  <GdsText color="brand-01" font="body-regular-s" text-decoration="underline">
                     Terms of Service
                   </GdsText>
                 </Link>
                 {' '}and to occasionally receive emails from us. Please read our{' '}
-                <Link href="#" text-decoration="underline">
-                  <GdsText color="brand-01" font="body-regular-s">
+                <Link href="#">
+                  <GdsText color="brand-01" font="body-regular-s" text-decoration="underline">
                     Privacy Policy
                   </GdsText>
                 </Link>
