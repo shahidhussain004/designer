@@ -7,6 +7,12 @@ module.exports = {
     './lib/**/*.{js,ts,jsx,tsx}',
   ],
   darkMode: 'class',
+  safelist: [
+    // Ensure all color variants are generated
+    {
+      pattern: /(bg|text|border|ring)-(primary|secondary|success|warning|error|info)-(50|100|200|300|400|500|600|700|800|900)/,
+    },
+  ],
   theme: {
     extend: {
       // ==========================================================================
