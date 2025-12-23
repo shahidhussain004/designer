@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import PWARegister from './PWARegister'
+import { SkipLink } from '@/components/ui/Accessibility'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -37,8 +38,23 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
       <body className={inter.className}>
+        {/* Skip Link for keyboard accessibility - WCAG 2.4.1 */}
+        <SkipLink targetId="main-content" />
+        
         <PWARegister />
-        {children}
+        
+        {/* Main content wrapper with ARIA landmark */}
+        <div id="main-content" role="main" tabIndex={-1}>
+          {children}
+        </div>
+        
+        {/* Live region for dynamic announcements */}
+        <div
+          id="live-announcements"
+          aria-live="polite"
+          aria-atomic="true"
+          className="sr-only"
+        />
       </body>
     </html>
   )

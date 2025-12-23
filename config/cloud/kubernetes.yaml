@@ -1,0 +1,531 @@
+# Kubernetes Deployment Configuration for Designer Marketplace
+# =============================================================
+# This configuration demonstrates Kubernetes deployment patterns
+# for learning purposes. Adapt for production environments.
+
+---
+# ==============================================================================
+# NAMESPACE
+# ==============================================================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: designer-marketplace
+  labels:
+    app.kubernetes.io/name: designer-marketplace
+    app.kubernetes.io/managed-by: kubectl
+    environment: development
+
+---
+# ==============================================================================
+# CONFIG MAP - Application Configuration
+# ==============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: marketplace-config
+  namespace: designer-marketplace
+  labels:
+    app: designer-marketplace
+data:
+  NODE_ENV: "production"
+  LOG_LEVEL: "info"
+  PORT: "3000"
+  CORS_ORIGIN: "https://marketplace.example.com"
+  RATE_LIMIT_WINDOW_MS: "60000"
+  RATE_LIMIT_MAX_REQUESTS: "100"
+
+---
+# ==============================================================================
+# SECRETS (Reference - Use external secret management in production)
+# ==============================================================================
+apiVersion: v1
+kind: Secret
+metadata:
+  name: marketplace-secrets
+  namespace: designer-marketplace
+  labels:
+    app: designer-marketplace
+type: Opaque
+stringData:
+  # IMPORTANT: In production, use external secrets management like:
+  # - Kubernetes External Secrets
+  # - HashiCorp Vault
+  # - AWS Secrets Manager
+  # - Azure Key Vault
+  # - Google Secret Manager
+  DATABASE_URL: "postgresql://user:password@host:5432/designer_marketplace"
+  REDIS_URL: "redis://host:6379"
+  JWT_SECRET: "your-jwt-secret-change-in-production"
+  API_KEY: "your-api-key-change-in-production"
+
+---
+# ==============================================================================
+# MARKETPLACE SERVICE DEPLOYMENT
+# ==============================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: marketplace-service
+  namespace: designer-marketplace
+  labels:
+    app: marketplace-service
+    version: v1
+spec:
+  replicas: 3
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: marketplace-service
+  template:
+    metadata:
+      labels:
+        app: marketplace-service
+        version: v1
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3000"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: marketplace-service-account
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      
+      containers:
+        - name: marketplace-service
+          image: registry.example.com/designer-marketplace/marketplace-service:latest
+          imagePullPolicy: Always
+          
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          
+          envFrom:
+            - configMapRef:
+                name: marketplace-config
+            - secretRef:
+                name: marketplace-secrets
+          
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: cache
+              mountPath: /app/.cache
+      
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: cache
+          emptyDir: {}
+      
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - marketplace-service
+                topologyKey: kubernetes.io/hostname
+      
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: marketplace-service
+
+---
+# ==============================================================================
+# MARKETPLACE SERVICE - SERVICE
+# ==============================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: marketplace-service
+  namespace: designer-marketplace
+  labels:
+    app: marketplace-service
+spec:
+  type: ClusterIP
+  selector:
+    app: marketplace-service
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+
+---
+# ==============================================================================
+# MESSAGING SERVICE DEPLOYMENT
+# ==============================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: messaging-service
+  namespace: designer-marketplace
+  labels:
+    app: messaging-service
+    version: v1
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: messaging-service
+  template:
+    metadata:
+      labels:
+        app: messaging-service
+        version: v1
+    spec:
+      serviceAccountName: marketplace-service-account
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      
+      containers:
+        - name: messaging-service
+          image: registry.example.com/designer-marketplace/messaging-service:latest
+          imagePullPolicy: Always
+          
+          ports:
+            - name: http
+              containerPort: 3001
+              protocol: TCP
+            - name: ws
+              containerPort: 3002
+              protocol: TCP
+          
+          envFrom:
+            - configMapRef:
+                name: marketplace-config
+            - secretRef:
+                name: marketplace-secrets
+          
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
+          
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+
+---
+# ==============================================================================
+# MESSAGING SERVICE - SERVICE
+# ==============================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: messaging-service
+  namespace: designer-marketplace
+  labels:
+    app: messaging-service
+spec:
+  type: ClusterIP
+  selector:
+    app: messaging-service
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+    - name: websocket
+      port: 3002
+      targetPort: ws
+      protocol: TCP
+
+---
+# ==============================================================================
+# INGRESS
+# ==============================================================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: marketplace-ingress
+  namespace: designer-marketplace
+  labels:
+    app: designer-marketplace
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+    - hosts:
+        - marketplace.example.com
+        - api.marketplace.example.com
+      secretName: marketplace-tls
+  rules:
+    - host: marketplace.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: marketplace-service
+                port:
+                  number: 80
+    - host: api.marketplace.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: marketplace-service
+                port:
+                  number: 80
+          - path: /ws
+            pathType: Prefix
+            backend:
+              service:
+                name: messaging-service
+                port:
+                  number: 3002
+
+---
+# ==============================================================================
+# HORIZONTAL POD AUTOSCALER
+# ==============================================================================
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: marketplace-service-hpa
+  namespace: designer-marketplace
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: marketplace-service
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+        - type: Pods
+          value: 2
+          periodSeconds: 60
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 120
+
+---
+# ==============================================================================
+# POD DISRUPTION BUDGET
+# ==============================================================================
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: marketplace-service-pdb
+  namespace: designer-marketplace
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: marketplace-service
+
+---
+# ==============================================================================
+# SERVICE ACCOUNT
+# ==============================================================================
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: marketplace-service-account
+  namespace: designer-marketplace
+  labels:
+    app: designer-marketplace
+automountServiceAccountToken: false
+
+---
+# ==============================================================================
+# NETWORK POLICY
+# ==============================================================================
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: marketplace-network-policy
+  namespace: designer-marketplace
+spec:
+  podSelector:
+    matchLabels:
+      app: marketplace-service
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+        - podSelector:
+            matchLabels:
+              app: messaging-service
+      ports:
+        - protocol: TCP
+          port: 3000
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: database
+      ports:
+        - protocol: TCP
+          port: 5432
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: cache
+      ports:
+        - protocol: TCP
+          port: 6379
+    # Allow DNS
+    - to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+
+---
+# ==============================================================================
+# RESOURCE QUOTA
+# ==============================================================================
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: marketplace-quota
+  namespace: designer-marketplace
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: "4Gi"
+    limits.cpu: "8"
+    limits.memory: "8Gi"
+    pods: "20"
+    services: "10"
+    secrets: "20"
+    configmaps: "20"
+
+---
+# ==============================================================================
+# LIMIT RANGE
+# ==============================================================================
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: marketplace-limits
+  namespace: designer-marketplace
+spec:
+  limits:
+    - type: Container
+      default:
+        cpu: "500m"
+        memory: "512Mi"
+      defaultRequest:
+        cpu: "100m"
+        memory: "128Mi"
+      max:
+        cpu: "2"
+        memory: "2Gi"
+      min:
+        cpu: "50m"
+        memory: "64Mi"
