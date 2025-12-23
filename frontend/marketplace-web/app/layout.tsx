@@ -28,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="theme-color" content="#003824" />
         <link rel="manifest" href="/manifest.json" />
@@ -36,7 +36,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
-      <body style={{ fontFamily: "'SEB Sans Serif', system-ui, -apple-system, sans-serif", margin: 0 } as any}>
+      <body suppressHydrationWarning style={{ fontFamily: "'SEB Sans Serif', system-ui, -apple-system, sans-serif", margin: 0 } as any}>
         {/* Skip Link for keyboard accessibility - WCAG 2.4.1 */}
         <SkipLink targetId="main-content" />
         

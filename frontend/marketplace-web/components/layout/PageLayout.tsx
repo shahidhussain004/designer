@@ -4,11 +4,42 @@ import React from 'react'
 import { GdsFlex, GdsDiv } from '@sebgroup/green-core/react'
 import Navbar from './Navbar'
 import Footer from './Footer'
+import ClientOnly from './ClientOnly'
 
 interface PageLayoutProps {
   children: React.ReactNode
   showNavbar?: boolean
   showFooter?: boolean
+}
+
+/**
+ * Loading skeleton shown while Green Core components are loading on client side.
+ * This prevents flash of unstyled content and hydration mismatches.
+ */
+function LoadingSkeleton() {
+  return (
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      minHeight: '100vh',
+      backgroundColor: '#f5f5f5'
+    }}>
+      {/* Navbar skeleton */}
+      <div style={{
+        height: '64px',
+        backgroundColor: '#fff',
+        borderBottom: '1px solid #e0e0e0'
+      }} />
+      {/* Content skeleton */}
+      <div style={{ flex: 1 }} />
+      {/* Footer skeleton */}
+      <div style={{
+        height: '80px',
+        backgroundColor: '#fff',
+        borderTop: '1px solid #e0e0e0'
+      }} />
+    </div>
+  )
 }
 
 export default function PageLayout({ 
@@ -17,16 +48,18 @@ export default function PageLayout({
   showFooter = true 
 }: PageLayoutProps) {
   return (
-    <GdsFlex 
-      flex-direction="column" 
-      min-height="100vh"
-      background="neutral-01"
-    >
-      {showNavbar && <Navbar />}
-      <GdsDiv flex="1" width="100%">
-        {children}
-      </GdsDiv>
-      {showFooter && <Footer />}
-    </GdsFlex>
+    <ClientOnly fallback={<LoadingSkeleton />}>
+      <GdsFlex 
+        flex-direction="column" 
+        min-height="100vh"
+        background="neutral-01"
+      >
+        {showNavbar && <Navbar />}
+        <GdsDiv flex="1" width="100%">
+          {children}
+        </GdsDiv>
+        {showFooter && <Footer />}
+      </GdsFlex>
+    </ClientOnly>
   )
 }

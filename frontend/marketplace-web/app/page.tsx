@@ -1,10 +1,37 @@
 'use client'
 
 import Link from 'next/link'
-import { GdsFlex, GdsGrid, GdsCard, GdsText, GdsDiv, GdsButton, GdsDivider } from '@sebgroup/green-core/react'
+import { useEffect, useRef, useState } from 'react'
+import { GdsFlex, GdsGrid, GdsCard, GdsText, GdsDiv, GdsButton, GdsDivider, GdsDialog } from '@sebgroup/green-core/react'
 import { PageLayout } from '@/components/layout'
 
 export default function Home() {
+  const dialogRef = useRef<any>(null)
+  const [hasShownModal, setHasShownModal] = useState(false)
+  const [isClient, setIsClient] = useState(false)
+
+  // Ensure we only run on client to avoid hydration mismatch
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  useEffect(() => {
+    if (isClient && !hasShownModal && dialogRef.current) {
+      // Small delay to ensure web components are registered
+      const timer = setTimeout(() => {
+        dialogRef.current.show()
+        setHasShownModal(true)
+      }, 100)
+      return () => clearTimeout(timer)
+    }
+  }, [isClient, hasShownModal])
+
+  const handleCloseModal = () => {
+    if (dialogRef.current) {
+      dialogRef.current.close()
+    }
+  }
+
   return (
     <PageLayout>
       {/* Hero Section */}
@@ -234,6 +261,16 @@ export default function Home() {
           </GdsGrid>
         </GdsDiv>
       </GdsDiv>
+
+      {/* Modal Dialog */}
+      <GdsDialog ref={dialogRef} heading="Welcome to Designer Marketplace">
+        <GdsText font="body-regular-m">
+          Welcome! This is your marketplace to find talented freelancers or post your projects.
+        </GdsText>
+        <GdsButton rank="primary" onClick={handleCloseModal} style={{ marginTop: '20px' } as any}>
+          Get Started
+        </GdsButton>
+      </GdsDialog>
     </PageLayout>
   )
 }
