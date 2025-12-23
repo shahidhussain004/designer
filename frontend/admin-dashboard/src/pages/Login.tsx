@@ -3,6 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { authApi } from '../lib/api'
 import toast from 'react-hot-toast'
+import {
+  GdsFlex,
+  GdsCard,
+  GdsText,
+  GdsButton,
+  GdsInput,
+  GdsDivider,
+} from '../components/green'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -37,77 +45,83 @@ export default function Login() {
 
       toast.success('Login successful!')
       navigate('/dashboard')
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Login failed')
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } }
+      toast.error(err.response?.data?.message || 'Login failed')
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Admin Dashboard
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Sign in to access the admin panel
-          </p>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="email" className="sr-only">
-                Email address
-              </label>
-              <input
-                id="email"
-                name="email"
+    <GdsFlex
+      justify-content="center"
+      align-items="center"
+      padding="l"
+      style={{
+        minHeight: '100vh',
+        backgroundColor: 'var(--gds-color-l3-background-secondary)',
+      } as any}
+    >
+      <GdsCard padding="xl" style={{ maxWidth: '400px', width: '100%' } as any}>
+        <GdsFlex flex-direction="column" gap="l">
+          {/* Header */}
+          <GdsFlex flex-direction="column" align-items="center" gap="s">
+            <GdsText tag="h1" font-size="heading-l">
+              Admin Dashboard
+            </GdsText>
+            <GdsText color="secondary">
+              Sign in to access the admin panel
+            </GdsText>
+          </GdsFlex>
+
+          <GdsDivider />
+
+          {/* Form */}
+          <form onSubmit={handleSubmit}>
+            <GdsFlex flex-direction="column" gap="m">
+              <GdsInput
+                label="Email address"
                 type="email"
-                autoComplete="email"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
+                onInput={(e: Event) => setEmail((e.target as HTMLInputElement).value)}
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
               />
-            </div>
-          </div>
 
-          <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? 'Signing in...' : 'Sign in'}
-            </button>
-          </div>
-        </form>
+              <GdsInput
+                label="Password"
+                type="password"
+                value={password}
+                onInput={(e: Event) => setPassword((e.target as HTMLInputElement).value)}
+                required
+              />
 
-        <div className="text-center text-sm text-gray-500">
-          <p>Demo Admin Credentials:</p>
-          <p>Email: admin@designermarket.com</p>
-          <p>Password: Admin123!</p>
-        </div>
-      </div>
-    </div>
+              <GdsButton type="submit" disabled={isLoading}>
+                {isLoading ? 'Signing in...' : 'Sign in'}
+              </GdsButton>
+            </GdsFlex>
+          </form>
+
+          <GdsDivider />
+
+          {/* Demo Credentials */}
+          <GdsCard padding="m" variant="secondary">
+            <GdsFlex flex-direction="column" gap="xs" align-items="center">
+              <GdsText font-size="body-s" font-weight="book">
+                Demo Admin Credentials
+              </GdsText>
+              <GdsText font-size="body-s" color="secondary">
+                Email: admin@designermarket.com
+              </GdsText>
+              <GdsText font-size="body-s" color="secondary">
+                Password: Admin123!
+              </GdsText>
+            </GdsFlex>
+          </GdsCard>
+        </GdsFlex>
+      </GdsCard>
+    </GdsFlex>
   )
 }
+
+
