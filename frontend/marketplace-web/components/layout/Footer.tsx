@@ -1,8 +1,7 @@
-'use client'
+ 'use client'
 
 import React from 'react'
-import Link from 'next/link'
-import { GdsFlex, GdsText, GdsDivider, GdsDiv } from '@sebgroup/green-core/react'
+import { GdsFlex, GdsText, GdsDivider, GdsDiv, GdsLink } from '@sebgroup/green-core/react'
 
 export default function Footer() {
   return (
@@ -26,18 +25,10 @@ export default function Footer() {
         </GdsFlex>
 
         <GdsFlex gap="l" flex-wrap="wrap">
-          <Link href="/about" style={{ textDecoration: 'none' }}>
-            <GdsText font="body-regular-s" color="neutral-02">About</GdsText>
-          </Link>
-          <Link href="/privacy" style={{ textDecoration: 'none' }}>
-            <GdsText font="body-regular-s" color="neutral-02">Privacy</GdsText>
-          </Link>
-          <Link href="/terms" style={{ textDecoration: 'none' }}>
-            <GdsText font="body-regular-s" color="neutral-02">Terms</GdsText>
-          </Link>
-          <Link href="/contact" style={{ textDecoration: 'none' }}>
-            <GdsText font="body-regular-s" color="neutral-02">Contact</GdsText>
-          </Link>
+          <GdsLink href="/about" text-decoration="none"><GdsText font="body-regular-s" color="neutral-02">About</GdsText></GdsLink>
+          <GdsLink href="/privacy" text-decoration="none"><GdsText font="body-regular-s" color="neutral-02">Privacy</GdsText></GdsLink>
+          <GdsLink href="/terms" text-decoration="none"><GdsText font="body-regular-s" color="neutral-02">Terms</GdsText></GdsLink>
+          <GdsLink href="/contact" text-decoration="none"><GdsText font="body-regular-s" color="neutral-02">Contact</GdsText></GdsLink>
         </GdsFlex>
       </GdsFlex>
     </GdsDiv>

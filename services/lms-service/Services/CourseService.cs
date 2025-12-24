@@ -95,16 +95,45 @@ public class CourseService : ICourseService
 
     public async Task<PagedResult<CourseSummaryResponse>> SearchCoursesAsync(string? searchTerm, string? category, string? level, int page, int pageSize)
     {
-        var categoryEnum = category != null ? Enum.Parse<CourseCategory>(category, true) : (CourseCategory?)null;
-        var levelEnum = level != null ? Enum.Parse<CourseLevel>(level, true) : (CourseLevel?)null;
+        CourseCategory? categoryEnum = null;
+        CourseLevel? levelEnum = null;
 
-        var courses = await _courseRepository.SearchAsync(searchTerm, categoryEnum, levelEnum, CourseStatus.Published, (page - 1) * pageSize, pageSize);
+        try
+        {
+            if (category != null)
+            {
+                categoryEnum = Enum.Parse<CourseCategory>(category, true);
+            }
+        }
+        catch
+        {
+            // If category parsing fails, just ignore it
+            categoryEnum = null;
+        }
+
+        try
+        {
+            if (level != null)
+            {
+                levelEnum = Enum.Parse<CourseLevel>(level, true);
+            }
+        }
+        catch
+        {
+            // If level parsing fails, just ignore it
+            levelEnum = null;
+        }
+
+        // Ensure page is at least 0, then convert to 0-based skip
+        int skip = Math.Max(0, page) * pageSize;
+        var courses = await _courseRepository.SearchAsync(searchTerm, categoryEnum, levelEnum, CourseStatus.Published, skip, pageSize);
         var total = await _courseRepository.CountAsync(searchTerm, categoryEnum, levelEnum, CourseStatus.Published);
 
+        // Return 1-based page number in response for compatibility
         return new PagedResult<CourseSummaryResponse>(
             courses.Select(MapToSummary).ToList(),
             total,
-            page,
+            page + 1,
             pageSize
         );
     }

@@ -24,9 +24,14 @@ interface Job {
   budget: number;
   status: string;
   createdAt: string;
-  employer: {
-    id: string;
-    name: string;
+  client: {
+    id: number;
+    username: string;
+    fullName: string;
+    profileImageUrl: string | null;
+    location: string | null;
+    ratingAvg: number;
+    ratingCount: number;
   };
 }
 
@@ -42,7 +47,7 @@ const categories = [
 
 const experienceLevels = [
   { value: '', label: 'All Levels' },
-  { value: 'BEGINNER', label: 'Beginner' },
+  { value: 'ENTRY', label: 'Entry' },
   { value: 'INTERMEDIATE', label: 'Intermediate' },
   { value: 'EXPERT', label: 'Expert' },
 ];
@@ -81,7 +86,7 @@ function JobsPageContent() {
       }
       
       const data = await response.json();
-      setJobs(data.jobs || []);
+      setJobs(data.content || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -294,7 +299,7 @@ function JobsPageContent() {
                             {job.title}
                           </GdsText>
                           <GdsText font-size="body-s" color="secondary">
-                            Posted by {job.employer.name} • {formatDate(job.createdAt)}
+                            Posted by {job.client.fullName} • {formatDate(job.createdAt)}
                           </GdsText>
                         </GdsFlex>
                         <GdsText font-size="heading-s" color="positive">

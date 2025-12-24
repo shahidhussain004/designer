@@ -42,7 +42,8 @@ jobs:
         id: extract
         run: |
           # Extract from branch name (e.g., feature/KAN-43-user-auth)
-          BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
+          # Use GITHUB_HEAD_REF for PRs, otherwise strip refs/heads/ from GITHUB_REF
+          BRANCH_NAME="${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
           echo "Branch: $BRANCH_NAME"
           
           # Try to match KAN-XX pattern in branch name
@@ -52,8 +53,8 @@ jobs:
             echo "ticket_key=$TICKET" >> $GITHUB_OUTPUT
             echo "ticket_found=true" >> $GITHUB_OUTPUT
           else
-            # If not in branch name, try commit message (for merges to main)
-            COMMIT_MSG="${{ github.event.head_commit.message }}"
+            # If not in branch name, try commit message (for pushes/merges)
+            COMMIT_MSG="${{ github.event.head_commit && github.event.head_commit.message || '' }}"
             echo "Commit message: $COMMIT_MSG"
             
             # First try to find KAN-XX directly in commit message
@@ -65,8 +66,14 @@ jobs:
             # If not found, try to extract PR number and fetch branch name
             elif [[ $COMMIT_MSG =~ \(#([0-9]+)\) ]]; then
               PR_NUM="${BASH_REMATCH[1]}"
-              echo "Found PR #$PR_NUM, fetching branch name..."
-              PR_BRANCH=$(gh pr view $PR_NUM --json headRefName --jq '.headRefName')
+              echo "Found PR #$PR_NUM, attempting to fetch PR branch name..."
+              # Try GitHub CLI first if available, otherwise fall back to REST API
+              if command -v gh >/dev/null 2>&1; then
+                PR_BRANCH=$(gh pr view $PR_NUM --json headRefName --jq '.headRefName')
+              else
+                echo "gh CLI not available, using REST API fallback"
+                PR_BRANCH=$(curl -s -H "Authorization: token $GH_TOKEN" "https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUM" | jq -r '.head.ref')
+              fi
               echo "PR branch: $PR_BRANCH"
               if [[ $PR_BRANCH =~ (KAN-[0-9]+) ]]; then
                 TICKET="${BASH_REMATCH[1]}"

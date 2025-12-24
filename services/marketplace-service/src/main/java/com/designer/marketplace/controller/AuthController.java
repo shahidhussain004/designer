@@ -45,6 +45,23 @@ public class AuthController {
     }
 
     /**
+     * DEBUG - Check current user authorities
+     */
+    @GetMapping("/debug/authorities")
+    public ResponseEntity<?> debugAuthorities() {
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        log.info("==== DEBUG: Current Authentication: {} ====", auth);
+        if (auth != null && auth.isAuthenticated()) {
+            return ResponseEntity.ok(new java.util.HashMap<String, Object>() {{
+                put("principal", auth.getPrincipal());
+                put("authorities", auth.getAuthorities());
+                put("name", auth.getName());
+            }});
+        }
+        return ResponseEntity.status(401).body("Not authenticated");
+    }
+
+    /**
      * POST /api/auth/register
      * Register a new user
      */

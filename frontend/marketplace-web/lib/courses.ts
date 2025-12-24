@@ -67,18 +67,57 @@ export async function getCourses(params?: {
   sortBy?: string;
 }): Promise<{ courses: Course[]; totalCount: number; page: number; size: number }> {
   const queryParams = new URLSearchParams();
-  if (params?.category) queryParams.append('category', params.category);
-  if (params?.skillLevel) queryParams.append('skillLevel', params.skillLevel);
+  
+  // Convert category to backend enum format (remove spaces and capitalize)
+  if (params?.category) {
+    const categoryEnum = params.category
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join('');
+    queryParams.append('category', categoryEnum);
+  }
+  
+  if (params?.skillLevel) queryParams.append('level', params.skillLevel);
   if (params?.minPrice !== undefined) queryParams.append('minPrice', params.minPrice.toString());
   if (params?.maxPrice !== undefined) queryParams.append('maxPrice', params.maxPrice.toString());
   if (params?.search) queryParams.append('search', params.search);
-  if (params?.page !== undefined) queryParams.append('page', params.page.toString());
-  if (params?.size !== undefined) queryParams.append('size', params.size.toString());
+  if (params?.page !== undefined) queryParams.append('page', (params.page + 1).toString());
+  if (params?.size !== undefined) queryParams.append('pageSize', params.size.toString());
   if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
 
   const response = await fetch(`${LMS_API_URL}/courses?${queryParams.toString()}`);
   if (!response.ok) throw new Error('Failed to fetch courses');
-  return response.json();
+  const data = await response.json();
+  
+  // Transform LMS PagedResult { items, totalCount, page, pageSize } to expected format { courses, totalCount, page, size }
+  return {
+    courses: (data.items || []).map((item: any) => ({
+      id: item.id,
+      title: item.title,
+      description: item.shortDescription || '',
+      instructorId: '',
+      instructorName: item.instructorName,
+      price: Math.round((item.price || 0) * 100),
+      currency: item.currency || 'USD',
+      thumbnailUrl: item.thumbnailUrl,
+      category: item.category,
+      skillLevel: (item.level || 'Beginner') as 'Beginner' | 'Intermediate' | 'Advanced',
+      durationMinutes: item.totalDurationMinutes || 0,
+      lessonsCount: item.totalLessons || 0,
+      enrollmentsCount: item.totalEnrollments || 0,
+      rating: item.averageRating || 0,
+      reviewsCount: item.reviewCount || 0,
+      isPublished: true,
+      tags: [],
+      learningOutcomes: [],
+      requirements: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    })),
+    totalCount: data.totalCount || 0,
+    page: (data.page || 1) - 1,
+    size: data.pageSize || 12,
+  };
 }
 
 export async function getCourseById(id: string): Promise<Course> {
