@@ -1,8 +1,6 @@
-const React = require('react');
+import React from 'react';
 
-module.exports = {
-  Navbar: function Navbar() { return React.createElement('div', null, 'Navbar'); },
-  Footer: function Footer() { return React.createElement('div', null, 'Footer'); },
-  PageLayout: function PageLayout({ children }) { return React.createElement('div', null, children); },
-  ClientOnly: function ClientOnly({ children }) { return React.createElement(React.Fragment, null, children); }
-};
+export function Navbar() { return React.createElement('div', null, 'Navbar'); }
+export function Footer() { return React.createElement('div', null, 'Footer'); }
+export function PageLayout({ children }: { children: React.ReactNode }) { return React.createElement('div', null, children); }
+export function ClientOnly({ children }: { children: React.ReactNode }) { return React.createElement(React.Fragment, null, children); }

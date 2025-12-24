@@ -12,4 +12,8 @@ jest.mock('next/navigation', () => ({
 }));
 
 // Provide a global fetch mock for components that call fetch during render
-global.fetch = global.fetch || jest.fn(async () => ({ ok: false, json: async () => ({}) }));
+if (!globalThis.fetch) {
+	globalThis.fetch = jest.fn(async () => ({ ok: false, json: async () => ({}) }));
+} else {
+	globalThis.fetch = globalThis.fetch || jest.fn(async () => ({ ok: false, json: async () => ({}) }));
+}

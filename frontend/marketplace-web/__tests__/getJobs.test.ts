@@ -5,11 +5,12 @@ process.env.NEXT_PUBLIC_MARKETPLACE_API = 'http://localhost:8083';
 
 import { getJobs } from '../lib/jobs';
 
-global.fetch = jest.fn();
+// Provide a properly typed jest mock for global fetch
+global.fetch = jest.fn() as unknown as jest.MockedFunction<typeof fetch>;
 
 describe('getJobs adapter', () => {
   afterEach(() => {
-    (global.fetch as jest.Mock).mockReset();
+    (global.fetch as jest.MockedFunction<typeof fetch>).mockReset();
   });
 
   it('transforms LMS job items and normalizes category tokens', async () => {
@@ -22,7 +23,7 @@ describe('getJobs adapter', () => {
       pageSize: 10
     };
 
-    (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: true, json: async () => apiResponse });
+    (global.fetch as jest.MockedFunction<typeof fetch>).mockResolvedValueOnce({ ok: true, json: async () => apiResponse } as unknown as Response);
 
     const result = await getJobs({ page: 0, size: 10 });
 
@@ -38,7 +39,7 @@ describe('getJobs adapter', () => {
 
   it('returns empty jobs array when API omits items', async () => {
     const apiResponse = { totalCount: 0, page: 1, pageSize: 10 };
-    (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: true, json: async () => apiResponse });
+    (global.fetch as jest.MockedFunction<typeof fetch>).mockResolvedValueOnce({ ok: true, json: async () => apiResponse } as unknown as Response);
 
     const result = await getJobs();
 

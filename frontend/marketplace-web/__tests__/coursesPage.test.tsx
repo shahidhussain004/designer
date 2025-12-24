@@ -11,9 +11,9 @@ jest.mock('../lib/courses', () => ({
 
 describe('Courses Page', () => {
   it('renders empty state when no courses', async () => {
-    // lazy-import so module-level code runs after any test setup
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const CoursesPage = require('../app/courses/page').default;
+    // dynamic import so module-level code runs after any test setup
+    const CoursesModule = await import('../app/courses/page');
+    const CoursesPage = CoursesModule.default;
     render(withAppRouter(React.createElement(CoursesPage), { pathname: '/courses' }));
     const emptyText = await screen.findByText(/no courses found/i);
     expect(emptyText).toBeInTheDocument();

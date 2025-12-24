@@ -1,4 +1,3 @@
-import fetch from 'node-fetch';
 import { jest } from '@jest/globals';
 
 // Mock environment
@@ -7,12 +6,12 @@ process.env.NEXT_PUBLIC_LMS_API = 'http://localhost:8082';
 // Import the adapter after setting env
 import { getCourses } from '../lib/courses';
 
-// Mock global fetch
-global.fetch = jest.fn();
+// Mock global fetch with proper typed jest mock
+global.fetch = jest.fn() as unknown as jest.MockedFunction<typeof fetch>;
 
 describe('getCourses adapter', () => {
   afterEach(() => {
-    (global.fetch as jest.Mock).mockReset();
+    (global.fetch as jest.MockedFunction<typeof fetch>).mockReset();
   });
 
   it('transforms LMS items -> courses and returns safe defaults', async () => {
@@ -25,7 +24,7 @@ describe('getCourses adapter', () => {
       pageSize: 20
     };
 
-    (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: true, json: async () => lmsResponse });
+    (global.fetch as jest.MockedFunction<typeof fetch>).mockResolvedValueOnce({ ok: true, json: async () => lmsResponse } as unknown as Response);
 
     const result = await getCourses({ page: 0, size: 20 });
 
@@ -40,7 +39,7 @@ describe('getCourses adapter', () => {
 
   it('returns empty courses array when LMS omits items', async () => {
     const lmsResponse = { totalCount: 0, page: 1, pageSize: 12 };
-    (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: true, json: async () => lmsResponse });
+    (global.fetch as jest.MockedFunction<typeof fetch>).mockResolvedValueOnce({ ok: true, json: async () => lmsResponse } as unknown as Response);
 
     const result = await getCourses();
 

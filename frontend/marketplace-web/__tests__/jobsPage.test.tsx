@@ -10,10 +10,10 @@ jest.mock('../lib/jobs', () => ({
 describe('Jobs Page', () => {
   it('renders empty state when no jobs', async () => {
     // Mock fetch to return an empty content list
-    global.fetch = jest.fn().mockResolvedValueOnce({ ok: true, json: async () => ({ content: [] }) });
-    // lazy-import to avoid module-level hook runs
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const JobsPage = require('../app/jobs/page').default;
+    (global.fetch as unknown as jest.Mock).mockResolvedValueOnce({ ok: true, json: async () => ({ content: [] }) });
+    // dynamic import to avoid module-level hook runs
+    const JobsModule = await import('../app/jobs/page');
+    const JobsPage = JobsModule.default;
     render(withAppRouter(React.createElement(JobsPage), { pathname: '/jobs' }));
     const emptyText = await screen.findByText(/no jobs found/i);
     expect(emptyText).toBeInTheDocument();

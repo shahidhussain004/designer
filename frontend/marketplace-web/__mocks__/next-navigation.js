@@ -1,22 +1,15 @@
-const React = require('react');
+import React from 'react';
 
-function useRouter() {
+export function useRouter() {
   return { push: () => {}, replace: () => {}, prefetch: () => {} };
 }
 
-function useSearchParams() {
+export function useSearchParams() {
   return { get: () => null };
 }
 
-function usePathname() {
+export function usePathname() {
   return '/';
 }
 
-const MemoryRouterProvider = ({ children }) => React.createElement(React.Fragment, null, children);
-
-module.exports = {
-  useRouter,
-  useSearchParams,
-  usePathname,
-  MemoryRouterProvider,
-};
+export const MemoryRouterProvider = ({ children }: { children: React.ReactNode }) => React.createElement(React.Fragment, null, children);
