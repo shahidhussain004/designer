@@ -27,7 +27,7 @@ public interface JobRepository extends JpaRepository<Job, Long> {
     Page<Job> findByExperienceLevel(Job.ExperienceLevel experienceLevel, Pageable pageable);
 
     @Query("SELECT j FROM Job j JOIN FETCH j.client WHERE j.status = :status AND " +
-            "(:category IS NULL OR j.category = :category) AND " +
+            "(:category IS NULL OR LOWER(j.category) = LOWER(:category)) AND " +
             "(:experienceLevel IS NULL OR j.experienceLevel = :experienceLevel) AND " +
             "(:minBudget IS NULL OR j.budget >= :minBudget) AND " +
             "(:maxBudget IS NULL OR j.budget <= :maxBudget)")

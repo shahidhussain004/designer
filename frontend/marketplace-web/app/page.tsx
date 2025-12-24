@@ -2,8 +2,9 @@
 
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { GdsFlex, GdsGrid, GdsCard, GdsText, GdsDiv, GdsButton, GdsDivider, GdsDialog } from '@sebgroup/green-core/react'
+import { GdsFlex, GdsGrid, GdsCard, GdsText, GdsDiv, GdsButton, GdsDialog, GdsLink } from '@sebgroup/green-core/react'
 import { PageLayout } from '@/components/layout'
+import ClientOnly from '@/components/layout/ClientOnly'
 
 export default function Home() {
   const dialogRef = useRef<any>(null)
@@ -34,6 +35,7 @@ export default function Home() {
 
   return (
     <PageLayout>
+      <ClientOnly fallback={<div style={{ padding: 24 }}>Loading…</div>}>
       {/* Hero Section */}
       <GdsDiv background="brand-01" padding="2xl l">
         <GdsFlex 
@@ -263,13 +265,13 @@ export default function Home() {
       </GdsDiv>
 
       {/* Modal Dialog */}
-      <GdsDialog ref={dialogRef}>
+      <GdsDialog ref={dialogRef} heading="Welcome to Designer Hub">
         <GdsGrid columns="s{1} m{2}" gap="0" width="100%">
           {/* Left Panel */}
           <GdsDiv background="brand-01" color="inversed" padding="s{l} m{2xl}" display="s{none} m{flex}" flex-direction="column" justify-content="center" align-items="flex-start">
             <GdsFlex flex-direction="column" gap="l" align-items="flex-start">
               <GdsText tag="h2" font="heading-l" color="inversed" text-align="start">
-                Success starts here
+                Welcome to Designer Hub
               </GdsText>
               
               {/* Features List */}
@@ -282,7 +284,7 @@ export default function Home() {
                     </svg>
                   </GdsDiv>
                   <GdsText font="body-regular-m" color="inversed">
-                    Over 700 categories
+                      Hundreds of curated categories
                   </GdsText>
                 </GdsFlex>
 
@@ -294,7 +296,7 @@ export default function Home() {
                     </svg>
                   </GdsDiv>
                   <GdsText font="body-regular-m" color="inversed">
-                    Quality work done faster
+                    Exceptional outcomes, delivered reliably
                   </GdsText>
                 </GdsFlex>
 
@@ -306,7 +308,7 @@ export default function Home() {
                     </svg>
                   </GdsDiv>
                   <GdsText font="body-regular-m" color="inversed">
-                    Global talent and opportunities
+                    Connect with skilled professionals worldwide
                   </GdsText>
                 </GdsFlex>
               </GdsFlex>
@@ -318,20 +320,20 @@ export default function Home() {
             <GdsFlex flex-direction="column" gap="l" align-items="center" width="100%">
               <GdsFlex flex-direction="column" gap="m" width="100%" align-items="flex-start">
                 <GdsText tag="h2" font="heading-m">
-                  Create your account
+                  Start your journey
                 </GdsText>
                 <GdsText font="body-regular-m" color="neutral-02">
-                  Join thousands of freelancers and clients worldwide
+                  Connect with professionals and projects that match your goals
                 </GdsText>
               </GdsFlex>
 
               {/* Action Buttons */}
               <GdsFlex flex-direction="column" gap="m" width="100%">
                 <GdsButton rank="primary" width="100%" onClick={handleCloseModal}>
-                  Get Started
+                  Create Account
                 </GdsButton>
                 <GdsButton rank="tertiary" variant="neutral" width="100%" onClick={handleCloseModal}>
-                  Browse as guest
+                  Continue Without Signing Up
                 </GdsButton>
               </GdsFlex>
 
@@ -339,7 +341,7 @@ export default function Home() {
               <GdsFlex gap="m" align-items="center" width="100%">
                 <GdsDiv flex="1" height="1px" background="subtle-01" />
                 <GdsText font="detail-regular-s" color="neutral-02">
-                  OR
+                  or choose an alternative sign-in method
                 </GdsText>
                 <GdsDiv flex="1" height="1px" background="subtle-01" />
               </GdsFlex>
@@ -347,21 +349,25 @@ export default function Home() {
               {/* Social Buttons */}
               <GdsFlex flex-direction="column" gap="s" width="100%">
                 <GdsButton rank="secondary" variant="neutral" width="100%">
-                  Continue with Google
+                  Sign in with Google
                 </GdsButton>
                 <GdsButton rank="secondary" variant="neutral" width="100%">
-                  Continue with Email
+                  Sign in with Email
                 </GdsButton>
               </GdsFlex>
 
               {/* Terms Text */}
               <GdsText font="detail-regular-s" color="neutral-02" text-align="center">
-                By joining, you agree to our Terms of Service and Privacy Policy
+                By continuing you accept our{' '}
+                <GdsLink href="/terms" text-decoration="hover:underline">Terms</GdsLink>{' '}
+                and acknowledge the{' '}
+                <GdsLink href="/privacy" text-decoration="hover:underline">Privacy Policy</GdsLink>.
               </GdsText>
             </GdsFlex>
           </GdsDiv>
         </GdsGrid>
       </GdsDialog>
+      </ClientOnly>
     </PageLayout>
   )
 }

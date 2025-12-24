@@ -32,17 +32,24 @@ public class CourseRepository : ICourseRepository
 
     private void CreateIndexes()
     {
-        var indexKeys = Builders<Course>.IndexKeys;
-        var indexes = new List<CreateIndexModel<Course>>
+        try
         {
-            new(indexKeys.Ascending(c => c.Slug), new CreateIndexOptions { Unique = true }),
-            new(indexKeys.Ascending(c => c.InstructorId)),
-            new(indexKeys.Ascending(c => c.Category)),
-            new(indexKeys.Ascending(c => c.Level)),
-            new(indexKeys.Ascending(c => c.Status)),
-            new(indexKeys.Text(c => c.Title).Text(c => c.Description))
-        };
-        _courses.Indexes.CreateMany(indexes);
+            var indexKeys = Builders<Course>.IndexKeys;
+            var indexes = new List<CreateIndexModel<Course>>
+            {
+                new(indexKeys.Ascending(c => c.Slug), new CreateIndexOptions { Unique = true }),
+                new(indexKeys.Ascending(c => c.InstructorId)),
+                new(indexKeys.Ascending(c => c.Category)),
+                new(indexKeys.Ascending(c => c.Level)),
+                new(indexKeys.Ascending(c => c.Status)),
+                new(indexKeys.Text(c => c.Title).Text(c => c.Description))
+            };
+            _courses.Indexes.CreateMany(indexes);
+        }
+        catch (MongoDB.Driver.MongoCommandException ex) when (ex.Message.Contains("Index already exists"))
+        {
+            // Index already exists, this is fine
+        }
     }
 
     public async Task<Course?> GetByIdAsync(string id)

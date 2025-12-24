@@ -197,7 +197,7 @@ export default function CreateJobPage() {
                       fontSize: '1rem',
                     } as any}
                   >
-                    <option value="BEGINNER">Beginner</option>
+                    <option value="ENTRY">Entry</option>
                     <option value="INTERMEDIATE">Intermediate</option>
                     <option value="EXPERT">Expert</option>
                   </select>

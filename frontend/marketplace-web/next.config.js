@@ -75,6 +75,35 @@ const nextConfig = {
       },
     ];
   },
+  // API proxy to backend services
+  async rewrites() {
+    return [
+      {
+        source: '/api/courses/:path*',
+        destination: 'http://localhost:8082/api/courses/:path*',
+      },
+      {
+        source: '/api/enrollments/:path*',
+        destination: 'http://localhost:8082/api/enrollments/:path*',
+      },
+      {
+        source: '/api/quizzes/:path*',
+        destination: 'http://localhost:8082/api/quizzes/:path*',
+      },
+      {
+        source: '/api/certificates/:path*',
+        destination: 'http://localhost:8082/api/certificates/:path*',
+      },
+      {
+        source: '/api/videos/:path*',
+        destination: 'http://localhost:8082/api/videos/:path*',
+      },
+      {
+        source: '/api/:path*',
+        destination: 'http://localhost:8080/api/:path*',
+      },
+    ];
+  },
 }
 
 module.exports = nextConfig

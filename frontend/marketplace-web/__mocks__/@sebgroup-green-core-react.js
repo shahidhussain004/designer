@@ -1,0 +1,55 @@
+const React = require('react');
+
+function make(name) {
+  return function MockComponent(props) {
+    return React.createElement('div', { 'data-mock-component': name }, props.children);
+  };
+}
+
+module.exports = {
+  GdsGrid: make('GdsGrid'),
+  GdsFlex: make('GdsFlex'),
+  GdsDiv: make('GdsDiv'),
+  GdsCard: make('GdsCard'),
+  GdsDivider: make('GdsDivider'),
+  GdsTheme: make('GdsTheme'),
+  GdsText: make('GdsText'),
+  GdsInput: make('GdsInput'),
+  GdsTextarea: make('GdsTextarea'),
+  GdsCheckbox: make('GdsCheckbox'),
+  GdsRadioGroup: make('GdsRadioGroup'),
+  GdsSelect: make('GdsSelect'),
+  GdsDropdown: make('GdsDropdown'),
+  GdsDatepicker: make('GdsDatepicker'),
+  GdsButton: make('GdsButton'),
+  GdsLink: make('GdsLink'),
+  GdsFab: make('GdsFab'),
+  GdsMenuButton: make('GdsMenuButton'),
+  GdsFilterChips: make('GdsFilterChips'),
+  GdsFilterChip: make('GdsFilterChip'),
+  GdsSegmentedControl: make('GdsSegmentedControl'),
+  GdsAlert: make('GdsAlert'),
+  GdsBadge: make('GdsBadge'),
+  GdsSpinner: make('GdsSpinner'),
+  GdsSignal: make('GdsSignal'),
+  GdsCoachmark: make('GdsCoachmark'),
+  GdsDialog: make('GdsDialog'),
+  GdsPopover: make('GdsPopover'),
+  GdsContextMenu: make('GdsContextMenu'),
+  GdsBreadcrumbs: make('GdsBreadcrumbs'),
+  GdsFormSummary: make('GdsFormSummary'),
+  GdsGroupedList: make('GdsGroupedList'),
+  GdsDetails: make('GdsDetails'),
+  GdsImg: make('GdsImg'),
+  GdsVideo: make('GdsVideo'),
+  GdsRichText: make('GdsRichText'),
+  GdsMask: make('GdsMask'),
+  GdsBlur: make('GdsBlur'),
+  GdsFormattedNumber: make('GdsFormattedNumber'),
+  GdsFormattedDate: make('GdsFormattedDate'),
+  GdsFormattedAccount: make('GdsFormattedAccount'),
+  GdsSensitiveNumber: make('GdsSensitiveNumber'),
+  GdsSensitiveDate: make('GdsSensitiveDate'),
+  GdsSensitiveAccount: make('GdsSensitiveAccount'),
+  GdsCalendar: make('GdsCalendar'),
+};

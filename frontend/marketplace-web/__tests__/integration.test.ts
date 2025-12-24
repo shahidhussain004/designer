@@ -479,7 +479,7 @@ describe('Designer Marketplace API - Integration Tests', () => {
             description: 'Test',
             budget: 1000,
             category: 'WEB_DEVELOPMENT',
-            experienceLevel: 'BEGINNER',
+            experienceLevel: 'ENTRY',
             timelineWeeks: 4,
           },
           getAuthHeader(freelancerUser.token!)

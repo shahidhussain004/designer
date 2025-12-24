@@ -15,12 +15,12 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddLmsServices(this IServiceCollection services, IConfiguration configuration)
     {
         // Configure settings
-        services.Configure<MongoDbSettings>(configuration.GetSection("MongoDB"));
-        services.Configure<AwsSettings>(configuration.GetSection("AWS"));
-        services.Configure<JwtSettings>(configuration.GetSection("JWT"));
-        services.Configure<KafkaSettings>(configuration.GetSection("Kafka"));
-        services.Configure<RedisSettings>(configuration.GetSection("Redis"));
-        services.Configure<CertificateSettings>(configuration.GetSection("Certificate"));
+        services.Configure<MongoDbSettings>(configuration.GetSection("MongoDbSettings"));
+        services.Configure<AwsSettings>(configuration.GetSection("AwsSettings"));
+        services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+        services.Configure<KafkaSettings>(configuration.GetSection("KafkaSettings"));
+        services.Configure<RedisSettings>(configuration.GetSection("RedisSettings"));
+        services.Configure<CertificateSettings>(configuration.GetSection("CertificateSettings"));
 
         // MongoDB
         services.AddSingleton<IMongoClient>(sp =>

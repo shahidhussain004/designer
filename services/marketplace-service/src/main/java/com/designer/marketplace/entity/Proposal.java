@@ -34,7 +34,7 @@ public class Proposal {
     @JoinColumn(name = "job_id", nullable = false)
     private Job job;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "freelancer_id", nullable = false)
     private User freelancer;
 

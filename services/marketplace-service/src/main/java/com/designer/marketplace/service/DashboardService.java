@@ -19,6 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.transaction.annotation.Transactional;
+
 /**
  * Service for dashboard operations
  */
@@ -35,6 +37,7 @@ public class DashboardService {
         /**
          * Task 3.17: Get client dashboard data
          */
+        @Transactional(readOnly = true)
         public ClientDashboardResponse getClientDashboard() {
                 User currentUser = userService.getCurrentUser();
 
@@ -90,6 +93,7 @@ public class DashboardService {
         /**
          * Task 3.18: Get freelancer dashboard data
          */
+        @Transactional(readOnly = true)
         public FreelancerDashboardResponse getFreelancerDashboard() {
                 User currentUser = userService.getCurrentUser();
 
