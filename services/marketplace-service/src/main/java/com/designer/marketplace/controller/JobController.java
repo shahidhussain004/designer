@@ -38,7 +38,7 @@ public class JobController {
     /**
      * Task 3.6: List jobs with filters
      * GET
-     * /api/jobs?category=web&experienceLevel=intermediate&minBudget=100&maxBudget=1000&page=0&size=20
+     * /api/jobs?category=web&experienceLevel=intermediate&minBudget=100&maxBudget=1000&search=keyword&page=0&size=20
      */
     @GetMapping
     public ResponseEntity<Page<JobResponse>> getJobs(
@@ -46,18 +46,19 @@ public class JobController {
             @RequestParam(required = false) String experienceLevel,
             @RequestParam(required = false) Double minBudget,
             @RequestParam(required = false) Double maxBudget,
+            @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "DESC") String sortDirection) {
 
-        log.info("Getting jobs - category: {}, experienceLevel: {}, page: {}, size: {}",
-                category, experienceLevel, page, size);
+        log.info("Getting jobs - category: {}, experienceLevel: {}, search: {}, page: {}, size: {}",
+                category, experienceLevel, search, page, size);
 
         Sort sort = sortDirection.equalsIgnoreCase("ASC") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<JobResponse> jobs = jobService.getJobs(category, experienceLevel, minBudget, maxBudget, pageable);
+        Page<JobResponse> jobs = jobService.getJobs(category, experienceLevel, minBudget, maxBudget, search, pageable);
         return ResponseEntity.ok(jobs);
     }
 

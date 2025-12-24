@@ -29,16 +29,42 @@ public class JobService {
      */
     @Transactional(readOnly = true)
     public Page<JobResponse> getJobs(String category, String experienceLevel,
-            Double minBudget, Double maxBudget, Pageable pageable) {
-        log.info("Getting jobs with filters - category: {}, experienceLevel: {}, minBudget: {}, maxBudget: {}",
-                category, experienceLevel, minBudget, maxBudget);
+            Double minBudget, Double maxBudget, String search, Pageable pageable) {
+        log.info("Getting jobs with filters - category: {}, experienceLevel: {}, minBudget: {}, maxBudget: {}, search: {}",
+                category, experienceLevel, minBudget, maxBudget, search);
+
+        // If search term is provided, use search method
+        if (search != null && !search.trim().isEmpty()) {
+            return searchJobs(search, pageable);
+        }
 
         Job.JobStatus status = Job.JobStatus.OPEN;
         Job.ExperienceLevel expLevel = experienceLevel != null
                 ? Job.ExperienceLevel.valueOf(experienceLevel.toUpperCase())
                 : null;
 
-        Page<Job> jobs = jobRepository.findByFilters(status, category, expLevel, minBudget, maxBudget, pageable);
+        // Normalize category tokens coming from frontend (e.g., WEB_DESIGN, BRANDING)
+        String normalizedCategory = null;
+        if (category != null && !category.trim().isEmpty()) {
+            // If frontend sent underscored enum-style values (e.g., WEB_DESIGN), convert to 'Web Design'
+            String c = category.trim();
+            if (c.contains("_")) {
+                String[] parts = c.split("_");
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < parts.length; i++) {
+                    if (i > 0) sb.append(' ');
+                    String p = parts[i].toLowerCase();
+                    sb.append(Character.toUpperCase(p.charAt(0))).append(p.substring(1));
+                }
+                normalizedCategory = sb.toString();
+            } else {
+                // For single token like BRANDING or 'Web Development', normalize capitalization
+                String lower = c.toLowerCase();
+                normalizedCategory = Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
+            }
+        }
+
+        Page<Job> jobs = jobRepository.findByFilters(status, normalizedCategory, expLevel, minBudget, maxBudget, pageable);
         return jobs.map(JobResponse::fromEntity);
     }
 
