@@ -2,8 +2,9 @@
 
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { GdsFlex, GdsGrid, GdsCard, GdsText, GdsDiv, GdsButton, GdsDivider, GdsDialog } from '@sebgroup/green-core/react'
+import { GdsFlex, GdsGrid, GdsCard, GdsText, GdsDiv, GdsButton, GdsDialog, GdsLink } from '@sebgroup/green-core/react'
 import { PageLayout } from '@/components/layout'
+import ClientOnly from '@/components/layout/ClientOnly'
 
 export default function Home() {
   const dialogRef = useRef<any>(null)
@@ -34,6 +35,7 @@ export default function Home() {
 
   return (
     <PageLayout>
+      <ClientOnly fallback={<div style={{ padding: 24 }}>Loading…</div>}>
       {/* Hero Section */}
       <GdsDiv background="brand-01" padding="2xl l">
         <GdsFlex 
@@ -263,14 +265,109 @@ export default function Home() {
       </GdsDiv>
 
       {/* Modal Dialog */}
-      <GdsDialog ref={dialogRef} heading="Welcome to Designer Marketplace">
-        <GdsText font="body-regular-m">
-          Welcome! This is your marketplace to find talented freelancers or post your projects.
-        </GdsText>
-        <GdsButton rank="primary" onClick={handleCloseModal} style={{ marginTop: '20px' } as any}>
-          Get Started
-        </GdsButton>
+      <GdsDialog ref={dialogRef} heading="Welcome to Designer Hub">
+        <GdsGrid columns="s{1} m{2}" gap="0" width="100%">
+          {/* Left Panel */}
+          <GdsDiv background="brand-01" color="inversed" padding="s{l} m{2xl}" display="s{none} m{flex}" flex-direction="column" justify-content="center" align-items="flex-start">
+            <GdsFlex flex-direction="column" gap="l" align-items="flex-start">
+              <GdsText tag="h2" font="heading-l" color="inversed" text-align="start">
+                Welcome to Designer Hub
+              </GdsText>
+              
+              {/* Features List */}
+              <GdsFlex flex-direction="column" gap="m">
+                {/* Feature 1 */}
+                <GdsFlex gap="m" align-items="flex-start">
+                  <GdsDiv width="24px" height="24px" display="flex" align-items="center" justify-content="center" flex-shrink="0">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ color: 'currentColor' }}>
+                      <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </GdsDiv>
+                  <GdsText font="body-regular-m" color="inversed">
+                      Hundreds of curated categories
+                  </GdsText>
+                </GdsFlex>
+
+                {/* Feature 2 */}
+                <GdsFlex gap="m" align-items="flex-start">
+                  <GdsDiv width="24px" height="24px" display="flex" align-items="center" justify-content="center" flex-shrink="0">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ color: 'currentColor' }}>
+                      <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </GdsDiv>
+                  <GdsText font="body-regular-m" color="inversed">
+                    Exceptional outcomes, delivered reliably
+                  </GdsText>
+                </GdsFlex>
+
+                {/* Feature 3 */}
+                <GdsFlex gap="m" align-items="flex-start">
+                  <GdsDiv width="24px" height="24px" display="flex" align-items="center" justify-content="center" flex-shrink="0">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ color: 'currentColor' }}>
+                      <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </GdsDiv>
+                  <GdsText font="body-regular-m" color="inversed">
+                    Connect with skilled professionals worldwide
+                  </GdsText>
+                </GdsFlex>
+              </GdsFlex>
+            </GdsFlex>
+          </GdsDiv>
+
+          {/* Right Panel */}
+          <GdsDiv padding="s{l} m{2xl}" display="flex" flex-direction="column" justify-content="center" align-items="center">
+            <GdsFlex flex-direction="column" gap="l" align-items="center" width="100%">
+              <GdsFlex flex-direction="column" gap="m" width="100%" align-items="flex-start">
+                <GdsText tag="h2" font="heading-m">
+                  Start your journey
+                </GdsText>
+                <GdsText font="body-regular-m" color="neutral-02">
+                  Connect with professionals and projects that match your goals
+                </GdsText>
+              </GdsFlex>
+
+              {/* Action Buttons */}
+              <GdsFlex flex-direction="column" gap="m" width="100%">
+                <GdsButton rank="primary" width="100%" onClick={handleCloseModal}>
+                  Create Account
+                </GdsButton>
+                <GdsButton rank="tertiary" variant="neutral" width="100%" onClick={handleCloseModal}>
+                  Continue Without Signing Up
+                </GdsButton>
+              </GdsFlex>
+
+              {/* Divider */}
+              <GdsFlex gap="m" align-items="center" width="100%">
+                <GdsDiv flex="1" height="1px" background="subtle-01" />
+                <GdsText font="detail-regular-s" color="neutral-02">
+                  or choose an alternative sign-in method
+                </GdsText>
+                <GdsDiv flex="1" height="1px" background="subtle-01" />
+              </GdsFlex>
+
+              {/* Social Buttons */}
+              <GdsFlex flex-direction="column" gap="s" width="100%">
+                <GdsButton rank="secondary" variant="neutral" width="100%">
+                  Sign in with Google
+                </GdsButton>
+                <GdsButton rank="secondary" variant="neutral" width="100%">
+                  Sign in with Email
+                </GdsButton>
+              </GdsFlex>
+
+              {/* Terms Text */}
+              <GdsText font="detail-regular-s" color="neutral-02" text-align="center">
+                By continuing you accept our{' '}
+                <GdsLink href="/terms" text-decoration="hover:underline">Terms</GdsLink>{' '}
+                and acknowledge the{' '}
+                <GdsLink href="/privacy" text-decoration="hover:underline">Privacy Policy</GdsLink>.
+              </GdsText>
+            </GdsFlex>
+          </GdsDiv>
+        </GdsGrid>
       </GdsDialog>
+      </ClientOnly>
     </PageLayout>
   )
 }

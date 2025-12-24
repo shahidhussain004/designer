@@ -6,8 +6,10 @@ import com.designer.marketplace.dto.NotificationResponse;
 import com.designer.marketplace.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,11 +37,24 @@ public class DashboardController {
      * GET /api/dashboard/client
      */
     @GetMapping("/dashboard/client")
-    @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<ClientDashboardResponse> getClientDashboard() {
         log.info("Getting client dashboard");
-        ClientDashboardResponse dashboard = dashboardService.getClientDashboard();
-        return ResponseEntity.ok(dashboard);
+
+        // Check if user has CLIENT role
+        boolean hasClientRole = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                .stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_CLIENT"));
+        if (!hasClientRole) {
+            log.warn("Unauthorized access to client dashboard");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        try {
+            ClientDashboardResponse dashboard = dashboardService.getClientDashboard();
+            return ResponseEntity.ok(dashboard);
+        } catch (Exception e) {
+            log.error("Error getting client dashboard", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     /**
@@ -47,9 +62,17 @@ public class DashboardController {
      * GET /api/dashboard/freelancer
      */
     @GetMapping("/dashboard/freelancer")
-    @PreAuthorize("hasRole('FREELANCER')")
     public ResponseEntity<FreelancerDashboardResponse> getFreelancerDashboard() {
         log.info("Getting freelancer dashboard");
+
+        // Check if user has FREELANCER role
+        boolean hasFreelancerRole = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                .stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_FREELANCER"));
+        if (!hasFreelancerRole) {
+            log.warn("Unauthorized access to freelancer dashboard");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
         FreelancerDashboardResponse dashboard = dashboardService.getFreelancerDashboard();
         return ResponseEntity.ok(dashboard);
     }
