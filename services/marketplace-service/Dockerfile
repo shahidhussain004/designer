@@ -1,23 +1,30 @@
 # Multi-stage Dockerfile for Designer Marketplace Service
 # Optimized for production with minimal image size and security best practices
 
+# Build argument to determine if we're inside SEB network
+ARG USE_SEB_ARTIFACTORY=true
+
 # Stage 1: Build Stage
-FROM sebshift-io.repo7.sebank.se/library/maven:3.9-eclipse-temurin-21-alpine AS builder
+FROM maven:3.9-eclipse-temurin-21-alpine AS builder
+
+ARG USE_SEB_ARTIFACTORY
 
 WORKDIR /app
 
-# Configure Alpine repositories to use SEB Artifactory
-RUN export `grep VERSION_ID= /etc/os-release|cut -d '.' -f -2` && \
-    env && \
-    echo "https://repo7.sebank.se:443/artifactory/alpinelinux-org/v$VERSION_ID/main" > /etc/apk/repositories && \
-    echo "https://repo7.sebank.se:443/artifactory/alpinelinux-org/v$VERSION_ID/community" >> /etc/apk/repositories && \
-    echo '@edge https://repo7.sebank.se:443/artifactory/alpinelinux-org/edge/main' >> /etc/apk/repositories && \
-    echo '@edgecommunity https://repo7.sebank.se:443/artifactory/alpinelinux-org/edge/community' >> /etc/apk/repositories && \
-    echo '@testing https://repo7.sebank.se:443/artifactory/alpinelinux-org/edge/testing' >> /etc/apk/repositories
+# Configure Alpine repositories conditionally
+RUN if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
+        export `grep VERSION_ID= /etc/os-release|cut -d '.' -f -2` && \
+        echo "https://repo7.sebank.se:443/artifactory/alpinelinux-org/v$VERSION_ID/main" > /etc/apk/repositories && \
+        echo "https://repo7.sebank.se:443/artifactory/alpinelinux-org/v$VERSION_ID/community" >> /etc/apk/repositories && \
+        echo '@edge https://repo7.sebank.se:443/artifactory/alpinelinux-org/edge/main' >> /etc/apk/repositories && \
+        echo '@edgecommunity https://repo7.sebank.se:443/artifactory/alpinelinux-org/edge/community' >> /etc/apk/repositories && \
+        echo '@testing https://repo7.sebank.se:443/artifactory/alpinelinux-org/edge/testing' >> /etc/apk/repositories; \
+    fi
 
-# Create Maven settings.xml with correct SEB Artifactory repositories
+# Create Maven settings.xml conditionally
 RUN mkdir -p /tmp/.m2 && \
-    cat > /tmp/.m2/settings.xml << 'EOF'
+    if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
+        cat > /tmp/.m2/settings.xml << 'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -64,9 +71,16 @@ RUN mkdir -p /tmp/.m2 && \
   </activeProfiles>
 </settings>
 EOF
+    else \
+        echo '<?xml version="1.0" encoding="UTF-8"?><settings/>' > /tmp/.m2/settings.xml; \
+    fi
 
-# Disable SSL verification for Maven (for SEB internal network)
-ENV MAVEN_OPTS="-Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true"
+# Disable SSL verification for Maven (only for SEB internal network)
+RUN if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
+        export MAVEN_OPTS="-Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true"; \
+    fi
+
+ENV MAVEN_OPTS="${MAVEN_OPTS:-}"
 
 # Copy only pom.xml first to leverage Docker layer caching for dependencies
 COPY pom.xml .
@@ -79,21 +93,27 @@ COPY src ./src
 RUN mvn --batch-mode --no-transfer-progress -Duser.home=/tmp -s /tmp/.m2/settings.xml package -Dmaven.test.skip -DskipITs=true
 
 # Stage 2: Runtime Stage
-FROM sebshift-io.repo7.sebank.se/library/eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 
-# Configure Alpine repositories to use SEB Artifactory
-RUN export `grep VERSION_ID= /etc/os-release|cut -d '.' -f -2` && \
-    env && \
-    echo "https://repo7.sebank.se:443/artifactory/alpinelinux-org/v$VERSION_ID/main" > /etc/apk/repositories && \
-    echo "https://repo7.sebank.se:443/artifactory/alpinelinux-org/v$VERSION_ID/community" >> /etc/apk/repositories
+ARG USE_SEB_ARTIFACTORY
+
+# Configure Alpine repositories conditionally
+RUN if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
+        export `grep VERSION_ID= /etc/os-release|cut -d '.' -f -2` && \
+        echo "https://repo7.sebank.se:443/artifactory/alpinelinux-org/v$VERSION_ID/main" > /etc/apk/repositories && \
+        echo "https://repo7.sebank.se:443/artifactory/alpinelinux-org/v$VERSION_ID/community" >> /etc/apk/repositories; \
+    fi
+
+# Install wget (needed for health check)
+RUN apk add --no-cache wget
 
 # Create non-root user
 RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
 
 WORKDIR /app
 
-# Copy the certificate file
-COPY src/main/resources-non-filtered/certs/99k45-dev.sebank.se.jks .
+# Copy the certificate file (if exists)
+COPY src/main/resources-non-filtered/certs/99k45-dev.sebank.se.jks . 2>/dev/null || true
 
 # Copy the built JAR from builder stage
 COPY --from=builder /app/target/*.jar app.jar

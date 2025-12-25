@@ -2,20 +2,21 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Install certificates and configure NuGet to use SEB Artifactory
+# Install certificates and curl
 RUN apt-get update && apt-get install -y --no-install-recommends curl && \
-    curl -s -L http://seb-ca-v2.seb.se/SEB-CA-v2/SEB%20Root%20CA%20v2.pem -o /usr/local/share/ca-certificates/SEB_Root_CA_v2.crt && \
-    curl -s -L http://seb-ca-v2.seb.se/SEB-CA-v2/SEB%20Appl%20Sub%20CA%20v2.pem -o /usr/local/share/ca-certificates/SEB_Appl_SubCA_v2.crt && \
-    curl -s -L http://pki.seb.se/g3/root/ecc/cert -o /usr/local/share/ca-certificates/SEB_Root_CA_ECC_G3.crt && \
-    curl -s -L http://pki.seb.se/g3/root/rsa/cert -o /usr/local/share/ca-certificates/SEB_Root_CA_RSA_G3.crt && \
-    update-ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-# Configure NuGet to use SEB Artifactory (bypasses external NuGet.org SSL issues)
-RUN dotnet nuget add source "https://repo7.sebank.se/artifactory/api/nuget/v3/nuget" --name "SEB Artifactory" && \
-    dotnet nuget disable source nuget.org || true
+# Try to download SEB certificates (only works inside corporate network)
+RUN curl -s -L http://seb-ca-v2.seb.se/SEB-CA-v2/SEB%20Root%20CA%20v2.pem -o /usr/local/share/ca-certificates/SEB_Root_CA_v2.crt 2>/dev/null || true && \
+    curl -s -L http://seb-ca-v2.seb.se/SEB-CA-v2/SEB%20Appl%20Sub%20CA%20v2.pem -o /usr/local/share/ca-certificates/SEB_Appl_SubCA_v2.crt 2>/dev/null || true && \
+    curl -s -L http://pki.seb.se/g3/root/ecc/cert -o /usr/local/share/ca-certificates/SEB_Root_CA_ECC_G3.crt 2>/dev/null || true && \
+    curl -s -L http://pki.seb.se/g3/root/rsa/cert -o /usr/local/share/ca-certificates/SEB_Root_CA_RSA_G3.crt 2>/dev/null || true && \
+    update-ca-certificates
 
-# Copy csproj and restore from Artifactory
+# Configure NuGet sources - add Artifactory but keep nuget.org enabled as fallback
+RUN dotnet nuget add source "https://repo7.sebank.se/artifactory/api/nuget/v3/nuget" --name "SEB Artifactory" 2>/dev/null || true
+
+# Copy csproj and restore (will use Artifactory if available, otherwise nuget.org)
 COPY *.csproj ./
 RUN dotnet restore
 
@@ -27,7 +28,7 @@ RUN dotnet publish -c Release -o /app/publish
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 
-# Install fonts for QuestPDF and download SEB Root Certificates
+# Install fonts for QuestPDF and try to download SEB Root Certificates
 RUN apt-get update && apt-get install -y --no-install-recommends \
     fontconfig \
     fonts-liberation \
