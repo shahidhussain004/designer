@@ -140,8 +140,8 @@ export const CookiesConsent: React.FC<CookiesConsentProps> = ({ onAccept, onReje
         </svg>
       </button>
 
-      {/* Use GdsDialog with size token 'xlarge' */}
-      <GdsDialog ref={dialogRef} heading="Privacy Preference Center" size="xlarge">
+      {/* Use GdsDialog */}
+      <GdsDialog ref={dialogRef} heading="Privacy Preference Center">
         <div className="p-8 md:p-10" style={{ fontFamily: "'SEB Sans Serif', system-ui, -apple-system, sans-serif" }}>
           <div className="flex items-start gap-4 mb-6">
             <div className="flex-shrink-0">
