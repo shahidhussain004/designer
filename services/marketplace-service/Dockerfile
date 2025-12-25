@@ -13,7 +13,7 @@ WORKDIR /app
 
 # Configure Alpine repositories conditionally
 RUN if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
-        export `grep VERSION_ID= /etc/os-release|cut -d '.' -f -2` && \
+        export VERSION_ID=$(grep VERSION_ID= /etc/os-release | cut -d '=' -f2 | cut -d '.' -f1,2 | tr -d '"') && \
         echo "https://repo7.sebank.se:443/artifactory/alpinelinux-org/v$VERSION_ID/main" > /etc/apk/repositories && \
         echo "https://repo7.sebank.se:443/artifactory/alpinelinux-org/v$VERSION_ID/community" >> /etc/apk/repositories && \
         echo '@edge https://repo7.sebank.se:443/artifactory/alpinelinux-org/edge/main' >> /etc/apk/repositories && \
@@ -21,56 +21,50 @@ RUN if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
         echo '@testing https://repo7.sebank.se:443/artifactory/alpinelinux-org/edge/testing' >> /etc/apk/repositories; \
     fi
 
-# Create Maven settings.xml conditionally
+# Create Maven settings.xml for SEB Artifactory
 RUN mkdir -p /tmp/.m2 && \
     if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
-        cat > /tmp/.m2/settings.xml << 'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
-  <profiles>
-    <profile>
-      <id>seb-repos</id>
-      <repositories>
-        <repository>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-          <id>central</id>
-          <name>libs-release</name>
-          <url>https://repo7.sebank.se/artifactory/maven-apache</url>
-        </repository>
-        <repository>
-          <snapshots/>
-          <id>snapshots</id>
-          <name>libs-snapshot</name>
-          <url>https://repo7.sebank.se/artifactory/maven-org</url>
-        </repository>
-      </repositories>
-      <pluginRepositories>
-        <pluginRepository>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-          <id>central</id>
-          <name>plugins-release</name>
-          <url>https://repo7.sebank.se/artifactory/maven-apache</url>
-        </pluginRepository>
-        <pluginRepository>
-          <snapshots/>
-          <id>snapshots</id>
-          <name>plugins-snapshot</name>
-          <url>https://repo7.sebank.se/artifactory/maven-org</url>
-        </pluginRepository>
-      </pluginRepositories>
-    </profile>
-  </profiles>
-  <activeProfiles>
-    <activeProfile>seb-repos</activeProfile>
-  </activeProfiles>
-</settings>
-EOF
+        echo '<?xml version="1.0" encoding="UTF-8"?>' > /tmp/.m2/settings.xml && \
+        echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"' >> /tmp/.m2/settings.xml && \
+        echo '          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"' >> /tmp/.m2/settings.xml && \
+        echo '          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">' >> /tmp/.m2/settings.xml && \
+        echo '  <profiles>' >> /tmp/.m2/settings.xml && \
+        echo '    <profile>' >> /tmp/.m2/settings.xml && \
+        echo '      <id>seb-repos</id>' >> /tmp/.m2/settings.xml && \
+        echo '      <repositories>' >> /tmp/.m2/settings.xml && \
+        echo '        <repository>' >> /tmp/.m2/settings.xml && \
+        echo '          <snapshots><enabled>false</enabled></snapshots>' >> /tmp/.m2/settings.xml && \
+        echo '          <id>central</id>' >> /tmp/.m2/settings.xml && \
+        echo '          <name>libs-release</name>' >> /tmp/.m2/settings.xml && \
+        echo '          <url>https://repo7.sebank.se/artifactory/maven-apache</url>' >> /tmp/.m2/settings.xml && \
+        echo '        </repository>' >> /tmp/.m2/settings.xml && \
+        echo '        <repository>' >> /tmp/.m2/settings.xml && \
+        echo '          <snapshots/>' >> /tmp/.m2/settings.xml && \
+        echo '          <id>snapshots</id>' >> /tmp/.m2/settings.xml && \
+        echo '          <name>libs-snapshot</name>' >> /tmp/.m2/settings.xml && \
+        echo '          <url>https://repo7.sebank.se/artifactory/maven-org</url>' >> /tmp/.m2/settings.xml && \
+        echo '        </repository>' >> /tmp/.m2/settings.xml && \
+        echo '      </repositories>' >> /tmp/.m2/settings.xml && \
+        echo '      <pluginRepositories>' >> /tmp/.m2/settings.xml && \
+        echo '        <pluginRepository>' >> /tmp/.m2/settings.xml && \
+        echo '          <snapshots><enabled>false</enabled></snapshots>' >> /tmp/.m2/settings.xml && \
+        echo '          <id>central</id>' >> /tmp/.m2/settings.xml && \
+        echo '          <name>plugins-release</name>' >> /tmp/.m2/settings.xml && \
+        echo '          <url>https://repo7.sebank.se/artifactory/maven-apache</url>' >> /tmp/.m2/settings.xml && \
+        echo '        </pluginRepository>' >> /tmp/.m2/settings.xml && \
+        echo '        <pluginRepository>' >> /tmp/.m2/settings.xml && \
+        echo '          <snapshots/>' >> /tmp/.m2/settings.xml && \
+        echo '          <id>snapshots</id>' >> /tmp/.m2/settings.xml && \
+        echo '          <name>plugins-snapshot</name>' >> /tmp/.m2/settings.xml && \
+        echo '          <url>https://repo7.sebank.se/artifactory/maven-org</url>' >> /tmp/.m2/settings.xml && \
+        echo '        </pluginRepository>' >> /tmp/.m2/settings.xml && \
+        echo '      </pluginRepositories>' >> /tmp/.m2/settings.xml && \
+        echo '    </profile>' >> /tmp/.m2/settings.xml && \
+        echo '  </profiles>' >> /tmp/.m2/settings.xml && \
+        echo '  <activeProfiles>' >> /tmp/.m2/settings.xml && \
+        echo '    <activeProfile>seb-repos</activeProfile>' >> /tmp/.m2/settings.xml && \
+        echo '  </activeProfiles>' >> /tmp/.m2/settings.xml && \
+        echo '</settings>' >> /tmp/.m2/settings.xml; \
     else \
         echo '<?xml version="1.0" encoding="UTF-8"?><settings/>' > /tmp/.m2/settings.xml; \
     fi
@@ -78,7 +72,7 @@ EOF
 # Copy only pom.xml first to leverage Docker layer caching for dependencies
 COPY pom.xml .
 
-# Try to download dependencies using the settings file with conditional Maven options
+# Download dependencies with conditional Maven options
 RUN if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
         MAVEN_OPTS="-Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true" \
         mvn dependency:resolve -B -s /tmp/.m2/settings.xml -Duser.home=/tmp || true; \
@@ -102,7 +96,7 @@ ARG USE_SEB_ARTIFACTORY
 
 # Configure Alpine repositories conditionally
 RUN if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
-        export `grep VERSION_ID= /etc/os-release|cut -d '.' -f -2` && \
+        export VERSION_ID=$(grep VERSION_ID= /etc/os-release | cut -d '=' -f2 | cut -d '.' -f1,2 | tr -d '"') && \
         echo "https://repo7.sebank.se:443/artifactory/alpinelinux-org/v$VERSION_ID/main" > /etc/apk/repositories && \
         echo "https://repo7.sebank.se:443/artifactory/alpinelinux-org/v$VERSION_ID/community" >> /etc/apk/repositories; \
     fi

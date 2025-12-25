@@ -40,42 +40,24 @@ RUN if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
         git config --system http.sslVerify false; \
     fi
 
-# Set environment variables
-ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
-ENV SSL_CERT_DIR=/etc/ssl/certs
-ENV GIT_SSL_CAINFO=/etc/ssl/certs/ca-certificates.crt
-
-# Set Go proxy conditionally - THIS IS THE KEY FIX
-RUN if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
-        echo "GOPROXY=https://repo7.sebank.se/artifactory/api/go/golang,direct" >> /etc/environment && \
-        echo "GOSUMDB=off" >> /etc/environment && \
-        echo "GOINSECURE=*" >> /etc/environment; \
-    else \
-        echo "GOPROXY=https://proxy.golang.org,direct" >> /etc/environment && \
-        echo "GOSUMDB=sum.golang.org" >> /etc/environment; \
-    fi
-
-# Source the environment and set as ENV
-RUN if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
-        export GOPROXY="https://repo7.sebank.se/artifactory/api/go/golang,direct" && \
-        export GOSUMDB="off" && \
-        export GOINSECURE="*"; \
-    fi
-
-ENV GOPROXY=${USE_SEB_ARTIFACTORY:+https://repo7.sebank.se/artifactory/api/go/golang,}${USE_SEB_ARTIFACTORY:-https://proxy.golang.org,}direct
-ENV GOSUMDB=${USE_SEB_ARTIFACTORY:+off}
-ENV GOINSECURE=${USE_SEB_ARTIFACTORY:+*}
+# Set basic environment variables
+ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt \
+    SSL_CERT_DIR=/etc/ssl/certs \
+    GIT_SSL_CAINFO=/etc/ssl/certs/ca-certificates.crt
 
 WORKDIR /app
 
 # Copy go mod files first for better layer caching
 COPY go.mod go.sum ./
 
-# Download dependencies with cache mount for faster rebuilds
+# Download dependencies - set GOPROXY inline in the RUN command
 RUN --mount=type=cache,id=gomod,target=/go/pkg/mod \
     --mount=type=cache,id=gobuild,target=/root/.cache/go-build \
     if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
-        GOPROXY="https://repo7.sebank.se/artifactory/api/go/golang,direct" GOSUMDB=off GOINSECURE=* go mod download; \
+        export GOPROXY="https://repo7.sebank.se/artifactory/api/go/golang,direct" && \
+        export GOSUMDB="off" && \
+        export GOINSECURE="*" && \
+        go mod download; \
     else \
         go mod download; \
     fi
