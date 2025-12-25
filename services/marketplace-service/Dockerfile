@@ -109,11 +109,15 @@ RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
 
 WORKDIR /app
 
-# Copy the certificate file (if exists)
-COPY --chown=appuser:appgroup src/main/resources-non-filtered/certs/*.jks ./ 2>/dev/null || true
-
 # Copy the built JAR from builder stage
 COPY --from=builder --chown=appuser:appgroup /app/target/*.jar app.jar
+
+# Copy certificates if they exist in the builder stage
+RUN --mount=type=bind,from=builder,source=/app/src/main/resources-non-filtered/certs,target=/tmp/certs \
+    cp /tmp/certs/*.jks ./ 2>/dev/null || echo "No certificate files found, skipping..."
+
+# Change ownership to non-root user
+RUN chown -R appuser:appgroup /app
 
 # Switch to non-root user
 USER appuser
