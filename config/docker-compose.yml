@@ -176,13 +176,19 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/marketplace_db
-      SPRING_DATASOURCE_USERNAME: marketplace_user
-      SPRING_DATASOURCE_PASSWORD: marketplace_pass_dev
-      SPRING_REDIS_HOST: redis
-      SPRING_REDIS_PORT: 6379
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      SPRING_DATA_MONGODB_URI: mongodb://mongo_user:mongo_pass_dev@mongodb:27017/lms_db?authSource=admin
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: marketplace_db
+      DB_USER: marketplace_user
+      DB_PASSWORD: marketplace_pass_dev
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      MONGO_USER: mongo_user
+      MONGO_PASSWORD: mongo_pass_dev
+      MONGO_HOST: mongodb
+      MONGO_PORT: 27017
+      MONGO_DB: lms_db
       JWT_SECRET: your-256-bit-secret-change-this-in-production-please-make-it-secure
     depends_on:
       postgres:
