@@ -65,6 +65,11 @@ services:
     volumes:
       - zookeeper_data:/var/lib/zookeeper/data
       - zookeeper_logs:/var/lib/zookeeper/log
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo ruok | nc localhost 2181 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - marketplace-network
 
@@ -73,7 +78,7 @@ services:
     image: confluentinc/cp-kafka:7.4.0
     depends_on:
       zookeeper:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "9092:9092"
       - "9101:9101"
@@ -121,6 +126,11 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     networks:
       - marketplace-network
 
@@ -135,7 +145,13 @@ services:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
     depends_on:
-      - prometheus
+      prometheus:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     networks:
       - marketplace-network
 
