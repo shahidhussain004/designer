@@ -71,25 +71,29 @@ RUN mkdir -p /tmp/.m2 && \
   </activeProfiles>
 </settings>
 EOF
-; else \
+    else \
         echo '<?xml version="1.0" encoding="UTF-8"?><settings/>' > /tmp/.m2/settings.xml; \
-    fi
-
-# Set Maven options for SEB environment
-ENV MAVEN_OPTS=""
-RUN if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
-        export MAVEN_OPTS="-Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true"; \
     fi
 
 # Copy only pom.xml first to leverage Docker layer caching for dependencies
 COPY pom.xml .
 
-# Try to download dependencies using the settings file
-RUN mvn dependency:resolve -B -s /tmp/.m2/settings.xml -Duser.home=/tmp || true
+# Try to download dependencies using the settings file with conditional Maven options
+RUN if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
+        MAVEN_OPTS="-Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true" \
+        mvn dependency:resolve -B -s /tmp/.m2/settings.xml -Duser.home=/tmp || true; \
+    else \
+        mvn dependency:resolve -B -s /tmp/.m2/settings.xml -Duser.home=/tmp || true; \
+    fi
 
 # Copy source code and build
 COPY src ./src
-RUN mvn --batch-mode --no-transfer-progress -Duser.home=/tmp -s /tmp/.m2/settings.xml package -Dmaven.test.skip -DskipITs=true
+RUN if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
+        MAVEN_OPTS="-Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true" \
+        mvn --batch-mode --no-transfer-progress -Duser.home=/tmp -s /tmp/.m2/settings.xml package -Dmaven.test.skip -DskipITs=true; \
+    else \
+        mvn --batch-mode --no-transfer-progress -Duser.home=/tmp -s /tmp/.m2/settings.xml package -Dmaven.test.skip -DskipITs=true; \
+    fi
 
 # Stage 2: Runtime Stage
 FROM eclipse-temurin:21-jre-alpine
@@ -111,7 +115,7 @@ RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
 
 WORKDIR /app
 
-# Copy the certificate file (if exists) - using a separate stage to handle missing file
+# Copy the certificate file (if exists)
 COPY --chown=appuser:appgroup src/main/resources-non-filtered/certs/*.jks ./ 2>/dev/null || true
 
 # Copy the built JAR from builder stage

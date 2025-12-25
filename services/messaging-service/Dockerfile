@@ -36,23 +36,33 @@ RUN if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
             "http://pki.seb.se/g3/root/rsa/cert" 2>/dev/null || true && \
         wget --no-check-certificate -O /usr/local/share/ca-certificates/seb_root_ca_v2.crt \
             "http://seb-ca-v2.seb.se/SEB-CA-v2/SEB%20Root%20CA%20v2.pem" 2>/dev/null || true && \
-        update-ca-certificates; \
-    fi
-
-# Configure Go environment conditionally
-RUN if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
-        echo "export GOPROXY=https://repo7.sebank.se/artifactory/api/go/golang,direct" >> /etc/profile && \
-        echo "export GOSUMDB=off" >> /etc/profile && \
-        echo "export GOINSECURE=*" >> /etc/profile && \
+        update-ca-certificates && \
         git config --system http.sslVerify false; \
     fi
 
+# Set environment variables
 ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 ENV SSL_CERT_DIR=/etc/ssl/certs
 ENV GIT_SSL_CAINFO=/etc/ssl/certs/ca-certificates.crt
 
-# Set Go proxy based on environment
-ENV GOPROXY=${USE_SEB_ARTIFACTORY:+https://repo7.sebank.se/artifactory/api/go/golang,}direct
+# Set Go proxy conditionally - THIS IS THE KEY FIX
+RUN if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
+        echo "GOPROXY=https://repo7.sebank.se/artifactory/api/go/golang,direct" >> /etc/environment && \
+        echo "GOSUMDB=off" >> /etc/environment && \
+        echo "GOINSECURE=*" >> /etc/environment; \
+    else \
+        echo "GOPROXY=https://proxy.golang.org,direct" >> /etc/environment && \
+        echo "GOSUMDB=sum.golang.org" >> /etc/environment; \
+    fi
+
+# Source the environment and set as ENV
+RUN if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
+        export GOPROXY="https://repo7.sebank.se/artifactory/api/go/golang,direct" && \
+        export GOSUMDB="off" && \
+        export GOINSECURE="*"; \
+    fi
+
+ENV GOPROXY=${USE_SEB_ARTIFACTORY:+https://repo7.sebank.se/artifactory/api/go/golang,}${USE_SEB_ARTIFACTORY:-https://proxy.golang.org,}direct
 ENV GOSUMDB=${USE_SEB_ARTIFACTORY:+off}
 ENV GOINSECURE=${USE_SEB_ARTIFACTORY:+*}
 
@@ -64,7 +74,11 @@ COPY go.mod go.sum ./
 # Download dependencies with cache mount for faster rebuilds
 RUN --mount=type=cache,id=gomod,target=/go/pkg/mod \
     --mount=type=cache,id=gobuild,target=/root/.cache/go-build \
-    go mod download
+    if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
+        GOPROXY="https://repo7.sebank.se/artifactory/api/go/golang,direct" GOSUMDB=off GOINSECURE=* go mod download; \
+    else \
+        go mod download; \
+    fi
 
 # Copy source code
 COPY . .
