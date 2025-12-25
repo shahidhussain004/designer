@@ -71,16 +71,15 @@ RUN mkdir -p /tmp/.m2 && \
   </activeProfiles>
 </settings>
 EOF
-    else \
+; else \
         echo '<?xml version="1.0" encoding="UTF-8"?><settings/>' > /tmp/.m2/settings.xml; \
     fi
 
-# Disable SSL verification for Maven (only for SEB internal network)
+# Set Maven options for SEB environment
+ENV MAVEN_OPTS=""
 RUN if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
         export MAVEN_OPTS="-Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true"; \
     fi
-
-ENV MAVEN_OPTS="${MAVEN_OPTS:-}"
 
 # Copy only pom.xml first to leverage Docker layer caching for dependencies
 COPY pom.xml .
@@ -112,14 +111,11 @@ RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
 
 WORKDIR /app
 
-# Copy the certificate file (if exists)
-COPY src/main/resources-non-filtered/certs/99k45-dev.sebank.se.jks . 2>/dev/null || true
+# Copy the certificate file (if exists) - using a separate stage to handle missing file
+COPY --chown=appuser:appgroup src/main/resources-non-filtered/certs/*.jks ./ 2>/dev/null || true
 
 # Copy the built JAR from builder stage
-COPY --from=builder /app/target/*.jar app.jar
-
-# Change ownership to non-root user
-RUN chown -R appuser:appgroup /app
+COPY --from=builder --chown=appuser:appgroup /app/target/*.jar app.jar
 
 # Switch to non-root user
 USER appuser
