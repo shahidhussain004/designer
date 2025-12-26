@@ -44,45 +44,23 @@ export default function Layout() {
   const isActive = (href: string) => location.pathname === href
 
   return (
-    <Flex style={{ minHeight: '100vh' } as any}>
+    <Flex>
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 40,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          }}
-          onClick={() => setSidebarOpen(false)}
+        <div onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Mobile sidebar */}
-      <div
-        style={{
-          position: 'fixed',
-          inset: 0,
-          zIndex: 50,
-          display: sidebarOpen ? 'block' : 'none',
-          width: '256px',
-        }}
-      >
+      <div>
         <Flex
-          flex-direction="column"
-          style={{
-            height: '100%',
-            width: '256px',
-            backgroundColor: '#ffffff',
-            borderRight: '1px solid #e5e7eb',
-          } as any}
-        >
+          flex-direction="column">
           <Flex justify-content="space-between" align-items="center" padding="m">
             <Text font-size="heading-s" font-weight="book">
               Admin Panel
             </Text>
             <Button rank="tertiary" onClick={() => setSidebarOpen(false)}>
-              <XMarkIcon style={{ width: '24px', height: '24px' }} />
+              <XMarkIcon width={24} height={24} />
             </Button>
           </Flex>
           <Flex flex-direction="column" gap="xs" padding="s" flex="1">
@@ -90,24 +68,12 @@ export default function Layout() {
               <Link
                 key={item.name}
                 to={item.href}
-                onClick={() => setSidebarOpen(false)}
-                style={{ textDecoration: 'none' }}
-              >
+                onClick={() => setSidebarOpen(false)}>
                 <Flex
                   align-items="center"
                   gap="s"
-                  padding="s"
-                  style={{
-                    borderRadius: '8px',
-                    backgroundColor: isActive(item.href)
-                      ? '#dcfce7'
-                      : 'transparent',
-                    color: isActive(item.href)
-                      ? '#16a34a'
-                      : '#6b7280',
-                  } as any}
-                >
-                  <item.icon style={{ width: '20px', height: '20px' }} />
+                  padding="s">
+                  <item.icon width={20} height={20} />
                   <Text font-size="body-s">{item.name}</Text>
                 </Flex>
               </Link>
@@ -118,18 +84,7 @@ export default function Layout() {
 
       {/* Desktop sidebar */}
       <Flex
-        flex-direction="column"
-        style={{
-          display: 'none',
-          width: '256px',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          bottom: 0,
-          borderRight: '1px solid #e5e7eb',
-          backgroundColor: '#ffffff',
-        } as any}
-        className="desktop-sidebar"
+        flex-direction="column" className="desktop-sidebar"
       >
         <Flex padding="m" align-items="center">
           <Text font-size="heading-s" font-weight="book">
@@ -139,28 +94,12 @@ export default function Layout() {
 
         <Flex flex-direction="column" gap="xs" padding="s" flex="1">
           {navigation.map((item) => (
-            <Link key={item.name} to={item.href} style={{ textDecoration: 'none' }}>
+            <Link key={item.name} to={item.href}>
               <Flex
                 align-items="center"
                 gap="s"
-                padding="s"
-                style={{
-                  borderRadius: '8px',
-                  backgroundColor: isActive(item.href)
-                    ? '#dcfce7'
-                    : 'transparent',
-                  transition: 'background-color 0.2s',
-                } as any}
-              >
-                <item.icon
-                  style={{
-                    width: '20px',
-                    height: '20px',
-                    color: isActive(item.href)
-                      ? '#16a34a'
-                      : '#6b7280',
-                  }}
-                />
+                padding="s">
+                <item.icon width={20} height={20} />
                 <Text
                   font-size="body-s"
                   color={isActive(item.href) ? 'positive' : 'secondary'}
@@ -179,14 +118,7 @@ export default function Layout() {
           <Flex align-items="center" gap="s">
             <Flex
               justify-content="center"
-              align-items="center"
-              style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '50%',
-                backgroundColor: '#dcfce7',
-              } as any}
-            >
+              align-items="center" >
               <Text font-weight="book" color="positive">
                 {user?.fullName?.charAt(0) || 'A'}
               </Text>
@@ -204,14 +136,14 @@ export default function Layout() {
           <Flex gap="s">
             <Button rank="tertiary" onClick={toggleTheme}>
               {theme === 'light' ? (
-                <MoonIcon style={{ width: '20px', height: '20px' }} />
+                <MoonIcon width={20} height={20} />
               ) : (
-                <SunIcon style={{ width: '20px', height: '20px' }} />
+                <SunIcon width={20} height={20} />
               )}
             </Button>
             <Button rank="secondary" onClick={handleLogout}>
               <Flex align-items="center" gap="xs">
-                <ArrowRightOnRectangleIcon style={{ width: '20px', height: '20px' }} />
+                <ArrowRightOnRectangleIcon />
                 <span>Logout</span>
               </Flex>
             </Button>
@@ -226,22 +158,16 @@ export default function Layout() {
           justify-content="space-between"
           align-items="center"
           padding="m"
-          className="mobile-topbar"
-          style={{
-            display: 'none',
-            borderBottom: '1px solid #e5e7eb',
-            backgroundColor: '#ffffff',
-          } as any}
-        >
+          className="mobile-topbar" >
           <Button rank="tertiary" onClick={() => setSidebarOpen(true)}>
-            <Bars3Icon style={{ width: '24px', height: '24px' }} />
+            <Bars3Icon width={24} height={24} />
           </Button>
           <Text font-size="heading-s">Admin Panel</Text>
           <Button rank="tertiary" onClick={toggleTheme}>
             {theme === 'light' ? (
-              <MoonIcon style={{ width: '20px', height: '20px' }} />
+              <MoonIcon width={20} height={20} />
             ) : (
-              <SunIcon style={{ width: '20px', height: '20px' }} />
+              <SunIcon width={20} height={20} />
             )}
           </Button>
         </Flex>
@@ -251,28 +177,6 @@ export default function Layout() {
           <Outlet />
         </Flex>
       </Flex>
-
-      <style>{`
-        @media (min-width: 1024px) {
-          .desktop-sidebar {
-            display: flex !important;
-          }
-          .main-content {
-            margin-left: 256px;
-          }
-          .mobile-topbar {
-            display: none !important;
-          }
-        }
-        @media (max-width: 1023px) {
-          .desktop-sidebar {
-            display: none !important;
-          }
-          .mobile-topbar {
-            display: flex !important;
-          }
-        }
-      `}</style>
     </Flex>
   )
 }

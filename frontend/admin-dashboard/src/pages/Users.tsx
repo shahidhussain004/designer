@@ -230,17 +230,6 @@ export default function Users() {
           </>
         )}
       </Card>
-
-      {/* Responsive Table Styles */}
-      <style>{`
-        @media (max-width: 768px) {
-          gds-grid[columns="2fr 1fr 1fr 1fr 1fr 1fr"] {
-            display: flex !important;
-            flex-direction: column;
-            gap: 0.5rem;
-          }
-        }
-      `}</style>
     </Flex>
   )
 }

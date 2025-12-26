@@ -111,12 +111,8 @@ export default function Jobs() {
       {/* Header */}
       <Flex justify-content="space-between" align-items="center" flex-wrap="wrap" gap="m">
         <div>
-          <Text tag="h1" style={{ fontSize: '1.5rem', fontWeight: 700 } as any}>
-            Jobs
-          </Text>
-          <Text style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>
-            Manage job listings and moderation queue
-          </Text>
+          <Text tag="h1">Jobs</Text>
+          <Text>Manage job listings and moderation queue</Text>
         </div>
         {pendingJobs?.length > 0 && (
           <Badge variant="warning">{pendingJobs.length} pending review</Badge>
@@ -125,11 +121,9 @@ export default function Jobs() {
 
       {/* Pending Jobs Queue */}
       {pendingJobs?.length > 0 && (
-        <Card style={{ background: 'var(--gds-color-l3-background-notice-dim)', border: '1px solid var(--gds-color-l3-border-notice)' } as any}>
+        <Card>
           <Flex flex-direction="column" gap="m" padding="m">
-            <Text style={{ fontWeight: 600, color: 'var(--gds-color-l3-content-notice)' } as any}>
-              Moderation Queue
-            </Text>
+            <Text>Moderation Queue</Text>
             {pendingJobs.slice(0, 3).map((job: Job) => (
               <Card key={job.id}>
                 <Flex justify-content="space-between" align-items="center" padding="m">
@@ -143,10 +137,10 @@ export default function Jobs() {
                     <Button size="small" rank="tertiary" onClick={() => setSelectedJob(job)}>
                       👁️ View
                     </Button>
-                    <Button size="small" rank="secondary" onClick={() => approveMutation.mutate(job.id)} style={{ color: 'var(--gds-color-l3-content-positive)' } as any}>
+                    <Button size="small" rank="secondary" onClick={() => approveMutation.mutate(job.id)}>
                       ✓ Approve
                     </Button>
-                    <Button size="small" rank="secondary" onClick={() => setSelectedJob(job)} style={{ color: 'var(--gds-color-l3-content-negative)' } as any}>
+                    <Button size="small" rank="secondary" onClick={() => setSelectedJob(job)}>
                       ✗ Reject
                     </Button>
                   </Flex>
@@ -198,14 +192,14 @@ export default function Jobs() {
         ) : (
           <>
             {/* Table Header */}
-            <Grid columns="2fr 1fr 1fr 1fr 1fr 1fr 1fr" gap="m" padding="m" style={{ background: 'var(--gds-color-l3-background-secondary)', borderRadius: '8px 8px 0 0' } as any}>
-              <Text style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Job</Text>
-              <Text style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Category</Text>
-              <Text style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Budget</Text>
-              <Text style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Status</Text>
-              <Text style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Proposals</Text>
-              <Text style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Posted</Text>
-              <Text style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)', textAlign: 'right' } as any}>Actions</Text>
+            <Grid columns="2fr 1fr 1fr 1fr 1fr 1fr 1fr" gap="m" padding="m">
+              <Text>Job</Text>
+              <Text>Category</Text>
+              <Text>Budget</Text>
+              <Text>Status</Text>
+              <Text>Proposals</Text>
+              <Text>Posted</Text>
+              <Text>Actions</Text>
             </Grid>
 
             {/* Table Body */}
@@ -215,21 +209,15 @@ export default function Jobs() {
                 <Grid columns="2fr 1fr 1fr 1fr 1fr 1fr 1fr" gap="m" padding="m" align-items="center">
                   {/* Job Info */}
                   <div>
-                    <Text style={{ fontWeight: 500 } as any}>{job.title}</Text>
-                    <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>
-                      by {job.clientName}
-                    </Text>
+                    <Text font-weight="500">{job.title}</Text>
+                    <Text>by {job.clientName}</Text>
                   </div>
 
                   {/* Category */}
-                  <Text style={{ color: 'var(--gds-color-l3-content-tertiary)', fontSize: '0.875rem' } as any}>
-                    {job.category}
-                  </Text>
+                  <Text>{job.category}</Text>
 
                   {/* Budget */}
-                  <Text style={{ fontWeight: 500 } as any}>
-                    ${job.budget?.toLocaleString()} {job.budgetType}
-                  </Text>
+                  <Text font-weight="500">${job.budget?.toLocaleString()} {job.budgetType}</Text>
 
                   {/* Status */}
                   <div>
@@ -237,14 +225,10 @@ export default function Jobs() {
                   </div>
 
                   {/* Proposals */}
-                  <Text style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>
-                    {job.proposalCount}
-                  </Text>
+                  <Text>{job.proposalCount}</Text>
 
                   {/* Posted */}
-                  <Text style={{ color: 'var(--gds-color-l3-content-tertiary)', fontSize: '0.875rem' } as any}>
-                    {new Date(job.createdAt).toLocaleDateString()}
-                  </Text>
+                  <Text>{new Date(job.createdAt).toLocaleDateString()}</Text>
 
                   {/* Actions */}
                   <Flex gap="s" justify-content="flex-end">
@@ -259,7 +243,6 @@ export default function Jobs() {
                           deleteMutation.mutate(job.id)
                         }
                       }}
-                      style={{ color: 'var(--gds-color-l3-content-negative)' } as any}
                     >
                       Delete
                     </Button>

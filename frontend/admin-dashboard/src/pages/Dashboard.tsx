@@ -80,7 +80,7 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <Flex justify-content="center" align-items="center" style={{ height: '256px' } as any}>
+      <Flex justify-content="center" align-items="center">
         <Spinner />
       </Flex>
     )
@@ -104,17 +104,8 @@ export default function Dashboard() {
           <Card key={stat.name} padding="l">
             <Flex flex-direction="column" gap="m">
               <Flex align-items="center" gap="m">
-                <Flex
-                  justify-content="center"
-                  align-items="center"
-                  style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '8px',
-                    backgroundColor: 'var(--gds-color-l3-background-positive)',
-                  } as any}
-                >
-                  <stat.icon style={{ width: '24px', height: '24px', color: 'var(--gds-color-l3-content-positive)' }} />
+                <Flex justify-content="center" align-items="center">
+                  <stat.icon width={24} height={24} />
                 </Flex>
                 <Flex flex-direction="column" gap="2xs">
                   <Text font-size="body-s" color="secondary">
@@ -138,20 +129,12 @@ export default function Dashboard() {
         {/* Recent Activity */}
         <Card padding="0">
           <Flex flex-direction="column">
-            <Flex padding="m" style={{ borderBottom: '1px solid var(--gds-color-l3-border-primary)' } as any}>
+            <Flex padding="m">
               <Text font-size="heading-s">Recent Activity</Text>
             </Flex>
             <Flex flex-direction="column">
               {activity?.slice(0, 5).map((item: { title: string; description: string; time: string }, index: number) => (
-                <Flex
-                  key={index}
-                  justify-content="space-between"
-                  align-items="center"
-                  padding="m"
-                  style={{
-                    borderBottom: index < 4 ? '1px solid var(--gds-color-l3-border-primary)' : 'none',
-                  } as any}
-                >
+                <Flex key={index} justify-content="space-between" align-items="center" padding="m">
                   <Flex flex-direction="column" gap="2xs">
                     <Text font-size="body-s" font-weight="book">
                       {item.title}
@@ -176,38 +159,38 @@ export default function Dashboard() {
         {/* Quick Actions */}
         <Card padding="0">
           <Flex flex-direction="column">
-            <Flex padding="m" style={{ borderBottom: '1px solid var(--gds-color-l3-border-primary)' } as any}>
+            <Flex padding="m">
               <Text font-size="heading-s">Quick Actions</Text>
             </Flex>
             <Grid columns="2" gap="m" padding="m">
-              <Link to="/users" style={{ textDecoration: 'none' }}>
-                <Card padding="m" variant="secondary" style={{ cursor: 'pointer' } as any}>
+              <Link to="/users">
+                <Card padding="m" variant="secondary">
                   <Flex align-items="center" justify-content="center" gap="s">
-                    <UsersIcon style={{ width: '20px', height: '20px' }} />
+                    <UsersIcon width={20} height={20} />
                     <Text font-size="body-s">Manage Users</Text>
                   </Flex>
                 </Card>
               </Link>
-              <Link to="/jobs" style={{ textDecoration: 'none' }}>
-                <Card padding="m" variant="secondary" style={{ cursor: 'pointer' } as any}>
+              <Link to="/jobs">
+                <Card padding="m" variant="secondary">
                   <Flex align-items="center" justify-content="center" gap="s">
-                    <BriefcaseIcon style={{ width: '20px', height: '20px' }} />
+                    <BriefcaseIcon width={20} height={20} />
                     <Text font-size="body-s">Review Jobs</Text>
                   </Flex>
                 </Card>
               </Link>
-              <Link to="/disputes" style={{ textDecoration: 'none' }}>
-                <Card padding="m" variant="secondary" style={{ cursor: 'pointer' } as any}>
+              <Link to="/disputes">
+                <Card padding="m" variant="secondary">
                   <Flex align-items="center" justify-content="center" gap="s">
-                    <ClockIcon style={{ width: '20px', height: '20px' }} />
+                    <ClockIcon width={20} height={20} />
                     <Text font-size="body-s">Handle Disputes</Text>
                   </Flex>
                 </Card>
               </Link>
-              <Link to="/analytics" style={{ textDecoration: 'none' }}>
-                <Card padding="m" variant="secondary" style={{ cursor: 'pointer' } as any}>
+              <Link to="/analytics">
+                <Card padding="m" variant="secondary">
                   <Flex align-items="center" justify-content="center" gap="s">
-                    <CurrencyDollarIcon style={{ width: '20px', height: '20px' }} />
+                    <CurrencyDollarIcon width={20} height={20} />
                     <Text font-size="body-s">View Analytics</Text>
                   </Flex>
                 </Card>

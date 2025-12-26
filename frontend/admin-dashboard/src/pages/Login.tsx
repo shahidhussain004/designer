@@ -54,16 +54,8 @@ export default function Login() {
   }
 
   return (
-    <Flex
-      justify-content="center"
-      align-items="center"
-      padding="l"
-      style={{
-        minHeight: '100vh',
-        backgroundColor: 'var(--gds-color-l3-background-secondary)',
-      } as any}
-    >
-      <Card padding="xl" style={{ maxWidth: '400px', width: '100%' } as any}>
+    <Flex justify-content="center" align-items="center" padding="l">
+      <Card padding="xl">
         <Flex flex-direction="column" gap="l">
           {/* Header */}
           <Flex flex-direction="column" align-items="center" gap="s">
