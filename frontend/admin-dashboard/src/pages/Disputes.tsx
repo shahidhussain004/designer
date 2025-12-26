@@ -85,18 +85,18 @@ export default function Disputes() {
     dispute.freelancerName?.toLowerCase().includes(search.toLowerCase())
   ) || []
 
-  const getStatusBadgeVariant = (status: string): 'positive' | 'notice' | 'information' | 'information' | 'negative' => {
+  const getStatusBadgeVariant = (status: string): 'primary' | 'secondary' | 'success' | 'warning' | 'danger' => {
     switch (status) {
       case 'PENDING':
-        return 'notice'
+        return 'warning'
       case 'UNDER_REVIEW':
-        return 'information'
+        return 'primary'
       case 'RESOLVED':
-        return 'positive'
+        return 'success'
       case 'REJECTED':
-        return 'negative'
+        return 'danger'
       default:
-        return 'information'
+        return 'primary'
     }
   }
 
@@ -232,7 +232,7 @@ export default function Disputes() {
           <GdsInput
             label=""
             value={search}
-            onInput={(e: Event) => setSearch((e.target as HTMLInputElement).value)}
+            onInput={(e: React.FormEvent<HTMLInputElement>) => setSearch((e.target as HTMLInputElement).value)}
           />
         </GdsDiv>
         <GdsDiv>

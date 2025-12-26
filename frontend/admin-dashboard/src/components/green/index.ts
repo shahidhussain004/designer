@@ -1,4 +1,4 @@
-// Re-export all green-core components with React wrappers
+// Re-export all Tailwind CSS components that replace green-core
 export {
   GdsCard,
   GdsGrid,
@@ -11,4 +11,4 @@ export {
   GdsTheme,
   GdsBadge,
   GdsSpinner,
-} from '@sebgroup/green-core/react';
+} from '../tw';

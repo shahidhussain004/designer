@@ -3,12 +3,13 @@
 /**
  * Green Design System Components
  * ==============================
- * Re-exports from @sebgroup/green-core for consistent usage across the application.
- * Uses the React wrapper components from green-core.
+ * Re-exports from Tailwind CSS components for consistent usage across the application.
+ * These components replace the original @sebgroup/green-core library.
  */
 
-// Layout Components
-export { 
+// All components from Tailwind implementation
+export {
+  // Layout Components
   GdsGrid, 
   GdsFlex, 
   GdsDiv, 
@@ -16,10 +17,7 @@ export {
   GdsDivider,
   GdsTheme,
   GdsText,
-} from '@sebgroup/green-core/react'
-
-// Form Components
-export { 
+  // Form Components
   GdsInput, 
   GdsTextarea, 
   GdsCheckbox,
@@ -27,10 +25,7 @@ export {
   GdsSelect,
   GdsDropdown,
   GdsDatepicker,
-} from '@sebgroup/green-core/react'
-
-// Action Components
-export { 
+  // Action Components
   GdsButton, 
   GdsLink,
   GdsFab,
@@ -38,31 +33,19 @@ export {
   GdsFilterChips,
   GdsFilterChip,
   GdsSegmentedControl,
-} from '@sebgroup/green-core/react'
-
-// Feedback Components  
-export { 
+  // Feedback Components  
   GdsAlert, 
   GdsBadge, 
   GdsSpinner,
   GdsSignal,
   GdsCoachmark,
-} from '@sebgroup/green-core/react'
-
-// Overlay Components
-export { 
+  // Overlay Components
   GdsDialog, 
   GdsPopover,
   GdsContextMenu,
-} from '@sebgroup/green-core/react'
-
-// Navigation Components
-export { 
+  // Navigation Components
   GdsBreadcrumbs,
-} from '@sebgroup/green-core/react'
-
-// Data Display
-export {
+  // Data Display
   GdsFormSummary,
   GdsGroupedList,
   GdsDetails,
@@ -77,9 +60,6 @@ export {
   GdsSensitiveNumber,
   GdsSensitiveDate,
   GdsSensitiveAccount,
-} from '@sebgroup/green-core/react'
-
-// Calendar
-export {
+  // Calendar
   GdsCalendar,
-} from '@sebgroup/green-core/react'
+} from '@/components/tw'

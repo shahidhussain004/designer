@@ -84,7 +84,7 @@ export default function Login() {
                 label="Email address"
                 type="email"
                 value={email}
-                onInput={(e: Event) => setEmail((e.target as HTMLInputElement).value)}
+                onInput={(e: React.FormEvent<HTMLInputElement>) => setEmail((e.target as HTMLInputElement).value)}
                 required
               />
 
@@ -92,7 +92,7 @@ export default function Login() {
                 label="Password"
                 type="password"
                 value={password}
-                onInput={(e: Event) => setPassword((e.target as HTMLInputElement).value)}
+                onInput={(e: React.FormEvent<HTMLInputElement>) => setPassword((e.target as HTMLInputElement).value)}
                 required
               />
 

@@ -14,10 +14,9 @@ const customJestConfig = {
     '^.+\\.(ts|tsx|js|jsx)$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.json' }],
   },
   transformIgnorePatterns: [
-    '/node_modules/(?!(?:@sebgroup)/)'
+    '/node_modules/'
   ],
   moduleNameMapper: {
-    '^@sebgroup/green-core/react$': '<rootDir>/__mocks__/@sebgroup-green-core-react.js',
     '^next/navigation$': '<rootDir>/__mocks__/next-navigation.js',
     '^@/components/layout$': '<rootDir>/__mocks__/components-layout.js',
     '^@/(.*)$': '<rootDir>/$1',

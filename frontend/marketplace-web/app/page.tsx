@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { GdsFlex, GdsGrid, GdsCard, GdsText, GdsDiv, GdsButton, GdsDialog, GdsLink } from '@sebgroup/green-core/react'
+import { GdsFlex, GdsGrid, GdsCard, GdsText, GdsDiv, GdsButton, GdsDialog, GdsLink } from '@/components/green'
 import { PageLayout } from '@/components/layout'
 import ClientOnly from '@/components/layout/ClientOnly'
 import LandingPage from './landing/page'

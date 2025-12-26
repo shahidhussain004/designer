@@ -67,14 +67,14 @@ export default function Dashboard() {
     },
   ]
 
-  const getVariant = (changeType: string): 'positive' | 'negative' | 'information' => {
+  const getVariant = (changeType: string): 'primary' | 'secondary' | 'success' | 'warning' | 'danger' => {
     switch (changeType) {
       case 'positive':
-        return 'positive'
+        return 'success'
       case 'negative':
-        return 'negative'
+        return 'danger'
       default:
-        return 'information'
+        return 'primary'
     }
   }
 

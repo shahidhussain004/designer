@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
-import '@sebgroup/fonts/css/seb-fonts.css'
 import PWARegister from './PWARegister'
 import { SkipLink } from '@/components/ui/Accessibility'
 import { ThemeProvider } from '@/lib/theme'

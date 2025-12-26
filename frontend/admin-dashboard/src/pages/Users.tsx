@@ -66,16 +66,16 @@ export default function Users() {
     user.username?.toLowerCase().includes(search.toLowerCase())
   ) || []
 
-  const getRoleBadgeVariant = (role: string): 'positive' | 'notice' | 'information' | 'information' => {
+  const getRoleBadgeVariant = (role: string): 'primary' | 'secondary' | 'success' | 'warning' | 'danger' => {
     switch (role) {
       case 'ADMIN':
-        return 'notice'
+        return 'warning'
       case 'CLIENT':
-        return 'information'
+        return 'primary'
       case 'FREELANCER':
-        return 'positive'
+        return 'success'
       default:
-        return 'information'
+        return 'primary'
     }
   }
 
@@ -99,7 +99,7 @@ export default function Users() {
           <GdsInput
             label=""
             value={search}
-            onInput={(e: Event) => setSearch((e.target as HTMLInputElement).value)}
+            onInput={(e: React.FormEvent<HTMLInputElement>) => setSearch((e.target as HTMLInputElement).value)}
           />
         </GdsDiv>
         <GdsDiv>
@@ -178,7 +178,7 @@ export default function Users() {
 
                   {/* Status */}
                   <GdsDiv>
-                    <GdsBadge variant={user.isActive ? 'positive' : 'negative'}>
+                    <GdsBadge variant={user.isActive ? 'success' : 'danger'}>
                       {user.isActive ? '✓ Active' : '✗ Inactive'}
                     </GdsBadge>
                   </GdsDiv>
