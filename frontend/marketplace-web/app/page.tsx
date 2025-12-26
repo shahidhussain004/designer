@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { GdsFlex, GdsGrid, GdsCard, GdsText, GdsDiv, GdsButton, GdsDialog, GdsLink } from '@sebgroup/green-core/react'
 import { PageLayout } from '@/components/layout'
 import ClientOnly from '@/components/layout/ClientOnly'
+import LandingPage from './landing/page'
 
 export default function Home() {
   const dialogRef = useRef<any>(null)
@@ -34,37 +35,10 @@ export default function Home() {
   }
 
   return (
-    <PageLayout>
+    <PageLayout showNavbar={false}>
       <ClientOnly fallback={<div style={{ padding: 24 }}>Loading…</div>}>
       {/* Hero Section */}
-      <GdsDiv background="brand-01" padding="2xl l">
-        <GdsFlex 
-          flex-direction="column" 
-          align-items="center" 
-          gap="l"
-          max-width="1280px"
-          margin="0 auto"
-        >
-          <GdsText tag="h1" font="heading-2xl" color="inversed" text-align="center">
-            Designer Marketplace
-          </GdsText>
-          <GdsText font="body-regular-l" color="inversed" text-align="center">
-            Find talented freelancers for your next project or learn new skills
-          </GdsText>
-          <GdsFlex gap="m">
-            <Link href="/jobs">
-              <GdsButton rank="primary" variant="neutral">
-                Browse Jobs
-              </GdsButton>
-            </Link>
-            <Link href="/auth/register">
-              <GdsButton rank="secondary" variant="neutral">
-                Get Started
-              </GdsButton>
-            </Link>
-          </GdsFlex>
-        </GdsFlex>
-      </GdsDiv>
+      <LandingPage />
 
       {/* Main Content */}
       <GdsDiv padding="xl l" max-width="1280px" margin="0 auto" width="100%">

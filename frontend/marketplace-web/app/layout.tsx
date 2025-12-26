@@ -33,6 +33,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#003824" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/favicon.ico" />
+        <link rel="preload" href="/images/landing-poster.svg" as="image" type="image/svg+xml" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
