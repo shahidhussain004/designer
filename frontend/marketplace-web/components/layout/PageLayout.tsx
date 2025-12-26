@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { GdsFlex, GdsDiv } from '@/components/green'
+import { Flex, Div } from '@/components/green'
 import Navbar from './Navbar'
 import Footer from './Footer'
 import ClientOnly from './ClientOnly'
@@ -49,17 +49,17 @@ export default function PageLayout({
 }: PageLayoutProps) {
   return (
     <ClientOnly fallback={<LoadingSkeleton />}>
-      <GdsFlex 
+      <Flex 
         flex-direction="column" 
         min-height="100vh"
         background="neutral-01"
       >
         {showNavbar && <Navbar />}
-        <GdsDiv flex="1" width="100%">
+        <Div flex="1" width="100%">
           {children}
-        </GdsDiv>
+        </Div>
         {showFooter && <Footer />}
-      </GdsFlex>
+      </Flex>
     </ClientOnly>
   )
 }

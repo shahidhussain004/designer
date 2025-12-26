@@ -4,12 +4,12 @@ import { useAuthStore } from '../store/authStore'
 import { authApi } from '../lib/api'
 import toast from 'react-hot-toast'
 import {
-  GdsFlex,
-  GdsCard,
-  GdsText,
-  GdsButton,
-  GdsInput,
-  GdsDivider,
+  Flex,
+  Card,
+  Text,
+  Button,
+  Input,
+  Divider,
 } from '../components/green'
 
 export default function Login() {
@@ -54,7 +54,7 @@ export default function Login() {
   }
 
   return (
-    <GdsFlex
+    <Flex
       justify-content="center"
       align-items="center"
       padding="l"
@@ -63,24 +63,24 @@ export default function Login() {
         backgroundColor: 'var(--gds-color-l3-background-secondary)',
       } as any}
     >
-      <GdsCard padding="xl" style={{ maxWidth: '400px', width: '100%' } as any}>
-        <GdsFlex flex-direction="column" gap="l">
+      <Card padding="xl" style={{ maxWidth: '400px', width: '100%' } as any}>
+        <Flex flex-direction="column" gap="l">
           {/* Header */}
-          <GdsFlex flex-direction="column" align-items="center" gap="s">
-            <GdsText tag="h1" font-size="heading-l">
+          <Flex flex-direction="column" align-items="center" gap="s">
+            <Text tag="h1" font-size="heading-l">
               Admin Dashboard
-            </GdsText>
-            <GdsText color="secondary">
+            </Text>
+            <Text color="secondary">
               Sign in to access the admin panel
-            </GdsText>
-          </GdsFlex>
+            </Text>
+          </Flex>
 
-          <GdsDivider />
+          <Divider />
 
           {/* Form */}
           <form onSubmit={handleSubmit}>
-            <GdsFlex flex-direction="column" gap="m">
-              <GdsInput
+            <Flex flex-direction="column" gap="m">
+              <Input
                 label="Email address"
                 type="email"
                 value={email}
@@ -88,7 +88,7 @@ export default function Login() {
                 required
               />
 
-              <GdsInput
+              <Input
                 label="Password"
                 type="password"
                 value={password}
@@ -96,31 +96,31 @@ export default function Login() {
                 required
               />
 
-              <GdsButton type="submit" disabled={isLoading}>
+              <Button type="submit" disabled={isLoading}>
                 {isLoading ? 'Signing in...' : 'Sign in'}
-              </GdsButton>
-            </GdsFlex>
+              </Button>
+            </Flex>
           </form>
 
-          <GdsDivider />
+          <Divider />
 
           {/* Demo Credentials */}
-          <GdsCard padding="m" variant="secondary">
-            <GdsFlex flex-direction="column" gap="xs" align-items="center">
-              <GdsText font-size="body-s" font-weight="book">
+          <Card padding="m" variant="secondary">
+            <Flex flex-direction="column" gap="xs" align-items="center">
+              <Text font-size="body-s" font-weight="book">
                 Demo Admin Credentials
-              </GdsText>
-              <GdsText font-size="body-s" color="secondary">
+              </Text>
+              <Text font-size="body-s" color="secondary">
                 Email: admin@designermarket.com
-              </GdsText>
-              <GdsText font-size="body-s" color="secondary">
+              </Text>
+              <Text font-size="body-s" color="secondary">
                 Password: Admin123!
-              </GdsText>
-            </GdsFlex>
-          </GdsCard>
-        </GdsFlex>
-      </GdsCard>
-    </GdsFlex>
+              </Text>
+            </Flex>
+          </Card>
+        </Flex>
+      </Card>
+    </Flex>
   )
 }
 

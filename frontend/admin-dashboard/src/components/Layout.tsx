@@ -3,10 +3,10 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { ThemeContext } from './ThemeProvider'
 import {
-  GdsFlex,
-  GdsText,
-  GdsButton,
-  GdsDivider,
+  Flex,
+  Text,
+  Button,
+  Divider,
 } from './green'
 import {
   HomeIcon,
@@ -44,7 +44,7 @@ export default function Layout() {
   const isActive = (href: string) => location.pathname === href
 
   return (
-    <GdsFlex style={{ minHeight: '100vh' } as any}>
+    <Flex style={{ minHeight: '100vh' } as any}>
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
@@ -68,24 +68,24 @@ export default function Layout() {
           width: '256px',
         }}
       >
-        <GdsFlex
+        <Flex
           flex-direction="column"
           style={{
             height: '100%',
             width: '256px',
-            backgroundColor: 'var(--gds-color-l3-background-primary)',
-            borderRight: '1px solid var(--gds-color-l3-border-primary)',
+            backgroundColor: '#ffffff',
+            borderRight: '1px solid #e5e7eb',
           } as any}
         >
-          <GdsFlex justify-content="space-between" align-items="center" padding="m">
-            <GdsText font-size="heading-s" font-weight="book">
+          <Flex justify-content="space-between" align-items="center" padding="m">
+            <Text font-size="heading-s" font-weight="book">
               Admin Panel
-            </GdsText>
-            <GdsButton rank="tertiary" onClick={() => setSidebarOpen(false)}>
+            </Text>
+            <Button rank="tertiary" onClick={() => setSidebarOpen(false)}>
               <XMarkIcon style={{ width: '24px', height: '24px' }} />
-            </GdsButton>
-          </GdsFlex>
-          <GdsFlex flex-direction="column" gap="xs" padding="s" flex="1">
+            </Button>
+          </Flex>
+          <Flex flex-direction="column" gap="xs" padding="s" flex="1">
             {navigation.map((item) => (
               <Link
                 key={item.name}
@@ -93,31 +93,31 @@ export default function Layout() {
                 onClick={() => setSidebarOpen(false)}
                 style={{ textDecoration: 'none' }}
               >
-                <GdsFlex
+                <Flex
                   align-items="center"
                   gap="s"
                   padding="s"
                   style={{
                     borderRadius: '8px',
                     backgroundColor: isActive(item.href)
-                      ? 'var(--gds-color-l3-background-positive)'
+                      ? '#dcfce7'
                       : 'transparent',
                     color: isActive(item.href)
-                      ? 'var(--gds-color-l3-content-positive)'
-                      : 'var(--gds-color-l3-content-secondary)',
+                      ? '#16a34a'
+                      : '#6b7280',
                   } as any}
                 >
                   <item.icon style={{ width: '20px', height: '20px' }} />
-                  <GdsText font-size="body-s">{item.name}</GdsText>
-                </GdsFlex>
+                  <Text font-size="body-s">{item.name}</Text>
+                </Flex>
               </Link>
             ))}
-          </GdsFlex>
-        </GdsFlex>
+          </Flex>
+        </Flex>
       </div>
 
       {/* Desktop sidebar */}
-      <GdsFlex
+      <Flex
         flex-direction="column"
         style={{
           display: 'none',
@@ -126,28 +126,28 @@ export default function Layout() {
           top: 0,
           left: 0,
           bottom: 0,
-          borderRight: '1px solid var(--gds-color-l3-border-primary)',
-          backgroundColor: 'var(--gds-color-l3-background-primary)',
+          borderRight: '1px solid #e5e7eb',
+          backgroundColor: '#ffffff',
         } as any}
         className="desktop-sidebar"
       >
-        <GdsFlex padding="m" align-items="center">
-          <GdsText font-size="heading-s" font-weight="book">
+        <Flex padding="m" align-items="center">
+          <Text font-size="heading-s" font-weight="book">
             Designer Marketplace
-          </GdsText>
-        </GdsFlex>
+          </Text>
+        </Flex>
 
-        <GdsFlex flex-direction="column" gap="xs" padding="s" flex="1">
+        <Flex flex-direction="column" gap="xs" padding="s" flex="1">
           {navigation.map((item) => (
             <Link key={item.name} to={item.href} style={{ textDecoration: 'none' }}>
-              <GdsFlex
+              <Flex
                 align-items="center"
                 gap="s"
                 padding="s"
                 style={{
                   borderRadius: '8px',
                   backgroundColor: isActive(item.href)
-                    ? 'var(--gds-color-l3-background-positive)'
+                    ? '#dcfce7'
                     : 'transparent',
                   transition: 'background-color 0.2s',
                 } as any}
@@ -157,100 +157,100 @@ export default function Layout() {
                     width: '20px',
                     height: '20px',
                     color: isActive(item.href)
-                      ? 'var(--gds-color-l3-content-positive)'
-                      : 'var(--gds-color-l3-content-secondary)',
+                      ? '#16a34a'
+                      : '#6b7280',
                   }}
                 />
-                <GdsText
+                <Text
                   font-size="body-s"
                   color={isActive(item.href) ? 'positive' : 'secondary'}
                 >
                   {item.name}
-                </GdsText>
-              </GdsFlex>
+                </Text>
+              </Flex>
             </Link>
           ))}
-        </GdsFlex>
+        </Flex>
 
-        <GdsDivider />
+        <Divider />
 
         {/* User section */}
-        <GdsFlex flex-direction="column" gap="m" padding="m">
-          <GdsFlex align-items="center" gap="s">
-            <GdsFlex
+        <Flex flex-direction="column" gap="m" padding="m">
+          <Flex align-items="center" gap="s">
+            <Flex
               justify-content="center"
               align-items="center"
               style={{
                 width: '40px',
                 height: '40px',
                 borderRadius: '50%',
-                backgroundColor: 'var(--gds-color-l3-background-positive)',
+                backgroundColor: '#dcfce7',
               } as any}
             >
-              <GdsText font-weight="book" color="positive">
+              <Text font-weight="book" color="positive">
                 {user?.fullName?.charAt(0) || 'A'}
-              </GdsText>
-            </GdsFlex>
-            <GdsFlex flex-direction="column" gap="2xs">
-              <GdsText font-size="body-s" font-weight="book">
+              </Text>
+            </Flex>
+            <Flex flex-direction="column" gap="2xs">
+              <Text font-size="body-s" font-weight="book">
                 {user?.fullName || 'Admin'}
-              </GdsText>
-              <GdsText font-size="body-s" color="secondary">
+              </Text>
+              <Text font-size="body-s" color="secondary">
                 {user?.email}
-              </GdsText>
-            </GdsFlex>
-          </GdsFlex>
+              </Text>
+            </Flex>
+          </Flex>
 
-          <GdsFlex gap="s">
-            <GdsButton rank="tertiary" onClick={toggleTheme}>
+          <Flex gap="s">
+            <Button rank="tertiary" onClick={toggleTheme}>
               {theme === 'light' ? (
                 <MoonIcon style={{ width: '20px', height: '20px' }} />
               ) : (
                 <SunIcon style={{ width: '20px', height: '20px' }} />
               )}
-            </GdsButton>
-            <GdsButton rank="secondary" onClick={handleLogout}>
-              <GdsFlex align-items="center" gap="xs">
+            </Button>
+            <Button rank="secondary" onClick={handleLogout}>
+              <Flex align-items="center" gap="xs">
                 <ArrowRightOnRectangleIcon style={{ width: '20px', height: '20px' }} />
                 <span>Logout</span>
-              </GdsFlex>
-            </GdsButton>
-          </GdsFlex>
-        </GdsFlex>
-      </GdsFlex>
+              </Flex>
+            </Button>
+          </Flex>
+        </Flex>
+      </Flex>
 
       {/* Main content */}
-      <GdsFlex flex-direction="column" flex="1" className="main-content">
+      <Flex flex-direction="column" flex="1" className="main-content">
         {/* Mobile top bar */}
-        <GdsFlex
+        <Flex
           justify-content="space-between"
           align-items="center"
           padding="m"
           className="mobile-topbar"
           style={{
             display: 'none',
-            borderBottom: '1px solid var(--gds-color-l3-border-primary)',
-            backgroundColor: 'var(--gds-color-l3-background-primary)',
+            borderBottom: '1px solid #e5e7eb',
+            backgroundColor: '#ffffff',
           } as any}
         >
-          <GdsButton rank="tertiary" onClick={() => setSidebarOpen(true)}>
+          <Button rank="tertiary" onClick={() => setSidebarOpen(true)}>
             <Bars3Icon style={{ width: '24px', height: '24px' }} />
-          </GdsButton>
-          <GdsText font-size="heading-s">Admin Panel</GdsText>
-          <GdsButton rank="tertiary" onClick={toggleTheme}>
+          </Button>
+          <Text font-size="heading-s">Admin Panel</Text>
+          <Button rank="tertiary" onClick={toggleTheme}>
             {theme === 'light' ? (
               <MoonIcon style={{ width: '20px', height: '20px' }} />
             ) : (
               <SunIcon style={{ width: '20px', height: '20px' }} />
             )}
-          </GdsButton>
-        </GdsFlex>
+          </Button>
+        </Flex>
 
         {/* Page content */}
-        <GdsFlex flex="1" padding="l">
+        <Flex flex="1" padding="l">
           <Outlet />
-        </GdsFlex>
-      </GdsFlex>
+        </Flex>
+      </Flex>
 
       <style>{`
         @media (min-width: 1024px) {
@@ -273,6 +273,6 @@ export default function Layout() {
           }
         }
       `}</style>
-    </GdsFlex>
+    </Flex>
   )
 }

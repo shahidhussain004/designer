@@ -6,12 +6,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getCourseById, Course } from '@/lib/courses';
 import {
-  GdsCard,
-  GdsFlex,
-  GdsText,
-  GdsButton,
-  GdsDiv,
-  GdsSpinner,
+  Card,
+  Flex,
+  Text,
+  Button,
+  Div,
+  Spinner,
 } from '@/components/green';
 
 export default function CourseEnrollmentSuccessPage() {
@@ -40,56 +40,56 @@ export default function CourseEnrollmentSuccessPage() {
 
   if (loading) {
     return (
-      <GdsFlex justify-content="center" align-items="center" style={{ minHeight: '100vh' } as any}>
-        <GdsSpinner />
-      </GdsFlex>
+      <Flex justify-content="center" align-items="center" style={{ minHeight: '100vh' } as any}>
+        <Spinner />
+      </Flex>
     );
   }
 
   return (
-    <GdsDiv style={{ minHeight: '100vh', background: 'var(--gds-color-l3-background-secondary)' } as any}>
-      <GdsFlex justify-content="center" align-items="center" padding="xl" style={{ minHeight: '100vh' } as any}>
-        <GdsDiv style={{ maxWidth: '400px', width: '100%' } as any}>
-          <GdsCard>
-            <GdsFlex flex-direction="column" align-items="center" gap="l" padding="xl">
+    <Div style={{ minHeight: '100vh', background: '#f3f4f6' } as any}>
+      <Flex justify-content="center" align-items="center" padding="xl" style={{ minHeight: '100vh' } as any}>
+        <Div style={{ maxWidth: '400px', width: '100%' } as any}>
+          <Card>
+            <Flex flex-direction="column" align-items="center" gap="l" padding="xl">
               {/* Success Icon */}
-              <GdsDiv
+              <Div
                 style={{
                   width: '80px',
                   height: '80px',
                   borderRadius: '50%',
-                  background: 'var(--gds-color-l3-background-positive-dim)',
+                  background: '#f0fdf4',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 } as any}
               >
-                <GdsText style={{ fontSize: '2.5rem', color: 'var(--gds-color-l3-content-positive)' } as any}>✓</GdsText>
-              </GdsDiv>
+                <Text style={{ fontSize: '2.5rem', color: '#16a34a' } as any}>✓</Text>
+              </Div>
 
-              <GdsText tag="h1" style={{ fontSize: '1.5rem', fontWeight: 700, textAlign: 'center' } as any}>
+              <Text tag="h1" style={{ fontSize: '1.5rem', fontWeight: 700, textAlign: 'center' } as any}>
                 Enrollment Successful!
-              </GdsText>
+              </Text>
               
-              <GdsText style={{ textAlign: 'center', color: 'var(--gds-color-l3-content-secondary)' } as any}>
+              <Text style={{ textAlign: 'center', color: '#6b7280' } as any}>
                 {course ? (
                   <>You&apos;re now enrolled in <strong>{course.title}</strong>. Start learning right away!</>
                 ) : (
                   <>Your enrollment has been confirmed. Start learning right away!</>
                 )}
-              </GdsText>
+              </Text>
 
               {/* Course Preview */}
               {course && (
-                <GdsCard style={{ width: '100%', background: 'var(--gds-color-l3-background-secondary)' } as any}>
-                  <GdsFlex align-items="center" gap="m" padding="m">
-                    <GdsDiv
+                <Card style={{ width: '100%', background: '#f3f4f6' } as any}>
+                  <Flex align-items="center" gap="m" padding="m">
+                    <Div
                       style={{
                         width: '64px',
                         height: '48px',
                         borderRadius: '4px',
                         overflow: 'hidden',
-                        background: 'var(--gds-color-l3-background-tertiary)',
+                        background: '#f9fafb',
                         flexShrink: 0,
                         position: 'relative',
                       } as any}
@@ -102,54 +102,54 @@ export default function CourseEnrollmentSuccessPage() {
                           style={{ objectFit: 'cover' } as any}
                         />
                       ) : (
-                        <GdsFlex justify-content="center" align-items="center" style={{ width: '100%', height: '100%' } as any}>
-                          <GdsText>🎬</GdsText>
-                        </GdsFlex>
+                        <Flex justify-content="center" align-items="center" style={{ width: '100%', height: '100%' } as any}>
+                          <Text>🎬</Text>
+                        </Flex>
                       )}
-                    </GdsDiv>
-                    <GdsDiv style={{ overflow: 'hidden' } as any}>
-                      <GdsText style={{ fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } as any}>
+                    </Div>
+                    <Div style={{ overflow: 'hidden' } as any}>
+                      <Text style={{ fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } as any}>
                         {course.title}
-                      </GdsText>
-                      <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>
+                      </Text>
+                      <Text style={{ fontSize: '0.875rem', color: '#9ca3af' } as any}>
                         {course.lessonsCount} lessons
-                      </GdsText>
-                    </GdsDiv>
-                  </GdsFlex>
-                </GdsCard>
+                      </Text>
+                    </Div>
+                  </Flex>
+                </Card>
               )}
 
               {/* Actions */}
-              <GdsFlex flex-direction="column" gap="m" style={{ width: '100%' } as any}>
+              <Flex flex-direction="column" gap="m" style={{ width: '100%' } as any}>
                 <Link href={`/courses/${courseId}/learn`} style={{ textDecoration: 'none' } as any}>
-                  <GdsButton rank="primary" style={{ width: '100%' } as any}>
+                  <Button rank="primary" style={{ width: '100%' } as any}>
                     Start Learning
-                  </GdsButton>
+                  </Button>
                 </Link>
                 
                 <Link href="/dashboard" style={{ textDecoration: 'none' } as any}>
-                  <GdsButton rank="secondary" style={{ width: '100%' } as any}>
+                  <Button rank="secondary" style={{ width: '100%' } as any}>
                     Go to Dashboard
-                  </GdsButton>
+                  </Button>
                 </Link>
-              </GdsFlex>
+              </Flex>
 
               {/* Receipt Info */}
-              <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)', textAlign: 'center' } as any}>
+              <Text style={{ fontSize: '0.875rem', color: '#9ca3af', textAlign: 'center' } as any}>
                 A receipt has been sent to your email address.
-              </GdsText>
-            </GdsFlex>
-          </GdsCard>
+              </Text>
+            </Flex>
+          </Card>
 
           {/* Help Link */}
-          <GdsText style={{ textAlign: 'center', fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)', marginTop: '1rem' } as any}>
+          <Text style={{ textAlign: 'center', fontSize: '0.875rem', color: '#9ca3af', marginTop: '1rem' } as any}>
             Having trouble?{' '}
-            <Link href="/support" style={{ color: 'var(--gds-color-l3-content-positive)' } as any}>
+            <Link href="/support" style={{ color: '#16a34a' } as any}>
               Contact Support
             </Link>
-          </GdsText>
-        </GdsDiv>
-      </GdsFlex>
-    </GdsDiv>
+          </Text>
+        </Div>
+      </Flex>
+    </Div>
   );
 }

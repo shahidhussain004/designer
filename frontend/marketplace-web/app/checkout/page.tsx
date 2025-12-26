@@ -4,15 +4,15 @@ import React, { Suspense, useEffect, useState, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
-  GdsGrid,
-  GdsFlex,
-  GdsCard,
-  GdsText,
-  GdsButton,
-  GdsInput,
-  GdsAlert,
-  GdsSpinner,
-  GdsDivider,
+  Grid,
+  Flex,
+  Card,
+  Text,
+  Button,
+  Input,
+  Alert,
+  Spinner,
+  Divider,
 } from '@/components/green';
 import {
   createPaymentIntent,
@@ -144,64 +144,64 @@ function CheckoutContent() {
 
   if (loading) {
     return (
-      <GdsFlex
+      <Flex
         justify-content="center"
         align-items="center"
         flex-direction="column"
         gap="m"
         style={{ minHeight: '100vh' } as any}
       >
-        <GdsSpinner />
-        <GdsText color="secondary">Setting up checkout...</GdsText>
-      </GdsFlex>
+        <Spinner />
+        <Text color="secondary">Setting up checkout...</Text>
+      </Flex>
     );
   }
 
   return (
-    <GdsFlex
+    <Flex
       flex-direction="column"
       padding="l"
-      style={{ minHeight: '100vh', backgroundColor: 'var(--gds-color-l3-background-secondary)' } as any}
+      style={{ minHeight: '100vh', backgroundColor: '#f3f4f6' } as any}
     >
-      <GdsFlex flex-direction="column" style={{ maxWidth: '900px', margin: '0 auto', width: '100%' } as any}>
+      <Flex flex-direction="column" style={{ maxWidth: '900px', margin: '0 auto', width: '100%' } as any}>
         {/* Header */}
-        <GdsFlex flex-direction="column" gap="s" padding="m">
-          <Link href={returnUrl} style={{ color: 'var(--gds-color-l3-content-positive)', textDecoration: 'none' } as any}>
+        <Flex flex-direction="column" gap="s" padding="m">
+          <Link href={returnUrl} style={{ color: '#16a34a', textDecoration: 'none' } as any}>
             ← Back
           </Link>
-          <GdsText tag="h1" font-size="heading-l">
+          <Text tag="h1" font-size="heading-l">
             Checkout
-          </GdsText>
-        </GdsFlex>
+          </Text>
+        </Flex>
 
-        <GdsGrid columns="1; m{3}" gap="l">
+        <Grid columns="1; m{3}" gap="l">
           {/* Payment Form */}
-          <GdsFlex flex-direction="column" gap="m" style={{ gridColumn: 'span 2' } as any}>
+          <Flex flex-direction="column" gap="m" style={{ gridColumn: 'span 2' } as any}>
             <form onSubmit={handleSubmit}>
-              <GdsFlex flex-direction="column" gap="m">
+              <Flex flex-direction="column" gap="m">
                 {/* Error Message */}
                 {error && (
-                  <GdsAlert variant="negative">{error}</GdsAlert>
+                  <Alert variant="negative">{error}</Alert>
                 )}
 
                 {/* Saved Payment Methods */}
                 {paymentMethods.length > 0 && !showAddCard && (
-                  <GdsCard padding="l">
-                    <GdsFlex flex-direction="column" gap="m">
-                      <GdsText tag="h2" font-size="heading-s">
+                  <Card padding="l">
+                    <Flex flex-direction="column" gap="m">
+                      <Text tag="h2" font-size="heading-s">
                         Payment Method
-                      </GdsText>
+                      </Text>
 
-                      <GdsFlex flex-direction="column" gap="s">
+                      <Flex flex-direction="column" gap="s">
                         {paymentMethods.map((method) => (
-                          <GdsCard
+                          <Card
                             key={method.id}
                             padding="m"
                             variant={selectedPaymentMethod === method.id ? 'positive' : 'secondary'}
                             onClick={() => setSelectedPaymentMethod(method.id)}
                             style={{ cursor: 'pointer' } as any}
                           >
-                            <GdsFlex align-items="center" gap="m">
+                            <Flex align-items="center" gap="m">
                               <input
                                 type="radio"
                                 name="paymentMethod"
@@ -209,54 +209,54 @@ function CheckoutContent() {
                                 checked={selectedPaymentMethod === method.id}
                                 onChange={(e) => setSelectedPaymentMethod(e.target.value)}
                               />
-                              <GdsFlex flex-direction="column" gap="2xs" flex="1">
-                                <GdsText font-weight="book">
+                              <Flex flex-direction="column" gap="2xs" flex="1">
+                                <Text font-weight="book">
                                   •••• {method.card?.last4}
-                                </GdsText>
-                                <GdsText font-size="body-s" color="secondary">
+                                </Text>
+                                <Text font-size="body-s" color="secondary">
                                   Expires {method.card?.expMonth}/{method.card?.expYear}
-                                </GdsText>
-                              </GdsFlex>
+                                </Text>
+                              </Flex>
                               {method.isDefault && (
-                                <GdsText font-size="body-s" color="secondary">
+                                <Text font-size="body-s" color="secondary">
                                   Default
-                                </GdsText>
+                                </Text>
                               )}
-                            </GdsFlex>
-                          </GdsCard>
+                            </Flex>
+                          </Card>
                         ))}
-                      </GdsFlex>
+                      </Flex>
 
-                      <GdsButton rank="tertiary" onClick={() => setShowAddCard(true)}>
+                      <Button rank="tertiary" onClick={() => setShowAddCard(true)}>
                         + Add new card
-                      </GdsButton>
-                    </GdsFlex>
-                  </GdsCard>
+                      </Button>
+                    </Flex>
+                  </Card>
                 )}
 
                 {/* New Card Form */}
                 {showAddCard && (
-                  <GdsCard padding="l">
-                    <GdsFlex flex-direction="column" gap="m">
-                      <GdsFlex justify-content="space-between" align-items="center">
-                        <GdsText tag="h2" font-size="heading-s">
+                  <Card padding="l">
+                    <Flex flex-direction="column" gap="m">
+                      <Flex justify-content="space-between" align-items="center">
+                        <Text tag="h2" font-size="heading-s">
                           Card Details
-                        </GdsText>
+                        </Text>
                         {paymentMethods.length > 0 && (
-                          <GdsButton rank="tertiary" onClick={() => setShowAddCard(false)}>
+                          <Button rank="tertiary" onClick={() => setShowAddCard(false)}>
                             Cancel
-                          </GdsButton>
+                          </Button>
                         )}
-                      </GdsFlex>
+                      </Flex>
 
-                      <GdsInput
+                      <Input
                         label="Cardholder Name"
                         value={cardName}
                         onInput={(e: Event) => setCardName((e.target as HTMLInputElement).value)}
                         required
                       />
 
-                      <GdsInput
+                      <Input
                         label="Card Number"
                         value={cardNumber}
                         onInput={(e: Event) =>
@@ -266,8 +266,8 @@ function CheckoutContent() {
                         required
                       />
 
-                      <GdsGrid columns="2" gap="m">
-                        <GdsInput
+                      <Grid columns="2" gap="m">
+                        <Input
                           label="Expiry Date"
                           value={cardExpiry}
                           onInput={(e: Event) =>
@@ -276,7 +276,7 @@ function CheckoutContent() {
                           maxLength={5}
                           required
                         />
-                        <GdsInput
+                        <Input
                           label="CVC"
                           value={cardCvc}
                           onInput={(e: Event) =>
@@ -285,7 +285,7 @@ function CheckoutContent() {
                           maxLength={4}
                           required
                         />
-                      </GdsGrid>
+                      </Grid>
 
                       <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' } as any}>
                         <input
@@ -293,96 +293,96 @@ function CheckoutContent() {
                           checked={saveCard}
                           onChange={(e) => setSaveCard(e.target.checked)}
                         />
-                        <GdsText font-size="body-s">Save card for future payments</GdsText>
+                        <Text font-size="body-s">Save card for future payments</Text>
                       </label>
-                    </GdsFlex>
-                  </GdsCard>
+                    </Flex>
+                  </Card>
                 )}
 
                 {/* Submit Button */}
-                <GdsButton type="submit" disabled={processing}>
+                <Button type="submit" disabled={processing}>
                   {processing ? 'Processing...' : `Pay ${formatCurrency(amount)}`}
-                </GdsButton>
+                </Button>
 
                 {/* Security Note */}
-                <GdsFlex justify-content="center" align-items="center" gap="xs">
-                  <GdsText font-size="body-s" color="secondary">
+                <Flex justify-content="center" align-items="center" gap="xs">
+                  <Text font-size="body-s" color="secondary">
                     🔒 Secured by Stripe. Your payment information is encrypted.
-                  </GdsText>
-                </GdsFlex>
-              </GdsFlex>
+                  </Text>
+                </Flex>
+              </Flex>
             </form>
-          </GdsFlex>
+          </Flex>
 
           {/* Order Summary */}
-          <GdsCard padding="l">
-            <GdsFlex flex-direction="column" gap="m">
-              <GdsText tag="h2" font-size="heading-s">
+          <Card padding="l">
+            <Flex flex-direction="column" gap="m">
+              <Text tag="h2" font-size="heading-s">
                 Order Summary
-              </GdsText>
+              </Text>
 
-              <GdsFlex flex-direction="column" gap="s">
-                <GdsFlex justify-content="space-between">
-                  <GdsText color="secondary">{title}</GdsText>
-                  <GdsText font-weight="book">{formatCurrency(amount)}</GdsText>
-                </GdsFlex>
-                <GdsFlex justify-content="space-between">
-                  <GdsText font-size="body-s" color="secondary">
+              <Flex flex-direction="column" gap="s">
+                <Flex justify-content="space-between">
+                  <Text color="secondary">{title}</Text>
+                  <Text font-weight="book">{formatCurrency(amount)}</Text>
+                </Flex>
+                <Flex justify-content="space-between">
+                  <Text font-size="body-s" color="secondary">
                     Processing fee
-                  </GdsText>
-                  <GdsText font-size="body-s" color="secondary">
+                  </Text>
+                  <Text font-size="body-s" color="secondary">
                     {formatCurrency(0)}
-                  </GdsText>
-                </GdsFlex>
-              </GdsFlex>
+                  </Text>
+                </Flex>
+              </Flex>
 
-              <GdsDivider />
+              <Divider />
 
-              <GdsFlex justify-content="space-between">
-                <GdsText font-size="heading-s" font-weight="book">
+              <Flex justify-content="space-between">
+                <Text font-size="heading-s" font-weight="book">
                   Total
-                </GdsText>
-                <GdsText font-size="heading-s" font-weight="book">
+                </Text>
+                <Text font-size="heading-s" font-weight="book">
                   {formatCurrency(amount)}
-                </GdsText>
-              </GdsFlex>
+                </Text>
+              </Flex>
 
               {/* Payment Type Info */}
-              <GdsCard padding="m" variant="secondary">
-                <GdsFlex gap="s">
-                  <GdsText>🛡️</GdsText>
-                  <GdsFlex flex-direction="column" gap="xs">
-                    <GdsText font-weight="book">
+              <Card padding="m" variant="secondary">
+                <Flex gap="s">
+                  <Text>🛡️</Text>
+                  <Flex flex-direction="column" gap="xs">
+                    <Text font-weight="book">
                       {type === 'milestone' ? 'Escrow Protection' : 'Secure Payment'}
-                    </GdsText>
-                    <GdsText font-size="body-s" color="secondary">
+                    </Text>
+                    <Text font-size="body-s" color="secondary">
                       {type === 'milestone'
                         ? 'Funds are held securely until the milestone is completed and approved.'
                         : 'Your payment is protected by our secure checkout system.'}
-                    </GdsText>
-                  </GdsFlex>
-                </GdsFlex>
-              </GdsCard>
-            </GdsFlex>
-          </GdsCard>
-        </GdsGrid>
-      </GdsFlex>
-    </GdsFlex>
+                    </Text>
+                  </Flex>
+                </Flex>
+              </Card>
+            </Flex>
+          </Card>
+        </Grid>
+      </Flex>
+    </Flex>
   );
 }
 
 function CheckoutLoading() {
   return (
-    <GdsFlex
+    <Flex
       justify-content="center"
       align-items="center"
       flex-direction="column"
       gap="m"
       style={{ minHeight: '100vh' } as any}
     >
-      <GdsSpinner />
-      <GdsText color="secondary">Loading checkout...</GdsText>
-    </GdsFlex>
+      <Spinner />
+      <Text color="secondary">Loading checkout...</Text>
+    </Flex>
   );
 }
 

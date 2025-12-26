@@ -1,10 +1,7 @@
 'use client'
 
 /**
- * Tailwind CSS Components
- * =======================
- * Pure Tailwind CSS components to replace SEB Group Green Core components.
- * These provide the same API where possible for easy migration.
+ * Tailwind CSS UI Components
  */
 
 import React, { forwardRef, HTMLAttributes, ButtonHTMLAttributes, InputHTMLAttributes, TextareaHTMLAttributes, AnchorHTMLAttributes } from 'react'
@@ -814,55 +811,35 @@ export const Theme: React.FC<ThemeProps> = ({ children, 'color-scheme': colorSch
 }
 
 // ============================================================================
-// EXPORTS with Gds prefix for compatibility
+// ADDITIONAL COMPONENT ALIASES
 // ============================================================================
 
-export {
-  Flex as GdsFlex,
-  Div as GdsDiv,
-  Grid as GdsGrid,
-  Card as GdsCard,
-  Divider as GdsDivider,
-  Text as GdsText,
-  Input as GdsInput,
-  Textarea as GdsTextarea,
-  Checkbox as GdsCheckbox,
-  Button as GdsButton,
-  LinkComponent as GdsLink,
-  Alert as GdsAlert,
-  Badge as GdsBadge,
-  Spinner as GdsSpinner,
-  Dialog as GdsDialog,
-  Theme as GdsTheme,
-}
-
-// Additional exports for form components that were used
-export const GdsRadioGroup = Checkbox // Placeholder
-export const GdsSelect = Input // Placeholder
-export const GdsDropdown = Input // Placeholder
-export const GdsDatepicker = Input // Placeholder
-export const GdsFab = Button
-export const GdsMenuButton = Button
-export const GdsFilterChips = Div
-export const GdsFilterChip = Badge
-export const GdsSegmentedControl = Div
-export const GdsSignal = Badge
-export const GdsCoachmark = Div
-export const GdsPopover = Dialog
-export const GdsContextMenu = Div
-export const GdsBreadcrumbs = Div
-export const GdsFormSummary = Div
-export const GdsGroupedList = Div
-export const GdsDetails = Div
-export const GdsImg = 'img' as any
-export const GdsVideo = 'video' as any
-export const GdsRichText = Div
-export const GdsMask = Div
-export const GdsBlur = Div
-export const GdsFormattedNumber = Text
-export const GdsFormattedDate = Text
-export const GdsFormattedAccount = Text
-export const GdsSensitiveNumber = Text
-export const GdsSensitiveDate = Text
-export const GdsSensitiveAccount = Text
-export const GdsCalendar = Div
+export const RadioGroup = Checkbox // Placeholder
+export const Select = Input // Placeholder
+export const Dropdown = Input // Placeholder
+export const Datepicker = Input // Placeholder
+export const Fab = Button
+export const MenuButton = Button
+export const FilterChips = Div
+export const FilterChip = Badge
+export const SegmentedControl = Div
+export const Signal = Badge
+export const Coachmark = Div
+export const Popover = Dialog
+export const ContextMenu = Div
+export const Breadcrumbs = Div
+export const FormSummary = Div
+export const GroupedList = Div
+export const Details = Div
+export const Img = 'img' as any
+export const Video = 'video' as any
+export const RichText = Div
+export const Mask = Div
+export const Blur = Div
+export const FormattedNumber = Text
+export const FormattedDate = Text
+export const FormattedAccount = Text
+export const SensitiveNumber = Text
+export const SensitiveDate = Text
+export const SensitiveAccount = Text
+export const Calendar = Div

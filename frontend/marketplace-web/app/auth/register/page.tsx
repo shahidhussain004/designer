@@ -4,13 +4,13 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
-  GdsFlex,
-  GdsCard,
-  GdsText,
-  GdsButton,
-  GdsInput,
-  GdsAlert,
-  GdsDivider,
+  Flex,
+  Card,
+  Text,
+  Button,
+  Input,
+  Alert,
+  Divider,
 } from '@/components/green';
 import { authService } from '@/lib/auth';
 
@@ -49,40 +49,40 @@ export default function RegisterPage() {
   };
 
   return (
-    <GdsFlex
+    <Flex
       justify-content="center"
       align-items="center"
       padding="l"
-      style={{ minHeight: '100vh', backgroundColor: 'var(--gds-color-l3-background-secondary)' } as any}
+      style={{ minHeight: '100vh', backgroundColor: '#f3f4f6' } as any}
     >
-      <GdsCard padding="xl" style={{ maxWidth: '480px', width: '100%' } as any}>
-        <GdsFlex flex-direction="column" gap="l">
+      <Card padding="xl" style={{ maxWidth: '480px', width: '100%' } as any}>
+        <Flex flex-direction="column" gap="l">
           {/* Header */}
-          <GdsFlex flex-direction="column" align-items="center" gap="s">
-            <GdsText tag="h1" font-size="heading-l">
+          <Flex flex-direction="column" align-items="center" gap="s">
+            <Text tag="h1" font-size="heading-l">
               Create your account
-            </GdsText>
-            <GdsText color="secondary">
+            </Text>
+            <Text color="secondary">
               Already have an account?{' '}
-              <Link href="/auth/login" style={{ color: 'var(--gds-color-l3-content-positive)' } as any}>
+              <Link href="/auth/login" style={{ color: '#16a34a' } as any}>
                 Sign in
               </Link>
-            </GdsText>
-          </GdsFlex>
+            </Text>
+          </Flex>
 
-          <GdsDivider />
+          <Divider />
 
           {/* Error Alert */}
           {error && (
-            <GdsAlert variant="negative">
+            <Alert variant="negative">
               {error}
-            </GdsAlert>
+            </Alert>
           )}
 
           {/* Form */}
           <form onSubmit={handleSubmit}>
-            <GdsFlex flex-direction="column" gap="m">
-              <GdsInput
+            <Flex flex-direction="column" gap="m">
+              <Input
                 label="Full Name"
                 value={formData.fullName}
                 onInput={(e: Event) =>
@@ -91,7 +91,7 @@ export default function RegisterPage() {
                 required
               />
 
-              <GdsInput
+              <Input
                 label="Email Address"
                 type="email"
                 value={formData.email}
@@ -101,8 +101,8 @@ export default function RegisterPage() {
                 required
               />
 
-              <GdsFlex flex-direction="column" gap="xs">
-                <GdsInput
+              <Flex flex-direction="column" gap="xs">
+                <Input
                   label="Username"
                   value={formData.username}
                   onInput={(e: Event) =>
@@ -110,13 +110,13 @@ export default function RegisterPage() {
                   }
                   required
                 />
-                <GdsText font-size="body-s" color="secondary">
+                <Text font-size="body-s" color="secondary">
                   Letters, numbers, and underscores only (3-50 characters)
-                </GdsText>
-              </GdsFlex>
+                </Text>
+              </Flex>
 
-              <GdsFlex flex-direction="column" gap="xs">
-                <GdsInput
+              <Flex flex-direction="column" gap="xs">
+                <Input
                   label="Password"
                   type="password"
                   value={formData.password}
@@ -125,24 +125,24 @@ export default function RegisterPage() {
                   }
                   required
                 />
-                <GdsText font-size="body-s" color="secondary">
+                <Text font-size="body-s" color="secondary">
                   Minimum 8 characters
-                </GdsText>
-              </GdsFlex>
+                </Text>
+              </Flex>
 
-              <GdsDivider />
+              <Divider />
 
               {/* Role Selection */}
-              <GdsFlex flex-direction="column" gap="s">
-                <GdsText font-weight="book">I want to:</GdsText>
+              <Flex flex-direction="column" gap="s">
+                <Text font-weight="book">I want to:</Text>
                 
-                <GdsCard
+                <Card
                   padding="m"
                   variant={formData.role === 'FREELANCER' ? 'positive' : 'secondary'}
                   onClick={() => setFormData({ ...formData, role: 'FREELANCER' })}
                   style={{ cursor: 'pointer' } as any}
                 >
-                  <GdsFlex align-items="center" gap="m">
+                  <Flex align-items="center" gap="m">
                     <input
                       type="radio"
                       name="role"
@@ -151,22 +151,22 @@ export default function RegisterPage() {
                       onChange={() => setFormData({ ...formData, role: 'FREELANCER' })}
                       style={{ width: '18px', height: '18px' } as any}
                     />
-                    <GdsFlex flex-direction="column" gap="2xs">
-                      <GdsText font-weight="book">Work as a Freelancer</GdsText>
-                      <GdsText font-size="body-s" color="secondary">
+                    <Flex flex-direction="column" gap="2xs">
+                      <Text font-weight="book">Work as a Freelancer</Text>
+                      <Text font-size="body-s" color="secondary">
                         Find jobs and get hired
-                      </GdsText>
-                    </GdsFlex>
-                  </GdsFlex>
-                </GdsCard>
+                      </Text>
+                    </Flex>
+                  </Flex>
+                </Card>
 
-                <GdsCard
+                <Card
                   padding="m"
                   variant={formData.role === 'CLIENT' ? 'positive' : 'secondary'}
                   onClick={() => setFormData({ ...formData, role: 'CLIENT' })}
                   style={{ cursor: 'pointer' } as any}
                 >
-                  <GdsFlex align-items="center" gap="m">
+                  <Flex align-items="center" gap="m">
                     <input
                       type="radio"
                       name="role"
@@ -175,29 +175,29 @@ export default function RegisterPage() {
                       onChange={() => setFormData({ ...formData, role: 'CLIENT' })}
                       style={{ width: '18px', height: '18px' } as any}
                     />
-                    <GdsFlex flex-direction="column" gap="2xs">
-                      <GdsText font-weight="book">Hire as a Client</GdsText>
-                      <GdsText font-size="body-s" color="secondary">
+                    <Flex flex-direction="column" gap="2xs">
+                      <Text font-weight="book">Hire as a Client</Text>
+                      <Text font-size="body-s" color="secondary">
                         Post jobs and find talent
-                      </GdsText>
-                    </GdsFlex>
-                  </GdsFlex>
-                </GdsCard>
-              </GdsFlex>
+                      </Text>
+                    </Flex>
+                  </Flex>
+                </Card>
+              </Flex>
 
-              <GdsDivider />
+              <Divider />
 
-              <GdsButton type="submit" disabled={loading}>
+              <Button type="submit" disabled={loading}>
                 {loading ? 'Creating account...' : 'Create account'}
-              </GdsButton>
+              </Button>
 
-              <GdsText font-size="body-s" color="secondary" style={{ textAlign: 'center' } as any}>
+              <Text font-size="body-s" color="secondary" style={{ textAlign: 'center' } as any}>
                 By creating an account, you agree to our Terms of Service and Privacy Policy
-              </GdsText>
-            </GdsFlex>
+              </Text>
+            </Flex>
           </form>
-        </GdsFlex>
-      </GdsCard>
-    </GdsFlex>
+        </Flex>
+      </Card>
+    </Flex>
   );
 }

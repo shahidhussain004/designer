@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { authService } from '@/lib/auth'
-import { GdsFlex, GdsCard, GdsText, GdsInput, GdsButton, GdsAlert, GdsDivider, GdsCheckbox, GdsDiv } from '@/components/green'
+import { Flex, Card, Text, Input, Button, Alert, Divider, Checkbox, Div } from '@/components/green'
 import { PageLayout } from '@/components/layout'
 
 export default function LoginPage() {
@@ -34,33 +34,33 @@ export default function LoginPage() {
 
   return (
     <PageLayout>
-      <GdsFlex 
+      <Flex 
         justify-content="center" 
         align-items="center" 
         padding="xl"
         min-height="calc(100vh - 200px)"
       >
-        <GdsCard padding="xl" variant="secondary" max-width="400px" width="100%">
-          <GdsFlex flex-direction="column" gap="l">
-            <GdsFlex flex-direction="column" align-items="center" gap="s">
-              <GdsText tag="h1" font="heading-l">Sign in to your account</GdsText>
-              <GdsText font="body-regular-m" color="neutral-02">
+        <Card padding="xl" variant="secondary" max-width="400px" width="100%">
+          <Flex flex-direction="column" gap="l">
+            <Flex flex-direction="column" align-items="center" gap="s">
+              <Text tag="h1" font="heading-l">Sign in to your account</Text>
+              <Text font="body-regular-m" color="neutral-02">
                 Or{' '}
                 <Link href="/auth/register" style={{ color: 'var(--gds-sys-color-content-brand-01)' } as any}>
                   create a new account
                 </Link>
-              </GdsText>
-            </GdsFlex>
+              </Text>
+            </Flex>
 
             {error && (
-              <GdsAlert variant="negative" role="alert">
+              <Alert variant="negative" role="alert">
                 Error: {error}
-              </GdsAlert>
+              </Alert>
             )}
 
             <form onSubmit={handleSubmit}>
-              <GdsFlex flex-direction="column" gap="m">
-                <GdsInput
+              <Flex flex-direction="column" gap="m">
+                <Input
                   label="Email or Username"
                   value={formData.emailOrUsername}
                   onInput={(e: unknown) => {
@@ -70,7 +70,7 @@ export default function LoginPage() {
                   required
                 />
                 
-                <GdsInput
+                <Input
                   label="Password"
                   type="password"
                   value={formData.password}
@@ -81,46 +81,46 @@ export default function LoginPage() {
                   required
                 />
 
-                <GdsFlex justify-content="space-between" align-items="center">
-                  <GdsCheckbox>
-                    <GdsText slot="label">Remember me</GdsText>
-                  </GdsCheckbox>
+                <Flex justify-content="space-between" align-items="center">
+                  <Checkbox>
+                    <Text slot="label">Remember me</Text>
+                  </Checkbox>
                   <Link href="#" style={{ textDecoration: 'none' } as any}>
-                    <GdsText font="body-regular-s" color="brand-01">
+                    <Text font="body-regular-s" color="brand-01">
                       Forgot your password?
-                    </GdsText>
+                    </Text>
                   </Link>
-                </GdsFlex>
+                </Flex>
 
-                <GdsButton 
+                <Button 
                   rank="primary" 
                   type="submit" 
                   disabled={loading}
                   width="100%"
                 >
                   {loading ? 'Signing in...' : 'Sign in'}
-                </GdsButton>
-              </GdsFlex>
+                </Button>
+              </Flex>
             </form>
 
-            <GdsDivider />
+            <Divider />
 
-            <GdsDiv>
-              <GdsText font="body-regular-s" color="neutral-02" text-align="center" margin-bottom="s">
+            <Div>
+              <Text font="body-regular-s" color="neutral-02" text-align="center" margin-bottom="s">
                 Test Credentials
-              </GdsText>
-              <GdsFlex flex-direction="column" gap="xs">
-                <GdsText font="body-regular-s" color="neutral-02">
+              </Text>
+              <Flex flex-direction="column" gap="xs">
+                <Text font="body-regular-s" color="neutral-02">
                   <strong>Client:</strong> client1@example.com / password123
-                </GdsText>
-                <GdsText font="body-regular-s" color="neutral-02">
+                </Text>
+                <Text font="body-regular-s" color="neutral-02">
                   <strong>Freelancer:</strong> freelancer1@example.com / password123
-                </GdsText>
-              </GdsFlex>
-            </GdsDiv>
-          </GdsFlex>
-        </GdsCard>
-      </GdsFlex>
+                </Text>
+              </Flex>
+            </Div>
+          </Flex>
+        </Card>
+      </Flex>
     </PageLayout>
   )
 }

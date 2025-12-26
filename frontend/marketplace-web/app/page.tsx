@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { GdsFlex, GdsGrid, GdsCard, GdsText, GdsDiv, GdsButton, GdsDialog, GdsLink } from '@/components/green'
+import { Flex, Grid, Card, Text, Div, Button, Dialog, LinkComponent } from '@/components/green'
 import { PageLayout } from '@/components/layout'
 import ClientOnly from '@/components/layout/ClientOnly'
 import LandingPage from './landing/page'
@@ -41,82 +41,82 @@ export default function Home() {
       <LandingPage />
 
       {/* Main Content */}
-      <GdsDiv padding="xl l" max-width="1280px" margin="0 auto" width="100%">
+      <Div padding="xl l" max-width="1280px" margin="0 auto" width="100%">
         {/* Feature Cards */}
-        <GdsGrid columns="1; m{2}; l{4}" gap="m" margin-bottom="xl">
+        <Grid columns="1; m{2}; l{4}" gap="m" margin-bottom="xl">
           <Link href="/jobs/create" style={{ textDecoration: 'none' } as any}>
-            <GdsCard padding="l" variant="secondary" height="100%">
-              <GdsFlex flex-direction="column" gap="m" height="100%">
-                <GdsText font="heading-m">Post a Job</GdsText>
-                <GdsText font="body-regular-m" color="neutral-02">
+            <Card padding="l" variant="secondary" height="100%">
+              <Flex flex-direction="column" gap="m" height="100%">
+                <Text font="heading-m">Post a Job</Text>
+                <Text font="body-regular-m" color="neutral-02">
                   Describe your project and find the perfect freelancer
-                </GdsText>
-                <GdsDiv margin-top="auto">
-                  <GdsButton rank="primary" size="small">
+                </Text>
+                <Div margin-top="auto">
+                  <Button rank="primary" size="small">
                     Get Started
-                  </GdsButton>
-                </GdsDiv>
-              </GdsFlex>
-            </GdsCard>
+                  </Button>
+                </Div>
+              </Flex>
+            </Card>
           </Link>
 
           <Link href="/freelancers" style={{ textDecoration: 'none' } as any}>
-            <GdsCard padding="l" variant="secondary" height="100%">
-              <GdsFlex flex-direction="column" gap="m" height="100%">
-                <GdsText font="heading-m">Browse Talent</GdsText>
-                <GdsText font="body-regular-m" color="neutral-02">
+            <Card padding="l" variant="secondary" height="100%">
+              <Flex flex-direction="column" gap="m" height="100%">
+                <Text font="heading-m">Browse Talent</Text>
+                <Text font="body-regular-m" color="neutral-02">
                   Explore profiles of skilled designers and developers
-                </GdsText>
-                <GdsDiv margin-top="auto">
-                  <GdsButton rank="primary" size="small">
+                </Text>
+                <Div margin-top="auto">
+                  <Button rank="primary" size="small">
                     Find Talent
-                  </GdsButton>
-                </GdsDiv>
-              </GdsFlex>
-            </GdsCard>
+                  </Button>
+                </Div>
+              </Flex>
+            </Card>
           </Link>
 
           <Link href="/jobs" style={{ textDecoration: 'none' } as any}>
-            <GdsCard padding="l" variant="secondary" height="100%">
-              <GdsFlex flex-direction="column" gap="m" height="100%">
-                <GdsText font="heading-m">Find Work</GdsText>
-                <GdsText font="body-regular-m" color="neutral-02">
+            <Card padding="l" variant="secondary" height="100%">
+              <Flex flex-direction="column" gap="m" height="100%">
+                <Text font="heading-m">Find Work</Text>
+                <Text font="body-regular-m" color="neutral-02">
                   Browse available jobs and submit proposals
-                </GdsText>
-                <GdsDiv margin-top="auto">
-                  <GdsButton rank="primary" size="small">
+                </Text>
+                <Div margin-top="auto">
+                  <Button rank="primary" size="small">
                     View Jobs
-                  </GdsButton>
-                </GdsDiv>
-              </GdsFlex>
-            </GdsCard>
+                  </Button>
+                </Div>
+              </Flex>
+            </Card>
           </Link>
 
           <Link href="/courses" style={{ textDecoration: 'none' } as any}>
-            <GdsCard padding="l" variant="notice" height="100%">
-              <GdsFlex flex-direction="column" gap="m" height="100%">
-                <GdsText font="heading-m">Learn Skills</GdsText>
-                <GdsText font="body-regular-m" color="neutral-02">
+            <Card padding="l" variant="notice" height="100%">
+              <Flex flex-direction="column" gap="m" height="100%">
+                <Text font="heading-m">Learn Skills</Text>
+                <Text font="body-regular-m" color="neutral-02">
                   Take courses from industry experts
-                </GdsText>
-                <GdsDiv margin-top="auto">
-                  <GdsButton rank="secondary" variant="notice" size="small">
+                </Text>
+                <Div margin-top="auto">
+                  <Button rank="secondary" variant="notice" size="small">
                     Browse Courses
-                  </GdsButton>
-                </GdsDiv>
-              </GdsFlex>
-            </GdsCard>
+                  </Button>
+                </Div>
+              </Flex>
+            </Card>
           </Link>
-        </GdsGrid>
+        </Grid>
 
         {/* How it Works Section */}
-        <GdsCard padding="xl" variant="tertiary" margin-bottom="xl">
-          <GdsText tag="h2" font="heading-l" text-align="center" margin-bottom="l">
+        <Card padding="xl" variant="tertiary" margin-bottom="xl">
+          <Text tag="h2" font="heading-l" text-align="center" margin-bottom="l">
             How it Works
-          </GdsText>
-          <GdsGrid columns="1; m{2}; l{4}" gap="l">
-            <GdsFlex flex-direction="column" align-items="center" gap="m" text-align="center">
-              <GdsFlex 
+          </Text>
+          <Grid columns="1; m{2}; l{4}" gap="l">
+            <Flex flex-direction="column" align-items="center" gap="m" text-align="center">
+              <Flex 
                 width="4xl" 
                 height="4xl" 
                 background="brand-01" 
@@ -124,16 +124,16 @@ export default function Home() {
                 align-items="center"
                 justify-content="center"
               >
-                <GdsText font="heading-m" color="inversed">1</GdsText>
-              </GdsFlex>
-              <GdsText font="heading-s">Post Your Project</GdsText>
-              <GdsText font="body-regular-s" color="neutral-02">
+                <Text font="heading-m" color="inversed">1</Text>
+              </Flex>
+              <Text font="heading-s">Post Your Project</Text>
+              <Text font="body-regular-s" color="neutral-02">
                 Describe what you need and set your budget
-              </GdsText>
-            </GdsFlex>
+              </Text>
+            </Flex>
 
-            <GdsFlex flex-direction="column" align-items="center" gap="m" text-align="center">
-              <GdsFlex 
+            <Flex flex-direction="column" align-items="center" gap="m" text-align="center">
+              <Flex 
                 width="4xl" 
                 height="4xl" 
                 background="brand-01" 
@@ -141,16 +141,16 @@ export default function Home() {
                 align-items="center"
                 justify-content="center"
               >
-                <GdsText font="heading-m" color="inversed">2</GdsText>
-              </GdsFlex>
-              <GdsText font="heading-s">Review Proposals</GdsText>
-              <GdsText font="body-regular-s" color="neutral-02">
+                <Text font="heading-m" color="inversed">2</Text>
+              </Flex>
+              <Text font="heading-s">Review Proposals</Text>
+              <Text font="body-regular-s" color="neutral-02">
                 Get bids from qualified freelancers
-              </GdsText>
-            </GdsFlex>
+              </Text>
+            </Flex>
 
-            <GdsFlex flex-direction="column" align-items="center" gap="m" text-align="center">
-              <GdsFlex 
+            <Flex flex-direction="column" align-items="center" gap="m" text-align="center">
+              <Flex 
                 width="4xl" 
                 height="4xl" 
                 background="brand-01" 
@@ -158,16 +158,16 @@ export default function Home() {
                 align-items="center"
                 justify-content="center"
               >
-                <GdsText font="heading-m" color="inversed">3</GdsText>
-              </GdsFlex>
-              <GdsText font="heading-s">Fund Milestones</GdsText>
-              <GdsText font="body-regular-s" color="neutral-02">
+                <Text font="heading-m" color="inversed">3</Text>
+              </Flex>
+              <Text font="heading-s">Fund Milestones</Text>
+              <Text font="body-regular-s" color="neutral-02">
                 Securely deposit funds into escrow
-              </GdsText>
-            </GdsFlex>
+              </Text>
+            </Flex>
 
-            <GdsFlex flex-direction="column" align-items="center" gap="m" text-align="center">
-              <GdsFlex 
+            <Flex flex-direction="column" align-items="center" gap="m" text-align="center">
+              <Flex 
                 width="4xl" 
                 height="4xl" 
                 background="brand-01" 
@@ -175,172 +175,172 @@ export default function Home() {
                 align-items="center"
                 justify-content="center"
               >
-                <GdsText font="heading-m" color="inversed">4</GdsText>
-              </GdsFlex>
-              <GdsText font="heading-s">Approve &amp; Pay</GdsText>
-              <GdsText font="body-regular-s" color="neutral-02">
+                <Text font="heading-m" color="inversed">4</Text>
+              </Flex>
+              <Text font="heading-s">Approve &amp; Pay</Text>
+              <Text font="body-regular-s" color="neutral-02">
                 Release payment when work is complete
-              </GdsText>
-            </GdsFlex>
-          </GdsGrid>
-        </GdsCard>
+              </Text>
+            </Flex>
+          </Grid>
+        </Card>
 
         {/* Featured Courses Section */}
-        <GdsDiv margin-bottom="xl">
-          <GdsFlex justify-content="space-between" align-items="center" margin-bottom="l">
-            <GdsText tag="h2" font="heading-l">Learn New Skills</GdsText>
+        <Div margin-bottom="xl">
+          <Flex justify-content="space-between" align-items="center" margin-bottom="l">
+            <Text tag="h2" font="heading-l">Learn New Skills</Text>
             <Link href="/courses" style={{ textDecoration: 'none' } as any}>
-              <GdsText font="body-regular-m" color="brand-01">
+              <Text font="body-regular-m" color="brand-01">
                 View all courses →
-              </GdsText>
+              </Text>
             </Link>
-          </GdsFlex>
-          <GdsGrid columns="1; m{2}; l{3}" gap="m">
-            <GdsCard padding="0" variant="secondary" overflow="hidden">
-              <GdsDiv background="notice-01" padding="xl" display="flex" align-items="center" justify-content="center">
-                <GdsText font="heading-2xl">🎨</GdsText>
-              </GdsDiv>
-              <GdsDiv padding="l">
-                <GdsText font="detail-regular-s" color="brand-01">UI/UX Design</GdsText>
-                <GdsText font="heading-s" margin-top="xs">Master Modern UI Design</GdsText>
-                <GdsText font="body-regular-s" color="neutral-02" margin-top="s">
+          </Flex>
+          <Grid columns="1; m{2}; l{3}" gap="m">
+            <Card padding="0" variant="secondary" overflow="hidden">
+              <Div background="notice-01" padding="xl" display="flex" align-items="center" justify-content="center">
+                <Text font="heading-2xl">🎨</Text>
+              </Div>
+              <Div padding="l">
+                <Text font="detail-regular-s" color="brand-01">UI/UX Design</Text>
+                <Text font="heading-s" margin-top="xs">Master Modern UI Design</Text>
+                <Text font="body-regular-s" color="neutral-02" margin-top="s">
                   12 lessons • 4h 30m
-                </GdsText>
-              </GdsDiv>
-            </GdsCard>
+                </Text>
+              </Div>
+            </Card>
 
-            <GdsCard padding="0" variant="secondary" overflow="hidden">
-              <GdsDiv background="positive-01" padding="xl" display="flex" align-items="center" justify-content="center">
-                <GdsText font="heading-2xl">💻</GdsText>
-              </GdsDiv>
-              <GdsDiv padding="l">
-                <GdsText font="detail-regular-s" color="brand-01">Web Development</GdsText>
-                <GdsText font="heading-s" margin-top="xs">React &amp; Next.js Fundamentals</GdsText>
-                <GdsText font="body-regular-s" color="neutral-02" margin-top="s">
+            <Card padding="0" variant="secondary" overflow="hidden">
+              <Div background="positive-01" padding="xl" display="flex" align-items="center" justify-content="center">
+                <Text font="heading-2xl">💻</Text>
+              </Div>
+              <Div padding="l">
+                <Text font="detail-regular-s" color="brand-01">Web Development</Text>
+                <Text font="heading-s" margin-top="xs">React &amp; Next.js Fundamentals</Text>
+                <Text font="body-regular-s" color="neutral-02" margin-top="s">
                   20 lessons • 8h 15m
-                </GdsText>
-              </GdsDiv>
-            </GdsCard>
+                </Text>
+              </Div>
+            </Card>
 
-            <GdsCard padding="0" variant="secondary" overflow="hidden">
-              <GdsDiv background="warning-01" padding="xl" display="flex" align-items="center" justify-content="center">
-                <GdsText font="heading-2xl">📱</GdsText>
-              </GdsDiv>
-              <GdsDiv padding="l">
-                <GdsText font="detail-regular-s" color="brand-01">Mobile Development</GdsText>
-                <GdsText font="heading-s" margin-top="xs">Build iOS &amp; Android Apps</GdsText>
-                <GdsText font="body-regular-s" color="neutral-02" margin-top="s">
+            <Card padding="0" variant="secondary" overflow="hidden">
+              <Div background="warning-01" padding="xl" display="flex" align-items="center" justify-content="center">
+                <Text font="heading-2xl">📱</Text>
+              </Div>
+              <Div padding="l">
+                <Text font="detail-regular-s" color="brand-01">Mobile Development</Text>
+                <Text font="heading-s" margin-top="xs">Build iOS &amp; Android Apps</Text>
+                <Text font="body-regular-s" color="neutral-02" margin-top="s">
                   18 lessons • 7h 45m
-                </GdsText>
-              </GdsDiv>
-            </GdsCard>
-          </GdsGrid>
-        </GdsDiv>
-      </GdsDiv>
+                </Text>
+              </Div>
+            </Card>
+          </Grid>
+        </Div>
+      </Div>
 
       {/* Modal Dialog */}
-      <GdsDialog ref={dialogRef} heading="Welcome to Designer Hub">
-        <GdsGrid columns="s{1} m{2}" gap="0" width="100%">
+      <Dialog ref={dialogRef} heading="Welcome to Designer Hub">
+        <Grid columns="s{1} m{2}" gap="0" width="100%">
           {/* Left Panel */}
-          <GdsDiv background="brand-01" color="inversed" padding="s{l} m{2xl}" display="s{none} m{flex}" flex-direction="column" justify-content="center" align-items="flex-start">
-            <GdsFlex flex-direction="column" gap="l" align-items="flex-start">
-              <GdsText tag="h2" font="heading-l" color="inversed" text-align="start">
+          <Div background="brand-01" color="inversed" padding="s{l} m{2xl}" display="s{none} m{flex}" flex-direction="column" justify-content="center" align-items="flex-start">
+            <Flex flex-direction="column" gap="l" align-items="flex-start">
+              <Text tag="h2" font="heading-l" color="inversed" text-align="start">
                 Welcome to Designer Hub
-              </GdsText>
+              </Text>
               
               {/* Features List */}
-              <GdsFlex flex-direction="column" gap="m">
+              <Flex flex-direction="column" gap="m">
                 {/* Feature 1 */}
-                <GdsFlex gap="m" align-items="flex-start">
-                  <GdsDiv width="24px" height="24px" display="flex" align-items="center" justify-content="center" flex-shrink="0">
+                <Flex gap="m" align-items="flex-start">
+                  <Div width="24px" height="24px" display="flex" align-items="center" justify-content="center" flex-shrink="0">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ color: 'currentColor' }}>
                       <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
-                  </GdsDiv>
-                  <GdsText font="body-regular-m" color="inversed">
+                  </Div>
+                  <Text font="body-regular-m" color="inversed">
                       Hundreds of curated categories
-                  </GdsText>
-                </GdsFlex>
+                  </Text>
+                </Flex>
 
                 {/* Feature 2 */}
-                <GdsFlex gap="m" align-items="flex-start">
-                  <GdsDiv width="24px" height="24px" display="flex" align-items="center" justify-content="center" flex-shrink="0">
+                <Flex gap="m" align-items="flex-start">
+                  <Div width="24px" height="24px" display="flex" align-items="center" justify-content="center" flex-shrink="0">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ color: 'currentColor' }}>
                       <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
-                  </GdsDiv>
-                  <GdsText font="body-regular-m" color="inversed">
+                  </Div>
+                  <Text font="body-regular-m" color="inversed">
                     Exceptional outcomes, delivered reliably
-                  </GdsText>
-                </GdsFlex>
+                  </Text>
+                </Flex>
 
                 {/* Feature 3 */}
-                <GdsFlex gap="m" align-items="flex-start">
-                  <GdsDiv width="24px" height="24px" display="flex" align-items="center" justify-content="center" flex-shrink="0">
+                <Flex gap="m" align-items="flex-start">
+                  <Div width="24px" height="24px" display="flex" align-items="center" justify-content="center" flex-shrink="0">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ color: 'currentColor' }}>
                       <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
-                  </GdsDiv>
-                  <GdsText font="body-regular-m" color="inversed">
+                  </Div>
+                  <Text font="body-regular-m" color="inversed">
                     Connect with skilled professionals worldwide
-                  </GdsText>
-                </GdsFlex>
-              </GdsFlex>
-            </GdsFlex>
-          </GdsDiv>
+                  </Text>
+                </Flex>
+              </Flex>
+            </Flex>
+          </Div>
 
           {/* Right Panel */}
-          <GdsDiv padding="s{l} m{2xl}" display="flex" flex-direction="column" justify-content="center" align-items="center">
-            <GdsFlex flex-direction="column" gap="l" align-items="center" width="100%">
-              <GdsFlex flex-direction="column" gap="m" width="100%" align-items="flex-start">
-                <GdsText tag="h2" font="heading-m">
+          <Div padding="s{l} m{2xl}" display="flex" flex-direction="column" justify-content="center" align-items="center">
+            <Flex flex-direction="column" gap="l" align-items="center" width="100%">
+              <Flex flex-direction="column" gap="m" width="100%" align-items="flex-start">
+                <Text tag="h2" font="heading-m">
                   Start your journey
-                </GdsText>
-                <GdsText font="body-regular-m" color="neutral-02">
+                </Text>
+                <Text font="body-regular-m" color="neutral-02">
                   Connect with professionals and projects that match your goals
-                </GdsText>
-              </GdsFlex>
+                </Text>
+              </Flex>
 
               {/* Action Buttons */}
-              <GdsFlex flex-direction="column" gap="m" width="100%">
-                <GdsButton rank="primary" width="100%" onClick={handleCloseModal}>
+              <Flex flex-direction="column" gap="m" width="100%">
+                <Button rank="primary" width="100%" onClick={handleCloseModal}>
                   Create Account
-                </GdsButton>
-                <GdsButton rank="tertiary" variant="neutral" width="100%" onClick={handleCloseModal}>
+                </Button>
+                <Button rank="tertiary" variant="neutral" width="100%" onClick={handleCloseModal}>
                   Continue Without Signing Up
-                </GdsButton>
-              </GdsFlex>
+                </Button>
+              </Flex>
 
               {/* Divider */}
-              <GdsFlex gap="m" align-items="center" width="100%">
-                <GdsDiv flex="1" height="1px" background="subtle-01" />
-                <GdsText font="detail-regular-s" color="neutral-02">
+              <Flex gap="m" align-items="center" width="100%">
+                <Div flex="1" height="1px" background="subtle-01" />
+                <Text font="detail-regular-s" color="neutral-02">
                   or choose an alternative sign-in method
-                </GdsText>
-                <GdsDiv flex="1" height="1px" background="subtle-01" />
-              </GdsFlex>
+                </Text>
+                <Div flex="1" height="1px" background="subtle-01" />
+              </Flex>
 
               {/* Social Buttons */}
-              <GdsFlex flex-direction="column" gap="s" width="100%">
-                <GdsButton rank="secondary" variant="neutral" width="100%">
+              <Flex flex-direction="column" gap="s" width="100%">
+                <Button rank="secondary" variant="neutral" width="100%">
                   Sign in with Google
-                </GdsButton>
-                <GdsButton rank="secondary" variant="neutral" width="100%">
+                </Button>
+                <Button rank="secondary" variant="neutral" width="100%">
                   Sign in with Email
-                </GdsButton>
-              </GdsFlex>
+                </Button>
+              </Flex>
 
               {/* Terms Text */}
-              <GdsText font="detail-regular-s" color="neutral-02" text-align="center">
+              <Text font="detail-regular-s" color="neutral-02" text-align="center">
                 By continuing you accept our{' '}
-                <GdsLink href="/terms" text-decoration="hover:underline">Terms</GdsLink>{' '}
+                <LinkComponent href="/terms" text-decoration="hover:underline">Terms</LinkComponent>{' '}
                 and acknowledge the{' '}
-                <GdsLink href="/privacy" text-decoration="hover:underline">Privacy Policy</GdsLink>.
-              </GdsText>
-            </GdsFlex>
-          </GdsDiv>
-        </GdsGrid>
-      </GdsDialog>
+                <LinkComponent href="/privacy" text-decoration="hover:underline">Privacy Policy</LinkComponent>.
+              </Text>
+            </Flex>
+          </Div>
+        </Grid>
+      </Dialog>
       </ClientOnly>
     </PageLayout>
   )

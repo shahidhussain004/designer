@@ -3,16 +3,15 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { disputesApi } from '../lib/api'
 import toast from 'react-hot-toast'
 import {
-  GdsCard,
-  GdsFlex,
-  GdsGrid,
-  GdsText,
-  GdsButton,
-  GdsInput,
-  GdsDiv,
-  GdsDivider,
-  GdsBadge,
-  GdsSpinner,
+  Card,
+  Flex,
+  Grid,
+  Text,
+  Button,
+  Input,
+  Divider,
+  Badge,
+  Spinner,
 } from '../components/green'
 
 interface Dispute {
@@ -116,24 +115,24 @@ export default function Disputes() {
   }
 
   return (
-    <GdsFlex flex-direction="column" gap="l">
+    <Flex flex-direction="column" gap="l">
       {/* Header */}
-      <GdsFlex justify-content="space-between" align-items="center">
-        <GdsDiv>
-          <GdsText tag="h1" style={{ fontSize: '1.5rem', fontWeight: 700 } as any}>
+      <Flex justify-content="space-between" align-items="center">
+        <div>
+          <Text tag="h1" style={{ fontSize: '1.5rem', fontWeight: 700 } as any}>
             Disputes
-          </GdsText>
-          <GdsText style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>
+          </Text>
+          <Text style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>
             Handle payment disputes and resolutions
-          </GdsText>
-        </GdsDiv>
-      </GdsFlex>
+          </Text>
+        </div>
+      </Flex>
 
       {/* Stats */}
-      <GdsGrid columns="1; s{2}; m{4}" gap="m">
-        <GdsCard>
-          <GdsFlex padding="m" gap="m" align-items="center">
-            <GdsDiv
+      <Grid columns="1; s{2}; m{4}" gap="m">
+        <Card>
+          <Flex padding="m" gap="m" align-items="center">
+            <div
               style={{
                 width: '48px',
                 height: '48px',
@@ -146,17 +145,17 @@ export default function Disputes() {
               } as any}
             >
               ⏳
-            </GdsDiv>
-            <GdsDiv>
-              <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Pending</GdsText>
-              <GdsText style={{ fontSize: '1.5rem', fontWeight: 700 } as any}>{data?.stats?.pending || 0}</GdsText>
-            </GdsDiv>
-          </GdsFlex>
-        </GdsCard>
+            </div>
+            <div>
+              <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Pending</Text>
+              <Text style={{ fontSize: '1.5rem', fontWeight: 700 } as any}>{data?.stats?.pending || 0}</Text>
+            </div>
+          </Flex>
+        </Card>
 
-        <GdsCard>
-          <GdsFlex padding="m" gap="m" align-items="center">
-            <GdsDiv
+        <Card>
+          <Flex padding="m" gap="m" align-items="center">
+            <div
               style={{
                 width: '48px',
                 height: '48px',
@@ -169,17 +168,17 @@ export default function Disputes() {
               } as any}
             >
               ⚠️
-            </GdsDiv>
-            <GdsDiv>
-              <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Under Review</GdsText>
-              <GdsText style={{ fontSize: '1.5rem', fontWeight: 700 } as any}>{data?.stats?.underReview || 0}</GdsText>
-            </GdsDiv>
-          </GdsFlex>
-        </GdsCard>
+            </div>
+            <div>
+              <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Under Review</Text>
+              <Text style={{ fontSize: '1.5rem', fontWeight: 700 } as any}>{data?.stats?.underReview || 0}</Text>
+            </div>
+          </Flex>
+        </Card>
 
-        <GdsCard>
-          <GdsFlex padding="m" gap="m" align-items="center">
-            <GdsDiv
+        <Card>
+          <Flex padding="m" gap="m" align-items="center">
+            <div
               style={{
                 width: '48px',
                 height: '48px',
@@ -192,17 +191,17 @@ export default function Disputes() {
               } as any}
             >
               ✓
-            </GdsDiv>
-            <GdsDiv>
-              <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Resolved</GdsText>
-              <GdsText style={{ fontSize: '1.5rem', fontWeight: 700 } as any}>{data?.stats?.resolved || 0}</GdsText>
-            </GdsDiv>
-          </GdsFlex>
-        </GdsCard>
+            </div>
+            <div>
+              <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Resolved</Text>
+              <Text style={{ fontSize: '1.5rem', fontWeight: 700 } as any}>{data?.stats?.resolved || 0}</Text>
+            </div>
+          </Flex>
+        </Card>
 
-        <GdsCard>
-          <GdsFlex padding="m" gap="m" align-items="center">
-            <GdsDiv
+        <Card>
+          <Flex padding="m" gap="m" align-items="center">
+            <div
               style={{
                 width: '48px',
                 height: '48px',
@@ -217,25 +216,25 @@ export default function Disputes() {
               } as any}
             >
               $
-            </GdsDiv>
-            <GdsDiv>
-              <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Total Disputed</GdsText>
-              <GdsText style={{ fontSize: '1.5rem', fontWeight: 700 } as any}>${(data?.stats?.totalAmount || 0).toLocaleString()}</GdsText>
-            </GdsDiv>
-          </GdsFlex>
-        </GdsCard>
-      </GdsGrid>
+            </div>
+            <div>
+              <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Total Disputed</Text>
+              <Text style={{ fontSize: '1.5rem', fontWeight: 700 } as any}>${(data?.stats?.totalAmount || 0).toLocaleString()}</Text>
+            </div>
+          </Flex>
+        </Card>
+      </Grid>
 
       {/* Filters */}
-      <GdsFlex gap="m" flex-wrap="wrap">
-        <GdsDiv style={{ flex: 1, minWidth: '200px' } as any}>
-          <GdsInput
+      <Flex gap="m" flex-wrap="wrap">
+        <div style={{ flex: 1, minWidth: '200px' } as any}>
+          <Input
             label=""
             value={search}
             onInput={(e: React.FormEvent<HTMLInputElement>) => setSearch((e.target as HTMLInputElement).value)}
           />
-        </GdsDiv>
-        <GdsDiv>
+        </div>
+        <div>
           <select
             style={{
               padding: '0.5rem 1rem',
@@ -254,55 +253,55 @@ export default function Disputes() {
             <option value="RESOLVED">Resolved</option>
             <option value="REJECTED">Rejected</option>
           </select>
-        </GdsDiv>
-      </GdsFlex>
+        </div>
+      </Flex>
 
       {/* Disputes List */}
-      <GdsCard>
+      <Card>
         {isLoading ? (
-          <GdsFlex justify-content="center" align-items="center" padding="3xl">
-            <GdsSpinner />
-          </GdsFlex>
+          <Flex justify-content="center" align-items="center" padding="3xl">
+            <Spinner />
+          </Flex>
         ) : filteredDisputes.length === 0 ? (
-          <GdsFlex justify-content="center" padding="3xl">
-            <GdsText style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>No disputes found</GdsText>
-          </GdsFlex>
+          <Flex justify-content="center" padding="3xl">
+            <Text style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>No disputes found</Text>
+          </Flex>
         ) : (
-          <GdsFlex flex-direction="column">
+          <Flex flex-direction="column">
             {filteredDisputes.map((dispute: Dispute, index: number) => (
-              <GdsDiv key={dispute.id}>
-                {index > 0 && <GdsDivider />}
-                <GdsFlex flex-direction="column" gap="m" padding="l">
-                  <GdsFlex justify-content="space-between" align-items="flex-start" flex-wrap="wrap" gap="m">
-                    <GdsFlex gap="m" align-items="flex-start">
-                      <GdsText style={{ fontSize: '1.5rem' } as any}>{getStatusIcon(dispute.status)}</GdsText>
-                      <GdsDiv>
-                        <GdsText style={{ fontSize: '1.125rem', fontWeight: 600 } as any}>{dispute.jobTitle}</GdsText>
-                        <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>
+              <div key={dispute.id}>
+                {index > 0 && <Divider />}
+                <Flex flex-direction="column" gap="m" padding="l">
+                  <Flex justify-content="space-between" align-items="flex-start" flex-wrap="wrap" gap="m">
+                    <Flex gap="m" align-items="flex-start">
+                      <Text style={{ fontSize: '1.5rem' } as any}>{getStatusIcon(dispute.status)}</Text>
+                      <div>
+                        <Text style={{ fontSize: '1.125rem', fontWeight: 600 } as any}>{dispute.jobTitle}</Text>
+                        <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>
                           {dispute.clientName} vs {dispute.freelancerName}
-                        </GdsText>
-                        <GdsText style={{ fontSize: '0.875rem', marginTop: '0.5rem' } as any}>
+                        </Text>
+                        <Text style={{ fontSize: '0.875rem', marginTop: '0.5rem' } as any}>
                           Reason: {dispute.reason}
-                        </GdsText>
-                        <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>
+                        </Text>
+                        <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>
                           {dispute.description}
-                        </GdsText>
-                      </GdsDiv>
-                    </GdsFlex>
-                    <GdsDiv style={{ textAlign: 'right' } as any}>
-                      <GdsText style={{ fontSize: '1.25rem', fontWeight: 700 } as any}>
+                        </Text>
+                      </div>
+                    </Flex>
+                    <div style={{ textAlign: 'right' } as any}>
+                      <Text style={{ fontSize: '1.25rem', fontWeight: 700 } as any}>
                         ${dispute.amount.toLocaleString()}
-                      </GdsText>
-                      <GdsBadge variant={getStatusBadgeVariant(dispute.status)} style={{ marginTop: '0.5rem' } as any}>
+                      </Text>
+                      <Badge variant={getStatusBadgeVariant(dispute.status)} style={{ marginTop: '0.5rem' } as any}>
                         {dispute.status.replace('_', ' ')}
-                      </GdsBadge>
-                      <GdsText style={{ fontSize: '0.75rem', color: 'var(--gds-color-l3-content-tertiary)', marginTop: '0.5rem' } as any}>
+                      </Badge>
+                      <Text style={{ fontSize: '0.75rem', color: 'var(--gds-color-l3-content-tertiary)', marginTop: '0.5rem' } as any}>
                         Filed {new Date(dispute.createdAt).toLocaleDateString()}
-                      </GdsText>
-                    </GdsDiv>
-                  </GdsFlex>
-                  <GdsFlex gap="m">
-                    <GdsButton
+                      </Text>
+                    </div>
+                  </Flex>
+                  <Flex gap="m">
+                    <Button
                       size="small"
                       rank="tertiary"
                       onClick={() => {
@@ -311,18 +310,18 @@ export default function Disputes() {
                       }}
                     >
                       View Details
-                    </GdsButton>
+                    </Button>
                     {dispute.status === 'PENDING' && (
                       <>
-                        <GdsButton
+                        <Button
                           size="small"
                           rank="tertiary"
                           onClick={() => escalateMutation.mutate(dispute.id)}
                           style={{ color: 'var(--gds-color-l3-content-notice)' } as any}
                         >
                           Escalate
-                        </GdsButton>
-                        <GdsButton
+                        </Button>
+                        <Button
                           size="small"
                           rank="tertiary"
                           onClick={() => {
@@ -332,41 +331,41 @@ export default function Disputes() {
                           style={{ color: 'var(--gds-color-l3-content-positive)' } as any}
                         >
                           Resolve
-                        </GdsButton>
+                        </Button>
                       </>
                     )}
-                  </GdsFlex>
-                </GdsFlex>
-              </GdsDiv>
+                  </Flex>
+                </Flex>
+              </div>
             ))}
 
             {/* Pagination */}
-            <GdsDivider />
-            <GdsFlex justify-content="space-between" align-items="center" padding="m">
-              <GdsButton
+            <Divider />
+            <Flex justify-content="space-between" align-items="center" padding="m">
+              <Button
                 rank="secondary"
                 size="small"
                 onClick={() => setPage(Math.max(0, page - 1))}
                 disabled={page === 0}
               >
                 Previous
-              </GdsButton>
-              <GdsButton
+              </Button>
+              <Button
                 rank="secondary"
                 size="small"
                 onClick={() => setPage(page + 1)}
                 disabled={!data?.hasNext}
               >
                 Next
-              </GdsButton>
-            </GdsFlex>
-          </GdsFlex>
+              </Button>
+            </Flex>
+          </Flex>
         )}
-      </GdsCard>
+      </Card>
 
       {/* Resolution Modal */}
       {selectedDispute && (
-        <GdsDiv
+        <div
           style={{
             position: 'fixed',
             inset: 0,
@@ -378,52 +377,52 @@ export default function Disputes() {
             padding: '1rem',
           } as any}
         >
-          <GdsCard style={{ maxWidth: '600px', width: '100%', maxHeight: '80vh', overflow: 'auto' } as any}>
-            <GdsFlex flex-direction="column" gap="l" padding="l">
+          <Card style={{ maxWidth: '600px', width: '100%', maxHeight: '80vh', overflow: 'auto' } as any}>
+            <Flex flex-direction="column" gap="l" padding="l">
               {/* Modal Header */}
-              <GdsDiv>
-                <GdsText tag="h2" style={{ fontSize: '1.25rem', fontWeight: 600 } as any}>
+              <div>
+                <Text tag="h2" style={{ fontSize: '1.25rem', fontWeight: 600 } as any}>
                   Resolve Dispute - {selectedDispute.jobTitle}
-                </GdsText>
-              </GdsDiv>
+                </Text>
+              </div>
 
-              <GdsDivider />
+              <Divider />
 
               {/* Modal Content */}
-              <GdsGrid columns="1; m{2}" gap="m">
-                <GdsDiv>
-                  <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Client</GdsText>
-                  <GdsText style={{ marginTop: '0.25rem' } as any}>{selectedDispute.clientName}</GdsText>
-                </GdsDiv>
-                <GdsDiv>
-                  <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Freelancer</GdsText>
-                  <GdsText style={{ marginTop: '0.25rem' } as any}>{selectedDispute.freelancerName}</GdsText>
-                </GdsDiv>
-              </GdsGrid>
+              <Grid columns="1; m{2}" gap="m">
+                <div>
+                  <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Client</Text>
+                  <Text style={{ marginTop: '0.25rem' } as any}>{selectedDispute.clientName}</Text>
+                </div>
+                <div>
+                  <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Freelancer</Text>
+                  <Text style={{ marginTop: '0.25rem' } as any}>{selectedDispute.freelancerName}</Text>
+                </div>
+              </Grid>
 
-              <GdsDiv>
-                <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Dispute Reason</GdsText>
-                <GdsText style={{ marginTop: '0.25rem' } as any}>{selectedDispute.reason}</GdsText>
-              </GdsDiv>
+              <div>
+                <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Dispute Reason</Text>
+                <Text style={{ marginTop: '0.25rem' } as any}>{selectedDispute.reason}</Text>
+              </div>
 
-              <GdsDiv>
-                <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Description</GdsText>
-                <GdsText style={{ marginTop: '0.25rem' } as any}>{selectedDispute.description}</GdsText>
-              </GdsDiv>
+              <div>
+                <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Description</Text>
+                <Text style={{ marginTop: '0.25rem' } as any}>{selectedDispute.description}</Text>
+              </div>
 
-              <GdsDiv>
-                <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Disputed Amount</GdsText>
-                <GdsText style={{ fontSize: '1.25rem', fontWeight: 600, marginTop: '0.25rem' } as any}>
+              <div>
+                <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Disputed Amount</Text>
+                <Text style={{ fontSize: '1.25rem', fontWeight: 600, marginTop: '0.25rem' } as any}>
                   ${selectedDispute.amount.toLocaleString()}
-                </GdsText>
-              </GdsDiv>
+                </Text>
+              </div>
 
-              <GdsDivider />
+              <Divider />
 
-              <GdsDiv>
-                <GdsText style={{ fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' } as any}>
+              <div>
+                <Text style={{ fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' } as any}>
                   Resolution Notes
-                </GdsText>
+                </Text>
                 <textarea
                   style={{
                     width: '100%',
@@ -437,14 +436,14 @@ export default function Disputes() {
                   value={resolution}
                   onChange={(e) => setResolution(e.target.value)}
                 />
-              </GdsDiv>
+              </div>
 
-              <GdsDiv>
-                <GdsText style={{ fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' } as any}>
+              <div>
+                <Text style={{ fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' } as any}>
                   Refund Amount (to client)
-                </GdsText>
-                <GdsFlex align-items="center" gap="s">
-                  <GdsText>$</GdsText>
+                </Text>
+                <Flex align-items="center" gap="s">
+                  <Text>$</Text>
                   <input
                     type="number"
                     style={{
@@ -460,17 +459,17 @@ export default function Disputes() {
                     min={0}
                     max={selectedDispute.amount}
                   />
-                </GdsFlex>
-                <GdsText style={{ fontSize: '0.75rem', color: 'var(--gds-color-l3-content-tertiary)', marginTop: '0.25rem' } as any}>
+                </Flex>
+                <Text style={{ fontSize: '0.75rem', color: 'var(--gds-color-l3-content-tertiary)', marginTop: '0.25rem' } as any}>
                   Remaining ${(selectedDispute.amount - refundAmount).toLocaleString()} goes to freelancer
-                </GdsText>
-              </GdsDiv>
+                </Text>
+              </div>
 
-              <GdsDivider />
+              <Divider />
 
               {/* Modal Footer */}
-              <GdsFlex justify-content="flex-end" gap="m" flex-wrap="wrap">
-                <GdsButton
+              <Flex justify-content="flex-end" gap="m" flex-wrap="wrap">
+                <Button
                   rank="secondary"
                   onClick={() => {
                     setSelectedDispute(null)
@@ -479,8 +478,8 @@ export default function Disputes() {
                   }}
                 >
                   Cancel
-                </GdsButton>
-                <GdsButton
+                </Button>
+                <Button
                   rank="secondary"
                   onClick={() =>
                     resolveMutation.mutate({
@@ -493,8 +492,8 @@ export default function Disputes() {
                   style={{ background: 'var(--gds-color-l3-background-positive)' } as any}
                 >
                   Favor Freelancer
-                </GdsButton>
-                <GdsButton
+                </Button>
+                <Button
                   rank="primary"
                   onClick={() =>
                     resolveMutation.mutate({
@@ -506,13 +505,13 @@ export default function Disputes() {
                   }
                 >
                   Favor Client (Refund ${refundAmount})
-                </GdsButton>
-              </GdsFlex>
-            </GdsFlex>
-          </GdsCard>
-        </GdsDiv>
+                </Button>
+              </Flex>
+            </Flex>
+          </Card>
+        </div>
       )}
-    </GdsFlex>
+    </Flex>
   )
 }
 

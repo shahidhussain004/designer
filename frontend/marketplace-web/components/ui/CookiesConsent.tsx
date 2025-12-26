@@ -1,7 +1,7 @@
  'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { GdsDialog } from '@/components/green';
+import { Dialog } from '@/components/green';
 import { Logo } from './Icons';
 import { cn } from '@/lib/design-system/utils';
 
@@ -140,8 +140,8 @@ export const CookiesConsent: React.FC<CookiesConsentProps> = ({ onAccept, onReje
         </svg>
       </button>
 
-      {/* Use GdsDialog */}
-      <GdsDialog ref={dialogRef} heading="Privacy Preference Center">
+      {/* Use Dialog */}
+      <Dialog ref={dialogRef} heading="Privacy Preference Center">
         <div className="p-8 md:p-10" style={{ fontFamily: "'SEB Sans Serif', system-ui, -apple-system, sans-serif" }}>
           <div className="flex items-start gap-4 mb-6">
             <div className="flex-shrink-0">
@@ -221,7 +221,7 @@ export const CookiesConsent: React.FC<CookiesConsentProps> = ({ onAccept, onReje
             </div>
           </div>
         </div>
-      </GdsDialog>
+      </Dialog>
     </>
   );
 };
