@@ -90,7 +90,7 @@ export default function CourseDetailPage() {
 
   if (loading) {
     return (
-      <Flex justify-content="center" align-items="center" style={{ minHeight: '100vh' } as any}>
+      <Flex justify-content="center" align-items="center">
         <Spinner />
       </Flex>
     );
@@ -98,13 +98,13 @@ export default function CourseDetailPage() {
 
   if (error || !course) {
     return (
-      <Flex justify-content="center" align-items="center" flex-direction="column" gap="l" style={{ minHeight: '100vh' } as any}>
-        <Text style={{ fontSize: '4rem' } as any}>😕</Text>
-        <Text tag="h2" style={{ fontSize: '1.5rem', fontWeight: 700 } as any}>Course Not Found</Text>
-        <Text style={{ color: '#9ca3af' } as any}>
+      <Flex justify-content="center" align-items="center" flex-direction="column" gap="l">
+        <Text>😕</Text>
+        <Text tag="h2">Course Not Found</Text>
+        <Text>
           {error || 'This course does not exist'}
         </Text>
-        <Link href="/courses" style={{ color: '#16a34a' } as any}>
+        <Link href="/courses">
           ← Back to Courses
         </Link>
       </Flex>
@@ -116,10 +116,10 @@ export default function CourseDetailPage() {
   const totalMinutes = course.durationMinutes % 60;
 
   return (
-    <Div style={{ minHeight: '100vh', background: '#f3f4f6' } as any}>
+    <Div>
       {/* Navigation */}
-      <Div style={{ background: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', position: 'sticky', top: 0, zIndex: 10 } as any}>
-        <Flex justify-content="space-between" align-items="center" padding="m" style={{ maxWidth: '1280px', margin: '0 auto' } as any}>
+      <Div>
+        <Flex justify-content="space-between" align-items="center" padding="m">
           <Flex align-items="center" gap="xl">
             <Link href="/" style={{ textDecoration: 'none' } as any}>
               <Text style={{ fontSize: '1.25rem', fontWeight: 700, color: '#16a34a' } as any}>
@@ -136,8 +136,8 @@ export default function CourseDetailPage() {
       </Div>
 
       {/* Course Header */}
-      <Div style={{ background: 'linear-gradient(to right, #1f2937, #111827)', color: 'white', padding: '3rem 0' } as any}>
-        <Flex flex-direction="column; l{row}" gap="xl" style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1rem' } as any}>
+      <Div>
+        <Flex flex-direction="column; l{row}" gap="xl">
           {/* Course Info */}
           <Flex flex-direction="column" gap="m" style={{ flex: 1 } as any}>
             {/* Breadcrumb */}
@@ -235,7 +235,7 @@ export default function CourseDetailPage() {
       </Div>
 
       {/* Course Content */}
-      <Flex flex-direction="column" gap="l" padding="xl" style={{ maxWidth: '900px', margin: '0 auto' } as any}>
+      <Flex flex-direction="column" gap="l" padding="xl">
         {/* What You'll Learn */}
         {course.learningOutcomes.length > 0 && (
           <Card>

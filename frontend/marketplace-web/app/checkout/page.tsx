@@ -149,7 +149,6 @@ function CheckoutContent() {
         align-items="center"
         flex-direction="column"
         gap="m"
-        style={{ minHeight: '100vh' } as any}
       >
         <Spinner />
         <Text color="secondary">Setting up checkout...</Text>
@@ -161,12 +160,11 @@ function CheckoutContent() {
     <Flex
       flex-direction="column"
       padding="l"
-      style={{ minHeight: '100vh', backgroundColor: '#f3f4f6' } as any}
     >
-      <Flex flex-direction="column" style={{ maxWidth: '900px', margin: '0 auto', width: '100%' } as any}>
+      <Flex flex-direction="column">
         {/* Header */}
         <Flex flex-direction="column" gap="s" padding="m">
-          <Link href={returnUrl} style={{ color: '#16a34a', textDecoration: 'none' } as any}>
+          <Link href={returnUrl}>
             ← Back
           </Link>
           <Text tag="h1" font-size="heading-l">
@@ -176,7 +174,7 @@ function CheckoutContent() {
 
         <Grid columns="1; m{3}" gap="l">
           {/* Payment Form */}
-          <Flex flex-direction="column" gap="m" style={{ gridColumn: 'span 2' } as any}>
+          <Flex flex-direction="column" gap="m">
             <form onSubmit={handleSubmit}>
               <Flex flex-direction="column" gap="m">
                 {/* Error Message */}

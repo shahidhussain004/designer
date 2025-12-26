@@ -40,34 +40,24 @@ export default function CourseEnrollmentSuccessPage() {
 
   if (loading) {
     return (
-      <Flex justify-content="center" align-items="center" style={{ minHeight: '100vh' } as any}>
+      <Flex justify-content="center" align-items="center">
         <Spinner />
       </Flex>
     );
   }
 
   return (
-    <Div style={{ minHeight: '100vh', background: '#f3f4f6' } as any}>
-      <Flex justify-content="center" align-items="center" padding="xl" style={{ minHeight: '100vh' } as any}>
-        <Div style={{ maxWidth: '400px', width: '100%' } as any}>
+    <Div>
+      <Flex justify-content="center" align-items="center" padding="xl">
+        <Div>
           <Card>
             <Flex flex-direction="column" align-items="center" gap="l" padding="xl">
               {/* Success Icon */}
-              <Div
-                style={{
-                  width: '80px',
-                  height: '80px',
-                  borderRadius: '50%',
-                  background: '#f0fdf4',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                } as any}
-              >
-                <Text style={{ fontSize: '2.5rem', color: '#16a34a' } as any}>✓</Text>
+              <Div>
+                <Text>✓</Text>
               </Div>
 
-              <Text tag="h1" style={{ fontSize: '1.5rem', fontWeight: 700, textAlign: 'center' } as any}>
+              <Text tag="h1">
                 Enrollment Successful!
               </Text>
               
@@ -81,19 +71,9 @@ export default function CourseEnrollmentSuccessPage() {
 
               {/* Course Preview */}
               {course && (
-                <Card style={{ width: '100%', background: '#f3f4f6' } as any}>
+                <Card>
                   <Flex align-items="center" gap="m" padding="m">
-                    <Div
-                      style={{
-                        width: '64px',
-                        height: '48px',
-                        borderRadius: '4px',
-                        overflow: 'hidden',
-                        background: '#f9fafb',
-                        flexShrink: 0,
-                        position: 'relative',
-                      } as any}
-                    >
+                    <Div>
                       {course.thumbnailUrl ? (
                         <Image
                           src={course.thumbnailUrl}
@@ -120,31 +100,31 @@ export default function CourseEnrollmentSuccessPage() {
               )}
 
               {/* Actions */}
-              <Flex flex-direction="column" gap="m" style={{ width: '100%' } as any}>
-                <Link href={`/courses/${courseId}/learn`} style={{ textDecoration: 'none' } as any}>
-                  <Button rank="primary" style={{ width: '100%' } as any}>
+              <Flex flex-direction="column" gap="m">
+                <Link href={`/courses/${courseId}/learn`}>
+                  <Button rank="primary">
                     Start Learning
                   </Button>
                 </Link>
                 
-                <Link href="/dashboard" style={{ textDecoration: 'none' } as any}>
-                  <Button rank="secondary" style={{ width: '100%' } as any}>
+                <Link href="/dashboard">
+                  <Button rank="secondary">
                     Go to Dashboard
                   </Button>
                 </Link>
               </Flex>
 
               {/* Receipt Info */}
-              <Text style={{ fontSize: '0.875rem', color: '#9ca3af', textAlign: 'center' } as any}>
+              <Text>
                 A receipt has been sent to your email address.
               </Text>
             </Flex>
           </Card>
 
           {/* Help Link */}
-          <Text style={{ textAlign: 'center', fontSize: '0.875rem', color: '#9ca3af', marginTop: '1rem' } as any}>
+          <Text>
             Having trouble?{' '}
-            <Link href="/support" style={{ color: '#16a34a' } as any}>
+            <Link href="/support">
               Contact Support
             </Link>
           </Text>

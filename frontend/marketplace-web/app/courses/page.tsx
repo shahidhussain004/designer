@@ -104,9 +104,6 @@ export default function CoursesPage() {
         flex-direction="column"
         gap="m"
         padding="xl"
-        style={{
-          background: 'linear-gradient(135deg, #dcfce7 0%, #ffffff 100%)',
-        }}
       >
         <Text tag="h1" font-size="heading-xl">
           Learn New Skills
@@ -117,7 +114,7 @@ export default function CoursesPage() {
 
         {/* Search Bar */}
         <form onSubmit={handleSearch}>
-          <Flex gap="m" align-items="flex-end" style={{ maxWidth: '600px' }}>
+          <Flex gap="m" align-items="flex-end">
             <Flex flex="1">
               <Input
                 label="Search Courses"
@@ -131,7 +128,7 @@ export default function CoursesPage() {
       </Flex>
 
       <Flex padding="l">
-        <Grid columns="1; m{4}" gap="l" style={{ width: '100%' }}>
+        <Grid columns="1; m{4}" gap="l">
           {/* Filters Sidebar */}
           <Card padding="l">
             <Flex flex-direction="column" gap="m">
@@ -157,15 +154,6 @@ export default function CoursesPage() {
                     setSelectedCategory(e.target.value);
                     setPage(0);
                   }}
-                  style={{
-                    padding: '0.75rem',
-                    borderRadius: '4px',
-                    border: '1px solid #e5e7eb',
-                    backgroundColor: '#ffffff',
-                    color: '#111827',
-                    fontSize: '0.875rem',
-                    width: '100%',
-                  }}
                 >
                   <option value="">All Categories</option>
                   {COURSE_CATEGORIES.map((cat) => (
@@ -183,7 +171,7 @@ export default function CoursesPage() {
                 </Text>
                 <Flex flex-direction="column" gap="xs">
                   {SKILL_LEVELS.map((level) => (
-                    <label key={level} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                    <label key={level}>
                       <input
                         type="radio"
                         name="skillLevel"

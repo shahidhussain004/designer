@@ -53,9 +53,8 @@ export default function RegisterPage() {
       justify-content="center"
       align-items="center"
       padding="l"
-      style={{ minHeight: '100vh', backgroundColor: '#f3f4f6' } as any}
     >
-      <Card padding="xl" style={{ maxWidth: '480px', width: '100%' } as any}>
+      <Card padding="xl">
         <Flex flex-direction="column" gap="l">
           {/* Header */}
           <Flex flex-direction="column" align-items="center" gap="s">
@@ -64,7 +63,7 @@ export default function RegisterPage() {
             </Text>
             <Text color="secondary">
               Already have an account?{' '}
-              <Link href="/auth/login" style={{ color: '#16a34a' } as any}>
+              <Link href="/auth/login">
                 Sign in
               </Link>
             </Text>
@@ -191,7 +190,7 @@ export default function RegisterPage() {
                 {loading ? 'Creating account...' : 'Create account'}
               </Button>
 
-              <Text font-size="body-s" color="secondary" style={{ textAlign: 'center' } as any}>
+              <Text font-size="body-s" color="secondary">
                 By creating an account, you agree to our Terms of Service and Privacy Policy
               </Text>
             </Flex>

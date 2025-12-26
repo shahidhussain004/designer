@@ -89,25 +89,25 @@ export default function CreateJobPage() {
 
   if (loading) {
     return (
-      <Flex justify-content="center" align-items="center" style={{ minHeight: '100vh' } as any}>
+      <Flex justify-content="center" align-items="center" padding="xl">
         <Spinner />
       </Flex>
     );
   }
 
   return (
-    <Div style={{ minHeight: '100vh', background: '#f3f4f6' } as any}>
+    <Div>
       {/* Header */}
-      <Div style={{ background: '#dcfce7', color: 'white', padding: '3rem 0' } as any}>
-        <Flex flex-direction="column" gap="m" style={{ maxWidth: '800px', margin: '0 auto', padding: '0 1rem' } as any}>
-          <Text tag="h1" style={{ fontSize: '2.5rem', fontWeight: 700 } as any}>Post a New Job</Text>
-          <Text style={{ fontSize: '1.125rem', opacity: 0.9 } as any}>
+      <Div padding="xl">
+        <Flex flex-direction="column" gap="m">
+          <Text tag="h1">Post a New Job</Text>
+          <Text>
             Find the right freelancer for your project
           </Text>
         </Flex>
       </Div>
 
-      <Flex flex-direction="column" gap="xl" padding="xl" style={{ maxWidth: '800px', margin: '0 auto' } as any}>
+      <Flex flex-direction="column" gap="xl" padding="xl">
         {error && (
           <Alert variant="negative">
             Error: {error}
@@ -119,7 +119,7 @@ export default function CreateJobPage() {
             <Flex flex-direction="column" gap="l" padding="l">
               {/* Job Title */}
               <Div>
-                <Text style={{ fontWeight: 500, marginBottom: '0.5rem' } as any}>Job Title *</Text>
+                <Text>Job Title *</Text>
                 <Input
                   label=""
                   name="title"
@@ -131,45 +131,25 @@ export default function CreateJobPage() {
 
               {/* Job Description */}
               <Div>
-                <Text style={{ fontWeight: 500, marginBottom: '0.5rem' } as any}>Job Description *</Text>
+                <Text>Job Description *</Text>
                 <textarea
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
                   rows={8}
                   required
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                    background: '#f3f4f6',
-                    color: '#111827',
-                    fontFamily: 'inherit',
-                    fontSize: '1rem',
-                    resize: 'vertical',
-                  } as any}
                 />
               </Div>
 
               {/* Category and Experience Level */}
               <Grid columns="1; m{2}" gap="l">
                 <Div>
-                  <Text style={{ fontWeight: 500, marginBottom: '0.5rem' } as any}>Category *</Text>
+                  <Text>Category *</Text>
                   <select
                     name="category"
                     value={formData.category}
                     onChange={handleChange}
                     required
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '4px',
-                      background: '#f3f4f6',
-                      color: '#111827',
-                      fontSize: '1rem',
-                    } as any}
                   >
                     <option value="WEB_DESIGN">Web Design</option>
                     <option value="GRAPHIC_DESIGN">Graphic Design</option>
@@ -181,21 +161,12 @@ export default function CreateJobPage() {
                 </Div>
 
                 <Div>
-                  <Text style={{ fontWeight: 500, marginBottom: '0.5rem' } as any}>Required Experience Level *</Text>
+                  <Text>Required Experience Level *</Text>
                   <select
                     name="experienceLevel"
                     value={formData.experienceLevel}
                     onChange={handleChange}
                     required
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '4px',
-                      background: '#f3f4f6',
-                      color: '#111827',
-                      fontSize: '1rem',
-                    } as any}
                   >
                     <option value="ENTRY">Entry</option>
                     <option value="INTERMEDIATE">Intermediate</option>
@@ -206,9 +177,9 @@ export default function CreateJobPage() {
 
               {/* Budget */}
               <Div>
-                <Text style={{ fontWeight: 500, marginBottom: '0.5rem' } as any}>Budget ($) *</Text>
+                <Text>Budget ($) *</Text>
                 <Flex align-items="center" gap="s">
-                  <Text style={{ fontSize: '1.25rem' } as any}>$</Text>
+                  <Text>$</Text>
                   <input
                     type="number"
                     name="budget"
@@ -250,7 +221,7 @@ export default function CreateJobPage() {
         {/* Helpful Tips */}
         <Card>
           <Flex flex-direction="column" gap="l" padding="l">
-            <Text tag="h2" style={{ fontSize: '1.5rem', fontWeight: 600 } as any}>
+            <Text tag="h2">
               Tips for Writing a Great Job Post
             </Text>
             <Flex flex-direction="column" gap="m">
@@ -261,21 +232,7 @@ export default function CreateJobPage() {
                 { num: 4, title: 'Mention Timeline:', desc: 'Let freelancers know your project deadline.' },
               ].map((tip) => (
                 <Flex key={tip.num} align-items="flex-start" gap="m">
-                  <Div
-                    style={{
-                      width: '28px',
-                      height: '28px',
-                      borderRadius: '50%',
-                      background: '#dcfce7',
-                      color: 'white',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontWeight: 700,
-                      fontSize: '0.875rem',
-                      flexShrink: 0,
-                    } as any}
-                  >
+                  <Div>
                     {tip.num}
                   </Div>
                   <Div>

@@ -42,7 +42,7 @@ export default function Home() {
       <Div padding="xl l" max-width="1280px" margin="0 auto" width="100%">
         {/* Feature Cards */}
         <Grid columns="1; m{2}; l{4}" gap="m" margin-bottom="xl">
-          <Link href="/jobs/create" style={{ textDecoration: 'none' } as any}>
+          <Link href="/jobs/create">
             <Card padding="l" variant="secondary" height="100%">
               <Flex flex-direction="column" gap="m" height="100%">
                 <Text font="heading-m">Post a Job</Text>
@@ -58,7 +58,7 @@ export default function Home() {
             </Card>
           </Link>
 
-          <Link href="/freelancers" style={{ textDecoration: 'none' } as any}>
+          <Link href="/freelancers">
             <Card padding="l" variant="secondary" height="100%">
               <Flex flex-direction="column" gap="m" height="100%">
                 <Text font="heading-m">Browse Talent</Text>
@@ -74,7 +74,7 @@ export default function Home() {
             </Card>
           </Link>
 
-          <Link href="/jobs" style={{ textDecoration: 'none' } as any}>
+          <Link href="/jobs">
             <Card padding="l" variant="secondary" height="100%">
               <Flex flex-direction="column" gap="m" height="100%">
                 <Text font="heading-m">Find Work</Text>
@@ -90,7 +90,7 @@ export default function Home() {
             </Card>
           </Link>
 
-          <Link href="/courses" style={{ textDecoration: 'none' } as any}>
+          <Link href="/courses">
             <Card padding="l" variant="notice" height="100%">
               <Flex flex-direction="column" gap="m" height="100%">
                 <Text font="heading-m">Learn Skills</Text>

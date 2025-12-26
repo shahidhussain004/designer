@@ -72,30 +72,20 @@ function CheckoutSuccessContent() {
       justify-content="center"
       align-items="center"
       padding="l"
-      style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #dcfce7 0%, #f3f4f6 100%)',
-      } as any}
     >
       {/* Confetti Effect - simple version */}
       {showConfetti && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, pointerEvents: 'none', textAlign: 'center' } as any}>
+        <div>
           <Text font-size="heading-xl">🎉 🎊 ✨ 🎉 🎊 ✨ 🎉</Text>
         </div>
       )}
 
-      <Card padding="xl" style={{ maxWidth: '480px', width: '100%', textAlign: 'center' } as any}>
+      <Card padding="xl">
         <Flex flex-direction="column" gap="l" align-items="center">
           {/* Success Icon */}
           <Flex
             justify-content="center"
             align-items="center"
-            style={{
-              width: '96px',
-              height: '96px',
-              borderRadius: '50%',
-              backgroundColor: '#dcfce7',
-            } as any}
           >
             <Text font-size="heading-xl">{details.icon}</Text>
           </Flex>
@@ -104,13 +94,13 @@ function CheckoutSuccessContent() {
             {details.title}
           </Text>
 
-          <Text color="secondary" style={{ textAlign: 'center' } as any}>
+          <Text color="secondary">
             {details.description}
           </Text>
 
           {/* Amount Confirmation */}
           {amount > 0 && (
-            <Card padding="m" variant="secondary" style={{ width: '100%' } as any}>
+            <Card padding="m" variant="secondary">
               <Flex flex-direction="column" gap="xs" align-items="center">
                 <Text font-size="body-s" color="secondary">
                   Amount Paid
@@ -121,7 +111,7 @@ function CheckoutSuccessContent() {
           )}
 
           {/* Transaction Details */}
-          <Card padding="m" style={{ width: '100%', textAlign: 'left' } as any}>
+          <Card padding="m">
             <Flex flex-direction="column" gap="m">
               <Text font-weight="book">Transaction Details</Text>
               <Flex flex-direction="column" gap="s">
@@ -129,7 +119,7 @@ function CheckoutSuccessContent() {
                   <Text font-size="body-s" color="secondary">
                     Transaction ID
                   </Text>
-                  <Text font-size="body-s" style={{ fontFamily: 'monospace' } as any}>
+                  <Text font-size="body-s">
                     TXN-{Date.now().toString(36).toUpperCase()}
                   </Text>
                 </Flex>

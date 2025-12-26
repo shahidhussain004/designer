@@ -17,20 +17,12 @@ interface PageLayoutProps {
  */
 function LoadingSkeleton() {
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      minHeight: '100vh',
-      backgroundColor: '#f5f5f5'
-    }}>
+    <div>
       {/* Navbar skeleton */}
-      <div style={{
-        height: '64px',
-        backgroundColor: '#fff',
-        borderBottom: '1px solid #e0e0e0'
-      }} />
-      {/* Content skeleton */}
-      <div style={{ flex: 1 }} />
+      <div>
+        {/* Content skeleton */}
+      </div>
+      <div />
       {/* Footer skeleton */}
     </div>
   )

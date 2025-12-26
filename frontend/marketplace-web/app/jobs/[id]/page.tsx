@@ -137,7 +137,7 @@ export default function JobDetailsPage() {
   if (loading) {
     return (
       <PageLayout>
-        <Flex justify-content="center" align-items="center" padding="xl" style={{ minHeight: '50vh' } as any}>
+        <Flex justify-content="center" align-items="center" padding="xl">
           <Spinner />
         </Flex>
       </PageLayout>
@@ -151,7 +151,7 @@ export default function JobDetailsPage() {
           <Alert variant="negative">
             Error: {error || 'Job not found'}
           </Alert>
-          <Link href="/jobs" style={{ color: '#16a34a', textDecoration: 'none' } as any}>
+          <Link href="/jobs">
             ← Back to Jobs
           </Link>
         </Flex>
@@ -162,8 +162,8 @@ export default function JobDetailsPage() {
   return (
     <PageLayout>
       {/* Header */}
-      <Flex flex-direction="column" gap="s" padding="l" style={{ borderBottom: '1px solid #e5e7eb' } as any}>
-        <Link href="/jobs" style={{ color: '#16a34a', textDecoration: 'none' } as any}>
+      <Flex flex-direction="column" gap="s" padding="l">
+        <Link href="/jobs">
           ← Back to Jobs
         </Link>
         <Text tag="h1" font-size="heading-xl">
@@ -172,7 +172,7 @@ export default function JobDetailsPage() {
       </Flex>
 
       <Flex padding="l">
-        <Grid columns="1; m{3}" gap="l" style={{ width: '100%' } as any}>
+        <Grid columns="1; m{3}" gap="l">
           {/* Main Content */}
           <Flex flex-direction="column" gap="m" style={{ gridColumn: 'span 2' } as any}>
             {/* Job Description */}
