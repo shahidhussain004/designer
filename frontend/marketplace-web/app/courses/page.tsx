@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -25,7 +24,6 @@ import {
 import { formatCurrency } from '@/lib/payments';
 
 export default function CoursesPage() {
-  const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -185,7 +183,7 @@ export default function CoursesPage() {
                       <Text font-size="body-s">{level}</Text>
                     </label>
                   ))}
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                  <label>
                     <input
                       type="radio"
                       name="skillLevel"
@@ -233,7 +231,7 @@ export default function CoursesPage() {
           </Card>
 
           {/* Main Content */}
-          <Flex flex-direction="column" gap="m" style={{ gridColumn: 'span 3' }}>
+          <Flex flex-direction="column" gap="m">
             {/* Sort and Results Count */}
             <Flex justify-content="space-between" align-items="center">
               <Text color="secondary">
@@ -244,13 +242,6 @@ export default function CoursesPage() {
                 onChange={(e) => {
                   setSortBy(e.target.value);
                   setPage(0);
-                }}
-                style={{
-                  padding: '0.5rem',
-                  borderRadius: '4px',
-                  border: '1px solid #e5e7eb',
-                  backgroundColor: '#ffffff',
-                  color: '#111827',
                 }}
               >
                 <option value="popular">Most Popular</option>
@@ -337,23 +328,22 @@ interface CourseCardProps {
 
 function CourseCard({ course, getSkillLevelVariant }: CourseCardProps) {
   return (
-    <Link href={`/courses/${course.id}`} style={{ textDecoration: 'none' }}>
-      <Card padding="0" style={{ height: '100%', overflow: 'hidden', cursor: 'pointer' }}>
+    <Link href={`/courses/${course.id}`}>
+      <Card padding="0">
         {/* Thumbnail */}
-        <div style={{ position: 'relative', aspectRatio: '16/9', backgroundColor: '#f3f4f6' }}>
+        <div>
           {course.thumbnailUrl ? (
             <Image
               src={course.thumbnailUrl}
               alt={course.title}
               fill
-              style={{ objectFit: 'cover' }}
             />
           ) : (
-            <Flex justify-content="center" align-items="center" style={{ width: '100%', height: '100%' }}>
+            <Flex justify-content="center" align-items="center">
               <Text font-size="heading-l" color="secondary">🎬</Text>
             </Flex>
           )}
-          <div style={{ position: 'absolute', top: '8px', left: '8px' }}>
+          <div>
             <Badge variant={getSkillLevelVariant(course.skillLevel)}>
               {course.skillLevel}
             </Badge>

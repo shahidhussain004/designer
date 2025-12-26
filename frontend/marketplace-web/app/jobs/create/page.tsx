@@ -188,15 +188,6 @@ export default function CreateJobPage() {
                     min="0"
                     step="100"
                     required
-                    style={{
-                      flex: 1,
-                      padding: '0.75rem',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '4px',
-                      background: '#f3f4f6',
-                      color: '#111827',
-                      fontSize: '1rem',
-                    } as any}
                   />
                 </Flex>
               </Div>

@@ -139,7 +139,6 @@ export default function RegisterPage() {
                   padding="m"
                   variant={formData.role === 'FREELANCER' ? 'positive' : 'secondary'}
                   onClick={() => setFormData({ ...formData, role: 'FREELANCER' })}
-                  style={{ cursor: 'pointer' } as any}
                 >
                   <Flex align-items="center" gap="m">
                     <input
@@ -148,7 +147,6 @@ export default function RegisterPage() {
                       value="FREELANCER"
                       checked={formData.role === 'FREELANCER'}
                       onChange={() => setFormData({ ...formData, role: 'FREELANCER' })}
-                      style={{ width: '18px', height: '18px' } as any}
                     />
                     <Flex flex-direction="column" gap="2xs">
                       <Text font-weight="book">Work as a Freelancer</Text>
@@ -163,7 +161,6 @@ export default function RegisterPage() {
                   padding="m"
                   variant={formData.role === 'CLIENT' ? 'positive' : 'secondary'}
                   onClick={() => setFormData({ ...formData, role: 'CLIENT' })}
-                  style={{ cursor: 'pointer' } as any}
                 >
                   <Flex align-items="center" gap="m">
                     <input
@@ -172,7 +169,6 @@ export default function RegisterPage() {
                       value="CLIENT"
                       checked={formData.role === 'CLIENT'}
                       onChange={() => setFormData({ ...formData, role: 'CLIENT' })}
-                      style={{ width: '18px', height: '18px' } as any}
                     />
                     <Flex flex-direction="column" gap="2xs">
                       <Text font-weight="book">Hire as a Client</Text>

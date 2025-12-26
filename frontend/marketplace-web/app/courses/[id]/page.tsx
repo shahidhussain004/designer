@@ -121,15 +121,15 @@ export default function CourseDetailPage() {
       <Div>
         <Flex justify-content="space-between" align-items="center" padding="m">
           <Flex align-items="center" gap="xl">
-            <Link href="/" style={{ textDecoration: 'none' } as any}>
-              <Text style={{ fontSize: '1.25rem', fontWeight: 700, color: '#16a34a' } as any}>
+            <Link href="/">
+              <Text>
                 Designer Marketplace
               </Text>
             </Link>
             <Flex gap="l" className="desktop-nav">
-              <Link href="/jobs" style={{ textDecoration: 'none', color: '#6b7280' } as any}>Jobs</Link>
-              <Link href="/courses" style={{ textDecoration: 'none', color: '#16a34a', fontWeight: 500 } as any}>Courses</Link>
-              <Link href="/dashboard" style={{ textDecoration: 'none', color: '#6b7280' } as any}>Dashboard</Link>
+              <Link href="/jobs">Jobs</Link>
+              <Link href="/courses">Courses</Link>
+              <Link href="/dashboard">Dashboard</Link>
             </Flex>
           </Flex>
         </Flex>
@@ -139,61 +139,60 @@ export default function CourseDetailPage() {
       <Div>
         <Flex flex-direction="column; l{row}" gap="xl">
           {/* Course Info */}
-          <Flex flex-direction="column" gap="m" style={{ flex: 1 } as any}>
+          <Flex flex-direction="column" gap="m">
             {/* Breadcrumb */}
             <Flex align-items="center" gap="s">
-              <Link href="/courses" style={{ color: '#d1d5db', textDecoration: 'none', fontSize: '0.875rem' } as any}>
+              <Link href="/courses">
                 Courses
               </Link>
-              <Text style={{ color: '#6b7280' } as any}>/</Text>
-              <Text style={{ color: '#d1d5db', fontSize: '0.875rem' } as any}>{course.category}</Text>
+              <Text>/</Text>
+              <Text>{course.category}</Text>
             </Flex>
 
-            <Text tag="h1" style={{ fontSize: '2rem', fontWeight: 700 } as any}>{course.title}</Text>
-            <Text style={{ fontSize: '1.125rem', color: '#d1d5db' } as any}>{course.description}</Text>
+            <Text tag="h1">{course.title}</Text>
+            <Text>{course.description}</Text>
 
             {/* Stats */}
-            <Flex gap="m" align-items="center" flex-wrap="wrap" style={{ fontSize: '0.875rem' } as any}>
+            <Flex gap="m" align-items="center" flex-wrap="wrap">
               <Flex align-items="center" gap="xs">
-                <Text style={{ color: '#fbbf24' } as any}>★</Text>
-                <Text style={{ fontWeight: 600 } as any}>{course.rating.toFixed(1)}</Text>
-                <Text style={{ color: '#9ca3af' } as any}>({course.reviewsCount} reviews)</Text>
+                <Text>★</Text>
+                <Text>{course.rating.toFixed(1)}</Text>
+                <Text>({course.reviewsCount} reviews)</Text>
               </Flex>
-              <Text style={{ color: '#6b7280' } as any}>|</Text>
+              <Text>|</Text>
               <Text>{course.enrollmentsCount.toLocaleString()} students</Text>
-              <Text style={{ color: '#6b7280' } as any}>|</Text>
+              <Text>|</Text>
               <Text>{course.skillLevel}</Text>
             </Flex>
 
-            <Text style={{ fontSize: '0.875rem', color: '#d1d5db' } as any}>
-              Created by <span style={{ color: '#16a34a', fontWeight: 500 } as any}>{course.instructorName}</span>
+            <Text>
+              Created by <span>{course.instructorName}</span>
             </Text>
-            <Text style={{ fontSize: '0.875rem', color: '#9ca3af' } as any}>
+            <Text>
               Last updated: {new Date(course.updatedAt).toLocaleDateString()}
             </Text>
           </Flex>
 
           {/* Enrollment Card */}
-          <Div style={{ width: '100%', maxWidth: '384px' } as any}>
-            <Card style={{ overflow: 'hidden' } as any}>
+          <Div>
+            <Card>
               {/* Course Thumbnail */}
-              <Div style={{ aspectRatio: '16/9', background: '#f3f4f6', position: 'relative' } as any}>
+              <Div>
                 {course.thumbnailUrl ? (
                   <Image
                     src={course.thumbnailUrl}
                     alt={course.title}
                     fill
-                    style={{ objectFit: 'cover' } as any}
                   />
                 ) : (
-                  <Flex justify-content="center" align-items="center" style={{ width: '100%', height: '100%' } as any}>
-                    <Text style={{ fontSize: '3rem', color: '#9ca3af' } as any}>🎬</Text>
+                  <Flex justify-content="center" align-items="center">
+                    <Text>🎬</Text>
                   </Flex>
                 )}
               </Div>
 
               <Flex flex-direction="column" gap="m" padding="l">
-                <Text style={{ fontSize: '2rem', fontWeight: 700 } as any}>
+                <Text>
                   {course.price > 0 ? formatCurrency(course.price, course.currency) : 'Free'}
                 </Text>
 
@@ -201,31 +200,30 @@ export default function CourseDetailPage() {
                   rank="primary"
                   onClick={handleEnroll}
                   disabled={isEnrolling}
-                  style={{ width: '100%' } as any}
                 >
                   {isEnrolling ? 'Processing...' : course.price > 0 ? 'Buy Now' : 'Enroll for Free'}
                 </Button>
 
-                <Text style={{ textAlign: 'center', fontSize: '0.875rem', color: '#9ca3af' } as any}>
+                <Text>
                   30-Day Money-Back Guarantee
                 </Text>
 
-                <Flex flex-direction="column" gap="s" style={{ marginTop: '0.5rem' } as any}>
+                <Flex flex-direction="column" gap="s">
                   <Flex align-items="center" gap="m">
                     <Text>⏱️</Text>
-                    <Text style={{ fontSize: '0.875rem' } as any}>{totalHours}h {totalMinutes}m total length</Text>
+                    <Text>{totalHours}h {totalMinutes}m total length</Text>
                   </Flex>
                   <Flex align-items="center" gap="m">
                     <Text>📄</Text>
-                    <Text style={{ fontSize: '0.875rem' } as any}>{course.lessonsCount} lessons</Text>
+                    <Text>{course.lessonsCount} lessons</Text>
                   </Flex>
                   <Flex align-items="center" gap="m">
-                    <Text>🏆</Text>
-                    <Text style={{ fontSize: '0.875rem' } as any}>Certificate of completion</Text>
+                    <Text>🌟</Text>
+                    <Text>Certificate of completion</Text>
                   </Flex>
                   <Flex align-items="center" gap="m">
                     <Text>🌐</Text>
-                    <Text style={{ fontSize: '0.875rem' } as any}>Full lifetime access</Text>
+                    <Text>Full lifetime access</Text>
                   </Flex>
                 </Flex>
               </Flex>
@@ -240,12 +238,12 @@ export default function CourseDetailPage() {
         {course.learningOutcomes.length > 0 && (
           <Card>
             <Flex flex-direction="column" gap="m" padding="l">
-              <Text tag="h2" style={{ fontSize: '1.25rem', fontWeight: 700 } as any}>What You&apos;ll Learn</Text>
+              <Text tag="h2">What You&apos;ll Learn</Text>
               <Grid columns="1; m{2}" gap="m">
                 {course.learningOutcomes.map((outcome, index) => (
                   <Flex key={index} align-items="flex-start" gap="s">
-                    <Text style={{ color: '#16a34a' } as any}>✓</Text>
-                    <Text style={{ color: '#6b7280' } as any}>{outcome}</Text>
+                    <Text>✓</Text>
+                    <Text>{outcome}</Text>
                   </Flex>
                 ))}
               </Grid>
@@ -256,12 +254,12 @@ export default function CourseDetailPage() {
         {/* Requirements */}
         {course.requirements.length > 0 && (
           <Div>
-            <Text tag="h2" style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem' } as any}>Requirements</Text>
+            <Text tag="h2">Requirements</Text>
             <Flex flex-direction="column" gap="s">
               {course.requirements.map((req, index) => (
                 <Flex key={index} align-items="flex-start" gap="s">
-                  <Text style={{ color: '#9ca3af' } as any}>•</Text>
-                  <Text style={{ color: '#6b7280' } as any}>{req}</Text>
+                  <Text>•</Text>
+                  <Text>{req}</Text>
                 </Flex>
               ))}
             </Flex>
@@ -271,9 +269,9 @@ export default function CourseDetailPage() {
         {/* Course Content / Lessons */}
         <Card>
           <Flex flex-direction="column" padding="l">
-            <Flex justify-content="space-between" align-items="center" style={{ marginBottom: '1rem' } as any}>
-              <Text tag="h2" style={{ fontSize: '1.25rem', fontWeight: 700 } as any}>Course Content</Text>
-              <Text style={{ fontSize: '0.875rem', color: '#9ca3af' } as any}>
+            <Flex justify-content="space-between" align-items="center">
+              <Text tag="h2">Course Content</Text>
+              <Text>
                 {lessons.length} lessons • {totalHours}h {totalMinutes}m
               </Text>
             </Flex>
@@ -284,25 +282,13 @@ export default function CourseDetailPage() {
                   {index > 0 && <Divider />}
                   <Flex justify-content="space-between" align-items="center" padding="m">
                     <Flex align-items="center" gap="m">
-                      <Div
-                        style={{
-                          width: '32px',
-                          height: '32px',
-                          borderRadius: '50%',
-                          background: '#f3f4f6',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '0.875rem',
-                          fontWeight: 500,
-                        } as any}
-                      >
+                      <Div>
                         {index + 1}
                       </Div>
                       <Div>
-                        <Text style={{ fontWeight: 500 } as any}>{lesson.title}</Text>
-                        <Flex align-items="center" gap="s" style={{ marginTop: '0.25rem' } as any}>
-                          <Text style={{ fontSize: '0.875rem', color: '#9ca3af' } as any}>
+                        <Text>{lesson.title}</Text>
+                        <Flex align-items="center" gap="s">
+                          <Text>
                             {lesson.contentType === 'Video' && '🎬'}
                             {lesson.contentType === 'Quiz' && '❓'}
                             {lesson.contentType === 'Text' && '📄'}
@@ -326,7 +312,6 @@ export default function CourseDetailPage() {
               <Button
                 rank="tertiary"
                 onClick={() => setShowAllLessons(true)}
-                style={{ marginTop: '1rem' } as any}
               >
                 Show all {lessons.length} lessons
               </Button>
@@ -337,7 +322,7 @@ export default function CourseDetailPage() {
         {/* Tags */}
         {course.tags.length > 0 && (
           <Div>
-            <Text tag="h2" style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem' } as any}>Tags</Text>
+            <Text tag="h2">Tags</Text>
             <Flex gap="s" flex-wrap="wrap">
               {course.tags.map((tag, index) => (
                 <Badge key={index} variant="information">{tag}</Badge>

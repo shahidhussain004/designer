@@ -197,7 +197,6 @@ function CheckoutContent() {
                             padding="m"
                             variant={selectedPaymentMethod === method.id ? 'positive' : 'secondary'}
                             onClick={() => setSelectedPaymentMethod(method.id)}
-                            style={{ cursor: 'pointer' } as any}
                           >
                             <Flex align-items="center" gap="m">
                               <input
@@ -285,7 +284,7 @@ function CheckoutContent() {
                         />
                       </Grid>
 
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' } as any}>
+                      <label>
                         <input
                           type="checkbox"
                           checked={saveCard}
@@ -376,7 +375,6 @@ function CheckoutLoading() {
       align-items="center"
       flex-direction="column"
       gap="m"
-      style={{ minHeight: '100vh' } as any}
     >
       <Spinner />
       <Text color="secondary">Loading checkout...</Text>

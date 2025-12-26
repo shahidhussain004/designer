@@ -174,14 +174,14 @@ export default function JobDetailsPage() {
       <Flex padding="l">
         <Grid columns="1; m{3}" gap="l">
           {/* Main Content */}
-          <Flex flex-direction="column" gap="m" style={{ gridColumn: 'span 2' } as any}>
+          <Flex flex-direction="column" gap="m">
             {/* Job Description */}
             <Card padding="l">
               <Flex flex-direction="column" gap="m">
                 <Text tag="h2" font-size="heading-m">
                   Job Description
                 </Text>
-                <Text style={{ whiteSpace: 'pre-wrap' } as any}>
+                <Text>
                   {job.description}
                 </Text>
               </Flex>
@@ -234,7 +234,6 @@ export default function JobDetailsPage() {
                     </Flex>
                     <Link
                       href={`/users/${client.id}/profile`}
-                      style={{ color: '#16a34a', textDecoration: 'none' } as any}
                     >
                       View Profile →
                     </Link>
@@ -263,13 +262,13 @@ export default function JobDetailsPage() {
                   </Button>
                 ) : user && user.id === job.clientId ? (
                   <Card padding="m" variant="information">
-                    <Text font-size="body-s" style={{ textAlign: 'center' } as any}>
+                    <Text font-size="body-s">
                       This is your job posting
                     </Text>
                   </Card>
                 ) : (
                   <Link href="/auth/login">
-                    <Button rank="secondary" style={{ width: '100%' } as any}>
+                    <Button rank="secondary">
                       Sign In to Propose
                     </Button>
                   </Link>
@@ -324,16 +323,6 @@ export default function JobDetailsPage() {
                           })
                         }
                         rows={6}
-                        style={{
-                          padding: '0.75rem',
-                          borderRadius: '4px',
-                          border: '1px solid #e5e7eb',
-                          backgroundColor: '#ffffff',
-                          color: '#111827',
-                          fontSize: '0.875rem',
-                          width: '100%',
-                          resize: 'vertical',
-                        } as any}
                       />
                     </Flex>
 

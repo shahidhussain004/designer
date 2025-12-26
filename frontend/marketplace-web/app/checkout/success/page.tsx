@@ -150,12 +150,12 @@ function CheckoutSuccessContent() {
           <Divider />
 
           {/* Actions */}
-          <Flex flex-direction="column" gap="s" style={{ width: '100%' } as any}>
-            <Link href={details.primaryAction.href} style={{ width: '100%', textDecoration: 'none' } as any}>
-              <Button style={{ width: '100%' } as any}>{details.primaryAction.label}</Button>
+          <Flex flex-direction="column" gap="s">
+            <Link href={details.primaryAction.href}>
+              <Button>{details.primaryAction.label}</Button>
             </Link>
-            <Link href={details.secondaryAction.href} style={{ width: '100%', textDecoration: 'none' } as any}>
-              <Button rank="secondary" style={{ width: '100%' } as any}>
+            <Link href={details.secondaryAction.href}>
+              <Button rank="secondary">
                 {details.secondaryAction.label}
               </Button>
             </Link>
@@ -168,7 +168,6 @@ function CheckoutSuccessContent() {
             </Text>
             <Link
               href="/dashboard/invoices"
-              style={{ color: '#16a34a', textDecoration: 'none' } as any}
             >
               <Text font-size="body-s">View all invoices →</Text>
             </Link>
@@ -184,7 +183,6 @@ function SuccessLoading() {
     <Flex
       justify-content="center"
       align-items="center"
-      style={{ minHeight: '100vh' } as any}
     >
       <Spinner />
     </Flex>

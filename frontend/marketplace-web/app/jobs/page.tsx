@@ -181,15 +181,6 @@ function JobsPageContent() {
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  style={{
-                    padding: '0.75rem',
-                    borderRadius: '4px',
-                    border: '1px solid #e5e7eb',
-                    backgroundColor: '#ffffff',
-                    color: '#111827',
-                    fontSize: '0.875rem',
-                    width: '100%',
-                  }}
                 >
                   {categories.map((cat) => (
                     <option key={cat.value} value={cat.value}>
@@ -207,15 +198,6 @@ function JobsPageContent() {
                 <select
                   value={experienceLevel}
                   onChange={(e) => setExperienceLevel(e.target.value)}
-                  style={{
-                    padding: '0.75rem',
-                    borderRadius: '4px',
-                    border: '1px solid #e5e7eb',
-                    backgroundColor: '#ffffff',
-                    color: '#111827',
-                    fontSize: '0.875rem',
-                    width: '100%',
-                  }}
                 >
                   {experienceLevels.map((level) => (
                     <option key={level.value} value={level.value}>

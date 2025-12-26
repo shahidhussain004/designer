@@ -187,7 +187,7 @@ export default function Home() {
         <Div margin-bottom="xl">
           <Flex justify-content="space-between" align-items="center" margin-bottom="l">
             <Text tag="h2" font="heading-l">Learn New Skills</Text>
-            <Link href="/courses" style={{ textDecoration: 'none' } as any}>
+            <Link href="/courses">
               <Text font="body-regular-m" color="brand-01">
                 View all courses →
               </Text>
@@ -251,7 +251,7 @@ export default function Home() {
                 {/* Feature 1 */}
                 <Flex gap="m" align-items="flex-start">
                   <Div width="24px" height="24px" display="flex" align-items="center" justify-content="center" flex-shrink="0">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ color: 'currentColor' }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                       <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </Div>
@@ -263,7 +263,7 @@ export default function Home() {
                 {/* Feature 2 */}
                 <Flex gap="m" align-items="flex-start">
                   <Div width="24px" height="24px" display="flex" align-items="center" justify-content="center" flex-shrink="0">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ color: 'currentColor' }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                       <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </Div>
@@ -275,7 +275,7 @@ export default function Home() {
                 {/* Feature 3 */}
                 <Flex gap="m" align-items="flex-start">
                   <Div width="24px" height="24px" display="flex" align-items="center" justify-content="center" flex-shrink="0">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ color: 'currentColor' }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                       <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </Div>

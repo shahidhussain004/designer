@@ -61,7 +61,7 @@ export default function CourseEnrollmentSuccessPage() {
                 Enrollment Successful!
               </Text>
               
-              <Text style={{ textAlign: 'center', color: '#6b7280' } as any}>
+              <Text>
                 {course ? (
                   <>You&apos;re now enrolled in <strong>{course.title}</strong>. Start learning right away!</>
                 ) : (
@@ -79,19 +79,18 @@ export default function CourseEnrollmentSuccessPage() {
                           src={course.thumbnailUrl}
                           alt={course.title}
                           fill
-                          style={{ objectFit: 'cover' } as any}
                         />
                       ) : (
-                        <Flex justify-content="center" align-items="center" style={{ width: '100%', height: '100%' } as any}>
+                        <Flex justify-content="center" align-items="center">
                           <Text>🎬</Text>
                         </Flex>
                       )}
                     </Div>
-                    <Div style={{ overflow: 'hidden' } as any}>
-                      <Text style={{ fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } as any}>
+                    <Div>
+                      <Text>
                         {course.title}
                       </Text>
-                      <Text style={{ fontSize: '0.875rem', color: '#9ca3af' } as any}>
+                      <Text>
                         {course.lessonsCount} lessons
                       </Text>
                     </Div>

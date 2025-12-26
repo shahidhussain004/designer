@@ -128,8 +128,8 @@ export default function Jobs() {
               <Card key={job.id}>
                 <Flex justify-content="space-between" align-items="center" padding="m">
                   <div>
-                    <Text style={{ fontWeight: 500 } as any}>{job.title}</Text>
-                    <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>
+                    <Text>{job.title}</Text>
+                    <Text>
                       by {job.clientName} • ${job.budget} {job.budgetType}
                     </Text>
                   </div>
@@ -153,7 +153,7 @@ export default function Jobs() {
 
       {/* Filters */}
       <Flex gap="m" flex-wrap="wrap">
-        <div style={{ flex: 1, minWidth: '200px' } as any}>
+        <div>
           <Input
             label=""
             value={search}
@@ -162,14 +162,6 @@ export default function Jobs() {
         </div>
         <div>
           <select
-            style={{
-              padding: '0.5rem 1rem',
-              border: '1px solid var(--gds-color-l3-border-primary)',
-              borderRadius: '4px',
-              background: 'var(--gds-color-l3-background-secondary)',
-              color: 'var(--gds-color-l3-content-primary)',
-              minHeight: '42px',
-            } as any}
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
@@ -277,23 +269,12 @@ export default function Jobs() {
 
       {/* Job Detail Modal */}
       {selectedJob && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 50,
-            padding: '1rem',
-          } as any}
-        >
-          <Card style={{ maxWidth: '600px', width: '100%', maxHeight: '80vh', overflow: 'auto' } as any}>
+        <div>
+          <Card>
             <Flex flex-direction="column" gap="l" padding="l">
               {/* Modal Header */}
               <div>
-                <Text tag="h2" style={{ fontSize: '1.25rem', fontWeight: 600 } as any}>
+                <Text tag="h2">
                   {selectedJob.title}
                 </Text>
               </div>
@@ -302,26 +283,26 @@ export default function Jobs() {
 
               {/* Modal Content */}
               <div>
-                <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Description</Text>
-                <Text style={{ marginTop: '0.25rem' } as any}>{selectedJob.description}</Text>
+                <Text>Description</Text>
+                <Text>{selectedJob.description}</Text>
               </div>
 
               <Grid columns="1; m{2}" gap="m">
                 <div>
-                  <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Client</Text>
-                  <Text style={{ marginTop: '0.25rem' } as any}>{selectedJob.clientName}</Text>
+                  <Text>Client</Text>
+                  <Text>{selectedJob.clientName}</Text>
                 </div>
                 <div>
-                  <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Category</Text>
-                  <Text style={{ marginTop: '0.25rem' } as any}>{selectedJob.category}</Text>
+                  <Text>Category</Text>
+                  <Text>{selectedJob.category}</Text>
                 </div>
                 <div>
-                  <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Budget</Text>
-                  <Text style={{ marginTop: '0.25rem' } as any}>${selectedJob.budget} {selectedJob.budgetType}</Text>
+                  <Text>Budget</Text>
+                  <Text>${selectedJob.budget} {selectedJob.budgetType}</Text>
                 </div>
                 <div>
-                  <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Status</Text>
-                  <Badge variant={getStatusBadgeVariant(selectedJob.status)} style={{ marginTop: '0.25rem' } as any}>
+                  <Text>Status</Text>
+                  <Badge variant={getStatusBadgeVariant(selectedJob.status)}>
                     {selectedJob.status}
                   </Badge>
                 </div>
@@ -329,19 +310,10 @@ export default function Jobs() {
 
               {selectedJob.status === 'DRAFT' && (
                 <div>
-                  <Text style={{ fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' } as any}>
+                  <Text>
                     Rejection Reason (if rejecting)
                   </Text>
                   <textarea
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem',
-                      border: '1px solid var(--gds-color-l3-border-primary)',
-                      borderRadius: '4px',
-                      minHeight: '80px',
-                      background: 'var(--gds-color-l3-background-secondary)',
-                      color: 'var(--gds-color-l3-content-primary)',
-                    } as any}
                     value={rejectReason}
                     onChange={(e) => setRejectReason(e.target.value)}
                   />
@@ -371,14 +343,12 @@ export default function Jobs() {
                           reason: rejectReason,
                         })
                       }
-                      style={{ background: 'var(--gds-color-l3-background-negative)', color: 'white' } as any}
                     >
                       Reject
                     </Button>
                     <Button
                       rank="primary"
                       onClick={() => approveMutation.mutate(selectedJob.id)}
-                      style={{ background: 'var(--gds-color-l3-background-positive)' } as any}
                     >
                       Approve
                     </Button>
