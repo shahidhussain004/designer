@@ -1,1 +1,1 @@
-test jira automation with adding new ticket feature/KAN-57
+test jira automation with adding new ticket feature/KAN-57..
