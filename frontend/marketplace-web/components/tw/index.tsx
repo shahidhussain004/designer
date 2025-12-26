@@ -639,10 +639,9 @@ interface LinkComponentProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
 export const LinkComponent = forwardRef<HTMLAnchorElement, LinkComponentProps>(({
   className,
   children,
+  'text-decoration': textDecoration,
   ...props
 }, ref) => {
-  const textDecoration = props['text-decoration']
-  
   return (
     <a
       ref={ref}

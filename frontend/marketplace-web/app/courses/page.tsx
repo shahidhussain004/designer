@@ -106,7 +106,7 @@ export default function CoursesPage() {
         padding="xl"
         style={{
           background: 'linear-gradient(135deg, var(--gds-color-l3-background-positive) 0%, var(--gds-color-l3-background-primary) 100%)',
-        } as any}
+        }}
       >
         <GdsText tag="h1" font-size="heading-xl">
           Learn New Skills
@@ -117,7 +117,7 @@ export default function CoursesPage() {
 
         {/* Search Bar */}
         <form onSubmit={handleSearch}>
-          <GdsFlex gap="m" align-items="flex-end" style={{ maxWidth: '600px' } as any}>
+          <GdsFlex gap="m" align-items="flex-end" style={{ maxWidth: '600px' }}>
             <GdsFlex flex="1">
               <GdsInput
                 label="Search Courses"
@@ -131,7 +131,7 @@ export default function CoursesPage() {
       </GdsFlex>
 
       <GdsFlex padding="l">
-        <GdsGrid columns="1; m{4}" gap="l" style={{ width: '100%' } as any}>
+        <GdsGrid columns="1; m{4}" gap="l" style={{ width: '100%' }}>
           {/* Filters Sidebar */}
           <GdsCard padding="l">
             <GdsFlex flex-direction="column" gap="m">
@@ -165,7 +165,7 @@ export default function CoursesPage() {
                     color: 'var(--gds-color-l3-content-primary)',
                     fontSize: '0.875rem',
                     width: '100%',
-                  } as any}
+                  }}
                 >
                   <option value="">All Categories</option>
                   {COURSE_CATEGORIES.map((cat) => (
@@ -183,7 +183,7 @@ export default function CoursesPage() {
                 </GdsText>
                 <GdsFlex flex-direction="column" gap="xs">
                   {SKILL_LEVELS.map((level) => (
-                    <label key={level} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' } as any}>
+                    <label key={level} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                       <input
                         type="radio"
                         name="skillLevel"
@@ -197,7 +197,7 @@ export default function CoursesPage() {
                       <GdsText font-size="body-s">{level}</GdsText>
                     </label>
                   ))}
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' } as any}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                     <input
                       type="radio"
                       name="skillLevel"
@@ -245,7 +245,7 @@ export default function CoursesPage() {
           </GdsCard>
 
           {/* Main Content */}
-          <GdsFlex flex-direction="column" gap="m" style={{ gridColumn: 'span 3' } as any}>
+          <GdsFlex flex-direction="column" gap="m" style={{ gridColumn: 'span 3' }}>
             {/* Sort and Results Count */}
             <GdsFlex justify-content="space-between" align-items="center">
               <GdsText color="secondary">
@@ -263,7 +263,7 @@ export default function CoursesPage() {
                   border: '1px solid var(--gds-color-l3-border-primary)',
                   backgroundColor: 'var(--gds-color-l3-background-primary)',
                   color: 'var(--gds-color-l3-content-primary)',
-                } as any}
+                }}
               >
                 <option value="popular">Most Popular</option>
                 <option value="newest">Newest</option>
@@ -349,23 +349,23 @@ interface CourseCardProps {
 
 function CourseCard({ course, getSkillLevelVariant }: CourseCardProps) {
   return (
-    <Link href={`/courses/${course.id}`} style={{ textDecoration: 'none' } as any}>
-      <GdsCard padding="0" style={{ height: '100%', overflow: 'hidden', cursor: 'pointer' } as any}>
+    <Link href={`/courses/${course.id}`} style={{ textDecoration: 'none' }}>
+      <GdsCard padding="0" style={{ height: '100%', overflow: 'hidden', cursor: 'pointer' }}>
         {/* Thumbnail */}
-        <div style={{ position: 'relative', aspectRatio: '16/9', backgroundColor: 'var(--gds-color-l3-background-secondary)' } as any}>
+        <div style={{ position: 'relative', aspectRatio: '16/9', backgroundColor: 'var(--gds-color-l3-background-secondary)' }}>
           {course.thumbnailUrl ? (
             <Image
               src={course.thumbnailUrl}
               alt={course.title}
               fill
-              style={{ objectFit: 'cover' } as any}
+              style={{ objectFit: 'cover' }}
             />
           ) : (
-            <GdsFlex justify-content="center" align-items="center" style={{ width: '100%', height: '100%' } as any}>
+            <GdsFlex justify-content="center" align-items="center" style={{ width: '100%', height: '100%' }}>
               <GdsText font-size="heading-l" color="secondary">🎬</GdsText>
             </GdsFlex>
           )}
-          <div style={{ position: 'absolute', top: '8px', left: '8px' } as any}>
+          <div style={{ position: 'absolute', top: '8px', left: '8px' }}>
             <GdsBadge variant={getSkillLevelVariant(course.skillLevel)}>
               {course.skillLevel}
             </GdsBadge>

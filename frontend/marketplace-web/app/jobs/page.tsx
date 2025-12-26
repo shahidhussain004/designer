@@ -189,7 +189,7 @@ function JobsPageContent() {
                     color: 'var(--gds-color-l3-content-primary)',
                     fontSize: '0.875rem',
                     width: '100%',
-                  } as any}
+                  }}
                 >
                   {categories.map((cat) => (
                     <option key={cat.value} value={cat.value}>
@@ -215,7 +215,7 @@ function JobsPageContent() {
                     color: 'var(--gds-color-l3-content-primary)',
                     fontSize: '0.875rem',
                     width: '100%',
-                  } as any}
+                  }}
                 >
                   {experienceLevels.map((level) => (
                     <option key={level.value} value={level.value}>
@@ -261,7 +261,7 @@ function JobsPageContent() {
           </GdsCard>
 
           {/* Jobs List */}
-          <GdsFlex flex-direction="column" gap="m" style={{ gridColumn: 'span 3' } as any}>
+          <GdsFlex flex-direction="column" gap="m" style={{ gridColumn: 'span 3' }}>
             {loading ? (
               <GdsFlex justify-content="center" padding="xl">
                 <GdsSpinner />
