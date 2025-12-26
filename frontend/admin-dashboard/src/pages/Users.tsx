@@ -3,16 +3,15 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { usersApi } from '../lib/api'
 import toast from 'react-hot-toast'
 import {
-  GdsCard,
-  GdsFlex,
-  GdsGrid,
-  GdsText,
-  GdsButton,
-  GdsInput,
-  GdsDiv,
-  GdsDivider,
-  GdsBadge,
-  GdsSpinner,
+  Card,
+  Flex,
+  Grid,
+  Text,
+  Button,
+  Input,
+  Divider,
+  Badge,
+  Spinner,
 } from '../components/green'
 
 interface User {
@@ -80,38 +79,30 @@ export default function Users() {
   }
 
   return (
-    <GdsFlex flex-direction="column" gap="l">
+    <Flex flex-direction="column" gap="l">
       {/* Header */}
-      <GdsFlex justify-content="space-between" align-items="center">
-        <GdsDiv>
-          <GdsText tag="h1" style={{ fontSize: '1.5rem', fontWeight: 700 } as any}>
+      <Flex justify-content="space-between" align-items="center">
+        <div>
+          <Text tag="h1">
             Users
-          </GdsText>
-          <GdsText style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>
+          </Text>
+          <Text>
             Manage platform users
-          </GdsText>
-        </GdsDiv>
-      </GdsFlex>
+          </Text>
+        </div>
+      </Flex>
 
       {/* Filters */}
-      <GdsFlex gap="m" flex-wrap="wrap">
-        <GdsDiv style={{ flex: 1, minWidth: '200px' } as any}>
-          <GdsInput
+      <Flex gap="m" flex-wrap="wrap">
+        <div>
+          <Input
             label=""
             value={search}
             onInput={(e: React.FormEvent<HTMLInputElement>) => setSearch((e.target as HTMLInputElement).value)}
           />
-        </GdsDiv>
-        <GdsDiv>
+        </div>
+        <div>
           <select
-            style={{
-              padding: '0.5rem 1rem',
-              border: '1px solid var(--gds-color-l3-border-primary)',
-              borderRadius: '4px',
-              background: 'var(--gds-color-l3-background-secondary)',
-              color: 'var(--gds-color-l3-content-primary)',
-              minHeight: '42px',
-            } as any}
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
           >
@@ -120,82 +111,70 @@ export default function Users() {
             <option value="FREELANCER">Freelancers</option>
             <option value="ADMIN">Admins</option>
           </select>
-        </GdsDiv>
-      </GdsFlex>
+        </div>
+      </Flex>
 
       {/* Users Table */}
-      <GdsCard>
+      <Card>
         {isLoading ? (
-          <GdsFlex justify-content="center" align-items="center" padding="3xl">
-            <GdsSpinner />
-          </GdsFlex>
+          <Flex justify-content="center" align-items="center" padding="3xl">
+            <Spinner />
+          </Flex>
         ) : (
           <>
             {/* Table Header */}
-            <GdsGrid columns="2fr 1fr 1fr 1fr 1fr 1fr" gap="m" padding="m" style={{ background: 'var(--gds-color-l3-background-secondary)', borderRadius: '8px 8px 0 0' } as any}>
-              <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>User</GdsText>
-              <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Role</GdsText>
-              <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Status</GdsText>
-              <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Rating</GdsText>
-              <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Joined</GdsText>
-              <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)', textAlign: 'right' } as any}>Actions</GdsText>
-            </GdsGrid>
+            <Grid columns="2fr 1fr 1fr 1fr 1fr 1fr" gap="m" padding="m">
+              <Text>User</Text>
+              <Text>Role</Text>
+              <Text>Status</Text>
+              <Text>Rating</Text>
+              <Text>Joined</Text>
+              <Text>Actions</Text>
+            </Grid>
 
             {/* Table Body */}
             {filteredUsers.map((user: User) => (
-              <GdsDiv key={user.id}>
-                <GdsDivider />
-                <GdsGrid columns="2fr 1fr 1fr 1fr 1fr 1fr" gap="m" padding="m" align-items="center" style={{ cursor: 'pointer' } as any}>
+              <div key={user.id}>
+                <Divider />
+                <Grid columns="2fr 1fr 1fr 1fr 1fr 1fr" gap="m" padding="m" align-items="center">
                   {/* User Info */}
-                  <GdsFlex gap="m" align-items="center">
-                    <GdsDiv
-                      style={{
-                        width: '40px',
-                        height: '40px',
-                        borderRadius: '50%',
-                        background: 'var(--gds-color-l3-background-positive)',
-                        color: 'var(--gds-color-l3-content-positive)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontWeight: 600,
-                      } as any}
-                    >
+                  <Flex gap="m" align-items="center">
+                    <div>
                       {user.fullName?.charAt(0) || 'U'}
-                    </GdsDiv>
-                    <GdsDiv>
-                      <GdsText style={{ fontWeight: 500 } as any}>{user.fullName}</GdsText>
-                      <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>
+                    </div>
+                    <div>
+                      <Text>{user.fullName}</Text>
+                      <Text>
                         {user.email}
-                      </GdsText>
-                    </GdsDiv>
-                  </GdsFlex>
+                      </Text>
+                    </div>
+                  </Flex>
 
                   {/* Role */}
-                  <GdsDiv>
-                    <GdsBadge variant={getRoleBadgeVariant(user.role)}>{user.role}</GdsBadge>
-                  </GdsDiv>
+                  <div>
+                    <Badge variant={getRoleBadgeVariant(user.role)}>{user.role}</Badge>
+                  </div>
 
                   {/* Status */}
-                  <GdsDiv>
-                    <GdsBadge variant={user.isActive ? 'success' : 'danger'}>
+                  <div>
+                    <Badge variant={user.isActive ? 'success' : 'danger'}>
                       {user.isActive ? '✓ Active' : '✗ Inactive'}
-                    </GdsBadge>
-                  </GdsDiv>
+                    </Badge>
+                  </div>
 
                   {/* Rating */}
-                  <GdsText style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>
+                  <Text>
                     {user.ratingAvg?.toFixed(1) || 'N/A'}
-                  </GdsText>
+                  </Text>
 
                   {/* Joined */}
-                  <GdsText style={{ color: 'var(--gds-color-l3-content-tertiary)', fontSize: '0.875rem' } as any}>
+                  <Text>
                     {new Date(user.createdAt).toLocaleDateString()}
-                  </GdsText>
+                  </Text>
 
                   {/* Actions */}
-                  <GdsFlex gap="s" justify-content="flex-end">
-                    <GdsButton
+                  <Flex gap="s" justify-content="flex-end">
+                    <Button
                       size="small"
                       rank="secondary"
                       onClick={() =>
@@ -206,8 +185,8 @@ export default function Users() {
                       }
                     >
                       {user.isActive ? 'Suspend' : 'Activate'}
-                    </GdsButton>
-                    <GdsButton
+                    </Button>
+                    <Button
                       size="small"
                       rank="secondary"
                       onClick={() => {
@@ -215,55 +194,43 @@ export default function Users() {
                           deleteMutation.mutate(user.id)
                         }
                       }}
-                      style={{ color: 'var(--gds-color-l3-content-negative)' } as any}
                     >
                       Delete
-                    </GdsButton>
-                  </GdsFlex>
-                </GdsGrid>
-              </GdsDiv>
+                    </Button>
+                  </Flex>
+                </Grid>
+              </div>
             ))}
 
             {/* Pagination */}
-            <GdsDivider />
-            <GdsFlex justify-content="space-between" align-items="center" padding="m">
-              <GdsText style={{ color: 'var(--gds-color-l3-content-tertiary)', fontSize: '0.875rem' } as any}>
+            <Divider />
+            <Flex justify-content="space-between" align-items="center" padding="m">
+              <Text>
                 Showing page {page + 1} of {data?.totalPages || 1}
-              </GdsText>
-              <GdsFlex gap="s">
-                <GdsButton
+              </Text>
+              <Flex gap="s">
+                <Button
                   rank="secondary"
                   size="small"
                   onClick={() => setPage(Math.max(0, page - 1))}
                   disabled={page === 0}
                 >
                   Previous
-                </GdsButton>
-                <GdsButton
+                </Button>
+                <Button
                   rank="secondary"
                   size="small"
                   onClick={() => setPage(page + 1)}
                   disabled={!data?.hasNext}
                 >
                   Next
-                </GdsButton>
-              </GdsFlex>
-            </GdsFlex>
+                </Button>
+              </Flex>
+            </Flex>
           </>
         )}
-      </GdsCard>
-
-      {/* Responsive Table Styles */}
-      <style>{`
-        @media (max-width: 768px) {
-          gds-grid[columns="2fr 1fr 1fr 1fr 1fr 1fr"] {
-            display: flex !important;
-            flex-direction: column;
-            gap: 0.5rem;
-          }
-        }
-      `}</style>
-    </GdsFlex>
+      </Card>
+    </Flex>
   )
 }
 

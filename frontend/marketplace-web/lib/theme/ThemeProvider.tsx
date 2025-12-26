@@ -1,10 +1,10 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { GdsTheme } from '@/components/green'
+import { Theme as ThemeWrapper } from '@/components/green'
 import { ThemeContext, type Theme } from './themeContext'
 
-const STORAGE_KEY = 'gds-theme'
+const STORAGE_KEY = 'app-theme'
 
 function getInitialTheme(): Theme {
   if (typeof window === 'undefined') return 'light'
@@ -46,9 +46,9 @@ export const ThemeProvider: React.FC<React.PropsWithChildren> = ({ children }) =
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, setTheme: setThemeDirect }}>
-      <GdsTheme color-scheme={theme === 'dark' ? 'dark' : 'light'} design-version="2023">
+      <ThemeWrapper color-scheme={theme === 'dark' ? 'dark' : 'light'}>
         {children}
-      </GdsTheme>
+      </ThemeWrapper>
     </ThemeContext.Provider>
   )
 }

@@ -4,12 +4,12 @@ import React, { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
-  GdsFlex,
-  GdsCard,
-  GdsText,
-  GdsButton,
-  GdsSpinner,
-  GdsDivider,
+  Flex,
+  Card,
+  Text,
+  Button,
+  Spinner,
+  Divider,
 } from '@/components/green';
 import { formatCurrency } from '@/lib/payments';
 
@@ -68,136 +68,124 @@ function CheckoutSuccessContent() {
   const details = getTypeDetails();
 
   return (
-    <GdsFlex
+    <Flex
       justify-content="center"
       align-items="center"
       padding="l"
-      style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, var(--gds-color-l3-background-positive) 0%, var(--gds-color-l3-background-secondary) 100%)',
-      } as any}
     >
       {/* Confetti Effect - simple version */}
       {showConfetti && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, pointerEvents: 'none', textAlign: 'center' } as any}>
-          <GdsText font-size="heading-xl">🎉 🎊 ✨ 🎉 🎊 ✨ 🎉</GdsText>
+        <div>
+          <Text font-size="heading-xl">🎉 🎊 ✨ 🎉 🎊 ✨ 🎉</Text>
         </div>
       )}
 
-      <GdsCard padding="xl" style={{ maxWidth: '480px', width: '100%', textAlign: 'center' } as any}>
-        <GdsFlex flex-direction="column" gap="l" align-items="center">
+      <Card padding="xl">
+        <Flex flex-direction="column" gap="l" align-items="center">
           {/* Success Icon */}
-          <GdsFlex
+          <Flex
             justify-content="center"
             align-items="center"
-            style={{
-              width: '96px',
-              height: '96px',
-              borderRadius: '50%',
-              backgroundColor: 'var(--gds-color-l3-background-positive)',
-            } as any}
           >
-            <GdsText font-size="heading-xl">{details.icon}</GdsText>
-          </GdsFlex>
+            <Text font-size="heading-xl">{details.icon}</Text>
+          </Flex>
 
-          <GdsText tag="h1" font-size="heading-l">
+          <Text tag="h1" font-size="heading-l">
             {details.title}
-          </GdsText>
+          </Text>
 
-          <GdsText color="secondary" style={{ textAlign: 'center' } as any}>
+          <Text color="secondary">
             {details.description}
-          </GdsText>
+          </Text>
 
           {/* Amount Confirmation */}
           {amount > 0 && (
-            <GdsCard padding="m" variant="secondary" style={{ width: '100%' } as any}>
-              <GdsFlex flex-direction="column" gap="xs" align-items="center">
-                <GdsText font-size="body-s" color="secondary">
+            <Card padding="m" variant="secondary">
+              <Flex flex-direction="column" gap="xs" align-items="center">
+                <Text font-size="body-s" color="secondary">
                   Amount Paid
-                </GdsText>
-                <GdsText font-size="heading-xl">{formatCurrency(amount)}</GdsText>
-              </GdsFlex>
-            </GdsCard>
+                </Text>
+                <Text font-size="heading-xl">{formatCurrency(amount)}</Text>
+              </Flex>
+            </Card>
           )}
 
           {/* Transaction Details */}
-          <GdsCard padding="m" style={{ width: '100%', textAlign: 'left' } as any}>
-            <GdsFlex flex-direction="column" gap="m">
-              <GdsText font-weight="book">Transaction Details</GdsText>
-              <GdsFlex flex-direction="column" gap="s">
-                <GdsFlex justify-content="space-between">
-                  <GdsText font-size="body-s" color="secondary">
+          <Card padding="m">
+            <Flex flex-direction="column" gap="m">
+              <Text font-weight="book">Transaction Details</Text>
+              <Flex flex-direction="column" gap="s">
+                <Flex justify-content="space-between">
+                  <Text font-size="body-s" color="secondary">
                     Transaction ID
-                  </GdsText>
-                  <GdsText font-size="body-s" style={{ fontFamily: 'monospace' } as any}>
+                  </Text>
+                  <Text font-size="body-s">
                     TXN-{Date.now().toString(36).toUpperCase()}
-                  </GdsText>
-                </GdsFlex>
-                <GdsFlex justify-content="space-between">
-                  <GdsText font-size="body-s" color="secondary">
+                  </Text>
+                </Flex>
+                <Flex justify-content="space-between">
+                  <Text font-size="body-s" color="secondary">
                     Date
-                  </GdsText>
-                  <GdsText font-size="body-s">{new Date().toLocaleDateString()}</GdsText>
-                </GdsFlex>
-                <GdsFlex justify-content="space-between">
-                  <GdsText font-size="body-s" color="secondary">
+                  </Text>
+                  <Text font-size="body-s">{new Date().toLocaleDateString()}</Text>
+                </Flex>
+                <Flex justify-content="space-between">
+                  <Text font-size="body-s" color="secondary">
                     Payment Method
-                  </GdsText>
-                  <GdsText font-size="body-s">•••• 4242</GdsText>
-                </GdsFlex>
-                <GdsFlex justify-content="space-between">
-                  <GdsText font-size="body-s" color="secondary">
+                  </Text>
+                  <Text font-size="body-s">•••• 4242</Text>
+                </Flex>
+                <Flex justify-content="space-between">
+                  <Text font-size="body-s" color="secondary">
                     Status
-                  </GdsText>
-                  <GdsText font-size="body-s" color="positive">
+                  </Text>
+                  <Text font-size="body-s" color="positive">
                     Completed
-                  </GdsText>
-                </GdsFlex>
-              </GdsFlex>
-            </GdsFlex>
-          </GdsCard>
+                  </Text>
+                </Flex>
+              </Flex>
+            </Flex>
+          </Card>
 
-          <GdsDivider />
+          <Divider />
 
           {/* Actions */}
-          <GdsFlex flex-direction="column" gap="s" style={{ width: '100%' } as any}>
-            <Link href={details.primaryAction.href} style={{ width: '100%', textDecoration: 'none' } as any}>
-              <GdsButton style={{ width: '100%' } as any}>{details.primaryAction.label}</GdsButton>
+          <Flex flex-direction="column" gap="s">
+            <Link href={details.primaryAction.href}>
+              <Button>{details.primaryAction.label}</Button>
             </Link>
-            <Link href={details.secondaryAction.href} style={{ width: '100%', textDecoration: 'none' } as any}>
-              <GdsButton rank="secondary" style={{ width: '100%' } as any}>
+            <Link href={details.secondaryAction.href}>
+              <Button rank="secondary">
                 {details.secondaryAction.label}
-              </GdsButton>
+              </Button>
             </Link>
-          </GdsFlex>
+          </Flex>
 
           {/* Receipt Link */}
-          <GdsFlex flex-direction="column" gap="xs" align-items="center">
-            <GdsText font-size="body-s" color="secondary">
+          <Flex flex-direction="column" gap="xs" align-items="center">
+            <Text font-size="body-s" color="secondary">
               A receipt has been sent to your email address.
-            </GdsText>
+            </Text>
             <Link
               href="/dashboard/invoices"
-              style={{ color: 'var(--gds-color-l3-content-positive)', textDecoration: 'none' } as any}
             >
-              <GdsText font-size="body-s">View all invoices →</GdsText>
+              <Text font-size="body-s">View all invoices →</Text>
             </Link>
-          </GdsFlex>
-        </GdsFlex>
-      </GdsCard>
-    </GdsFlex>
+          </Flex>
+        </Flex>
+      </Card>
+    </Flex>
   );
 }
 
 function SuccessLoading() {
   return (
-    <GdsFlex
+    <Flex
       justify-content="center"
       align-items="center"
-      style={{ minHeight: '100vh' } as any}
     >
-      <GdsSpinner />
-    </GdsFlex>
+      <Spinner />
+    </Flex>
   );
 }
 

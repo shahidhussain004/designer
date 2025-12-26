@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { GdsFlex, GdsText, GdsButton, GdsDiv } from '@/components/green'
+import { Flex, Text, Button, Div } from '@/components/green'
 import { useTheme } from '@/lib/theme'
 
 interface NavItem {
@@ -21,8 +21,8 @@ export default function Navbar() {
   const { theme, toggleTheme } = useTheme()
 
   return (
-    <GdsDiv background="neutral-02" border-width="0 0 4xs 0" border-color="subtle-01">
-      <GdsFlex 
+    <Div background="neutral-02" border-width="0 0 4xs 0" border-color="subtle-01">
+      <Flex 
         justify-content="space-between" 
         align-items="center"
         padding="m l"
@@ -31,33 +31,31 @@ export default function Navbar() {
         width="100%"
       >
         {/* Logo and navigation */}
-        <GdsFlex align-items="center" gap="xl">
-          <Link href="/" style={{ textDecoration: 'none' }}>
-            <GdsText font="heading-m" color="brand-01">
+        <Flex align-items="center" gap="xl">
+          <Link href="/">
+            <Text font="heading-m" color="brand-01">
               Designer Marketplace
-            </GdsText>
+            </Text>
           </Link>
-          <GdsFlex gap="m" display="s{none} m{flex}">
+          <Flex gap="m" display="s{none} m{flex}">
             {navItems.map((item) => (
               <Link 
                 key={item.href} 
-                href={item.href}
-                style={{ textDecoration: 'none' }}
-              >
-                <GdsText 
+                href={item.href}>
+                <Text 
                   font="body-regular-m"
                   color={pathname === item.href ? 'brand-01' : 'neutral-01'}
                 >
                   {item.label}
-                </GdsText>
+                </Text>
               </Link>
             ))}
-          </GdsFlex>
-        </GdsFlex>
+          </Flex>
+        </Flex>
 
         {/* Auth buttons */}
-        <GdsFlex align-items="center" gap="s">
-          <GdsButton
+        <Flex align-items="center" gap="s">
+          <Button
             rank="tertiary"
             variant="neutral"
             size="small"
@@ -65,19 +63,19 @@ export default function Navbar() {
             aria-label="Toggle theme"
           >
             {theme === 'dark' ? '☀️' : '🌙'}
-          </GdsButton>
+          </Button>
           <Link href="/auth/login">
-            <GdsButton rank="tertiary" variant="neutral" size="small">
+            <Button rank="tertiary" variant="neutral" size="small">
               Login
-            </GdsButton>
+            </Button>
           </Link>
           <Link href="/auth/register">
-            <GdsButton rank="primary" size="small">
+            <Button rank="primary" size="small">
               Sign Up
-            </GdsButton>
+            </Button>
           </Link>
-        </GdsFlex>
-      </GdsFlex>
-    </GdsDiv>
+        </Flex>
+      </Flex>
+    </Div>
   )
 }

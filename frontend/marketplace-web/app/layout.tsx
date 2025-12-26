@@ -37,7 +37,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
-      <body suppressHydrationWarning style={{ fontFamily: "'SEB Sans Serif', system-ui, -apple-system, sans-serif", margin: 0 } as any}>
+      <body suppressHydrationWarning>
         {/* Skip Link for keyboard accessibility - WCAG 2.4.1 */}
         <SkipLink targetId="main-content" />
         

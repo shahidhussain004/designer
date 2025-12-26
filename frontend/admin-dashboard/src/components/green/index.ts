@@ -1,14 +1,14 @@
-// Re-export all Tailwind CSS components that replace green-core
+// UI Components
 export {
-  GdsCard,
-  GdsGrid,
-  GdsFlex,
-  GdsText,
-  GdsButton,
-  GdsInput,
-  GdsDiv,
-  GdsDivider,
-  GdsTheme,
-  GdsBadge,
-  GdsSpinner,
+  Card,
+  Grid,
+  Flex,
+  Text,
+  Button,
+  Input,
+  Div,
+  Divider,
+  Theme,
+  Badge,
+  Spinner,
 } from '../tw';

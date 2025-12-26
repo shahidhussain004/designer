@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, ReactNode } from 'react';
-import { GdsTheme } from './green';
+import { Theme as ThemeWrapper } from './green';
 
 type Theme = 'light' | 'dark';
 
@@ -45,7 +45,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <GdsTheme color-scheme={theme}>{children}</GdsTheme>
+      <ThemeWrapper color-scheme={theme}>{children}</ThemeWrapper>
     </ThemeContext.Provider>
   );
 }

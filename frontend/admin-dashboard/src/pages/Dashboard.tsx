@@ -3,12 +3,12 @@ import { useQuery } from '@tanstack/react-query'
 import { adminApi } from '../lib/api'
 import { Link } from 'react-router-dom'
 import {
-  GdsGrid,
-  GdsFlex,
-  GdsCard,
-  GdsText,
-  GdsBadge,
-  GdsSpinner,
+  Grid,
+  Flex,
+  Card,
+  Text,
+  Badge,
+  Spinner,
 } from '../components/green'
 import {
   UsersIcon,
@@ -80,142 +80,125 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <GdsFlex justify-content="center" align-items="center" style={{ height: '256px' } as any}>
-        <GdsSpinner />
-      </GdsFlex>
+      <Flex justify-content="center" align-items="center">
+        <Spinner />
+      </Flex>
     )
   }
 
   return (
-    <GdsFlex flex-direction="column" gap="l">
+    <Flex flex-direction="column" gap="l">
       {/* Header */}
-      <GdsFlex flex-direction="column" gap="xs">
-        <GdsText tag="h1" font-size="heading-l">
+      <Flex flex-direction="column" gap="xs">
+        <Text tag="h1" font-size="heading-l">
           Dashboard
-        </GdsText>
-        <GdsText color="secondary">
+        </Text>
+        <Text color="secondary">
           Welcome back! Here&apos;s what&apos;s happening.
-        </GdsText>
-      </GdsFlex>
+        </Text>
+      </Flex>
 
       {/* Stats Grid */}
-      <GdsGrid columns="1; s{2}; l{4}" gap="m">
+      <Grid columns="1; s{2}; l{4}" gap="m">
         {statCards.map((stat) => (
-          <GdsCard key={stat.name} padding="l">
-            <GdsFlex flex-direction="column" gap="m">
-              <GdsFlex align-items="center" gap="m">
-                <GdsFlex
-                  justify-content="center"
-                  align-items="center"
-                  style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '8px',
-                    backgroundColor: 'var(--gds-color-l3-background-positive)',
-                  } as any}
-                >
-                  <stat.icon style={{ width: '24px', height: '24px', color: 'var(--gds-color-l3-content-positive)' }} />
-                </GdsFlex>
-                <GdsFlex flex-direction="column" gap="2xs">
-                  <GdsText font-size="body-s" color="secondary">
+          <Card key={stat.name} padding="l">
+            <Flex flex-direction="column" gap="m">
+              <Flex align-items="center" gap="m">
+                <Flex justify-content="center" align-items="center">
+                  <stat.icon width={24} height={24} />
+                </Flex>
+                <Flex flex-direction="column" gap="2xs">
+                  <Text font-size="body-s" color="secondary">
                     {stat.name}
-                  </GdsText>
-                  <GdsText font-size="heading-m" font-weight="book">
+                  </Text>
+                  <Text font-size="heading-m" font-weight="book">
                     {stat.value}
-                  </GdsText>
-                </GdsFlex>
-              </GdsFlex>
-              <GdsBadge variant={getVariant(stat.changeType)}>
+                  </Text>
+                </Flex>
+              </Flex>
+              <Badge variant={getVariant(stat.changeType)}>
                 {stat.change}
-              </GdsBadge>
-            </GdsFlex>
-          </GdsCard>
+              </Badge>
+            </Flex>
+          </Card>
         ))}
-      </GdsGrid>
+      </Grid>
 
       {/* Bottom Section */}
-      <GdsGrid columns="1; l{2}" gap="l">
+      <Grid columns="1; l{2}" gap="l">
         {/* Recent Activity */}
-        <GdsCard padding="0">
-          <GdsFlex flex-direction="column">
-            <GdsFlex padding="m" style={{ borderBottom: '1px solid var(--gds-color-l3-border-primary)' } as any}>
-              <GdsText font-size="heading-s">Recent Activity</GdsText>
-            </GdsFlex>
-            <GdsFlex flex-direction="column">
+        <Card padding="0">
+          <Flex flex-direction="column">
+            <Flex padding="m">
+              <Text font-size="heading-s">Recent Activity</Text>
+            </Flex>
+            <Flex flex-direction="column">
               {activity?.slice(0, 5).map((item: { title: string; description: string; time: string }, index: number) => (
-                <GdsFlex
-                  key={index}
-                  justify-content="space-between"
-                  align-items="center"
-                  padding="m"
-                  style={{
-                    borderBottom: index < 4 ? '1px solid var(--gds-color-l3-border-primary)' : 'none',
-                  } as any}
-                >
-                  <GdsFlex flex-direction="column" gap="2xs">
-                    <GdsText font-size="body-s" font-weight="book">
+                <Flex key={index} justify-content="space-between" align-items="center" padding="m">
+                  <Flex flex-direction="column" gap="2xs">
+                    <Text font-size="body-s" font-weight="book">
                       {item.title}
-                    </GdsText>
-                    <GdsText font-size="body-s" color="secondary">
+                    </Text>
+                    <Text font-size="body-s" color="secondary">
                       {item.description}
-                    </GdsText>
-                  </GdsFlex>
-                  <GdsText font-size="body-s" color="secondary">
+                    </Text>
+                  </Flex>
+                  <Text font-size="body-s" color="secondary">
                     {item.time}
-                  </GdsText>
-                </GdsFlex>
+                  </Text>
+                </Flex>
               )) || (
-                <GdsFlex justify-content="center" padding="l">
-                  <GdsText color="secondary">No recent activity</GdsText>
-                </GdsFlex>
+                <Flex justify-content="center" padding="l">
+                  <Text color="secondary">No recent activity</Text>
+                </Flex>
               )}
-            </GdsFlex>
-          </GdsFlex>
-        </GdsCard>
+            </Flex>
+          </Flex>
+        </Card>
 
         {/* Quick Actions */}
-        <GdsCard padding="0">
-          <GdsFlex flex-direction="column">
-            <GdsFlex padding="m" style={{ borderBottom: '1px solid var(--gds-color-l3-border-primary)' } as any}>
-              <GdsText font-size="heading-s">Quick Actions</GdsText>
-            </GdsFlex>
-            <GdsGrid columns="2" gap="m" padding="m">
-              <Link to="/users" style={{ textDecoration: 'none' }}>
-                <GdsCard padding="m" variant="secondary" style={{ cursor: 'pointer' } as any}>
-                  <GdsFlex align-items="center" justify-content="center" gap="s">
-                    <UsersIcon style={{ width: '20px', height: '20px' }} />
-                    <GdsText font-size="body-s">Manage Users</GdsText>
-                  </GdsFlex>
-                </GdsCard>
+        <Card padding="0">
+          <Flex flex-direction="column">
+            <Flex padding="m">
+              <Text font-size="heading-s">Quick Actions</Text>
+            </Flex>
+            <Grid columns="2" gap="m" padding="m">
+              <Link to="/users">
+                <Card padding="m" variant="secondary">
+                  <Flex align-items="center" justify-content="center" gap="s">
+                    <UsersIcon width={20} height={20} />
+                    <Text font-size="body-s">Manage Users</Text>
+                  </Flex>
+                </Card>
               </Link>
-              <Link to="/jobs" style={{ textDecoration: 'none' }}>
-                <GdsCard padding="m" variant="secondary" style={{ cursor: 'pointer' } as any}>
-                  <GdsFlex align-items="center" justify-content="center" gap="s">
-                    <BriefcaseIcon style={{ width: '20px', height: '20px' }} />
-                    <GdsText font-size="body-s">Review Jobs</GdsText>
-                  </GdsFlex>
-                </GdsCard>
+              <Link to="/jobs">
+                <Card padding="m" variant="secondary">
+                  <Flex align-items="center" justify-content="center" gap="s">
+                    <BriefcaseIcon width={20} height={20} />
+                    <Text font-size="body-s">Review Jobs</Text>
+                  </Flex>
+                </Card>
               </Link>
-              <Link to="/disputes" style={{ textDecoration: 'none' }}>
-                <GdsCard padding="m" variant="secondary" style={{ cursor: 'pointer' } as any}>
-                  <GdsFlex align-items="center" justify-content="center" gap="s">
-                    <ClockIcon style={{ width: '20px', height: '20px' }} />
-                    <GdsText font-size="body-s">Handle Disputes</GdsText>
-                  </GdsFlex>
-                </GdsCard>
+              <Link to="/disputes">
+                <Card padding="m" variant="secondary">
+                  <Flex align-items="center" justify-content="center" gap="s">
+                    <ClockIcon width={20} height={20} />
+                    <Text font-size="body-s">Handle Disputes</Text>
+                  </Flex>
+                </Card>
               </Link>
-              <Link to="/analytics" style={{ textDecoration: 'none' }}>
-                <GdsCard padding="m" variant="secondary" style={{ cursor: 'pointer' } as any}>
-                  <GdsFlex align-items="center" justify-content="center" gap="s">
-                    <CurrencyDollarIcon style={{ width: '20px', height: '20px' }} />
-                    <GdsText font-size="body-s">View Analytics</GdsText>
-                  </GdsFlex>
-                </GdsCard>
+              <Link to="/analytics">
+                <Card padding="m" variant="secondary">
+                  <Flex align-items="center" justify-content="center" gap="s">
+                    <CurrencyDollarIcon width={20} height={20} />
+                    <Text font-size="body-s">View Analytics</Text>
+                  </Flex>
+                </Card>
               </Link>
-            </GdsGrid>
-          </GdsFlex>
-        </GdsCard>
-      </GdsGrid>
-    </GdsFlex>
+            </Grid>
+          </Flex>
+        </Card>
+      </Grid>
+    </Flex>
   )
 }

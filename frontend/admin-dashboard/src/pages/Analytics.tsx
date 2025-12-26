@@ -16,13 +16,12 @@ import {
 } from 'chart.js'
 import { Line, Bar, Doughnut } from 'react-chartjs-2'
 import {
-  GdsCard,
-  GdsFlex,
-  GdsGrid,
-  GdsText,
-  GdsDiv,
-  GdsDivider,
-  GdsSpinner,
+  Card,
+  Flex,
+  Grid,
+  Text,
+  Divider,
+  Spinner,
 } from '../components/green'
 
 ChartJS.register(
@@ -208,149 +207,113 @@ export default function Analytics() {
 
   if (isLoading) {
     return (
-      <GdsFlex justify-content="center" align-items="center" style={{ minHeight: '400px' } as any}>
-        <GdsSpinner />
-      </GdsFlex>
+      <Flex justify-content="center" align-items="center">
+        <Spinner />
+      </Flex>
     )
   }
 
   return (
-    <GdsFlex flex-direction="column" gap="l">
+    <Flex flex-direction="column" gap="l">
       {/* Header */}
-      <GdsDiv>
-        <GdsText tag="h1" style={{ fontSize: '1.5rem', fontWeight: 700 } as any}>
-          Analytics
-        </GdsText>
-        <GdsText style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>
-          Platform performance and insights
-        </GdsText>
-      </GdsDiv>
+      <div>
+        <Text tag="h1">Analytics</Text>
+        <Text>Platform performance and insights</Text>
+      </div>
 
       {/* Summary Cards */}
-      <GdsGrid columns="1; s{2}; m{4}" gap="m">
-        <GdsCard>
-          <GdsFlex flex-direction="column" padding="m" gap="xs">
-            <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>
-              Total Revenue (MTD)
-            </GdsText>
-            <GdsText style={{ fontSize: '1.75rem', fontWeight: 700 } as any}>
-              ${(revenue?.totalMTD || 30000).toLocaleString()}
-            </GdsText>
-            <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-positive)' } as any}>
-              +12% from last month
-            </GdsText>
-          </GdsFlex>
-        </GdsCard>
+      <Grid columns="1; s{2}; m{4}" gap="m">
+        <Card>
+          <Flex flex-direction="column" padding="m" gap="xs">
+            <Text>Total Revenue (MTD)</Text>
+            <Text>{(revenue?.totalMTD || 30000).toLocaleString()}</Text>
+            <Text>+12% from last month</Text>
+          </Flex>
+        </Card>
 
-        <GdsCard>
-          <GdsFlex flex-direction="column" padding="m" gap="xs">
-            <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>
-              Active Users
-            </GdsText>
-            <GdsText style={{ fontSize: '1.75rem', fontWeight: 700 } as any}>
-              {(userGrowth?.totalActive || 1250).toLocaleString()}
-            </GdsText>
-            <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-positive)' } as any}>
-              +8% from last month
-            </GdsText>
-          </GdsFlex>
-        </GdsCard>
+        <Card>
+          <Flex flex-direction="column" padding="m" gap="xs">
+            <Text>Active Users</Text>
+            <Text>{(userGrowth?.totalActive || 1250).toLocaleString()}</Text>
+            <Text>+8% from last month</Text>
+          </Flex>
+        </Card>
 
-        <GdsCard>
-          <GdsFlex flex-direction="column" padding="m" gap="xs">
-            <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>
-              Jobs Completed (MTD)
-            </GdsText>
-            <GdsText style={{ fontSize: '1.75rem', fontWeight: 700 } as any}>
-              {jobs?.totalCompleted || 92}
-            </GdsText>
-            <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-positive)' } as any}>
-              +15% from last month
-            </GdsText>
-          </GdsFlex>
-        </GdsCard>
+        <Card>
+          <Flex flex-direction="column" padding="m" gap="xs">
+            <Text>Jobs Completed (MTD)</Text>
+            <Text>{jobs?.totalCompleted || 92}</Text>
+            <Text>+15% from last month</Text>
+          </Flex>
+        </Card>
 
-        <GdsCard>
-          <GdsFlex flex-direction="column" padding="m" gap="xs">
-            <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>
-              Avg Job Value
-            </GdsText>
-            <GdsText style={{ fontSize: '1.75rem', fontWeight: 700 } as any}>
-              ${(revenue?.avgJobValue || 326).toLocaleString()}
-            </GdsText>
-            <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-notice)' } as any}>
-              -2% from last month
-            </GdsText>
-          </GdsFlex>
-        </GdsCard>
-      </GdsGrid>
+        <Card>
+          <Flex flex-direction="column" padding="m" gap="xs">
+            <Text>Avg Job Value</Text>
+            <Text>{(revenue?.avgJobValue || 326).toLocaleString()}</Text>
+            <Text>-2% from last month</Text>
+          </Flex>
+        </Card>
+      </Grid>
 
       {/* Charts Grid */}
-      <GdsGrid columns="1; l{2}" gap="l">
+      <Grid columns="1; l{2}" gap="l">
         {/* User Growth Chart */}
-        <GdsCard>
-          <GdsFlex flex-direction="column" padding="l" gap="m">
-            <GdsText style={{ fontSize: '1.125rem', fontWeight: 600 } as any}>User Growth</GdsText>
-            <GdsDiv style={{ height: '256px' } as any}>
+        <Card>
+          <Flex flex-direction="column" padding="l" gap="m">
+            <Text>User Growth</Text>
+            <div>
               <Line data={userGrowthData} options={chartOptions} />
-            </GdsDiv>
-          </GdsFlex>
-        </GdsCard>
+            </div>
+          </Flex>
+        </Card>
 
         {/* Revenue Chart */}
-        <GdsCard>
-          <GdsFlex flex-direction="column" padding="l" gap="m">
-            <GdsText style={{ fontSize: '1.125rem', fontWeight: 600 } as any}>Revenue</GdsText>
-            <GdsDiv style={{ height: '256px' } as any}>
+        <Card>
+          <Flex flex-direction="column" padding="l" gap="m">
+            <Text>Revenue</Text>
+            <div>
               <Bar data={revenueData} options={chartOptions} />
-            </GdsDiv>
-          </GdsFlex>
-        </GdsCard>
+            </div>
+          </Flex>
+        </Card>
 
         {/* Jobs Chart */}
-        <GdsCard>
-          <GdsFlex flex-direction="column" padding="l" gap="m">
-            <GdsText style={{ fontSize: '1.125rem', fontWeight: 600 } as any}>Job Activity</GdsText>
-            <GdsDiv style={{ height: '256px' } as any}>
+        <Card>
+          <Flex flex-direction="column" padding="l" gap="m">
+            <Text>Job Activity</Text>
+            <div>
               <Line data={jobsData} options={chartOptions} />
-            </GdsDiv>
-          </GdsFlex>
-        </GdsCard>
+            </div>
+          </Flex>
+        </Card>
 
         {/* Category Distribution */}
-        <GdsCard>
-          <GdsFlex flex-direction="column" padding="l" gap="m">
-            <GdsText style={{ fontSize: '1.125rem', fontWeight: 600 } as any}>Jobs by Category</GdsText>
-            <GdsDiv style={{ height: '256px' } as any}>
+        <Card>
+          <Flex flex-direction="column" padding="l" gap="m">
+            <Text>Jobs by Category</Text>
+            <div>
               <Doughnut data={categoryData} options={doughnutOptions} />
-            </GdsDiv>
-          </GdsFlex>
-        </GdsCard>
-      </GdsGrid>
+            </div>
+          </Flex>
+        </Card>
+      </Grid>
 
       {/* Top Performers Table */}
-      <GdsCard>
-        <GdsFlex flex-direction="column">
-          <GdsFlex padding="l">
-            <GdsText style={{ fontSize: '1.125rem', fontWeight: 600 } as any}>Top Freelancers</GdsText>
-          </GdsFlex>
-          <GdsDivider />
+      <Card>
+        <Flex flex-direction="column">
+          <Flex padding="l">
+            <Text>Top Freelancers</Text>
+          </Flex>
+          <Divider />
 
           {/* Table Header */}
-          <GdsGrid columns="2fr 1fr 1fr 1fr" gap="m" padding="m" style={{ background: 'var(--gds-color-l3-background-secondary)' } as any}>
-            <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>
-              Freelancer
-            </GdsText>
-            <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>
-              Jobs Completed
-            </GdsText>
-            <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>
-              Total Earned
-            </GdsText>
-            <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>
-              Rating
-            </GdsText>
-          </GdsGrid>
+          <Grid columns="2fr 1fr 1fr 1fr" gap="m" padding="m">
+            <Text>Freelancer</Text>
+            <Text>Jobs Completed</Text>
+            <Text>Total Earned</Text>
+            <Text>Rating</Text>
+          </Grid>
 
           {/* Table Body */}
           {[
@@ -360,36 +323,23 @@ export default function Analytics() {
             { name: 'Emily Davis', jobs: 28, earned: 17500, rating: 4.7 },
             { name: 'Chris Lee', jobs: 25, earned: 15200, rating: 4.8 },
           ].map((freelancer, index) => (
-            <GdsDiv key={index}>
-              <GdsDivider />
-              <GdsGrid columns="2fr 1fr 1fr 1fr" gap="m" padding="m" align-items="center">
-                <GdsFlex gap="m" align-items="center">
-                  <GdsDiv
-                    style={{
-                      width: '32px',
-                      height: '32px',
-                      borderRadius: '50%',
-                      background: 'var(--gds-color-l3-background-positive)',
-                      color: 'var(--gds-color-l3-content-positive)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontWeight: 600,
-                      fontSize: '0.875rem',
-                    } as any}
-                  >
+            <div key={index}>
+              <Divider />
+              <Grid columns="2fr 1fr 1fr 1fr" gap="m" padding="m" align-items="center">
+                <Flex gap="m" align-items="center">
+                  <div>
                     {freelancer.name.charAt(0)}
-                  </GdsDiv>
-                  <GdsText style={{ fontWeight: 500 } as any}>{freelancer.name}</GdsText>
-                </GdsFlex>
-                <GdsText style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>{freelancer.jobs}</GdsText>
-                <GdsText style={{ fontWeight: 500 } as any}>${freelancer.earned.toLocaleString()}</GdsText>
-                <GdsText style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>⭐ {freelancer.rating}</GdsText>
-              </GdsGrid>
-            </GdsDiv>
+                  </div>
+                  <Text>{freelancer.name}</Text>
+                </Flex>
+                <Text>{freelancer.jobs}</Text>
+                <Text>${freelancer.earned.toLocaleString()}</Text>
+                <Text>⭐ {freelancer.rating}</Text>
+              </Grid>
+            </div>
           ))}
-        </GdsFlex>
-      </GdsCard>
-    </GdsFlex>
+        </Flex>
+      </Card>
+    </Flex>
   )
 }
