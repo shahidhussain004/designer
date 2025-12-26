@@ -83,10 +83,10 @@ export default function Users() {
       {/* Header */}
       <Flex justify-content="space-between" align-items="center">
         <div>
-          <Text tag="h1" style={{ fontSize: '1.5rem', fontWeight: 700 } as any}>
+          <Text tag="h1">
             Users
           </Text>
-          <Text style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>
+          <Text>
             Manage platform users
           </Text>
         </div>
@@ -94,7 +94,7 @@ export default function Users() {
 
       {/* Filters */}
       <Flex gap="m" flex-wrap="wrap">
-        <div style={{ flex: 1, minWidth: '200px' } as any}>
+        <div>
           <Input
             label=""
             value={search}
@@ -103,14 +103,6 @@ export default function Users() {
         </div>
         <div>
           <select
-            style={{
-              padding: '0.5rem 1rem',
-              border: '1px solid var(--gds-color-l3-border-primary)',
-              borderRadius: '4px',
-              background: 'var(--gds-color-l3-background-secondary)',
-              color: 'var(--gds-color-l3-content-primary)',
-              minHeight: '42px',
-            } as any}
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
           >
@@ -131,40 +123,28 @@ export default function Users() {
         ) : (
           <>
             {/* Table Header */}
-            <Grid columns="2fr 1fr 1fr 1fr 1fr 1fr" gap="m" padding="m" style={{ background: 'var(--gds-color-l3-background-secondary)', borderRadius: '8px 8px 0 0' } as any}>
-              <Text style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>User</Text>
-              <Text style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Role</Text>
-              <Text style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Status</Text>
-              <Text style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Rating</Text>
-              <Text style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Joined</Text>
-              <Text style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)', textAlign: 'right' } as any}>Actions</Text>
+            <Grid columns="2fr 1fr 1fr 1fr 1fr 1fr" gap="m" padding="m">
+              <Text>User</Text>
+              <Text>Role</Text>
+              <Text>Status</Text>
+              <Text>Rating</Text>
+              <Text>Joined</Text>
+              <Text>Actions</Text>
             </Grid>
 
             {/* Table Body */}
             {filteredUsers.map((user: User) => (
               <div key={user.id}>
                 <Divider />
-                <Grid columns="2fr 1fr 1fr 1fr 1fr 1fr" gap="m" padding="m" align-items="center" style={{ cursor: 'pointer' } as any}>
+                <Grid columns="2fr 1fr 1fr 1fr 1fr 1fr" gap="m" padding="m" align-items="center">
                   {/* User Info */}
                   <Flex gap="m" align-items="center">
-                    <div
-                      style={{
-                        width: '40px',
-                        height: '40px',
-                        borderRadius: '50%',
-                        background: 'var(--gds-color-l3-background-positive)',
-                        color: 'var(--gds-color-l3-content-positive)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontWeight: 600,
-                      } as any}
-                    >
+                    <div>
                       {user.fullName?.charAt(0) || 'U'}
                     </div>
                     <div>
-                      <Text style={{ fontWeight: 500 } as any}>{user.fullName}</Text>
-                      <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>
+                      <Text>{user.fullName}</Text>
+                      <Text>
                         {user.email}
                       </Text>
                     </div>
@@ -183,12 +163,12 @@ export default function Users() {
                   </div>
 
                   {/* Rating */}
-                  <Text style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>
+                  <Text>
                     {user.ratingAvg?.toFixed(1) || 'N/A'}
                   </Text>
 
                   {/* Joined */}
-                  <Text style={{ color: 'var(--gds-color-l3-content-tertiary)', fontSize: '0.875rem' } as any}>
+                  <Text>
                     {new Date(user.createdAt).toLocaleDateString()}
                   </Text>
 
@@ -214,7 +194,6 @@ export default function Users() {
                           deleteMutation.mutate(user.id)
                         }
                       }}
-                      style={{ color: 'var(--gds-color-l3-content-negative)' } as any}
                     >
                       Delete
                     </Button>
@@ -226,7 +205,7 @@ export default function Users() {
             {/* Pagination */}
             <Divider />
             <Flex justify-content="space-between" align-items="center" padding="m">
-              <Text style={{ color: 'var(--gds-color-l3-content-tertiary)', fontSize: '0.875rem' } as any}>
+              <Text>
                 Showing page {page + 1} of {data?.totalPages || 1}
               </Text>
               <Flex gap="s">

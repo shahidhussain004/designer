@@ -346,14 +346,6 @@ export default function CourseDetailPage() {
           </Div>
         )}
       </Flex>
-
-      <style>{`
-        @media (max-width: 768px) {
-          .desktop-nav {
-            display: none !important;
-          }
-        }
-      `}</style>
     </Div>
   );
 }

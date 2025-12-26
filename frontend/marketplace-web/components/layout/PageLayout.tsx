@@ -4,7 +4,6 @@ import React from 'react'
 import { Flex, Div } from '@/components/green'
 import Navbar from './Navbar'
 import Footer from './Footer'
-import ClientOnly from './ClientOnly'
 
 interface PageLayoutProps {
   children: React.ReactNode
@@ -48,7 +47,6 @@ export default function PageLayout({
   showFooter = true 
 }: PageLayoutProps) {
   return (
-    <ClientOnly fallback={<LoadingSkeleton />}>
       <Flex 
         flex-direction="column" 
         min-height="100vh"
@@ -60,6 +58,5 @@ export default function PageLayout({
         </Div>
         {showFooter && <Footer />}
       </Flex>
-    </ClientOnly>
   )
 }

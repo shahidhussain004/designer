@@ -8,20 +8,6 @@
    Prevent flash of unstyled content by hiding undefined custom elements
    ============================================================================ */
 
-@layer base {
-  /* Hide custom elements until they are fully defined and upgraded */
-  gds-flex:not(:defined),
-  gds-div:not(:defined),
-  gds-text:not(:defined),
-  gds-button:not(:defined),
-  gds-card:not(:defined),
-  gds-grid:not(:defined),
-  gds-dialog:not(:defined),
-  gds-divider:not(:defined) {
-    display: none !important;
-  }
-}
-
 /* ============================================================================
    DESIGN SYSTEM CSS VARIABLES
    ============================================================================

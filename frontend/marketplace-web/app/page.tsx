@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { Flex, Grid, Card, Text, Div, Button, Dialog, LinkComponent } from '@/components/green'
 import { PageLayout } from '@/components/layout'
-import ClientOnly from '@/components/layout/ClientOnly'
 import LandingPage from './landing/page'
 
 export default function Home() {
@@ -36,7 +35,6 @@ export default function Home() {
 
   return (
     <PageLayout showNavbar={false}>
-      <ClientOnly fallback={<div style={{ padding: 24 }}>Loading…</div>}>
       {/* Hero Section */}
       <LandingPage />
 
@@ -341,7 +339,6 @@ export default function Home() {
           </Div>
         </Grid>
       </Dialog>
-      </ClientOnly>
     </PageLayout>
   )
 }
