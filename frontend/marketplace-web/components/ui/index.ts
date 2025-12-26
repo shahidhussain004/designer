@@ -44,6 +44,7 @@ export type {
 // Overlay Components
 export { Modal, ModalHeader, ModalBody, ModalFooter, ConfirmDialog } from './Modal';
 export type { ModalProps, ModalHeaderProps, ModalBodyProps, ModalFooterProps, ConfirmDialogProps } from './Modal';
+export { CookiesConsent, type CookiesConsentProps } from './CookiesConsent';
 
 // Navigation Components
 export { Tabs, TabList, Tab, TabPanel } from './Tabs';

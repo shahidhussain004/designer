@@ -4,6 +4,7 @@ import '@sebgroup/fonts/css/seb-fonts.css'
 import PWARegister from './PWARegister'
 import { SkipLink } from '@/components/ui/Accessibility'
 import { ThemeProvider } from '@/lib/theme'
+import { CookiesConsent } from '@/components/ui/CookiesConsent'
 
 export const metadata: Metadata = {
   title: 'Designer Marketplace - Find Freelance Talent',
@@ -47,6 +48,9 @@ export default function RootLayout({
           <div id="main-content" role="main" tabIndex={-1}>
             {children}
           </div>
+          
+          {/* Cookies Consent Component */}
+          <CookiesConsent />
         </ThemeProvider>
         
         {/* Live region for dynamic announcements */}
