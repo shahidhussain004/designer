@@ -85,7 +85,7 @@ export default function LoginPage() {
                   <Checkbox>
                     <Text slot="label">Remember me</Text>
                   </Checkbox>
-                  <Link href="#" style={{ textDecoration: 'none' } as any}>
+                  <Link href="#">
                     <Text font="body-regular-s" color="brand-01">
                       Forgot your password?
                     </Text>

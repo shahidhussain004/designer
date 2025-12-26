@@ -199,7 +199,7 @@ function ClientDashboardContent({ data }: ClientDashboardProps) {
         ) : (
           <Flex flex-direction="column">
             {activeJobs.map((job) => (
-              <Link key={job.id} href={`/jobs/${job.id}`} style={{ textDecoration: 'none' } as any}>
+              <Link key={job.id} href={`/jobs/${job.id}`}>
                 <Div padding="m" border-width="0 0 4xs 0" border-color="subtle-01">
                   <Flex justify-content="space-between" align-items="flex-start">
                     <Flex flex-direction="column" gap="xs" flex="1">
@@ -263,7 +263,7 @@ function FreelancerDashboardContent({ data }: FreelancerDashboardProps) {
               Browse and apply for jobs that match your skills
             </Text>
           </Flex>
-          <Link href="/jobs" style={{ textDecoration: 'none' } as any}>
+          <Link href="/jobs">
             <Text font="body-regular-m" color="brand-01">View All →</Text>
           </Link>
         </Flex>
@@ -275,7 +275,7 @@ function FreelancerDashboardContent({ data }: FreelancerDashboardProps) {
         ) : (
           <Flex flex-direction="column">
             {availableJobs.slice(0, 5).map((job) => (
-              <Link key={job.id} href={`/jobs/${job.id}`} style={{ textDecoration: 'none' } as any}>
+              <Link key={job.id} href={`/jobs/${job.id}`}>
                 <Div padding="m" border-width="0 0 4xs 0" border-color="subtle-01">
                   <Flex justify-content="space-between" align-items="flex-start">
                     <Flex flex-direction="column" gap="xs" flex="1">

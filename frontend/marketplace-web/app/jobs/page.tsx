@@ -261,7 +261,7 @@ function JobsPageContent() {
           </Card>
 
           {/* Jobs List */}
-          <Flex flex-direction="column" gap="m" style={{ gridColumn: 'span 3' }}>
+          <Flex flex-direction="column" gap="m">
             {loading ? (
               <Flex justify-content="center" padding="xl">
                 <Spinner />

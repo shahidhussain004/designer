@@ -32,7 +32,7 @@ export default function Navbar() {
       >
         {/* Logo and navigation */}
         <Flex align-items="center" gap="xl">
-          <Link href="/" style={{ textDecoration: 'none' }}>
+          <Link href="/">
             <Text font="heading-m" color="brand-01">
               Designer Marketplace
             </Text>
@@ -41,9 +41,7 @@ export default function Navbar() {
             {navItems.map((item) => (
               <Link 
                 key={item.href} 
-                href={item.href}
-                style={{ textDecoration: 'none' }}
-              >
+                href={item.href}>
                 <Text 
                   font="body-regular-m"
                   color={pathname === item.href ? 'brand-01' : 'neutral-01'}

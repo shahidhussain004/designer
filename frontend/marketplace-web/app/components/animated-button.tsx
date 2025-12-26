@@ -46,7 +46,6 @@ export default function AnimatedButton({
         "relative inline-block rounded-xl overflow-visible group",
         disabled && "opacity-50 cursor-not-allowed",
       )}
-      style={{ perspective: "600px" }}
       onMouseEnter={() => !disabled && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -80,9 +79,6 @@ export default function AnimatedButton({
             variantClasses[variant],
             className,
           )}
-          style={{ 
-            backfaceVisibility: "hidden",
-          }}
         >
           {children}
         </div>
@@ -95,10 +91,6 @@ export default function AnimatedButton({
             variantClasses[variant],
             className,
           )}
-          style={{ 
-            backfaceVisibility: "hidden",
-            transform: "rotateX(90deg)",
-          }}
         >
           {children}
         </div>

@@ -32,11 +32,6 @@ function LoadingSkeleton() {
       {/* Content skeleton */}
       <div style={{ flex: 1 }} />
       {/* Footer skeleton */}
-      <div style={{
-        height: '80px',
-        backgroundColor: '#fff',
-        borderTop: '1px solid #e0e0e0'
-      }} />
     </div>
   )
 }
