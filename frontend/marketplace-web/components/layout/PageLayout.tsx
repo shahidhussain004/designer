@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { GdsFlex, GdsDiv } from '@sebgroup/green-core/react'
+import { GdsFlex, GdsDiv } from '@/components/green'
 import Navbar from './Navbar'
 import Footer from './Footer'
 import ClientOnly from './ClientOnly'

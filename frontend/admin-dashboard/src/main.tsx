@@ -5,7 +5,6 @@ import { BrowserRouter } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { ThemeProvider } from './components/ThemeProvider'
 import App from './App'
-import '@sebgroup/fonts/css/seb-fonts.css'
 import './index.css'
 
 const queryClient = new QueryClient({

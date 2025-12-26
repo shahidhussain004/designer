@@ -262,7 +262,7 @@ function CheckoutContent() {
                         onInput={(e: Event) =>
                           setCardNumber(formatCardNumber((e.target as HTMLInputElement).value))
                         }
-                        maxlength={19}
+                        maxLength={19}
                         required
                       />
 
@@ -273,7 +273,7 @@ function CheckoutContent() {
                           onInput={(e: Event) =>
                             setCardExpiry(formatExpiry((e.target as HTMLInputElement).value))
                           }
-                          maxlength={5}
+                          maxLength={5}
                           required
                         />
                         <GdsInput
@@ -282,7 +282,7 @@ function CheckoutContent() {
                           onInput={(e: Event) =>
                             setCardCvc((e.target as HTMLInputElement).value.replace(/\D/g, '').slice(0, 4))
                           }
-                          maxlength={4}
+                          maxLength={4}
                           required
                         />
                       </GdsGrid>

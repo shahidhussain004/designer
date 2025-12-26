@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { GdsTheme } from '@sebgroup/green-core/react'
+import { GdsTheme } from '@/components/green'
 import { ThemeContext, type Theme } from './themeContext'
 
 const STORAGE_KEY = 'gds-theme'

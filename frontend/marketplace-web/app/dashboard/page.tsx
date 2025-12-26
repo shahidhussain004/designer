@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { authService } from '@/lib/auth'
 import { getDashboardData, ClientDashboard, FreelancerDashboard } from '@/lib/dashboard'
-import { GdsFlex, GdsGrid, GdsCard, GdsText, GdsDiv, GdsButton, GdsSpinner, GdsBadge, GdsDivider } from '@sebgroup/green-core/react'
+import { GdsFlex, GdsGrid, GdsCard, GdsText, GdsDiv, GdsButton, GdsSpinner, GdsBadge, GdsDivider } from '@/components/green'
 import { PageLayout } from '@/components/layout'
 
 interface User {

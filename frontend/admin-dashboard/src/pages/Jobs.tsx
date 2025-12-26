@@ -90,20 +90,20 @@ export default function Jobs() {
     job.category?.toLowerCase().includes(search.toLowerCase())
   ) || []
 
-  const getStatusBadgeVariant = (status: string): 'positive' | 'notice' | 'information' | 'information' | 'negative' => {
+  const getStatusBadgeVariant = (status: string): 'primary' | 'secondary' | 'success' | 'warning' | 'danger' => {
     switch (status) {
       case 'OPEN':
-        return 'positive'
+        return 'success'
       case 'IN_PROGRESS':
-        return 'information'
+        return 'primary'
       case 'COMPLETED':
-        return 'information'
+        return 'success'
       case 'CANCELLED':
-        return 'negative'
+        return 'danger'
       case 'DRAFT':
-        return 'notice'
+        return 'warning'
       default:
-        return 'information'
+        return 'primary'
     }
   }
 
@@ -120,7 +120,7 @@ export default function Jobs() {
           </GdsText>
         </GdsDiv>
         {pendingJobs?.length > 0 && (
-          <GdsBadge variant="notice">{pendingJobs.length} pending review</GdsBadge>
+          <GdsBadge variant="warning">{pendingJobs.length} pending review</GdsBadge>
         )}
       </GdsFlex>
 
@@ -164,7 +164,7 @@ export default function Jobs() {
           <GdsInput
             label=""
             value={search}
-            onInput={(e: Event) => setSearch((e.target as HTMLInputElement).value)}
+            onInput={(e: React.FormEvent<HTMLInputElement>) => setSearch((e.target as HTMLInputElement).value)}
           />
         </GdsDiv>
         <GdsDiv>

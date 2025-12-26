@@ -1,7 +1,7 @@
  'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { GdsDialog } from '@sebgroup/green-core/react';
+import { GdsDialog } from '@/components/green';
 import { Logo } from './Icons';
 import { cn } from '@/lib/design-system/utils';
 
