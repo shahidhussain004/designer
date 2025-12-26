@@ -142,13 +142,13 @@ export const CookiesConsent: React.FC<CookiesConsentProps> = ({ onAccept, onReje
 
       {/* Use Dialog */}
       <Dialog ref={dialogRef} heading="Privacy Preference Center">
-        <div className="p-8 md:p-10" style={{ fontFamily: "'SEB Sans Serif', system-ui, -apple-system, sans-serif" }}>
+        <div className="p-8 md:p-10" >
           <div className="flex items-start gap-4 mb-6">
             <div className="flex-shrink-0">
               <Logo size="sm" variant="icon" />
             </div>
             <div className="flex-1">
-              <h1 id="cookies-dialog-title" className="text-2xl md:text-3xl font-bold text-gray-900 mb-2" style={{ margin: '0 0 8px 0' }}>
+              <h1 id="cookies-dialog-title" className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
                 Privacy Preference Center
               </h1>
               <p className="text-sm text-gray-600">Manage your cookie and tracking preferences</p>
@@ -174,7 +174,7 @@ export const CookiesConsent: React.FC<CookiesConsentProps> = ({ onAccept, onReje
                     <div className="flex items-start gap-3 flex-1 text-left">
                       <div className="pt-1">
                         {c.isRequired ? (
-                          <div className="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded" style={{ fontSize: '11px' }}>
+                          <div className="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded" >
                             Always Active
                           </div>
                         ) : null}

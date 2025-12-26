@@ -46,7 +46,7 @@ export default function LoginPage() {
               <Text tag="h1" font="heading-l">Sign in to your account</Text>
               <Text font="body-regular-m" color="neutral-02">
                 Or{' '}
-                <Link href="/auth/register" style={{ color: 'var(--gds-sys-color-content-brand-01)' } as any}>
+                <Link href="/auth/register">
                   create a new account
                 </Link>
               </Text>
