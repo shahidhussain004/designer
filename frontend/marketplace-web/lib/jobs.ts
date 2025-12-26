@@ -28,15 +28,17 @@ export async function getJobs(opts?: { page?: number; size?: number }): Promise<
     if (!res.ok) return { jobs: [], totalCount: 0, page, size };
     const json = await res.json();
     const items = Array.isArray(json.items) ? json.items : [];
-    const jobs = items.map((i: any) => ({
-      id: i.id,
-      title: i.title,
-      category: normalizeCategory(i.category),
-      budget: i.budget ?? null,
-    }));
+    type ApiJob = { id: string; title?: string; category?: string | null; budget?: number | null };
+    const jobs = (items as ApiJob[]).map((i) => ({
+        id: i.id,
+        title: i.title,
+        category: normalizeCategory(i.category),
+        budget: i.budget ?? null,
+      }));
     return { jobs, totalCount: json.totalCount ?? jobs.length, page, size };
   } catch (err) {
-    return { jobs: [], totalCount: 0, page, size };
+      console.error('getJobs error:', err);
+      return { jobs: [], totalCount: 0, page, size };
   }
 }
 

@@ -57,7 +57,8 @@ export const CookiesConsent: React.FC<CookiesConsentProps> = ({ onAccept, onReje
     'targeting': false,
   });
 
-  const dialogRef = useRef<any>(null);
+  type DialogRef = HTMLDialogElement & { show?: () => void; close?: () => void };
+  const dialogRef = useRef<DialogRef | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -71,18 +72,18 @@ export const CookiesConsent: React.FC<CookiesConsentProps> = ({ onAccept, onReje
         const t = setTimeout(() => setIsOpen(true), 500);
         return () => clearTimeout(t);
       }
-    } catch (err) {
-      // ignore
+    } catch (err: unknown) {
+      console.error('CookiesConsent init error:', err);
     }
   }, []);
 
   useEffect(() => {
     if (!dialogRef.current) return;
     try {
-      if (isOpen) dialogRef.current.show();
-      else dialogRef.current.close();
-    } catch (e) {
-      // ignore if web-component methods aren't present
+      if (isOpen) dialogRef.current?.show?.();
+      else dialogRef.current?.close?.();
+    } catch (e: unknown) {
+      console.warn('CookiesConsent dialog control error:', e);
     }
   }, [isOpen]);
 

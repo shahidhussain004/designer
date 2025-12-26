@@ -90,17 +90,34 @@ export async function getCourses(params?: {
   const data = await response.json();
   
   // Transform LMS PagedResult { items, totalCount, page, pageSize } to expected format { courses, totalCount, page, size }
+  type ApiCourse = {
+    id: string;
+    title?: string;
+    shortDescription?: string;
+    instructorName?: string;
+    price?: number;
+    currency?: string;
+    thumbnailUrl?: string;
+    category?: string;
+    level?: string;
+    totalDurationMinutes?: number;
+    totalLessons?: number;
+    totalEnrollments?: number;
+    averageRating?: number;
+    reviewCount?: number;
+  };
+
   return {
-    courses: (data.items || []).map((item: any) => ({
+    courses: (data.items || []).map((item: ApiCourse) => ({
       id: item.id,
-      title: item.title,
+      title: item.title || '',
       description: item.shortDescription || '',
       instructorId: '',
-      instructorName: item.instructorName,
+      instructorName: item.instructorName || '',
       price: Math.round((item.price || 0) * 100),
       currency: item.currency || 'USD',
       thumbnailUrl: item.thumbnailUrl,
-      category: item.category,
+      category: item.category || '',
       skillLevel: (item.level || 'Beginner') as 'Beginner' | 'Intermediate' | 'Advanced',
       durationMinutes: item.totalDurationMinutes || 0,
       lessonsCount: item.totalLessons || 0,

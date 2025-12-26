@@ -325,10 +325,13 @@ export default function InvoicesPage() {
 
               <Div>
                 <Text>Amount (USD)</Text>
-                <input
+                <Input
                   type="number"
                   value={payoutAmount}
-                  onChange={(e) => setPayoutAmount(e.target.value)}
+                  onInput={(e: Event) => {
+                    const target = e.target as HTMLInputElement
+                    setPayoutAmount(target.value)
+                  }}
                   min="0"
                   max={(balance.availableBalance / 100).toFixed(2)}
                   step="0.01"
