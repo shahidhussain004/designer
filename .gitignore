@@ -103,6 +103,7 @@ frontend/marketplace-web/npm-debug.log*
 frontend/marketplace-web/yarn-debug.log*
 frontend/marketplace-web/yarn-error.log*
 frontend/marketplace-web/.vercel
+frontend/marketplace-web/videos/
 
 # ============================================================================
 # Frontend - React (Admin Dashboard)
