@@ -15,50 +15,31 @@ function cn(...classes: (string | boolean | undefined)[]) {
 // ============================================================================
 
 interface FlexProps extends HTMLAttributes<HTMLDivElement> {
-  'flex-direction'?: string
-  'justify-content'?: string
-  'align-items'?: string
-  gap?: string
-  'flex-wrap'?: string
-  flex?: string
-  padding?: string
-  margin?: string
-  'min-height'?: string
-  'max-width'?: string
-  width?: string
-  height?: string
-  background?: string
+  direction?: 'row' | 'column'
+  justify?: 'start' | 'center' | 'end' | 'between'
+  align?: 'start' | 'center' | 'end'
+  gap?: 'xs' | 's' | 'm' | 'l' | 'xl'
+  wrap?: boolean
+  padding?: 'xs' | 's' | 'm' | 'l' | 'xl'
 }
 
 export const Flex = forwardRef<HTMLDivElement, FlexProps>(({
   className,
   children,
-  style,
+  direction,
+  justify,
+  align,
+  gap,
+  wrap,
+  padding,
   ...props
 }, ref) => {
-  const flexDirection = props['flex-direction']
-  const justifyContent = props['justify-content']
-  const alignItems = props['align-items']
-  const gap = props.gap
-  const padding = props.padding
-  const flex = props.flex
-  const width = props.width
-
   const gapMap: Record<string, string> = {
-    '2xs': 'gap-0.5',
-    'xs': 'gap-1',
-    's': 'gap-2',
-    'm': 'gap-4',
-    'l': 'gap-6',
-    'xl': 'gap-8',
+    xs: 'gap-1', s: 'gap-2', m: 'gap-4', l: 'gap-6', xl: 'gap-8',
   }
 
   const paddingMap: Record<string, string> = {
-    'xs': 'p-1',
-    's': 'p-2',
-    'm': 'p-4',
-    'l': 'p-6',
-    'xl': 'p-8',
+    xs: 'p-1', s: 'p-2', m: 'p-4', l: 'p-6', xl: 'p-8',
   }
 
   return (
@@ -66,17 +47,19 @@ export const Flex = forwardRef<HTMLDivElement, FlexProps>(({
       ref={ref}
       className={cn(
         'flex',
-        flexDirection?.includes('column') && 'flex-col',
-        justifyContent === 'space-between' && 'justify-between',
-        justifyContent === 'center' && 'justify-center',
-        alignItems === 'center' && 'items-center',
+        direction === 'column' && 'flex-col',
+        justify === 'between' && 'justify-between',
+        justify === 'center' && 'justify-center',
+        justify === 'end' && 'justify-end',
+        align === 'center' && 'items-center',
+        align === 'start' && 'items-start',
+        align === 'end' && 'items-end',
+        wrap && 'flex-wrap',
         gap && gapMap[gap],
         padding && paddingMap[padding],
-        flex === '1' && 'flex-1',
-        width === '100%' && 'w-full',
         className
       )}
-      style={style}
+      {...props}
     >
       {children}
     </div>
@@ -84,80 +67,61 @@ export const Flex = forwardRef<HTMLDivElement, FlexProps>(({
 })
 Flex.displayName = 'Flex'
 
-interface DivProps extends HTMLAttributes<HTMLDivElement> {
-  padding?: string
-  margin?: string
-  background?: string
-  flex?: string
-  width?: string
-  display?: string
+interface BoxProps extends HTMLAttributes<HTMLDivElement> {
+  padding?: 'xs' | 's' | 'm' | 'l' | 'xl'
 }
 
-export const Div = forwardRef<HTMLDivElement, DivProps>(({
+export const Box = forwardRef<HTMLDivElement, BoxProps>(({
   className,
   children,
-  style,
   padding,
-  flex,
-  width,
-  display,
   ...props
 }, ref) => {
   const paddingMap: Record<string, string> = {
-    'xs': 'p-1',
-    's': 'p-2',
-    'm': 'p-4',
-    'l': 'p-6',
-    'xl': 'p-8',
+    xs: 'p-1', s: 'p-2', m: 'p-4', l: 'p-6', xl: 'p-8',
   }
 
   return (
     <div
       ref={ref}
-      className={cn(
-        padding && paddingMap[padding],
-        flex === '1' && 'flex-1',
-        width === '100%' && 'w-full',
-        display === 'flex' && 'flex',
-        className
-      )}
-      style={style}
+      className={cn(padding && paddingMap[padding], className)}
       {...props}
     >
       {children}
     </div>
   )
 })
-Div.displayName = 'Div'
+Box.displayName = 'Box'
 
 interface GridProps extends HTMLAttributes<HTMLDivElement> {
-  columns?: string
-  gap?: string
-  padding?: string
+  columns?: 1 | 2 | 3 | 4 | 6 | 12
+  gap?: 'xs' | 's' | 'm' | 'l' | 'xl'
+  padding?: 'xs' | 's' | 'm' | 'l' | 'xl'
 }
 
 export const Grid = forwardRef<HTMLDivElement, GridProps>(({
   className,
   children,
-  columns = '1',
+  columns = 1,
   gap = 'm',
   padding,
   ...props
 }, ref) => {
   const gapMap: Record<string, string> = {
-    'xs': 'gap-1',
-    's': 'gap-2',
-    'm': 'gap-4',
-    'l': 'gap-6',
-    'xl': 'gap-8',
+    xs: 'gap-1', s: 'gap-2', m: 'gap-4', l: 'gap-6', xl: 'gap-8',
   }
 
   const paddingMap: Record<string, string> = {
-    'xs': 'p-1',
-    's': 'p-2',
-    'm': 'p-4',
-    'l': 'p-6',
-    'xl': 'p-8',
+    xs: 'p-1', s: 'p-2', m: 'p-4', l: 'p-6', xl: 'p-8',
+  }
+
+  const colsMap: Record<number, string> = {
+    1: 'grid-cols-1',
+    2: 'grid-cols-2',
+    3: 'grid-cols-3',
+    4: 'grid-cols-4',
+    6: 'grid-cols-6',
+    12: 'grid-cols-12',
   }
 
   return (
@@ -165,7 +129,7 @@ export const Grid = forwardRef<HTMLDivElement, GridProps>(({
       ref={ref}
       className={cn(
         'grid',
-        `grid-cols-${columns}`,
+        colsMap[columns],
         gapMap[gap],
         padding && paddingMap[padding],
         className
@@ -179,23 +143,19 @@ export const Grid = forwardRef<HTMLDivElement, GridProps>(({
 Grid.displayName = 'Grid'
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
-  padding?: string
-  variant?: 'primary' | 'secondary' | 'tertiary'
+  padding?: 'none' | 'xs' | 's' | 'm' | 'l' | 'xl'
+  variant?: 'default' | 'bordered'
 }
 
 export const Card = forwardRef<HTMLDivElement, CardProps>(({
   className,
   children,
   padding = 'l',
+  variant = 'default',
   ...props
 }, ref) => {
   const paddingMap: Record<string, string> = {
-    '0': 'p-0',
-    'xs': 'p-1',
-    's': 'p-2',
-    'm': 'p-4',
-    'l': 'p-6',
-    'xl': 'p-8',
+    none: 'p-0', xs: 'p-1', s: 'p-2', m: 'p-4', l: 'p-6', xl: 'p-8',
   }
 
   return (
@@ -227,59 +187,50 @@ Divider.displayName = 'Divider'
 // ============================================================================
 
 interface TextProps extends HTMLAttributes<HTMLElement> {
-  tag?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span' | 'label'
-  font?: string
-  'font-size'?: string
-  'font-weight'?: string
-  color?: string
+  as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span' | 'label'
+  size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl'
+  weight?: 'normal' | 'medium' | 'semibold' | 'bold'
+  color?: 'primary' | 'secondary' | 'muted'
 }
 
 export const Text = forwardRef<HTMLElement, TextProps>(({
-  tag = 'span',
+  as: Component = 'span',
   className,
   children,
-  font,
+  size,
+  weight,
   color,
   ...props
 }, ref) => {
-  const fontSize = props['font-size']
-  const fontWeight = props['font-weight']
-
-  const fontClasses: Record<string, string> = {
-    'heading-xl': 'text-3xl font-bold',
-    'heading-l': 'text-2xl font-bold',
-    'heading-m': 'text-xl font-semibold',
-    'heading-s': 'text-lg font-semibold',
-    'body-regular-l': 'text-lg',
-    'body-regular-m': 'text-base',
-    'body-regular-s': 'text-sm',
+  const sizeClasses: Record<string, string> = {
+    xs: 'text-xs',
+    sm: 'text-sm',
+    base: 'text-base',
+    lg: 'text-lg',
+    xl: 'text-xl',
+    '2xl': 'text-2xl',
+    '3xl': 'text-3xl',
   }
 
-  const fontSizeClasses: Record<string, string> = {
-    'heading-xl': 'text-3xl font-bold',
-    'heading-l': 'text-2xl font-bold',
-    'heading-s': 'text-lg font-semibold',
-    'body-s': 'text-sm',
-    'body-m': 'text-base',
+  const weightClasses: Record<string, string> = {
+    normal: 'font-normal',
+    medium: 'font-medium',
+    semibold: 'font-semibold',
+    bold: 'font-bold',
   }
 
   const colorClasses: Record<string, string> = {
-    'neutral-01': 'text-gray-900',
-    'neutral-02': 'text-gray-600',
-    'secondary': 'text-gray-500',
-    'positive': 'text-green-600',
-    'negative': 'text-red-600',
+    primary: 'text-gray-900',
+    secondary: 'text-gray-600',
+    muted: 'text-gray-500',
   }
-
-  const Component = tag as React.ElementType
 
   return (
     <Component
-      ref={ref}
+      ref={ref as any}
       className={cn(
-        font && fontClasses[font],
-        fontSize && fontSizeClasses[fontSize],
-        fontWeight === 'book' && 'font-medium',
+        size && sizeClasses[size],
+        weight && weightClasses[weight],
         color && colorClasses[color],
         className
       )}
@@ -292,12 +243,11 @@ export const Text = forwardRef<HTMLElement, TextProps>(({
 Text.displayName = 'Text'
 
 // ============================================================================
-// FORM COMPONENT
+// FORM COMPONENTS
 // ============================================================================
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string
-  onInput?: (e: React.FormEvent<HTMLInputElement>) => void
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(({
@@ -321,32 +271,32 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
 Input.displayName = 'Input'
 
 // ============================================================================
-// ACTION COMPONENT
+// BUTTON COMPONENT
 // ============================================================================
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  rank?: 'primary' | 'secondary' | 'tertiary'
-  size?: 'small' | 'medium' | 'large'
+  variant?: 'primary' | 'secondary' | 'ghost'
+  size?: 'sm' | 'md' | 'lg'
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   className,
   children,
-  rank = 'primary',
-  size = 'medium',
+  variant = 'primary',
+  size = 'md',
   disabled,
   ...props
 }, ref) => {
   const sizeClasses: Record<string, string> = {
-    small: 'px-3 py-1.5 text-sm',
-    medium: 'px-4 py-2 text-base',
-    large: 'px-6 py-3 text-lg',
+    sm: 'px-3 py-1.5 text-sm',
+    md: 'px-4 py-2 text-base',
+    lg: 'px-6 py-3 text-lg',
   }
 
-  const rankClasses: Record<string, string> = {
+  const variantClasses: Record<string, string> = {
     primary: 'bg-blue-600 text-white hover:bg-blue-700',
     secondary: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50',
-    tertiary: 'bg-transparent text-gray-700 hover:bg-gray-100',
+    ghost: 'bg-transparent text-gray-700 hover:bg-gray-100',
   }
 
   return (
@@ -355,7 +305,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
       className={cn(
         'inline-flex items-center justify-center font-medium rounded-md transition-colors',
         sizeClasses[size],
-        rankClasses[rank],
+        variantClasses[variant],
         disabled && 'cursor-not-allowed opacity-50',
         className
       )}
@@ -373,38 +323,37 @@ Button.displayName = 'Button'
 // ============================================================================
 
 interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
-  variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'positive' | 'negative' | 'neutral'
-}
-
-const badgeVariants: Record<string, string> = {
-  primary: 'bg-blue-100 text-blue-800',
-  secondary: 'bg-gray-100 text-gray-800',
-  success: 'bg-green-100 text-green-800',
-  positive: 'bg-green-100 text-green-800',
-  warning: 'bg-yellow-100 text-yellow-800',
-  danger: 'bg-red-100 text-red-800',
-  negative: 'bg-red-100 text-red-800',
-  neutral: 'bg-gray-100 text-gray-800',
+  variant?: 'default' | 'success' | 'warning' | 'danger' | 'info'
 }
 
 export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(({
   className,
   children,
-  variant = 'primary',
+  variant = 'default',
   ...props
-}, ref) => (
-  <span
-    ref={ref}
-    className={cn(
-      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-      badgeVariants[variant],
-      className
-    )}
-    {...props}
-  >
-    {children}
-  </span>
-))
+}, ref) => {
+  const variantClasses: Record<string, string> = {
+    default: 'bg-gray-100 text-gray-800',
+    success: 'bg-green-100 text-green-800',
+    warning: 'bg-yellow-100 text-yellow-800',
+    danger: 'bg-red-100 text-red-800',
+    info: 'bg-blue-100 text-blue-800',
+  }
+
+  return (
+    <span
+      ref={ref}
+      className={cn(
+        'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+        variantClasses[variant],
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </span>
+  )
+})
 Badge.displayName = 'Badge'
 
 export const Spinner = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({
@@ -421,9 +370,9 @@ Spinner.displayName = 'Spinner'
 
 interface ThemeProps {
   children: React.ReactNode
-  'color-scheme'?: 'light' | 'dark'
+  mode?: 'light' | 'dark'
 }
 
-export const Theme: React.FC<ThemeProps> = ({ children, 'color-scheme': colorScheme }) => {
-  return <div className={colorScheme === 'dark' ? 'dark' : ''}>{children}</div>
+export const Theme: React.FC<ThemeProps> = ({ children, mode }) => {
+  return <div className={mode === 'dark' ? 'dark' : ''}>{children}</div>
 }

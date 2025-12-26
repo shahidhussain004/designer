@@ -96,9 +96,6 @@ const LandingPage = () => {
             <h2 
               key={`word-${currentWordIndex}`}
               className="text-5xl font-bold text-white relative z-10 mb-2"
-              style={{
-                animation: 'wordSlideReveal 4000ms ease-in-out'
-              }}
             >
               {rotatingWords[currentWordIndex].line1}
             </h2>
@@ -107,9 +104,6 @@ const LandingPage = () => {
             <h2 
               key={`line2-${currentWordIndex}`}
               className="text-5xl font-bold text-white relative z-10 mb-2"
-              style={{
-                animation: 'secondLineReveal 4000ms ease-in-out'
-              }}
             >
               {rotatingWords[currentWordIndex].line2}
             </h2>
@@ -118,9 +112,6 @@ const LandingPage = () => {
             <h2 
               key={`line3-${currentWordIndex}`}
               className="text-5xl font-bold text-white relative z-10 mb-4"
-              style={{
-                animation: 'thirdLineReveal 4000ms ease-in-out'
-              }}
             >
               {rotatingWords[currentWordIndex].line3}
             </h2>

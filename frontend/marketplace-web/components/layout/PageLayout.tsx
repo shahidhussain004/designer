@@ -1,10 +1,9 @@
 'use client'
 
 import React from 'react'
-import { GdsFlex, GdsDiv } from '@/components/green'
+import { Flex, Div } from '@/components/green'
 import Navbar from './Navbar'
 import Footer from './Footer'
-import ClientOnly from './ClientOnly'
 
 interface PageLayoutProps {
   children: React.ReactNode
@@ -18,26 +17,13 @@ interface PageLayoutProps {
  */
 function LoadingSkeleton() {
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      minHeight: '100vh',
-      backgroundColor: '#f5f5f5'
-    }}>
+    <div>
       {/* Navbar skeleton */}
-      <div style={{
-        height: '64px',
-        backgroundColor: '#fff',
-        borderBottom: '1px solid #e0e0e0'
-      }} />
-      {/* Content skeleton */}
-      <div style={{ flex: 1 }} />
+      <div>
+        {/* Content skeleton */}
+      </div>
+      <div />
       {/* Footer skeleton */}
-      <div style={{
-        height: '80px',
-        backgroundColor: '#fff',
-        borderTop: '1px solid #e0e0e0'
-      }} />
     </div>
   )
 }
@@ -48,18 +34,16 @@ export default function PageLayout({
   showFooter = true 
 }: PageLayoutProps) {
   return (
-    <ClientOnly fallback={<LoadingSkeleton />}>
-      <GdsFlex 
+      <Flex 
         flex-direction="column" 
         min-height="100vh"
         background="neutral-01"
       >
         {showNavbar && <Navbar />}
-        <GdsDiv flex="1" width="100%">
+        <Div flex="1" width="100%">
           {children}
-        </GdsDiv>
+        </Div>
         {showFooter && <Footer />}
-      </GdsFlex>
-    </ClientOnly>
+      </Flex>
   )
 }

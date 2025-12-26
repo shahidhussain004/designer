@@ -14,15 +14,15 @@ import {
 import { formatCurrency, createCourseCheckoutSession } from '@/lib/payments';
 import { authService } from '@/lib/auth';
 import {
-  GdsCard,
-  GdsFlex,
-  GdsGrid,
-  GdsText,
-  GdsButton,
-  GdsDiv,
-  GdsDivider,
-  GdsBadge,
-  GdsSpinner,
+  Card,
+  Flex,
+  Grid,
+  Text,
+  Button,
+  Div,
+  Divider,
+  Badge,
+  Spinner,
 } from '@/components/green';
 
 export default function CourseDetailPage() {
@@ -90,24 +90,24 @@ export default function CourseDetailPage() {
 
   if (loading) {
     return (
-      <GdsFlex justify-content="center" align-items="center" style={{ minHeight: '100vh' } as any}>
-        <GdsSpinner />
-      </GdsFlex>
+      <Flex justify-content="center" align-items="center">
+        <Spinner />
+      </Flex>
     );
   }
 
   if (error || !course) {
     return (
-      <GdsFlex justify-content="center" align-items="center" flex-direction="column" gap="l" style={{ minHeight: '100vh' } as any}>
-        <GdsText style={{ fontSize: '4rem' } as any}>😕</GdsText>
-        <GdsText tag="h2" style={{ fontSize: '1.5rem', fontWeight: 700 } as any}>Course Not Found</GdsText>
-        <GdsText style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>
+      <Flex justify-content="center" align-items="center" flex-direction="column" gap="l">
+        <Text>😕</Text>
+        <Text tag="h2">Course Not Found</Text>
+        <Text>
           {error || 'This course does not exist'}
-        </GdsText>
-        <Link href="/courses" style={{ color: 'var(--gds-color-l3-content-positive)' } as any}>
+        </Text>
+        <Link href="/courses">
           ← Back to Courses
         </Link>
-      </GdsFlex>
+      </Flex>
     );
   }
 
@@ -116,244 +116,221 @@ export default function CourseDetailPage() {
   const totalMinutes = course.durationMinutes % 60;
 
   return (
-    <GdsDiv style={{ minHeight: '100vh', background: 'var(--gds-color-l3-background-secondary)' } as any}>
+    <Div>
       {/* Navigation */}
-      <GdsDiv style={{ background: 'var(--gds-color-l3-background-primary)', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', position: 'sticky', top: 0, zIndex: 10 } as any}>
-        <GdsFlex justify-content="space-between" align-items="center" padding="m" style={{ maxWidth: '1280px', margin: '0 auto' } as any}>
-          <GdsFlex align-items="center" gap="xl">
-            <Link href="/" style={{ textDecoration: 'none' } as any}>
-              <GdsText style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--gds-color-l3-content-positive)' } as any}>
+      <Div>
+        <Flex justify-content="space-between" align-items="center" padding="m">
+          <Flex align-items="center" gap="xl">
+            <Link href="/">
+              <Text>
                 Designer Marketplace
-              </GdsText>
+              </Text>
             </Link>
-            <GdsFlex gap="l" className="desktop-nav">
-              <Link href="/jobs" style={{ textDecoration: 'none', color: 'var(--gds-color-l3-content-secondary)' } as any}>Jobs</Link>
-              <Link href="/courses" style={{ textDecoration: 'none', color: 'var(--gds-color-l3-content-positive)', fontWeight: 500 } as any}>Courses</Link>
-              <Link href="/dashboard" style={{ textDecoration: 'none', color: 'var(--gds-color-l3-content-secondary)' } as any}>Dashboard</Link>
-            </GdsFlex>
-          </GdsFlex>
-        </GdsFlex>
-      </GdsDiv>
+            <Flex gap="l" className="desktop-nav">
+              <Link href="/jobs">Jobs</Link>
+              <Link href="/courses">Courses</Link>
+              <Link href="/dashboard">Dashboard</Link>
+            </Flex>
+          </Flex>
+        </Flex>
+      </Div>
 
       {/* Course Header */}
-      <GdsDiv style={{ background: 'linear-gradient(to right, #1f2937, #111827)', color: 'white', padding: '3rem 0' } as any}>
-        <GdsFlex flex-direction="column; l{row}" gap="xl" style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1rem' } as any}>
+      <Div>
+        <Flex flex-direction="column; l{row}" gap="xl">
           {/* Course Info */}
-          <GdsFlex flex-direction="column" gap="m" style={{ flex: 1 } as any}>
+          <Flex flex-direction="column" gap="m">
             {/* Breadcrumb */}
-            <GdsFlex align-items="center" gap="s">
-              <Link href="/courses" style={{ color: '#d1d5db', textDecoration: 'none', fontSize: '0.875rem' } as any}>
+            <Flex align-items="center" gap="s">
+              <Link href="/courses">
                 Courses
               </Link>
-              <GdsText style={{ color: '#6b7280' } as any}>/</GdsText>
-              <GdsText style={{ color: '#d1d5db', fontSize: '0.875rem' } as any}>{course.category}</GdsText>
-            </GdsFlex>
+              <Text>/</Text>
+              <Text>{course.category}</Text>
+            </Flex>
 
-            <GdsText tag="h1" style={{ fontSize: '2rem', fontWeight: 700 } as any}>{course.title}</GdsText>
-            <GdsText style={{ fontSize: '1.125rem', color: '#d1d5db' } as any}>{course.description}</GdsText>
+            <Text tag="h1">{course.title}</Text>
+            <Text>{course.description}</Text>
 
             {/* Stats */}
-            <GdsFlex gap="m" align-items="center" flex-wrap="wrap" style={{ fontSize: '0.875rem' } as any}>
-              <GdsFlex align-items="center" gap="xs">
-                <GdsText style={{ color: '#fbbf24' } as any}>★</GdsText>
-                <GdsText style={{ fontWeight: 600 } as any}>{course.rating.toFixed(1)}</GdsText>
-                <GdsText style={{ color: '#9ca3af' } as any}>({course.reviewsCount} reviews)</GdsText>
-              </GdsFlex>
-              <GdsText style={{ color: '#6b7280' } as any}>|</GdsText>
-              <GdsText>{course.enrollmentsCount.toLocaleString()} students</GdsText>
-              <GdsText style={{ color: '#6b7280' } as any}>|</GdsText>
-              <GdsText>{course.skillLevel}</GdsText>
-            </GdsFlex>
+            <Flex gap="m" align-items="center" flex-wrap="wrap">
+              <Flex align-items="center" gap="xs">
+                <Text>★</Text>
+                <Text>{course.rating.toFixed(1)}</Text>
+                <Text>({course.reviewsCount} reviews)</Text>
+              </Flex>
+              <Text>|</Text>
+              <Text>{course.enrollmentsCount.toLocaleString()} students</Text>
+              <Text>|</Text>
+              <Text>{course.skillLevel}</Text>
+            </Flex>
 
-            <GdsText style={{ fontSize: '0.875rem', color: '#d1d5db' } as any}>
-              Created by <span style={{ color: 'var(--gds-color-l3-content-positive)', fontWeight: 500 } as any}>{course.instructorName}</span>
-            </GdsText>
-            <GdsText style={{ fontSize: '0.875rem', color: '#9ca3af' } as any}>
+            <Text>
+              Created by <span>{course.instructorName}</span>
+            </Text>
+            <Text>
               Last updated: {new Date(course.updatedAt).toLocaleDateString()}
-            </GdsText>
-          </GdsFlex>
+            </Text>
+          </Flex>
 
           {/* Enrollment Card */}
-          <GdsDiv style={{ width: '100%', maxWidth: '384px' } as any}>
-            <GdsCard style={{ overflow: 'hidden' } as any}>
+          <Div>
+            <Card>
               {/* Course Thumbnail */}
-              <GdsDiv style={{ aspectRatio: '16/9', background: 'var(--gds-color-l3-background-secondary)', position: 'relative' } as any}>
+              <Div>
                 {course.thumbnailUrl ? (
                   <Image
                     src={course.thumbnailUrl}
                     alt={course.title}
                     fill
-                    style={{ objectFit: 'cover' } as any}
                   />
                 ) : (
-                  <GdsFlex justify-content="center" align-items="center" style={{ width: '100%', height: '100%' } as any}>
-                    <GdsText style={{ fontSize: '3rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>🎬</GdsText>
-                  </GdsFlex>
+                  <Flex justify-content="center" align-items="center">
+                    <Text>🎬</Text>
+                  </Flex>
                 )}
-              </GdsDiv>
+              </Div>
 
-              <GdsFlex flex-direction="column" gap="m" padding="l">
-                <GdsText style={{ fontSize: '2rem', fontWeight: 700 } as any}>
+              <Flex flex-direction="column" gap="m" padding="l">
+                <Text>
                   {course.price > 0 ? formatCurrency(course.price, course.currency) : 'Free'}
-                </GdsText>
+                </Text>
 
-                <GdsButton
+                <Button
                   rank="primary"
                   onClick={handleEnroll}
                   disabled={isEnrolling}
-                  style={{ width: '100%' } as any}
                 >
                   {isEnrolling ? 'Processing...' : course.price > 0 ? 'Buy Now' : 'Enroll for Free'}
-                </GdsButton>
+                </Button>
 
-                <GdsText style={{ textAlign: 'center', fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>
+                <Text>
                   30-Day Money-Back Guarantee
-                </GdsText>
+                </Text>
 
-                <GdsFlex flex-direction="column" gap="s" style={{ marginTop: '0.5rem' } as any}>
-                  <GdsFlex align-items="center" gap="m">
-                    <GdsText>⏱️</GdsText>
-                    <GdsText style={{ fontSize: '0.875rem' } as any}>{totalHours}h {totalMinutes}m total length</GdsText>
-                  </GdsFlex>
-                  <GdsFlex align-items="center" gap="m">
-                    <GdsText>📄</GdsText>
-                    <GdsText style={{ fontSize: '0.875rem' } as any}>{course.lessonsCount} lessons</GdsText>
-                  </GdsFlex>
-                  <GdsFlex align-items="center" gap="m">
-                    <GdsText>🏆</GdsText>
-                    <GdsText style={{ fontSize: '0.875rem' } as any}>Certificate of completion</GdsText>
-                  </GdsFlex>
-                  <GdsFlex align-items="center" gap="m">
-                    <GdsText>🌐</GdsText>
-                    <GdsText style={{ fontSize: '0.875rem' } as any}>Full lifetime access</GdsText>
-                  </GdsFlex>
-                </GdsFlex>
-              </GdsFlex>
-            </GdsCard>
-          </GdsDiv>
-        </GdsFlex>
-      </GdsDiv>
+                <Flex flex-direction="column" gap="s">
+                  <Flex align-items="center" gap="m">
+                    <Text>⏱️</Text>
+                    <Text>{totalHours}h {totalMinutes}m total length</Text>
+                  </Flex>
+                  <Flex align-items="center" gap="m">
+                    <Text>📄</Text>
+                    <Text>{course.lessonsCount} lessons</Text>
+                  </Flex>
+                  <Flex align-items="center" gap="m">
+                    <Text>🌟</Text>
+                    <Text>Certificate of completion</Text>
+                  </Flex>
+                  <Flex align-items="center" gap="m">
+                    <Text>🌐</Text>
+                    <Text>Full lifetime access</Text>
+                  </Flex>
+                </Flex>
+              </Flex>
+            </Card>
+          </Div>
+        </Flex>
+      </Div>
 
       {/* Course Content */}
-      <GdsFlex flex-direction="column" gap="l" padding="xl" style={{ maxWidth: '900px', margin: '0 auto' } as any}>
+      <Flex flex-direction="column" gap="l" padding="xl">
         {/* What You'll Learn */}
         {course.learningOutcomes.length > 0 && (
-          <GdsCard>
-            <GdsFlex flex-direction="column" gap="m" padding="l">
-              <GdsText tag="h2" style={{ fontSize: '1.25rem', fontWeight: 700 } as any}>What You&apos;ll Learn</GdsText>
-              <GdsGrid columns="1; m{2}" gap="m">
+          <Card>
+            <Flex flex-direction="column" gap="m" padding="l">
+              <Text tag="h2">What You&apos;ll Learn</Text>
+              <Grid columns="1; m{2}" gap="m">
                 {course.learningOutcomes.map((outcome, index) => (
-                  <GdsFlex key={index} align-items="flex-start" gap="s">
-                    <GdsText style={{ color: 'var(--gds-color-l3-content-positive)' } as any}>✓</GdsText>
-                    <GdsText style={{ color: 'var(--gds-color-l3-content-secondary)' } as any}>{outcome}</GdsText>
-                  </GdsFlex>
+                  <Flex key={index} align-items="flex-start" gap="s">
+                    <Text>✓</Text>
+                    <Text>{outcome}</Text>
+                  </Flex>
                 ))}
-              </GdsGrid>
-            </GdsFlex>
-          </GdsCard>
+              </Grid>
+            </Flex>
+          </Card>
         )}
 
         {/* Requirements */}
         {course.requirements.length > 0 && (
-          <GdsDiv>
-            <GdsText tag="h2" style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem' } as any}>Requirements</GdsText>
-            <GdsFlex flex-direction="column" gap="s">
+          <Div>
+            <Text tag="h2">Requirements</Text>
+            <Flex flex-direction="column" gap="s">
               {course.requirements.map((req, index) => (
-                <GdsFlex key={index} align-items="flex-start" gap="s">
-                  <GdsText style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>•</GdsText>
-                  <GdsText style={{ color: 'var(--gds-color-l3-content-secondary)' } as any}>{req}</GdsText>
-                </GdsFlex>
+                <Flex key={index} align-items="flex-start" gap="s">
+                  <Text>•</Text>
+                  <Text>{req}</Text>
+                </Flex>
               ))}
-            </GdsFlex>
-          </GdsDiv>
+            </Flex>
+          </Div>
         )}
 
         {/* Course Content / Lessons */}
-        <GdsCard>
-          <GdsFlex flex-direction="column" padding="l">
-            <GdsFlex justify-content="space-between" align-items="center" style={{ marginBottom: '1rem' } as any}>
-              <GdsText tag="h2" style={{ fontSize: '1.25rem', fontWeight: 700 } as any}>Course Content</GdsText>
-              <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>
+        <Card>
+          <Flex flex-direction="column" padding="l">
+            <Flex justify-content="space-between" align-items="center">
+              <Text tag="h2">Course Content</Text>
+              <Text>
                 {lessons.length} lessons • {totalHours}h {totalMinutes}m
-              </GdsText>
-            </GdsFlex>
+              </Text>
+            </Flex>
 
-            <GdsFlex flex-direction="column">
+            <Flex flex-direction="column">
               {displayedLessons.map((lesson, index) => (
-                <GdsDiv key={lesson.id}>
-                  {index > 0 && <GdsDivider />}
-                  <GdsFlex justify-content="space-between" align-items="center" padding="m">
-                    <GdsFlex align-items="center" gap="m">
-                      <GdsDiv
-                        style={{
-                          width: '32px',
-                          height: '32px',
-                          borderRadius: '50%',
-                          background: 'var(--gds-color-l3-background-secondary)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '0.875rem',
-                          fontWeight: 500,
-                        } as any}
-                      >
+                <Div key={lesson.id}>
+                  {index > 0 && <Divider />}
+                  <Flex justify-content="space-between" align-items="center" padding="m">
+                    <Flex align-items="center" gap="m">
+                      <Div>
                         {index + 1}
-                      </GdsDiv>
-                      <GdsDiv>
-                        <GdsText style={{ fontWeight: 500 } as any}>{lesson.title}</GdsText>
-                        <GdsFlex align-items="center" gap="s" style={{ marginTop: '0.25rem' } as any}>
-                          <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>
+                      </Div>
+                      <Div>
+                        <Text>{lesson.title}</Text>
+                        <Flex align-items="center" gap="s">
+                          <Text>
                             {lesson.contentType === 'Video' && '🎬'}
                             {lesson.contentType === 'Quiz' && '❓'}
                             {lesson.contentType === 'Text' && '📄'}
                             {' '}{lesson.durationMinutes} min
-                          </GdsText>
+                          </Text>
                           {lesson.isPreview && (
-                            <GdsBadge variant="information">Preview</GdsBadge>
+                            <Badge variant="information">Preview</Badge>
                           )}
-                        </GdsFlex>
-                      </GdsDiv>
-                    </GdsFlex>
+                        </Flex>
+                      </Div>
+                    </Flex>
                     {lesson.isPreview && (
-                      <GdsButton size="small" rank="tertiary">Preview</GdsButton>
+                      <Button size="small" rank="tertiary">Preview</Button>
                     )}
-                  </GdsFlex>
-                </GdsDiv>
+                  </Flex>
+                </Div>
               ))}
-            </GdsFlex>
+            </Flex>
 
             {lessons.length > 5 && !showAllLessons && (
-              <GdsButton
+              <Button
                 rank="tertiary"
                 onClick={() => setShowAllLessons(true)}
-                style={{ marginTop: '1rem' } as any}
               >
                 Show all {lessons.length} lessons
-              </GdsButton>
+              </Button>
             )}
-          </GdsFlex>
-        </GdsCard>
+          </Flex>
+        </Card>
 
         {/* Tags */}
         {course.tags.length > 0 && (
-          <GdsDiv>
-            <GdsText tag="h2" style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem' } as any}>Tags</GdsText>
-            <GdsFlex gap="s" flex-wrap="wrap">
+          <Div>
+            <Text tag="h2">Tags</Text>
+            <Flex gap="s" flex-wrap="wrap">
               {course.tags.map((tag, index) => (
-                <GdsBadge key={index} variant="information">{tag}</GdsBadge>
+                <Badge key={index} variant="information">{tag}</Badge>
               ))}
-            </GdsFlex>
-          </GdsDiv>
+            </Flex>
+          </Div>
         )}
-      </GdsFlex>
-
-      <style>{`
-        @media (max-width: 768px) {
-          .desktop-nav {
-            display: none !important;
-          }
-        }
-      `}</style>
-    </GdsDiv>
+      </Flex>
+    </Div>
   );
 }

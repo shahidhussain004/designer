@@ -4,16 +4,16 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import {
-  GdsGrid,
-  GdsFlex,
-  GdsCard,
-  GdsText,
-  GdsButton,
-  GdsInput,
-  GdsAlert,
-  GdsBadge,
-  GdsSpinner,
-  GdsDivider,
+  Grid,
+  Flex,
+  Card,
+  Text,
+  Button,
+  Input,
+  Alert,
+  Badge,
+  Spinner,
+  Divider,
 } from '@/components/green';
 import { PageLayout } from '@/components/layout';
 import { authService } from '@/lib/auth';
@@ -137,9 +137,9 @@ export default function JobDetailsPage() {
   if (loading) {
     return (
       <PageLayout>
-        <GdsFlex justify-content="center" align-items="center" padding="xl" style={{ minHeight: '50vh' } as any}>
-          <GdsSpinner />
-        </GdsFlex>
+        <Flex justify-content="center" align-items="center" padding="xl">
+          <Spinner />
+        </Flex>
       </PageLayout>
     );
   }
@@ -147,14 +147,14 @@ export default function JobDetailsPage() {
   if (error || !job) {
     return (
       <PageLayout>
-        <GdsFlex flex-direction="column" padding="l" gap="m">
-          <GdsAlert variant="negative">
+        <Flex flex-direction="column" padding="l" gap="m">
+          <Alert variant="negative">
             Error: {error || 'Job not found'}
-          </GdsAlert>
-          <Link href="/jobs" style={{ color: 'var(--gds-color-l3-content-positive)', textDecoration: 'none' } as any}>
+          </Alert>
+          <Link href="/jobs">
             ← Back to Jobs
           </Link>
-        </GdsFlex>
+        </Flex>
       </PageLayout>
     );
   }
@@ -162,131 +162,130 @@ export default function JobDetailsPage() {
   return (
     <PageLayout>
       {/* Header */}
-      <GdsFlex flex-direction="column" gap="s" padding="l" style={{ borderBottom: '1px solid var(--gds-color-l3-border-primary)' } as any}>
-        <Link href="/jobs" style={{ color: 'var(--gds-color-l3-content-positive)', textDecoration: 'none' } as any}>
+      <Flex flex-direction="column" gap="s" padding="l">
+        <Link href="/jobs">
           ← Back to Jobs
         </Link>
-        <GdsText tag="h1" font-size="heading-xl">
+        <Text tag="h1" font-size="heading-xl">
           {job.title}
-        </GdsText>
-      </GdsFlex>
+        </Text>
+      </Flex>
 
-      <GdsFlex padding="l">
-        <GdsGrid columns="1; m{3}" gap="l" style={{ width: '100%' } as any}>
+      <Flex padding="l">
+        <Grid columns="1; m{3}" gap="l">
           {/* Main Content */}
-          <GdsFlex flex-direction="column" gap="m" style={{ gridColumn: 'span 2' } as any}>
+          <Flex flex-direction="column" gap="m">
             {/* Job Description */}
-            <GdsCard padding="l">
-              <GdsFlex flex-direction="column" gap="m">
-                <GdsText tag="h2" font-size="heading-m">
+            <Card padding="l">
+              <Flex flex-direction="column" gap="m">
+                <Text tag="h2" font-size="heading-m">
                   Job Description
-                </GdsText>
-                <GdsText style={{ whiteSpace: 'pre-wrap' } as any}>
+                </Text>
+                <Text>
                   {job.description}
-                </GdsText>
-              </GdsFlex>
-            </GdsCard>
+                </Text>
+              </Flex>
+            </Card>
 
             {/* Job Meta */}
-            <GdsGrid columns="2" gap="m">
-              <GdsCard padding="m">
-                <GdsFlex flex-direction="column" gap="xs">
-                  <GdsText font-size="body-s" color="secondary">Category</GdsText>
-                  <GdsText font-size="heading-s">{job.category}</GdsText>
-                </GdsFlex>
-              </GdsCard>
-              <GdsCard padding="m">
-                <GdsFlex flex-direction="column" gap="xs">
-                  <GdsText font-size="body-s" color="secondary">Experience Level</GdsText>
-                  <GdsText font-size="heading-s">{job.experienceLevel}</GdsText>
-                </GdsFlex>
-              </GdsCard>
-              <GdsCard padding="m">
-                <GdsFlex flex-direction="column" gap="xs">
-                  <GdsText font-size="body-s" color="secondary">Status</GdsText>
-                  <GdsBadge variant={job.status === 'OPEN' ? 'positive' : 'information'}>
+            <Grid columns="2" gap="m">
+              <Card padding="m">
+                <Flex flex-direction="column" gap="xs">
+                  <Text font-size="body-s" color="secondary">Category</Text>
+                  <Text font-size="heading-s">{job.category}</Text>
+                </Flex>
+              </Card>
+              <Card padding="m">
+                <Flex flex-direction="column" gap="xs">
+                  <Text font-size="body-s" color="secondary">Experience Level</Text>
+                  <Text font-size="heading-s">{job.experienceLevel}</Text>
+                </Flex>
+              </Card>
+              <Card padding="m">
+                <Flex flex-direction="column" gap="xs">
+                  <Text font-size="body-s" color="secondary">Status</Text>
+                  <Badge variant={job.status === 'OPEN' ? 'positive' : 'information'}>
                     {job.status}
-                  </GdsBadge>
-                </GdsFlex>
-              </GdsCard>
-              <GdsCard padding="m">
-                <GdsFlex flex-direction="column" gap="xs">
-                  <GdsText font-size="body-s" color="secondary">Posted</GdsText>
-                  <GdsText font-size="heading-s">
+                  </Badge>
+                </Flex>
+              </Card>
+              <Card padding="m">
+                <Flex flex-direction="column" gap="xs">
+                  <Text font-size="body-s" color="secondary">Posted</Text>
+                  <Text font-size="heading-s">
                     {new Date(job.createdAt).toLocaleDateString()}
-                  </GdsText>
-                </GdsFlex>
-              </GdsCard>
-            </GdsGrid>
+                  </Text>
+                </Flex>
+              </Card>
+            </Grid>
 
             {/* Client Info */}
             {client && (
-              <GdsCard padding="l">
-                <GdsFlex flex-direction="column" gap="m">
-                  <GdsText tag="h2" font-size="heading-m">
+              <Card padding="l">
+                <Flex flex-direction="column" gap="m">
+                  <Text tag="h2" font-size="heading-m">
                     About the Client
-                  </GdsText>
-                  <GdsFlex justify-content="space-between" align-items="center">
-                    <GdsFlex flex-direction="column" gap="xs">
-                      <GdsText font-size="heading-s">{client.fullName}</GdsText>
-                      <GdsText font-size="body-s" color="secondary">@{client.username}</GdsText>
-                      <GdsText font-size="body-s" color="secondary">{client.email}</GdsText>
-                    </GdsFlex>
+                  </Text>
+                  <Flex justify-content="space-between" align-items="center">
+                    <Flex flex-direction="column" gap="xs">
+                      <Text font-size="heading-s">{client.fullName}</Text>
+                      <Text font-size="body-s" color="secondary">@{client.username}</Text>
+                      <Text font-size="body-s" color="secondary">{client.email}</Text>
+                    </Flex>
                     <Link
                       href={`/users/${client.id}/profile`}
-                      style={{ color: 'var(--gds-color-l3-content-positive)', textDecoration: 'none' } as any}
                     >
                       View Profile →
                     </Link>
-                  </GdsFlex>
-                </GdsFlex>
-              </GdsCard>
+                  </Flex>
+                </Flex>
+              </Card>
             )}
-          </GdsFlex>
+          </Flex>
 
           {/* Sidebar */}
-          <GdsFlex flex-direction="column" gap="m">
+          <Flex flex-direction="column" gap="m">
             {/* Budget Card */}
-            <GdsCard padding="l" variant="positive">
-              <GdsFlex flex-direction="column" gap="m">
-                <GdsFlex flex-direction="column" gap="xs">
-                  <GdsText font-size="body-s">Budget</GdsText>
-                  <GdsText font-size="heading-xl">${job.budget}</GdsText>
-                </GdsFlex>
+            <Card padding="l" variant="positive">
+              <Flex flex-direction="column" gap="m">
+                <Flex flex-direction="column" gap="xs">
+                  <Text font-size="body-s">Budget</Text>
+                  <Text font-size="heading-xl">${job.budget}</Text>
+                </Flex>
                 
                 {user && user.role === 'FREELANCER' && user.id !== job.clientId ? (
-                  <GdsButton
+                  <Button
                     variant={proposalOpen ? 'neutral' : 'brand'}
                     onClick={() => setProposalOpen(!proposalOpen)}
                   >
                     {proposalOpen ? 'Cancel' : 'Send Proposal'}
-                  </GdsButton>
+                  </Button>
                 ) : user && user.id === job.clientId ? (
-                  <GdsCard padding="m" variant="information">
-                    <GdsText font-size="body-s" style={{ textAlign: 'center' } as any}>
+                  <Card padding="m" variant="information">
+                    <Text font-size="body-s">
                       This is your job posting
-                    </GdsText>
-                  </GdsCard>
+                    </Text>
+                  </Card>
                 ) : (
                   <Link href="/auth/login">
-                    <GdsButton rank="secondary" style={{ width: '100%' } as any}>
+                    <Button rank="secondary">
                       Sign In to Propose
-                    </GdsButton>
+                    </Button>
                   </Link>
                 )}
-              </GdsFlex>
-            </GdsCard>
+              </Flex>
+            </Card>
 
             {/* Proposal Form */}
             {proposalOpen && user && user.role === 'FREELANCER' && (
-              <GdsCard padding="l">
+              <Card padding="l">
                 <form onSubmit={handleProposalSubmit}>
-                  <GdsFlex flex-direction="column" gap="m">
-                    <GdsText tag="h3" font-size="heading-s">
+                  <Flex flex-direction="column" gap="m">
+                    <Text tag="h3" font-size="heading-s">
                       Submit Your Proposal
-                    </GdsText>
+                    </Text>
 
-                    <GdsInput
+                    <Input
                       label="Your Proposed Rate ($)"
                       type="number"
                       value={proposalData.proposedRate.toString()}
@@ -299,7 +298,7 @@ export default function JobDetailsPage() {
                       required
                     />
 
-                    <GdsInput
+                    <Input
                       label="Estimated Duration (days)"
                       type="number"
                       value={(proposalData.estimatedDuration || 30).toString()}
@@ -311,10 +310,10 @@ export default function JobDetailsPage() {
                       }
                     />
 
-                    <GdsFlex flex-direction="column" gap="xs">
-                      <GdsText font-size="body-s" font-weight="book">
+                    <Flex flex-direction="column" gap="xs">
+                      <Text font-size="body-s" font-weight="book">
                         Cover Letter
-                      </GdsText>
+                      </Text>
                       <textarea
                         value={proposalData.coverLetter}
                         onChange={(e) =>
@@ -324,55 +323,45 @@ export default function JobDetailsPage() {
                           })
                         }
                         rows={6}
-                        style={{
-                          padding: '0.75rem',
-                          borderRadius: '4px',
-                          border: '1px solid var(--gds-color-l3-border-primary)',
-                          backgroundColor: 'var(--gds-color-l3-background-primary)',
-                          color: 'var(--gds-color-l3-content-primary)',
-                          fontSize: '0.875rem',
-                          width: '100%',
-                          resize: 'vertical',
-                        } as any}
                       />
-                    </GdsFlex>
+                    </Flex>
 
-                    <GdsButton type="submit" disabled={submittingProposal}>
+                    <Button type="submit" disabled={submittingProposal}>
                       {submittingProposal ? 'Submitting...' : 'Submit Proposal'}
-                    </GdsButton>
-                  </GdsFlex>
+                    </Button>
+                  </Flex>
                 </form>
-              </GdsCard>
+              </Card>
             )}
 
             {/* Quick Stats */}
-            <GdsCard padding="l">
-              <GdsFlex flex-direction="column" gap="m">
-                <GdsText tag="h3" font-size="heading-s">
+            <Card padding="l">
+              <Flex flex-direction="column" gap="m">
+                <Text tag="h3" font-size="heading-s">
                   Quick Stats
-                </GdsText>
-                <GdsFlex flex-direction="column" gap="s">
-                  <GdsFlex justify-content="space-between">
-                    <GdsText color="secondary">Budget</GdsText>
-                    <GdsText font-weight="book">${job.budget}</GdsText>
-                  </GdsFlex>
-                  <GdsFlex justify-content="space-between">
-                    <GdsText color="secondary">Status</GdsText>
-                    <GdsBadge variant={job.status === 'OPEN' ? 'positive' : 'information'}>
+                </Text>
+                <Flex flex-direction="column" gap="s">
+                  <Flex justify-content="space-between">
+                    <Text color="secondary">Budget</Text>
+                    <Text font-weight="book">${job.budget}</Text>
+                  </Flex>
+                  <Flex justify-content="space-between">
+                    <Text color="secondary">Status</Text>
+                    <Badge variant={job.status === 'OPEN' ? 'positive' : 'information'}>
                       {job.status}
-                    </GdsBadge>
-                  </GdsFlex>
-                  <GdsDivider />
-                  <GdsFlex justify-content="space-between">
-                    <GdsText font-size="body-s" color="secondary">Posted</GdsText>
-                    <GdsText font-size="body-s">{new Date(job.createdAt).toLocaleDateString()}</GdsText>
-                  </GdsFlex>
-                </GdsFlex>
-              </GdsFlex>
-            </GdsCard>
-          </GdsFlex>
-        </GdsGrid>
-      </GdsFlex>
+                    </Badge>
+                  </Flex>
+                  <Divider />
+                  <Flex justify-content="space-between">
+                    <Text font-size="body-s" color="secondary">Posted</Text>
+                    <Text font-size="body-s">{new Date(job.createdAt).toLocaleDateString()}</Text>
+                  </Flex>
+                </Flex>
+              </Flex>
+            </Card>
+          </Flex>
+        </Grid>
+      </Flex>
     </PageLayout>
   );
 }

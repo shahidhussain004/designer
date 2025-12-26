@@ -15,17 +15,17 @@ import {
   formatCurrency,
 } from '@/lib/payments';
 import {
-  GdsCard,
-  GdsFlex,
-  GdsGrid,
-  GdsText,
-  GdsButton,
-  GdsInput,
-  GdsDiv,
-  GdsDivider,
-  GdsBadge,
-  GdsSpinner,
-  GdsAlert,
+  Card,
+  Flex,
+  Grid,
+  Text,
+  Button,
+  Input,
+  Div,
+  Divider,
+  Badge,
+  Spinner,
+  Alert,
 } from '@/components/green';
 
 export default function InvoicesPage() {
@@ -112,241 +112,219 @@ export default function InvoicesPage() {
   const getInvoiceStatusBadge = (status: string) => {
     switch (status.toUpperCase()) {
       case 'PAID':
-        return <GdsBadge variant="positive">{status}</GdsBadge>;
+        return <Badge variant="positive">{status}</Badge>;
       case 'PENDING':
-        return <GdsBadge variant="notice">{status}</GdsBadge>;
+        return <Badge variant="notice">{status}</Badge>;
       case 'OVERDUE':
-        return <GdsBadge variant="negative">{status}</GdsBadge>;
+        return <Badge variant="negative">{status}</Badge>;
       default:
-        return <GdsBadge variant="information">{status}</GdsBadge>;
+        return <Badge variant="information">{status}</Badge>;
     }
   };
 
   const getPayoutStatusBadge = (status: string) => {
     switch (status.toUpperCase()) {
       case 'COMPLETED':
-        return <GdsBadge variant="positive">{status}</GdsBadge>;
+        return <Badge variant="positive">{status}</Badge>;
       case 'PENDING':
-        return <GdsBadge variant="notice">{status}</GdsBadge>;
+        return <Badge variant="notice">{status}</Badge>;
       case 'PROCESSING':
-        return <GdsBadge variant="information">{status}</GdsBadge>;
+        return <Badge variant="information">{status}</Badge>;
       case 'FAILED':
-        return <GdsBadge variant="negative">{status}</GdsBadge>;
+        return <Badge variant="negative">{status}</Badge>;
       default:
-        return <GdsBadge variant="information">{status}</GdsBadge>;
+        return <Badge variant="information">{status}</Badge>;
     }
   };
 
   if (loading) {
     return (
-      <GdsFlex justify-content="center" align-items="center" style={{ minHeight: '100vh' } as any}>
-        <GdsSpinner />
-      </GdsFlex>
+      <Flex justify-content="center" align-items="center">
+        <Spinner />
+      </Flex>
     );
   }
 
   return (
-    <GdsDiv style={{ minHeight: '100vh', background: 'var(--gds-color-l3-background-secondary)' } as any}>
+    <Div>
       {/* Navigation */}
-      <GdsDiv style={{ background: 'var(--gds-color-l3-background-primary)', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', position: 'sticky', top: 0, zIndex: 10 } as any}>
-        <GdsFlex justify-content="space-between" align-items="center" padding="m" style={{ maxWidth: '1280px', margin: '0 auto' } as any}>
-          <GdsFlex align-items="center" gap="xl">
-            <Link href="/" style={{ textDecoration: 'none' } as any}>
-              <GdsText style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--gds-color-l3-content-positive)' } as any}>
+      <Div>
+        <Flex justify-content="space-between" align-items="center" padding="m">
+          <Flex align-items="center" gap="xl">
+            <Link href="/">
+              <Text>
                 Designer Marketplace
-              </GdsText>
+              </Text>
             </Link>
-            <GdsFlex gap="l" className="desktop-nav">
-              <Link href="/dashboard" style={{ textDecoration: 'none', color: 'var(--gds-color-l3-content-secondary)' } as any}>Dashboard</Link>
-              <Link href="/dashboard/invoices" style={{ textDecoration: 'none', color: 'var(--gds-color-l3-content-positive)', fontWeight: 500 } as any}>Billing</Link>
-            </GdsFlex>
-          </GdsFlex>
-        </GdsFlex>
-      </GdsDiv>
+            <Flex gap="l" className="desktop-nav">
+              <Link href="/dashboard">Dashboard</Link>
+              <Link href="/dashboard/invoices">Billing</Link>
+            </Flex>
+          </Flex>
+        </Flex>
+      </Div>
 
-      <GdsFlex flex-direction="column" gap="l" padding="xl" style={{ maxWidth: '1280px', margin: '0 auto' } as any}>
+      <Flex flex-direction="column" gap="l" padding="xl">
         {/* Balance Card */}
         {balance && (
-          <GdsCard style={{ background: 'linear-gradient(to right, var(--gds-color-l3-background-positive), #166534)', color: 'white' } as any}>
-            <GdsFlex justify-content="space-between" align-items="center" flex-wrap="wrap" gap="l" padding="l">
-              <GdsDiv>
-                <GdsText style={{ fontSize: '1rem', opacity: 0.9, marginBottom: '0.5rem' } as any}>Available Balance</GdsText>
-                <GdsText style={{ fontSize: '2.5rem', fontWeight: 700 } as any}>
+          <Card>
+            <Flex justify-content="space-between" align-items="center" flex-wrap="wrap" gap="l" padding="l">
+              <Div>
+                <Text>Available Balance</Text>
+                <Text>
                   {formatCurrency(balance.availableBalance, balance.currency)}
-                </GdsText>
+                </Text>
                 {balance.pendingBalance > 0 && (
-                  <GdsText style={{ fontSize: '0.875rem', opacity: 0.8, marginTop: '0.5rem' } as any}>
+                  <Text>
                     + {formatCurrency(balance.pendingBalance, balance.currency)} pending
-                  </GdsText>
+                  </Text>
                 )}
-              </GdsDiv>
-              <GdsButton
+              </Div>
+              <Button
                 rank="secondary"
                 onClick={() => setShowPayoutModal(true)}
                 disabled={balance.availableBalance <= 0}
-                style={{ background: 'white', color: 'var(--gds-color-l3-content-positive)' } as any}
               >
                 Request Payout
-              </GdsButton>
-            </GdsFlex>
-          </GdsCard>
+              </Button>
+            </Flex>
+          </Card>
         )}
 
         {/* Tabs */}
-        <GdsFlex gap="l" style={{ borderBottom: '1px solid var(--gds-color-l3-border-primary)' } as any}>
-          <GdsButton
+        <Flex gap="l">
+          <Button
             rank="tertiary"
             onClick={() => setActiveTab('invoices')}
-            style={{
-              borderBottom: activeTab === 'invoices' ? '2px solid var(--gds-color-l3-content-positive)' : 'none',
-              borderRadius: 0,
-              color: activeTab === 'invoices' ? 'var(--gds-color-l3-content-positive)' : 'var(--gds-color-l3-content-tertiary)',
-            } as any}
           >
             Invoices ({invoices.length})
-          </GdsButton>
-          <GdsButton
+          </Button>
+          <Button
             rank="tertiary"
             onClick={() => setActiveTab('payouts')}
-            style={{
-              borderBottom: activeTab === 'payouts' ? '2px solid var(--gds-color-l3-content-positive)' : 'none',
-              borderRadius: 0,
-              color: activeTab === 'payouts' ? 'var(--gds-color-l3-content-positive)' : 'var(--gds-color-l3-content-tertiary)',
-            } as any}
           >
             Payouts ({payouts.length})
-          </GdsButton>
-        </GdsFlex>
+          </Button>
+        </Flex>
 
         {/* Error */}
-        {error && <GdsAlert variant="negative">{error}</GdsAlert>}
+        {error && <Alert variant="negative">{error}</Alert>}
 
         {/* Invoices Tab */}
         {activeTab === 'invoices' && (
-          <GdsCard>
+          <Card>
             {invoices.length === 0 ? (
-              <GdsFlex flex-direction="column" align-items="center" padding="3xl" gap="m">
-                <GdsText style={{ fontSize: '3rem' } as any}>📄</GdsText>
-                <GdsText style={{ fontSize: '1.125rem', fontWeight: 600 } as any}>No invoices yet</GdsText>
-                <GdsText style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>
+              <Flex flex-direction="column" align-items="center" padding="3xl" gap="m">
+                <Text>📄</Text>
+                <Text>No invoices yet</Text>
+                <Text>
                   Invoices will appear here once you make or receive payments.
-                </GdsText>
-              </GdsFlex>
+                </Text>
+              </Flex>
             ) : (
               <>
-                <GdsGrid columns="1fr 1fr 1fr 1fr 1fr 1fr" gap="m" padding="m" style={{ background: 'var(--gds-color-l3-background-secondary)' } as any}>
-                  <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Invoice</GdsText>
-                  <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Type</GdsText>
-                  <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Amount</GdsText>
-                  <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Status</GdsText>
-                  <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Date</GdsText>
-                  <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)', textAlign: 'right' } as any}>Actions</GdsText>
-                </GdsGrid>
+                <Grid columns="1fr 1fr 1fr 1fr 1fr 1fr" gap="m" padding="m">
+                  <Text>Invoice</Text>
+                  <Text>Type</Text>
+                  <Text>Amount</Text>
+                  <Text>Status</Text>
+                  <Text>Date</Text>
+                  <Text>Actions</Text>
+                </Grid>
                 {invoices.map((invoice) => (
-                  <GdsDiv key={invoice.id}>
-                    <GdsDivider />
-                    <GdsGrid columns="1fr 1fr 1fr 1fr 1fr 1fr" gap="m" padding="m" align-items="center">
-                      <GdsText style={{ fontWeight: 500 } as any}>{invoice.invoiceNumber}</GdsText>
-                      <GdsText style={{ color: 'var(--gds-color-l3-content-tertiary)', textTransform: 'capitalize' } as any}>{invoice.type.toLowerCase()}</GdsText>
-                      <GdsText style={{ fontWeight: 500 } as any}>{formatCurrency(invoice.totalAmount, invoice.currency)}</GdsText>
-                      <GdsDiv>{getInvoiceStatusBadge(invoice.status)}</GdsDiv>
-                      <GdsText style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>
+                  <Div key={invoice.id}>
+                    <Divider />
+                    <Grid columns="1fr 1fr 1fr 1fr 1fr 1fr" gap="m" padding="m" align-items="center">
+                      <Text>{invoice.invoiceNumber}</Text>
+                      <Text>{invoice.type.toLowerCase()}</Text>
+                      <Text>{formatCurrency(invoice.totalAmount, invoice.currency)}</Text>
+                      <Div>{getInvoiceStatusBadge(invoice.status)}</Div>
+                      <Text>
                         {invoice.issuedAt ? new Date(invoice.issuedAt).toLocaleDateString() : '-'}
-                      </GdsText>
-                      <GdsFlex justify-content="flex-end">
-                        <GdsButton size="small" rank="tertiary" onClick={() => handleDownloadInvoice(invoice.id)}>
+                      </Text>
+                      <Flex justify-content="flex-end">
+                        <Button size="small" rank="tertiary" onClick={() => handleDownloadInvoice(invoice.id)}>
                           Download PDF
-                        </GdsButton>
-                      </GdsFlex>
-                    </GdsGrid>
-                  </GdsDiv>
+                        </Button>
+                      </Flex>
+                    </Grid>
+                  </Div>
                 ))}
               </>
             )}
-          </GdsCard>
+          </Card>
         )}
 
         {/* Payouts Tab */}
         {activeTab === 'payouts' && (
-          <GdsCard>
+          <Card>
             {payouts.length === 0 ? (
-              <GdsFlex flex-direction="column" align-items="center" padding="3xl" gap="m">
-                <GdsText style={{ fontSize: '3rem' } as any}>💸</GdsText>
-                <GdsText style={{ fontSize: '1.125rem', fontWeight: 600 } as any}>No payouts yet</GdsText>
-                <GdsText style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>
+              <Flex flex-direction="column" align-items="center" padding="3xl" gap="m">
+                <Text>💸</Text>
+                <Text>No payouts yet</Text>
+                <Text>
                   Complete milestones to earn and request payouts.
-                </GdsText>
-              </GdsFlex>
+                </Text>
+              </Flex>
             ) : (
               <>
-                <GdsGrid columns="1fr 1fr 1fr 1fr 1fr" gap="m" padding="m" style={{ background: 'var(--gds-color-l3-background-secondary)' } as any}>
-                  <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>ID</GdsText>
-                  <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Amount</GdsText>
-                  <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Method</GdsText>
-                  <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Status</GdsText>
-                  <GdsText style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Date</GdsText>
-                </GdsGrid>
+                <Grid columns="1fr 1fr 1fr 1fr 1fr" gap="m" padding="m">
+                  <Text>ID</Text>
+                  <Text>Amount</Text>
+                  <Text>Method</Text>
+                  <Text>Status</Text>
+                  <Text>Date</Text>
+                </Grid>
                 {payouts.map((payout) => (
-                  <GdsDiv key={payout.id}>
-                    <GdsDivider />
-                    <GdsGrid columns="1fr 1fr 1fr 1fr 1fr" gap="m" padding="m" align-items="center">
-                      <GdsText style={{ fontFamily: 'monospace', color: 'var(--gds-color-l3-content-tertiary)' } as any}>PAY-{payout.id}</GdsText>
-                      <GdsText style={{ fontWeight: 500 } as any}>{formatCurrency(payout.amount, payout.currency)}</GdsText>
-                      <GdsText style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>{payout.payoutMethod.replace('_', ' ')}</GdsText>
-                      <GdsDiv>
+                  <Div key={payout.id}>
+                    <Divider />
+                    <Grid columns="1fr 1fr 1fr 1fr 1fr" gap="m" padding="m" align-items="center">
+                      <Text>PAY-{payout.id}</Text>
+                      <Text>{formatCurrency(payout.amount, payout.currency)}</Text>
+                      <Text>{payout.payoutMethod.replace('_', ' ')}</Text>
+                      <Div>
                         {getPayoutStatusBadge(payout.status)}
                         {payout.failedReason && (
-                          <GdsText style={{ fontSize: '0.75rem', color: 'var(--gds-color-l3-content-negative)', marginTop: '0.25rem' } as any}>
+                          <Text>
                             {payout.failedReason}
-                          </GdsText>
+                          </Text>
                         )}
-                      </GdsDiv>
-                      <GdsDiv>
-                        <GdsText style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>
+                      </Div>
+                      <Div>
+                        <Text>
                           {new Date(payout.createdAt).toLocaleDateString()}
-                        </GdsText>
+                        </Text>
                         {payout.completedAt && (
-                          <GdsText style={{ fontSize: '0.75rem', color: 'var(--gds-color-l3-content-positive)' } as any}>
+                          <Text>
                             Completed: {new Date(payout.completedAt).toLocaleDateString()}
-                          </GdsText>
+                          </Text>
                         )}
-                      </GdsDiv>
-                    </GdsGrid>
-                  </GdsDiv>
+                      </Div>
+                    </Grid>
+                  </Div>
                 ))}
               </>
             )}
-          </GdsCard>
+          </Card>
         )}
-      </GdsFlex>
+      </Flex>
 
       {/* Payout Request Modal */}
       {showPayoutModal && balance && (
-        <GdsDiv
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 50,
-            padding: '1rem',
-          } as any}
-        >
-          <GdsCard style={{ maxWidth: '400px', width: '100%' } as any}>
-            <GdsFlex flex-direction="column" gap="l" padding="l">
-              <GdsText tag="h3" style={{ fontSize: '1.25rem', fontWeight: 600 } as any}>Request Payout</GdsText>
+        <Div>
+          <Card>
+            <Flex flex-direction="column" gap="l" padding="l">
+              <Text tag="h3">Request Payout</Text>
               
-              <GdsDiv>
-                <GdsText style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Available balance</GdsText>
-                <GdsText style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--gds-color-l3-content-positive)' } as any}>
+              <Div>
+                <Text>Available balance</Text>
+                <Text>
                   {formatCurrency(balance.availableBalance, balance.currency)}
-                </GdsText>
-              </GdsDiv>
+                </Text>
+              </Div>
 
-              <GdsDiv>
-                <GdsText style={{ fontWeight: 500, marginBottom: '0.5rem' } as any}>Amount (USD)</GdsText>
+              <Div>
+                <Text>Amount (USD)</Text>
                 <input
                   type="number"
                   value={payoutAmount}
@@ -354,39 +332,23 @@ export default function InvoicesPage() {
                   min="0"
                   max={(balance.availableBalance / 100).toFixed(2)}
                   step="0.01"
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    border: '1px solid var(--gds-color-l3-border-primary)',
-                    borderRadius: '4px',
-                    background: 'var(--gds-color-l3-background-secondary)',
-                    color: 'var(--gds-color-l3-content-primary)',
-                  } as any}
                 />
-              </GdsDiv>
+              </Div>
 
-              <GdsDiv>
-                <GdsText style={{ fontWeight: 500, marginBottom: '0.5rem' } as any}>Payout Method</GdsText>
+              <Div>
+                <Text>Payout Method</Text>
                 <select
                   value={payoutMethod}
                   onChange={(e) => setPayoutMethod(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    border: '1px solid var(--gds-color-l3-border-primary)',
-                    borderRadius: '4px',
-                    background: 'var(--gds-color-l3-background-secondary)',
-                    color: 'var(--gds-color-l3-content-primary)',
-                  } as any}
                 >
                   <option value="STRIPE_CONNECT">Stripe Connect</option>
                   <option value="BANK_TRANSFER">Bank Transfer</option>
                   <option value="PAYPAL">PayPal</option>
                 </select>
-              </GdsDiv>
+              </Div>
 
-              <GdsFlex justify-content="flex-end" gap="m">
-                <GdsButton
+              <Flex justify-content="flex-end" gap="m">
+                <Button
                   rank="secondary"
                   onClick={() => {
                     setShowPayoutModal(false);
@@ -394,33 +356,19 @@ export default function InvoicesPage() {
                   }}
                 >
                   Cancel
-                </GdsButton>
-                <GdsButton
+                </Button>
+                <Button
                   rank="primary"
                   onClick={handleRequestPayout}
                   disabled={isRequesting || !payoutAmount || parseFloat(payoutAmount) <= 0}
                 >
                   {isRequesting ? 'Processing...' : 'Request Payout'}
-                </GdsButton>
-              </GdsFlex>
-            </GdsFlex>
-          </GdsCard>
-        </GdsDiv>
+                </Button>
+              </Flex>
+            </Flex>
+          </Card>
+        </Div>
       )}
-
-      <style>{`
-        @media (max-width: 768px) {
-          .desktop-nav {
-            display: none !important;
-          }
-          gds-grid[columns="1fr 1fr 1fr 1fr 1fr 1fr"],
-          gds-grid[columns="1fr 1fr 1fr 1fr 1fr"] {
-            display: flex !important;
-            flex-direction: column;
-            gap: 0.5rem;
-          }
-        }
-      `}</style>
-    </GdsDiv>
+    </Div>
   );
 }

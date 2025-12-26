@@ -46,7 +46,6 @@ export default function AnimatedButton({
         "relative inline-block rounded-xl overflow-visible group",
         disabled && "opacity-50 cursor-not-allowed",
       )}
-      style={{ perspective: "600px" }}
       onMouseEnter={() => !disabled && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -56,21 +55,11 @@ export default function AnimatedButton({
           "absolute -inset-0.5 rounded-xl transition-opacity duration-200",
           isHovered ? "opacity-100" : "opacity-0"
         )}
-        style={{
-          background: "linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3)",
-          backgroundSize: "400% 400%",
-          animation: isHovered ? "gradient-shift 2s linear infinite" : undefined,
-        }}
       />
 
       {/* Button container with 3D transform */}
       <div
         className="relative"
-        style={{
-          transformStyle: "preserve-3d",
-          transition: "transform 0.3s ease-out",
-          transform: isHovered ? "rotateX(-90deg)" : "rotateX(0deg)",
-        }}
       >
         {/* Front face */}
         <div
@@ -80,9 +69,6 @@ export default function AnimatedButton({
             variantClasses[variant],
             className,
           )}
-          style={{ 
-            backfaceVisibility: "hidden",
-          }}
         >
           {children}
         </div>
@@ -95,10 +81,6 @@ export default function AnimatedButton({
             variantClasses[variant],
             className,
           )}
-          style={{ 
-            backfaceVisibility: "hidden",
-            transform: "rotateX(90deg)",
-          }}
         >
           {children}
         </div>

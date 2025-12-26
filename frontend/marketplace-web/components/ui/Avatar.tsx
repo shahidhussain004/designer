@@ -195,9 +195,7 @@ export const AvatarGroup = forwardRef<HTMLDivElement, AvatarGroupProps>(
         {visibleAvatars.map((child, index) => (
           <div
             key={index}
-            className="ring-2 ring-white rounded-full"
-            style={{ zIndex: visibleAvatars.length - index }}
-          >
+            className="ring-2 ring-white rounded-full">
             {React.isValidElement<AvatarProps>(child)
               ? React.cloneElement(child, { size })
               : child}
@@ -210,9 +208,7 @@ export const AvatarGroup = forwardRef<HTMLDivElement, AvatarGroupProps>(
               'inline-flex items-center justify-center shrink-0 rounded-full',
               'bg-secondary-100 text-secondary-600 font-medium ring-2 ring-white',
               avatarSizes[size]
-            )}
-            style={{ zIndex: 0 }}
-          >
+            )}>
             +{remainingCount}
           </div>
         )}

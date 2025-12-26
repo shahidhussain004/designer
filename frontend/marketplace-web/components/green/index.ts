@@ -1,65 +1,62 @@
 'use client'
 
 /**
- * Green Design System Components
- * ==============================
- * Re-exports from Tailwind CSS components for consistent usage across the application.
- * These components replace the original @sebgroup/green-core library.
+ * UI Components
  */
 
 // All components from Tailwind implementation
 export {
   // Layout Components
-  GdsGrid, 
-  GdsFlex, 
-  GdsDiv, 
-  GdsCard,
-  GdsDivider,
-  GdsTheme,
-  GdsText,
+  Grid, 
+  Flex, 
+  Div, 
+  Card,
+  Divider,
+  Theme,
+  Text,
   // Form Components
-  GdsInput, 
-  GdsTextarea, 
-  GdsCheckbox,
-  GdsRadioGroup,
-  GdsSelect,
-  GdsDropdown,
-  GdsDatepicker,
+  Input, 
+  Textarea, 
+  Checkbox,
+  RadioGroup,
+  Select,
+  Dropdown,
+  Datepicker,
   // Action Components
-  GdsButton, 
-  GdsLink,
-  GdsFab,
-  GdsMenuButton,
-  GdsFilterChips,
-  GdsFilterChip,
-  GdsSegmentedControl,
+  Button, 
+  LinkComponent,
+  Fab,
+  MenuButton,
+  FilterChips,
+  FilterChip,
+  SegmentedControl,
   // Feedback Components  
-  GdsAlert, 
-  GdsBadge, 
-  GdsSpinner,
-  GdsSignal,
-  GdsCoachmark,
+  Alert, 
+  Badge, 
+  Spinner,
+  Signal,
+  Coachmark,
   // Overlay Components
-  GdsDialog, 
-  GdsPopover,
-  GdsContextMenu,
+  Dialog, 
+  Popover,
+  ContextMenu,
   // Navigation Components
-  GdsBreadcrumbs,
+  Breadcrumbs,
   // Data Display
-  GdsFormSummary,
-  GdsGroupedList,
-  GdsDetails,
-  GdsImg,
-  GdsVideo,
-  GdsRichText,
-  GdsMask,
-  GdsBlur,
-  GdsFormattedNumber,
-  GdsFormattedDate,
-  GdsFormattedAccount,
-  GdsSensitiveNumber,
-  GdsSensitiveDate,
-  GdsSensitiveAccount,
+  FormSummary,
+  GroupedList,
+  Details,
+  Img,
+  Video,
+  RichText,
+  Mask,
+  Blur,
+  FormattedNumber,
+  FormattedDate,
+  FormattedAccount,
+  SensitiveNumber,
+  SensitiveDate,
+  SensitiveAccount,
   // Calendar
-  GdsCalendar,
+  Calendar,
 } from '@/components/tw'

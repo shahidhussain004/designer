@@ -2,7 +2,7 @@ import React from 'react'
 
 export default function ContactPage() {
   return (
-    <div style={{ padding: '24px', maxWidth: 960, margin: '0 auto' }}>
+    <div>
       <h1>Contact Us</h1>
       <p>
         This is a placeholder Contact page. You can add email, phone, or a
