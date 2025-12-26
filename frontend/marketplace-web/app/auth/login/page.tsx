@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { authService } from '@/lib/auth'
-import { GdsFlex, GdsCard, GdsText, GdsInput, GdsButton, GdsAlert, GdsDivider, GdsCheckbox, GdsDiv } from '@sebgroup/green-core/react'
+import { GdsFlex, GdsCard, GdsText, GdsInput, GdsButton, GdsAlert, GdsDivider, GdsCheckbox, GdsDiv } from '@/components/green'
 import { PageLayout } from '@/components/layout'
 
 export default function LoginPage() {

@@ -1,7 +1,9 @@
+'use client'
+
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { IconSearch, IconCalendar, IconStar } from '../../components/ui';
-import { VideoBackground } from '../video/page';
+import { VideoBackground } from '@/components/ui/VideoBackground';
 import AnimatedButton from '../components/animated-button';
 import Link from 'next/link';
 
@@ -70,8 +72,8 @@ const LandingPage = () => {
           />
         </div>
         <nav className="flex items-center space-x-8 text-white">
-          <a href="/jobs" className="hover:text-pink-300 transition-colors">Jobs</a>
-          <a href="/courses" className="hover:text-pink-300 transition-colors">Courses</a>
+          <Link href="/jobs" className="hover:text-pink-300 transition-colors">Jobs</Link>
+          <Link href="/courses" className="hover:text-pink-300 transition-colors">Courses</Link>
           <button onClick={() => {}} className="text-2xl hover:scale-110 transition-transform">🌙</button>
           <Link href="/auth/login" className="hover:text-pink-300 transition-colors">Login</Link>
              <Link href="/get-started">

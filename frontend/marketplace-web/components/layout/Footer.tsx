@@ -1,7 +1,7 @@
  'use client'
 
 import React from 'react'
-import { GdsFlex, GdsText, GdsDivider, GdsDiv, GdsLink } from '@sebgroup/green-core/react'
+import { GdsFlex, GdsText, GdsDivider, GdsDiv, GdsLink } from '@/components/green'
 
 export default function Footer() {
   return (

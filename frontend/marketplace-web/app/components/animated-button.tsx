@@ -1,7 +1,7 @@
 "use client"
 
 import type * as React from "react"
-import { motion } from "framer-motion"
+import { useState } from "react"
 import { cn } from "../../lib/utils"
 
 interface AnimatedButtonProps {
@@ -15,23 +15,6 @@ interface AnimatedButtonProps {
   disabled?: boolean
 }
 
-const itemVariants = {
-  initial: { rotateX: 0, opacity: 1 },
-  hover: { rotateX: -90, opacity: 0 },
-}
-
-const backVariants = {
-  initial: { rotateX: 90, opacity: 0 },
-  hover: { rotateX: 0, opacity: 1 },
-}
-
-const sharedTransition = {
-  type: "spring",
-  stiffness: 200,
-  damping: 15,
-  duration: 0.2,
-}
-
 export default function AnimatedButton({
   children,
   className,
@@ -42,6 +25,8 @@ export default function AnimatedButton({
   href,
   disabled = false,
 }: AnimatedButtonProps) {
+  const [isHovered, setIsHovered] = useState(false)
+
   const sizeClasses = {
     sm: "px-4 py-2 text-sm",
     default: "px-6 py-2.5",
@@ -49,77 +34,85 @@ export default function AnimatedButton({
   }
 
   const variantClasses = {
-    default: "bg-white text-black hover:bg-gray-100",
-    outline: "border border-gray-300 bg-transparent hover:bg-gray-50",
-    ghost: "bg-transparent hover:bg-gray-100",
-    slim: "bg-white text-black hover:bg-gray-100 px-6 py-2 text-sm",
+    default: "bg-white text-black",
+    outline: "border border-gray-300 bg-transparent",
+    ghost: "bg-transparent",
+    slim: "bg-white text-black px-6 py-2 text-sm",
   }
 
   const buttonContent = (
-    <motion.div
+    <div
       className={cn(
         "relative inline-block rounded-xl overflow-visible group",
         disabled && "opacity-50 cursor-not-allowed",
       )}
-      style={{ perspective: "600px", transformStyle: "preserve-3d" }}
-      whileHover={disabled ? undefined : "hover"}
-      initial="initial"
+      style={{ perspective: "600px" }}
+      onMouseEnter={() => !disabled && setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {/* Rainbow border on hover */}
-      <motion.div
-        className="absolute -inset-0.5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+      <div
+        className={cn(
+          "absolute -inset-0.5 rounded-xl transition-opacity duration-200",
+          isHovered ? "opacity-100" : "opacity-0"
+        )}
         style={{
           background: "linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3)",
           backgroundSize: "400% 400%",
-        }}
-        animate={{
-          backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-        }}
-        transition={{
-          duration: 2,
-          repeat: Number.POSITIVE_INFINITY,
-          ease: "linear",
+          animation: isHovered ? "gradient-shift 2s linear infinite" : undefined,
         }}
       />
 
-      {/* Front face */}
-      <motion.div
-        className={cn(
-          "relative z-10 rounded-xl transition-colors font-medium flex items-center justify-center",
-          sizeClasses[size],
-          variantClasses[variant],
-          className,
-        )}
-        variants={itemVariants}
-        transition={sharedTransition}
-        style={{ 
-          transformStyle: "preserve-3d", 
-          transformOrigin: "center center",
-          backfaceVisibility: "hidden",
+      {/* Button container with 3D transform */}
+      <div
+        className="relative"
+        style={{
+          transformStyle: "preserve-3d",
+          transition: "transform 0.3s ease-out",
+          transform: isHovered ? "rotateX(-90deg)" : "rotateX(0deg)",
         }}
       >
-        {children}
-      </motion.div>
+        {/* Front face */}
+        <div
+          className={cn(
+            "relative z-10 rounded-xl font-medium flex items-center justify-center",
+            sizeClasses[size],
+            variantClasses[variant],
+            className,
+          )}
+          style={{ 
+            backfaceVisibility: "hidden",
+          }}
+        >
+          {children}
+        </div>
+        
+        {/* Back face */}
+        <div
+          className={cn(
+            "absolute inset-0 z-10 rounded-xl font-medium flex items-center justify-center",
+            sizeClasses[size],
+            variantClasses[variant],
+            className,
+          )}
+          style={{ 
+            backfaceVisibility: "hidden",
+            transform: "rotateX(90deg)",
+          }}
+        >
+          {children}
+        </div>
+      </div>
       
-      {/* Back face */}
-      <motion.div
-        className={cn(
-          "absolute inset-0 z-10 rounded-xl transition-colors font-medium flex items-center justify-center",
-          sizeClasses[size],
-          variantClasses[variant],
-          className,
-        )}
-        variants={backVariants}
-        transition={sharedTransition}
-        style={{ 
-          transformStyle: "preserve-3d", 
-          transformOrigin: "center center",
-          backfaceVisibility: "hidden",
-        }}
-      >
-        {children}
-      </motion.div>
-    </motion.div>
+      {/* Keyframe animation style */}
+      <style jsx>{`
+        @keyframes gradient-shift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+      `}</style>
+    </div>
   )
 
   if (href) {
@@ -131,7 +124,7 @@ export default function AnimatedButton({
   }
 
   return (
-    <button type={type} onClick={onClick} disabled={disabled} className="inline-block">
+    <button type={type} onClick={onClick} disabled={disabled} className="inline-block border-0 bg-transparent p-0 cursor-pointer">
       {buttonContent}
     </button>
   )

@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { GdsFlex, GdsText, GdsButton, GdsDiv } from '@sebgroup/green-core/react'
+import { GdsFlex, GdsText, GdsButton, GdsDiv } from '@/components/green'
 import { useTheme } from '@/lib/theme'
 
 interface NavItem {

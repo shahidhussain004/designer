@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, ReactNode } from 'react';
-import { GdsTheme } from '@sebgroup/green-core/react';
+import { GdsTheme } from './green';
 
 type Theme = 'light' | 'dark';
 
