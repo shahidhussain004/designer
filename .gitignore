@@ -191,8 +191,9 @@ Desktop.ini
 
 # VS Code
 .vscode/
-launch.json
-extensions.json
+!.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
 
 # Visual Studio
 .vs/
