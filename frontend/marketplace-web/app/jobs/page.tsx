@@ -43,6 +43,15 @@ const categories = [
   { value: 'BRANDING', label: 'Branding' },
   { value: 'ILLUSTRATION', label: 'Illustration' },
   { value: 'MOTION_GRAPHICS', label: 'Motion Graphics' },
+  { value: 'LOGO_DESIGN', label: 'Logo Design' },
+  { value: 'PRINT_DESIGN', label: 'Print Design' },
+  { value: 'PACKAGING', label: 'Packaging' },
+  { value: 'PHOTOGRAPHY', label: 'Photography' },
+  { value: 'VIDEO_EDITING', label: 'Video Editing' },
+  { value: '3D_MODELING', label: '3D Modeling' },
+  { value: 'ANIMATION', label: 'Animation' },
+  { value: 'MOBILE_DESIGN', label: 'Mobile Design' },
+  { value: 'PRODUCT_DESIGN', label: 'Product Design' },
 ];
 
 const experienceLevels = [
@@ -79,7 +88,9 @@ function JobsPageContent() {
       if (maxBudget) params.append('maxBudget', maxBudget);
       if (searchQuery) params.append('search', searchQuery);
       
-      const response = await fetch(`/api/jobs?${params.toString()}`);
+      const queryString = params.toString();
+      const url = queryString ? `/api/jobs?${queryString}` : '/api/jobs';
+      const response = await fetch(url);
       
       if (!response.ok) {
         throw new Error('Failed to fetch jobs');

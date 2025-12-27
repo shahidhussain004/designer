@@ -8,15 +8,17 @@ param(
 
 Write-Host "Creating Kafka topics on $KafkaBroker..." -ForegroundColor Cyan
 
-# Define all 11 core event topics
+# Define all core event topics
 $topics = @(
     "jobs.posted",
     "jobs.updated",
     "jobs.deleted",
     "payments.received",
     "payments.disputed",
+    "payments.succeeded",
     "messages.sent",
     "users.joined",
+    "users.created",
     "proposals.submitted",
     "contracts.signed",
     "courses.completed",
