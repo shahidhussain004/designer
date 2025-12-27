@@ -1,19 +1,34 @@
 package com.designer.marketplace.lms.service;
 
-import com.designer.marketplace.lms.dto.*;
-import com.designer.marketplace.lms.entity.*;
-import com.designer.marketplace.lms.repository.*;
-import com.designer.marketplace.entity.User;
-import com.designer.marketplace.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.stream.Collectors;
+import com.designer.marketplace.entity.User;
+import com.designer.marketplace.lms.dto.CreateQuizRequest;
+import com.designer.marketplace.lms.dto.SubmitQuizRequest;
+import com.designer.marketplace.lms.entity.Certificate;
+import com.designer.marketplace.lms.entity.Course;
+import com.designer.marketplace.lms.entity.Enrollment;
+import com.designer.marketplace.lms.entity.Quiz;
+import com.designer.marketplace.lms.entity.QuizAttempt;
+import com.designer.marketplace.lms.repository.CertificateRepository;
+import com.designer.marketplace.lms.repository.CourseRepository;
+import com.designer.marketplace.lms.repository.EnrollmentRepository;
+import com.designer.marketplace.lms.repository.QuizAttemptRepository;
+import com.designer.marketplace.lms.repository.QuizRepository;
+import com.designer.marketplace.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service

@@ -1,16 +1,20 @@
 package com.designer.marketplace.lms.dto;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 import com.designer.marketplace.lms.entity.Course;
 import com.designer.marketplace.lms.entity.Course.CourseCategory;
 import com.designer.marketplace.lms.entity.Course.CourseLevel;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import lombok.*;
-
-import java.math.BigDecimal;
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Request DTO for creating a new course.
@@ -45,6 +49,7 @@ public class CreateCourseRequest {
     @Positive(message = "Price must be positive")
     private BigDecimal price;
 
+    @Builder.Default
     private String currency = "USD";
 
     private List<String> tags;

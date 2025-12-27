@@ -1,17 +1,18 @@
 package com.designer.marketplace.dto;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import com.designer.marketplace.entity.Milestone;
 import com.designer.marketplace.entity.Milestone.MilestoneStatus;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import java.time.LocalDateTime;
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 public class MilestoneDTOs {
 
@@ -38,6 +39,7 @@ public class MilestoneDTOs {
         @Positive(message = "Amount must be positive")
         private Long amount;
 
+        @Builder.Default
         private String currency = "USD";
 
         private LocalDateTime dueDate;
