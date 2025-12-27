@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FluidAccountDropdown } from './fluid-account-dropdown';
@@ -15,7 +15,7 @@ export interface NavbarProps extends React.HTMLAttributes<HTMLElement> {
   sticky?: boolean;
 }
 
-export const Navbar = ({ className }: NavbarProps) => {
+export const Navbar = ({ className: _className }: NavbarProps) => {
   const pathname = usePathname();
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');

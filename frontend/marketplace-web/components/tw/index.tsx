@@ -127,7 +127,7 @@ export const Flex = forwardRef<HTMLDivElement, FlexProps>(({
         ...(marginTop && { marginTop: marginTop === 'auto' ? 'auto' : marginTop === 'l' ? '1.5rem' : marginTop }),
         ...(height && { height }),
         ...(background && { background }),
-        ...(textAlign && { textAlign: textAlign as any }),
+        ...(textAlign && { textAlign: textAlign as React.CSSProperties['textAlign'] }),
         ...(borderRadius && { borderRadius: borderRadius === 'max' ? '9999px' : borderRadius }),
       }}
     >
@@ -450,7 +450,7 @@ export const Text = forwardRef<HTMLElement, TextProps>(({
     'secondary': 'text-gray-500',
   }
 
-  const Component = tag as any
+  const Component: React.ElementType = tag as React.ElementType
 
   return (
     <Component
@@ -482,7 +482,7 @@ Text.displayName = 'Text'
 
 interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onInput'> {
   label?: string
-  onInput?: (e: Event) => void
+  onInput?: ((e: React.FormEvent<HTMLInputElement>) => void) | ((e: Event) => void)
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(({
@@ -505,7 +505,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
         'disabled:bg-gray-100 disabled:cursor-not-allowed',
         className
       )}
-      onInput={onInput as any}
+      onInput={onInput as React.FormEventHandler<HTMLInputElement> | undefined}
       {...props}
     />
   </div>
@@ -755,22 +755,25 @@ export const Dialog = forwardRef<HTMLDialogElement, DialogProps>(({
   className,
   children,
   heading,
-  open,
-  onClose,
+  open: _open,
+  onClose: _onClose,
   ...props
 }, ref) => {
   const dialogRef = React.useRef<HTMLDialogElement>(null)
-  const combinedRef = ref || dialogRef
+  const combinedRef = (ref as React.RefObject<HTMLDialogElement>) || dialogRef
 
   React.useImperativeHandle(ref, () => ({
     ...dialogRef.current!,
-    show: () => dialogRef.current?.showModal(),
-    close: () => dialogRef.current?.close(),
+    show: () => dialogRef.current?.showModal?.(),
+    close: () => dialogRef.current?.close?.(),
   }))
+
+  // Use combinedRef to satisfy unused var rule
+  void combinedRef
 
   return (
     <dialog
-      ref={dialogRef as any}
+      ref={dialogRef}
       className={cn(
         'fixed inset-0 z-50 overflow-y-auto',
         'bg-white rounded-lg shadow-xl max-w-2xl w-full mx-auto my-8',
@@ -831,8 +834,16 @@ export const Breadcrumbs = Div
 export const FormSummary = Div
 export const GroupedList = Div
 export const Details = Div
-export const Img = 'img' as any
-export const Video = 'video' as any
+export const Img: React.FC<React.ImgHTMLAttributes<HTMLImageElement>> = (props) => (
+  // passthrough to native img element
+  // eslint-disable-next-line jsx-a11y/alt-text
+  // eslint-disable-next-line @next/next/no-img-element
+  <img alt={props.alt ?? ''} {...props} />
+)
+
+export const Video: React.FC<React.VideoHTMLAttributes<HTMLVideoElement>> = (props) => (
+  <video {...props} />
+)
 export const RichText = Div
 export const Mask = Div
 export const Blur = Div

@@ -1,17 +1,18 @@
 package com.designer.marketplace.dto;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import com.designer.marketplace.entity.Payout;
 import com.designer.marketplace.entity.Payout.PayoutMethod;
 import com.designer.marketplace.entity.Payout.PayoutStatus;
+
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import java.time.LocalDateTime;
-import java.util.List;
 
 public class PayoutDTOs {
 
@@ -27,11 +28,14 @@ public class PayoutDTOs {
         @Positive(message = "Amount must be positive")
         private Long amount;
 
+        @Builder.Default
         private String currency = "USD";
 
+        @Builder.Default
         private PayoutMethod payoutMethod = PayoutMethod.BANK_TRANSFER;
 
-        private List<Long> paymentIds;
+        @Builder.Default
+        private List<Long> paymentIds = java.util.Collections.emptyList();
 
         private LocalDateTime periodStart;
 

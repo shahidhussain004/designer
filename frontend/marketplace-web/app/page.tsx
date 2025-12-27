@@ -7,7 +7,13 @@ import { PageLayout } from '@/components/layout'
 import LandingPage from './landing/page'
 
 export default function Home() {
-  const dialogRef = useRef<any>(null)
+  type DialogHandle = HTMLDialogElement & {
+    show?: () => void
+    close?: () => void
+    showModal?: () => void
+  }
+
+  const dialogRef = useRef<DialogHandle | null>(null)
   const [hasShownModal, setHasShownModal] = useState(false)
   const [isClient, setIsClient] = useState(false)
 
@@ -20,8 +26,16 @@ export default function Home() {
     if (isClient && !hasShownModal && dialogRef.current) {
       // Small delay to ensure web components are registered
       const timer = setTimeout(() => {
-        dialogRef.current.show()
-        setHasShownModal(true)
+        if (dialogRef.current) {
+          // call the custom show method exposed by the Dialog wrapper
+          // prefer the standard showModal if present otherwise fallback to show()
+          if (typeof dialogRef.current.showModal === 'function') {
+            dialogRef.current.showModal()
+          } else if (typeof dialogRef.current.show === 'function') {
+            dialogRef.current.show()
+          }
+          setHasShownModal(true)
+        }
       }, 100)
       return () => clearTimeout(timer)
     }
@@ -29,7 +43,9 @@ export default function Home() {
 
   const handleCloseModal = () => {
     if (dialogRef.current) {
-      dialogRef.current.close()
+      if (typeof dialogRef.current.close === 'function') {
+        dialogRef.current.close()
+      }
     }
   }
 

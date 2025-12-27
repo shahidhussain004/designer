@@ -1,25 +1,29 @@
 package com.designer.marketplace.service;
 
-import com.designer.marketplace.dto.*;
-import com.designer.marketplace.entity.Job;
-import com.designer.marketplace.entity.Proposal;
-import com.designer.marketplace.entity.User;
-import com.designer.marketplace.repository.JobRepository;
-import com.designer.marketplace.repository.ProposalRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.transaction.annotation.Transactional;
+
+import com.designer.marketplace.dto.ClientDashboardResponse;
+import com.designer.marketplace.dto.FreelancerDashboardResponse;
+import com.designer.marketplace.dto.JobResponse;
+import com.designer.marketplace.dto.NotificationResponse;
+import com.designer.marketplace.dto.ProposalResponse;
+import com.designer.marketplace.entity.Job;
+import com.designer.marketplace.entity.Proposal;
+import com.designer.marketplace.entity.User;
+import com.designer.marketplace.repository.JobRepository;
+import com.designer.marketplace.repository.ProposalRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Service for dashboard operations
