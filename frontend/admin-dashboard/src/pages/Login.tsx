@@ -25,20 +25,21 @@ export default function Login() {
 
     try {
       const response = await authApi.login(email, password)
-      
-      // Check if user is admin
-      if (response.role !== 'ADMIN') {
+     
+      console.log('Login response:', response)
+      // Check if user is admin (role is inside user object)
+      if (response.user.role !== 'ADMIN') {
         toast.error('Access denied. Admin privileges required.')
         return
       }
 
       login(
         {
-          id: response.userId,
-          email: response.email,
-          username: response.username,
-          fullName: response.fullName,
-          role: response.role,
+          id: response.user.id,
+          email: response.user.email,
+          username: response.user.username,
+          fullName: response.user.fullName,
+          role: response.user.role,
         },
         response.accessToken
       )
@@ -106,7 +107,7 @@ export default function Login() {
                 Email: admin@designermarket.com
               </Text>
               <Text font-size="body-s" color="secondary">
-                Password: Admin123!
+                Password: password123
               </Text>
             </Flex>
           </Card>

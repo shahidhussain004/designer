@@ -1,13 +1,10 @@
 package com.designer.marketplace.service;
 
 import com.designer.marketplace.repository.JobRepository;
-import com.designer.marketplace.entity.Job;
-import com.designer.marketplace.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
