@@ -6,6 +6,22 @@ import { usePathname, useRouter } from 'next/navigation'
 import { Flex, Text, Button, Div } from '@/components/green'
 import { authService } from '@/lib/auth'
 
+// Small helper to simulate :hover effect using inline styles and mouse events
+const HoverableDiv: React.FC<React.ComponentProps<typeof Div> & { as?: any; href?: string }> = ({ children, style, onMouseEnter, onMouseLeave, ...rest }) => {
+  const [hover, setHover] = useState(false)
+  const mergedStyle = { ...(style || {}), ...(hover ? { backgroundColor: 'var(--color-neutral-03)' } : {}) }
+  return (
+    <Div
+      {...(rest as any)}
+      style={mergedStyle}
+      onMouseEnter={(e: any) => { setHover(true); if (typeof onMouseEnter === 'function') onMouseEnter(e) }}
+      onMouseLeave={(e: any) => { setHover(false); if (typeof onMouseLeave === 'function') onMouseLeave(e) }}
+    >
+      {children}
+    </Div>
+  )
+}
+
 interface NavItem {
   label: string
   href: string
@@ -88,7 +104,7 @@ export default function Navbar() {
         {/* Auth section */}
         <Flex align-items="center" gap="s">
           {user ? (
-            <Div position="relative" ref={dropdownRef}>
+            <Div ref={dropdownRef} style={{ position: 'relative' }}>
               <Button
                 rank="tertiary"
                 variant="neutral"
@@ -100,53 +116,34 @@ export default function Navbar() {
               
               {showDropdown && (
                 <Div
-                  position="absolute"
-                  top="100%"
-                  right="0"
-                  margin-top="xs"
-                  background="neutral-02"
-                  border-width="4xs"
-                  border-color="subtle-01"
-                  border-radius="s"
-                  min-width="200px"
-                  box-shadow="m"
-                  z-index="50"
+                  style={{
+                    position: 'absolute',
+                    top: '100%',
+                    right: 0,
+                    marginTop: 'xs',
+                    background: 'neutral-02',
+                    borderWidth: '4xs',
+                    borderColor: 'subtle-01',
+                    borderRadius: 's',
+                    minWidth: '200px',
+                    boxShadow: 'm',
+                    zIndex: 50,
+                  }}
                 >
                   <Flex flex-direction="column" gap="4xs">
-                    <Link href="/dashboard">
-                      <Div
-                        padding="s m"
-                        cursor="pointer"
-                        style={{
-                          ':hover': { backgroundColor: 'var(--color-neutral-03)' }
-                        }}
-                      >
-                        <Text font="body-regular-s">Dashboard</Text>
-                      </Div>
-                    </Link>
-                    <Link href="/dashboard/profile">
-                      <Div
-                        padding="s m"
-                        cursor="pointer"
-                        style={{
-                          ':hover': { backgroundColor: 'var(--color-neutral-03)' }
-                        }}
-                      >
-                        <Text font="body-regular-s">Profile Settings</Text>
-                      </Div>
-                    </Link>
-                    <Div
+                    <HoverableDiv as={Link} href="/dashboard" padding="s m">
+                      <Text font="body-regular-s">Dashboard</Text>
+                    </HoverableDiv>
+                    <HoverableDiv as={Link} href="/dashboard/profile" padding="s m">
+                      <Text font="body-regular-s">Profile Settings</Text>
+                    </HoverableDiv>
+                    <HoverableDiv
                       padding="s m"
-                      cursor="pointer"
-                      border-width="4xs 0 0 0"
-                      border-color="subtle-01"
+                      style={{ borderTop: 'var(--border-4xs) solid var(--color-subtle-01)' }}
                       onClick={handleLogout}
-                      style={{
-                        ':hover': { backgroundColor: 'var(--color-neutral-03)' }
-                      }}
                     >
                       <Text font="body-regular-s" color="danger-01">Logout</Text>
-                    </Div>
+                    </HoverableDiv>
                   </Flex>
                 </Div>
               )}
