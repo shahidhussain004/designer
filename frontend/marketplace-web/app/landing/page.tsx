@@ -95,7 +95,7 @@ const LandingPage = () => {
             {/* First line */}
             <h2 
               key={`word-${currentWordIndex}`}
-              className="text-5xl font-bold text-white relative z-10 mb-2"
+              className="text-5xl font-bold relative z-10 mb-2"
             >
               {rotatingWords[currentWordIndex].line1}
             </h2>
@@ -103,7 +103,7 @@ const LandingPage = () => {
             {/* Second line */}
             <h2 
               key={`line2-${currentWordIndex}`}
-              className="text-5xl font-bold text-white relative z-10 mb-2"
+              className="text-5xl font-bold relative z-10 mb-2"
             >
               {rotatingWords[currentWordIndex].line2}
             </h2>
@@ -111,13 +111,13 @@ const LandingPage = () => {
             {/* Third line */}
             <h2 
               key={`line3-${currentWordIndex}`}
-              className="text-5xl font-bold text-white relative z-10 mb-4"
+              className="text-5xl font-bold relative z-10 mb-4"
             >
               {rotatingWords[currentWordIndex].line3}
             </h2>
           </div>
 
-          <h4 className="text-xl text-white/90 font-light mb-6">
+          <h4 className="text-xl font-light mb-6">
             Built to help businesses move faster with trusted creative professionals
           </h4>
         </div>

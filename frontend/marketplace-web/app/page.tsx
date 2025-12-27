@@ -237,12 +237,12 @@ export default function Home() {
       </Div>
 
       {/* Modal Dialog */}
-      <Dialog ref={dialogRef} heading="Welcome to Designer Hub">
+      <Dialog ref={dialogRef}>
         <Grid columns="s{1} m{2}" gap="0" width="100%">
           {/* Left Panel */}
-          <Div background="brand-01" color="inversed" padding="s{l} m{2xl}" display="s{none} m{flex}" flex-direction="column" justify-content="center" align-items="flex-start">
+          <Div background="brand-01" padding="s{l} m{2xl}" display="s{none} m{flex}" flex-direction="column" justify-content="center" align-items="flex-start">
             <Flex flex-direction="column" gap="l" align-items="flex-start">
-              <Text tag="h2" font="heading-l" color="inversed" text-align="start">
+              <Text tag="h2" font="heading-l" text-align="start">
                 Welcome to Designer Hub
               </Text>
               
@@ -255,7 +255,7 @@ export default function Home() {
                       <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </Div>
-                  <Text font="body-regular-m" color="inversed">
+                  <Text font="body-regular-m">
                       Hundreds of curated categories
                   </Text>
                 </Flex>
@@ -267,7 +267,7 @@ export default function Home() {
                       <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </Div>
-                  <Text font="body-regular-m" color="inversed">
+                  <Text font="body-regular-m">
                     Exceptional outcomes, delivered reliably
                   </Text>
                 </Flex>
@@ -279,7 +279,7 @@ export default function Home() {
                       <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </Div>
-                  <Text font="body-regular-m" color="inversed">
+                  <Text font="body-regular-m">
                     Connect with skilled professionals worldwide
                   </Text>
                 </Flex>
