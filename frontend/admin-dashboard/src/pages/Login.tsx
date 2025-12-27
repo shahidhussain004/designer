@@ -107,7 +107,7 @@ export default function Login() {
                 Email: admin@designermarket.com
               </Text>
               <Text font-size="body-s" color="secondary">
-                Password: Admin123!
+                Password: password123
               </Text>
             </Flex>
           </Card>
