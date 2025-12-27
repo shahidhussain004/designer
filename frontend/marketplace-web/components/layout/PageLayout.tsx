@@ -15,7 +15,7 @@ interface PageLayoutProps {
  * Loading skeleton shown while Green Core components are loading on client side.
  * This prevents flash of unstyled content and hydration mismatches.
  */
-function LoadingSkeleton() {
+function _LoadingSkeleton() {
   return (
     <div>
       {/* Navbar skeleton */}

@@ -49,7 +49,7 @@ export { CookiesConsent, type CookiesConsentProps } from './CookiesConsent';
 // Navigation Components
 export { Tabs, TabList, Tab, TabPanel } from './Tabs';
 export type { TabsProps, TabListProps, TabProps, TabPanelProps } from './Tabs';
-export { Navbar, type NavbarProps, type NavItem } from './Navbar';
+export { Navbar, type NavbarProps } from './Navbar';
 export { Footer, type FooterProps, type FooterSection, type FooterLink } from './Footer';
 
 // Accessibility Components

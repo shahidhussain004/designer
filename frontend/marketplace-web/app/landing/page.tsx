@@ -43,7 +43,7 @@ const LandingPage = () => {
     }, 4000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [rotatingWords.length]);
 
   if (showSplash) {
     return (

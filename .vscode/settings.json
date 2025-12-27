@@ -19,8 +19,10 @@
 
   // Auto-fix ESLint issues on save
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
   },
+   "files.autoSave": "off",
 
   // Optional: set default formatter to Prettier if installed
   "editor.defaultFormatter": "esbenp.prettier-vscode",

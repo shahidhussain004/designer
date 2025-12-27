@@ -88,10 +88,14 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
     const helperId = `${selectId.current}-helper`;
     const listboxId = `${selectId.current}-listbox`;
 
-    // Normalize value to array
-    const selectedValues: string[] = multiple
-      ? (Array.isArray(value) ? value : value ? [value] : [])
-      : (value ? [value as string] : []);
+    // Normalize value to array (memoized so it doesn't change reference each render)
+    const selectedValues: string[] = React.useMemo(() =>
+      multiple
+        ? (Array.isArray(value) ? value : value ? [value] : [])
+        : (value ? [value as string] : []),
+      // depend on value and multiple only
+      [value, multiple]
+    );
 
     // Filter options based on search
     const filteredOptions = options.filter(option =>

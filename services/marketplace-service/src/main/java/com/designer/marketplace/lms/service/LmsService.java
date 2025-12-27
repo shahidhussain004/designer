@@ -1,5 +1,16 @@
 package com.designer.marketplace.lms.service;
 
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.designer.marketplace.entity.User;
 import com.designer.marketplace.lms.dto.CourseResponse;
 import com.designer.marketplace.lms.dto.CreateCourseRequest;
@@ -16,16 +27,9 @@ import com.designer.marketplace.lms.entity.Module;
 import com.designer.marketplace.lms.repository.CourseRepository;
 import com.designer.marketplace.lms.repository.EnrollmentRepository;
 import com.designer.marketplace.repository.UserRepository;
-import com.designer.marketplace.service.UserService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Instant;
-import java.util.*;
 
 /**
  * Service for Learning Management System operations.
@@ -38,7 +42,6 @@ public class LmsService {
     private final CourseRepository courseRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final UserRepository userRepository;
-    private final UserService userService;
 
     // ================== Course Operations ==================
 

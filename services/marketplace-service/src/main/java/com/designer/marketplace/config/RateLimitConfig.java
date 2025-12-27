@@ -1,14 +1,14 @@
 package com.designer.marketplace.config;
 
-import io.github.bucket4j.Bandwidth;
-import io.github.bucket4j.Bucket;
-import io.github.bucket4j.Refill;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
-
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
+
+import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.Bucket;
 
 /**
  * Rate limiting configuration using Bucket4j
@@ -21,8 +21,9 @@ public class RateLimitConfig {
      * Rate limiter for authentication endpoints (stricter limits)
      * 5 requests per minute per IP
      */
+    @SuppressWarnings("deprecation")
     public Bucket createAuthBucket() {
-        Bandwidth limit = Bandwidth.classic(5, Refill.greedy(5, Duration.ofMinutes(1)));
+        Bandwidth limit = Bandwidth.simple(5, Duration.ofMinutes(1));
         return Bucket.builder().addLimit(limit).build();
     }
 
@@ -30,8 +31,9 @@ public class RateLimitConfig {
      * Rate limiter for general API endpoints
      * 100 requests per minute per IP
      */
+    @SuppressWarnings("deprecation")
     public Bucket createGeneralBucket() {
-        Bandwidth limit = Bandwidth.classic(100, Refill.greedy(100, Duration.ofMinutes(1)));
+        Bandwidth limit = Bandwidth.simple(100, Duration.ofMinutes(1));
         return Bucket.builder().addLimit(limit).build();
     }
 
@@ -39,8 +41,9 @@ public class RateLimitConfig {
      * Rate limiter for admin endpoints
      * 50 requests per minute per admin user
      */
+    @SuppressWarnings("deprecation")
     public Bucket createAdminBucket() {
-        Bandwidth limit = Bandwidth.classic(50, Refill.greedy(50, Duration.ofMinutes(1)));
+        Bandwidth limit = Bandwidth.simple(50, Duration.ofMinutes(1));
         return Bucket.builder().addLimit(limit).build();
     }
 
@@ -48,8 +51,9 @@ public class RateLimitConfig {
      * Rate limiter for webhook endpoints (Stripe)
      * 1000 requests per minute (Stripe may send bursts)
      */
+    @SuppressWarnings("deprecation")
     public Bucket createWebhookBucket() {
-        Bandwidth limit = Bandwidth.classic(1000, Refill.greedy(1000, Duration.ofMinutes(1)));
+        Bandwidth limit = Bandwidth.simple(1000, Duration.ofMinutes(1));
         return Bucket.builder().addLimit(limit).build();
     }
 
