@@ -3,10 +3,10 @@
 ## Admin User (for testing)
 
 **Email**: `admin@designermarket.com`  
-**Password**: `Admin123!`  
+**Password**: `password123`  
 **Role**: ADMIN
 
-This user will be created automatically when the marketplace service starts (Flyway migration V10).
+This user is created by Flyway migration V10 with an initial password hash that was corrected in V11.
 
 ## Test Clients (from seed data)
 
