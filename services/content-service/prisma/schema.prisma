@@ -1,0 +1,209 @@
+// Prisma schema for Content Service
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x", "debian-openssl-3.0.x", "linux-musl-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Author table - synced from marketplace users
+model Author {
+  id          String    @id @default(uuid())
+  userId      String    @unique @map("user_id")
+  name        String
+  email       String
+  bio         String?
+  avatarUrl   String?   @map("avatar_url")
+  socialLinks Json      @default("{}") @map("social_links")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  content  Content[]
+  comments Comment[]
+
+  @@map("authors")
+}
+
+// Category table - hierarchical categories
+model Category {
+  id          String     @id @default(uuid())
+  name        String     @unique
+  slug        String     @unique
+  description String?
+  parentId    String?    @map("parent_id")
+  icon        String?
+  sortOrder   Int        @default(0) @map("sort_order")
+  isActive    Boolean    @default(true) @map("is_active")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryTree")
+  content  Content[]
+
+  @@map("categories")
+}
+
+// Tag table
+model Tag {
+  id         String       @id @default(uuid())
+  name       String       @unique
+  slug       String       @unique
+  color      String       @default("#3B82F6")
+  usageCount Int          @default(0) @map("usage_count")
+  createdAt  DateTime     @default(now()) @map("created_at")
+
+  content ContentTag[]
+
+  @@map("tags")
+}
+
+// Content type enum
+enum ContentType {
+  blog
+  article
+  news
+
+  @@map("content_type")
+}
+
+// Content status enum
+enum ContentStatus {
+  draft
+  review
+  published
+  archived
+
+  @@map("content_status")
+}
+
+// Main Content table
+model Content {
+  id                 String        @id @default(uuid())
+  title              String
+  slug               String        @unique
+  excerpt            String?
+  body               String
+  contentType        ContentType   @map("content_type")
+  status             ContentStatus @default(draft)
+  authorId           String        @map("author_id")
+  categoryId         String?       @map("category_id")
+  featuredImage      String?       @map("featured_image")
+  featuredImageAlt   String?       @map("featured_image_alt")
+  metaTitle          String?       @map("meta_title")
+  metaDescription    String?       @map("meta_description")
+  metaKeywords       String[]      @map("meta_keywords")
+  publishedAt        DateTime?     @map("published_at")
+  scheduledAt        DateTime?     @map("scheduled_at")
+  viewCount          Int           @default(0) @map("view_count")
+  likeCount          Int           @default(0) @map("like_count")
+  shareCount         Int           @default(0) @map("share_count")
+  readingTimeMinutes Int?          @map("reading_time_minutes")
+  isFeatured         Boolean       @default(false) @map("is_featured")
+  isTrending         Boolean       @default(false) @map("is_trending")
+  allowComments      Boolean       @default(true) @map("allow_comments")
+  customFields       Json          @default("{}") @map("custom_fields")
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
+  deletedAt          DateTime?     @map("deleted_at")
+
+  author   Author    @relation(fields: [authorId], references: [id])
+  category Category? @relation(fields: [categoryId], references: [id])
+  tags     ContentTag[]
+  comments Comment[]
+  views    ContentView[]
+  likes    ContentLike[]
+
+  @@index([status])
+  @@index([contentType])
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([publishedAt])
+  @@index([slug])
+  @@index([isFeatured])
+  @@index([isTrending])
+  @@map("content")
+}
+
+// Content-Tag junction table
+model ContentTag {
+  contentId String  @map("content_id")
+  tagId     String  @map("tag_id")
+  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([contentId, tagId])
+  @@map("content_tags")
+}
+
+// Comments table
+model Comment {
+  id         String    @id @default(uuid())
+  contentId  String    @map("content_id")
+  authorId   String    @map("author_id")
+  parentId   String?   @map("parent_id")
+  body       String
+  isApproved Boolean   @default(false) @map("is_approved")
+  isFlagged  Boolean   @default(false) @map("is_flagged")
+  likeCount  Int       @default(0) @map("like_count")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  content  Content   @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  author   Author    @relation(fields: [authorId], references: [id])
+  parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies  Comment[] @relation("CommentReplies")
+
+  @@index([contentId])
+  @@index([authorId])
+  @@map("comments")
+}
+
+// Content Views tracking
+model ContentView {
+  id        String   @id @default(uuid())
+  contentId String   @map("content_id")
+  userId    String?  @map("user_id")
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  viewedAt  DateTime @default(now()) @map("viewed_at")
+
+  content Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  @@index([contentId])
+  @@index([viewedAt])
+  @@map("content_views")
+}
+
+// Content Likes
+model ContentLike {
+  contentId String   @map("content_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  content Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  @@id([contentId, userId])
+  @@map("content_likes")
+}
+
+// Media Assets table
+model MediaAsset {
+  id               String   @id @default(uuid())
+  filename         String
+  originalFilename String   @map("original_filename")
+  filePath         String   @map("file_path")
+  fileSize         BigInt   @map("file_size")
+  mimeType         String   @map("mime_type")
+  width            Int?
+  height           Int?
+  uploadedBy       String   @map("uploaded_by")
+  altText          String?  @map("alt_text")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@index([uploadedBy])
+  @@map("media_assets")
+}

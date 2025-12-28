@@ -1,0 +1,11 @@
+/**
+ * Plugins barrel export
+ */
+
+export { default as corsPlugin } from './cors.plugin';
+export { default as errorHandlerPlugin } from './error-handler.plugin';
+export { default as healthPlugin } from './health.plugin';
+export { default as multipartPlugin } from './multipart.plugin';
+export { default as rateLimitPlugin } from './rate-limit.plugin';
+export { default as swaggerPlugin } from './swagger.plugin';
+
