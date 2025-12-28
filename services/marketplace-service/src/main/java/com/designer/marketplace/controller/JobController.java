@@ -1,12 +1,5 @@
 package com.designer.marketplace.controller;
 
-import com.designer.marketplace.dto.CreateJobRequest;
-import com.designer.marketplace.dto.JobResponse;
-import com.designer.marketplace.dto.UpdateJobRequest;
-import com.designer.marketplace.service.JobService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +7,24 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.designer.marketplace.dto.CreateJobRequest;
+import com.designer.marketplace.dto.JobResponse;
+import com.designer.marketplace.dto.UpdateJobRequest;
+import com.designer.marketplace.service.JobService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Controller for job listing endpoints
@@ -38,12 +48,12 @@ public class JobController {
     /**
      * Task 3.6: List jobs with filters
      * GET
-     * /api/jobs?category=web&experienceLevel=intermediate&minBudget=100&maxBudget=1000&search=keyword&page=0&size=20
+     * /api/jobs?categoryId=1&experienceLevelId=2&minBudget=100&maxBudget=1000&search=keyword&page=0&size=20
      */
     @GetMapping
     public ResponseEntity<Page<JobResponse>> getJobs(
-            @RequestParam(required = false) String category,
-            @RequestParam(required = false) String experienceLevel,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) Long experienceLevelId,
             @RequestParam(required = false) Double minBudget,
             @RequestParam(required = false) Double maxBudget,
             @RequestParam(required = false) String search,
@@ -52,13 +62,13 @@ public class JobController {
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "DESC") String sortDirection) {
 
-        log.info("Getting jobs - category: {}, experienceLevel: {}, search: {}, page: {}, size: {}",
-                category, experienceLevel, search, page, size);
+        log.info("Getting jobs - categoryId: {}, experienceLevelId: {}, search: {}, page: {}, size: {}",
+                categoryId, experienceLevelId, search, page, size);
 
         Sort sort = sortDirection.equalsIgnoreCase("ASC") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<JobResponse> jobs = jobService.getJobs(category, experienceLevel, minBudget, maxBudget, search, pageable);
+        Page<JobResponse> jobs = jobService.getJobs(categoryId, experienceLevelId, minBudget, maxBudget, search, pageable);
         return ResponseEntity.ok(jobs);
     }
 

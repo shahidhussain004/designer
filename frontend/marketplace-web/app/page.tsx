@@ -28,7 +28,7 @@ export default function Home() {
         const v = localStorage.getItem(k)
         if (v) return true
       }
-    } catch (e) {
+    } catch {
       // ignore
     }
 
@@ -75,7 +75,7 @@ export default function Home() {
         // mark dismissed for this session
         try {
           if (typeof window !== 'undefined') sessionStorage.setItem('designerHub.dismissed', '1')
-        } catch (e) {
+        } catch {
           // ignore
         }
         setHasShownModal(true)
@@ -90,9 +90,9 @@ export default function Home() {
       if (!dlg) return
       if (!dlg.open) return
       if (dlg && !dlg.contains(event.target as Node)) {
-        // use the same close handler to ensure session flag is set
-        handleCloseModal()
-      }
+          // use the same close handler to ensure session flag is set
+          handleCloseModal()
+        }
     }
 
     document.addEventListener('mousedown', handleOutsideClick)

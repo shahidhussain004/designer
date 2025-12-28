@@ -21,20 +21,23 @@ public interface JobRepository extends JpaRepository<Job, Long> {
 
     Page<Job> findByClientId(Long clientId, Pageable pageable);
 
-    Page<Job> findByCategory(String category, Pageable pageable);
+    // Updated to use JobCategory foreign key
+    Page<Job> findByJobCategoryId(Long categoryId, Pageable pageable);
 
-    Page<Job> findByCategoryAndStatus(String category, Job.JobStatus status, Pageable pageable);
+    Page<Job> findByJobCategoryIdAndStatus(Long categoryId, Job.JobStatus status, Pageable pageable);
 
-    Page<Job> findByExperienceLevel(Job.ExperienceLevel experienceLevel, Pageable pageable);
+    // Updated to use ExperienceLevel foreign key
+    Page<Job> findByExperienceLevelEntityId(Long experienceLevelId, Pageable pageable);
 
+    // Updated query to use foreign key relationships
     @Query("SELECT j FROM Job j WHERE j.status = :status AND " +
-            "(:category IS NULL OR LOWER(j.category) = LOWER(CAST(:category AS string))) AND " +
-            "(:experienceLevel IS NULL OR j.experienceLevel = :experienceLevel) AND " +
+            "(:categoryId IS NULL OR j.jobCategory.id = :categoryId) AND " +
+            "(:experienceLevelId IS NULL OR j.experienceLevelEntity.id = :experienceLevelId) AND " +
             "(:minBudget IS NULL OR j.budget >= :minBudget) AND " +
             "(:maxBudget IS NULL OR j.budget <= :maxBudget)")
     Page<Job> findByFilters(@Param("status") Job.JobStatus status,
-            @Param("category") String category,
-            @Param("experienceLevel") Job.ExperienceLevel experienceLevel,
+            @Param("categoryId") Long categoryId,
+            @Param("experienceLevelId") Long experienceLevelId,
             @Param("minBudget") Double minBudget,
             @Param("maxBudget") Double maxBudget,
             Pageable pageable);

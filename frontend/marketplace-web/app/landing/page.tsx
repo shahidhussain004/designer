@@ -1,32 +1,61 @@
 'use client'
 
 import { VideoBackground } from '@/components/ui/VideoBackground';
+import { parseCategories } from '@/lib/apiParsers';
+import type { JobCategory } from '@/lib/apiTypes';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { IconCalendar, IconSearch, IconStar } from '../../components/ui';
 import AnimatedButton from '../components/animated-button';
 
+type Category = JobCategory
+
+const rotatingWords = [
+  { line1: 'Creator-First', line2: 'Portfolio & Opportunity', line3: 'Platform' },
+  { line1: 'Design-Driven', line2: 'Careers &', line3: 'Collaboration' },
+  { line1: 'Built for Creators', line2: 'Jobs, Gigs, &', line3: 'Growth' },
+  { line1: 'Empowering', line2: 'Designers &', line3: 'Developers' }
+];
+
+const FALLBACK_CATEGORIES: Category[] = [
+  { id: 0, name: 'Development & IT' },
+  { id: 0, name: 'Design & Creative' },
+  { id: 0, name: 'UI/UX Design' },
+  { id: 0, name: 'Video & Animation' },
+  { id: 0, name: '3D Modeling' },
+  { id: 0, name: 'Branding & Identity' },
+];
+
 const LandingPage = () => {
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const [activeTab, setActiveTab] = useState('talents');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [currentWordIndex, setCurrentWordIndex] = useState<number>(0);
+  const [activeTab, setActiveTab] = useState<'talents' | 'jobs'>('talents');
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
-  const rotatingWords = [
-    { line1: 'Creator-First', line2: 'Portfolio & Opportunity', line3: 'Platform' },
-    { line1: 'Design-Driven', line2: 'Careers &', line3: 'Collaboration' },
-    { line1: 'Built for Creators', line2: 'Jobs, Gigs, &', line3: 'Growth' },
-    { line1: 'Empowering', line2: 'Designers &', line3: 'Developers' }
-  ];
+  const [categories, setCategories] = useState<Category[]>(FALLBACK_CATEGORIES);
 
-  const categories = [
-    'Development & IT',
-    'Design & Creative',
-    'UI/UX Design',
-    'Video & Animation',
-    '3D Modeling',
-    'Branding & Identity'
-  ];
+  useEffect(() => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    async function load() {
+      try {
+        const res = await fetch('/api/job-categories', { signal });
+        if (!res.ok) throw new Error(`Failed to fetch categories: ${res.status}`);
+        const data = await res.json();
+        const categories = parseCategories(data);
+        setCategories(categories);
+      } catch (err: unknown) {
+        const maybeErr = err as { name?: string }
+        if (maybeErr.name === 'AbortError') return
+        console.error('Error loading categories:', err)
+        // keep fallback categories
+      }
+    }
+
+    load();
+    return () => controller.abort();
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -34,7 +63,7 @@ const LandingPage = () => {
     }, 4000);
 
     return () => clearInterval(interval);
-  }, [rotatingWords.length]);
+  }, []);
 
   return (
     <div className="relative min-h-screen overflow-hidden">
@@ -52,7 +81,7 @@ const LandingPage = () => {
           />
         </div>
         <nav className="flex items-center space-x-8 text-white">
-          <Link href="/jobs" className="hover:text-pink-300 transition-colors">Jobs</Link>
+          <Link href="/jobs" className="hover:text-pink-300 transition-colors">Find Work</Link>
           <Link href="/courses" className="hover:text-pink-300 transition-colors">Courses</Link>
           <button onClick={() => {}} className="text-2xl hover:scale-110 transition-transform">🌙</button>
           <Link href="/auth/login" className="hover:text-pink-300 transition-colors">Login</Link>
@@ -241,14 +270,14 @@ const LandingPage = () => {
 
                 <div className="border-t border-white/30 pt-6">
                   <div className="flex flex-wrap gap-3">
-                    {categories.map((category, index) => (
-                      <a
-                        key={index}
-                        href="#"
+                    {categories.map((cat) => (
+                      <Link
+                        key={cat.id + '-' + cat.name}
+                        href={`/jobs?categoryId=${cat.id}`}
                         className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-full text-sm transition-all hover:scale-105"
                       >
-                        {category}
-                      </a>
+                        {cat.name}
+                      </Link>
                     ))}
                   </div>
                 </div>
@@ -266,14 +295,14 @@ const LandingPage = () => {
 
                 <div className="border-t border-white/30 pt-6">
                   <div className="flex flex-wrap gap-3">
-                    {categories.map((category, index) => (
-                      <a
-                        key={index}
-                        href="#"
+                    {categories.map((cat) => (
+                      <Link
+                        key={cat.id + '-' + cat.name}
+                        href={`/jobs?categoryId=${cat.id}`}
                         className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-full text-sm transition-all hover:scale-105"
                       >
-                        {category}
-                      </a>
+                        {cat.name}
+                      </Link>
                     ))}
                   </div>
                 </div>
