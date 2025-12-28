@@ -1,12 +1,12 @@
 import {
-    createCategorySchema,
-    createCommentSchema,
-    createContentSchema,
-    createTagSchema,
-    paginationSchema,
-    searchQuerySchema,
-    updateCategorySchema,
-    updateContentSchema,
+  createCategorySchema,
+  createCommentSchema,
+  createContentSchema,
+  createTagSchema,
+  paginationSchema,
+  searchQuerySchema,
+  updateCategorySchema,
+  updateContentSchema,
 } from '../../../src/common/utils/validation';
 
 describe('Validation Schemas', () => {

@@ -65,7 +65,7 @@ describe('ContentService', () => {
   beforeEach(() => {
     mockContentRepo = new ContentRepository() as jest.Mocked<ContentRepository>;
     mockCategoryRepo = new CategoryRepository() as jest.Mocked<CategoryRepository>;
-    
+
     service = new ContentService();
     (service as any).repository = mockContentRepo;
     (service as any).categoryRepository = mockCategoryRepo;

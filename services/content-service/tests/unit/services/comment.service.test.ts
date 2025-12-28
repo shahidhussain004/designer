@@ -35,7 +35,7 @@ describe('CommentService', () => {
   beforeEach(() => {
     mockCommentRepo = new CommentRepository() as jest.Mocked<CommentRepository>;
     mockContentRepo = new ContentRepository() as jest.Mocked<ContentRepository>;
-    
+
     service = new CommentService();
     (service as any).repository = mockCommentRepo;
     (service as any).contentRepository = mockContentRepo;
@@ -139,9 +139,9 @@ describe('CommentService', () => {
     it('should throw NotFoundException when comment not found', async () => {
       mockCommentRepo.findById.mockResolvedValue(null);
 
-      await expect(
-        service.update('non-existent', 'user-1', { body: 'Updated' })
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.update('non-existent', 'user-1', { body: 'Updated' })).rejects.toThrow(
+        NotFoundException
+      );
     });
   });
 

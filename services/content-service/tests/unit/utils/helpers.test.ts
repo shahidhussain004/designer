@@ -1,9 +1,9 @@
 import {
-    buildPaginationMeta,
-    calculateReadingTime,
-    generateExcerpt,
-    generateSlug,
-    isValidUuid,
+  buildPaginationMeta,
+  calculateReadingTime,
+  generateExcerpt,
+  generateSlug,
+  isValidUuid,
 } from '../../../src/common/utils/helpers';
 
 describe('Helpers', () => {
