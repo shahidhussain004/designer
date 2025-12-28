@@ -10,8 +10,11 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { label: 'Jobs', href: '/jobs' },
+  { label: 'Find Work', href: '/jobs' },
+  { label: 'Hire Talent', href: '/talent' },
   { label: 'Courses', href: '/courses' },
+  { label: 'Resources', href: '/resources' },
+
 ];
 
 export const FluidLogo: React.FC = () => (

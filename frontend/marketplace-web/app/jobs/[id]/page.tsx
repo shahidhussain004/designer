@@ -167,7 +167,7 @@ export default function JobDetailsPage() {
             Error: {error || 'Job not found'}
           </Alert>
           <Link href="/jobs">
-            ← Back to Jobs
+            ← Back to Find Work
           </Link>
         </Flex>
       </PageLayout>
@@ -179,7 +179,7 @@ export default function JobDetailsPage() {
       {/* Header */}
       <Flex flex-direction="column" gap="s" padding="l">
         <Link href="/jobs">
-          ← Back to Jobs
+          ← Back to Find Work
         </Link>
         <Text tag="h1" font-size="heading-xl">
           {job.title}

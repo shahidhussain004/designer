@@ -164,7 +164,7 @@ function JobsPageContent() {
         {/* Page Header */}
         <Flex flex-direction="column" gap="s">
           <Text tag="h1" font-size="heading-l">
-            Browse Jobs
+            Find Work
           </Text>
           <Text color="secondary">
             Find your next design opportunity from our curated job listings
@@ -176,7 +176,7 @@ function JobsPageContent() {
           <Flex gap="m" align-items="flex-end">
             <Flex flex="1">
               <Input
-                label="Search Jobs"
+                label="Search Work"
                 value={searchQuery}
                 onInput={(e: Event) => setSearchQuery((e.target as HTMLInputElement).value)}
               />

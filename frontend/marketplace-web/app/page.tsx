@@ -100,7 +100,7 @@ export default function Home() {
   }, [])
 
   return (
-    <PageLayout showNavbar={false}>
+    <PageLayout showNavbar={true}>
       {/* Hero Section */}
       <LandingPage />
 

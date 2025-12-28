@@ -3,11 +3,9 @@
 import { VideoBackground } from '@/components/ui/VideoBackground';
 import { parseCategories } from '@/lib/apiParsers';
 import type { JobCategory } from '@/lib/apiTypes';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { IconCalendar, IconSearch, IconStar } from '../../components/ui';
-import AnimatedButton from '../components/animated-button';
 
 type Category = JobCategory
 
@@ -69,31 +67,6 @@ const LandingPage = () => {
     <div className="relative min-h-screen overflow-hidden">
       {/* Video Background */}
       <VideoBackground />
-      {/* Header */}
-      <header className="relative z-20 px-8 py-6 flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <Image
-            src="/logo-reverse-designer.png"
-            alt="Designer Marketplace"
-            width={160}
-            height={36}
-            className="object-contain"
-          />
-        </div>
-        <nav className="flex items-center space-x-8 text-white">
-          <Link href="/jobs" className="hover:text-pink-300 transition-colors">Find Work</Link>
-          <Link href="/courses" className="hover:text-pink-300 transition-colors">Courses</Link>
-          <button onClick={() => {}} className="text-2xl hover:scale-110 transition-transform">🌙</button>
-          <Link href="/auth/login" className="hover:text-pink-300 transition-colors">Login</Link>
-             <Link href="/get-started">
-            <AnimatedButton variant="slim" className="bg-white text-black hover:bg-gray-100">
-              <span className="flex items-center">
-              Sign Up
-              </span>
-            </AnimatedButton>
-            </Link>
-        </nav>
-      </header>
 
      {/* Main Content */}
       <main className="relative z-20 flex flex-col items-center justify-end px-8 pt-12">
