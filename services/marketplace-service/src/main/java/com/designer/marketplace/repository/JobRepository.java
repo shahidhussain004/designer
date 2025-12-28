@@ -1,6 +1,7 @@
 package com.designer.marketplace.repository;
 
-import com.designer.marketplace.entity.Job;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.designer.marketplace.entity.Job;
 
 /**
  * Repository for Job entity
@@ -26,8 +27,8 @@ public interface JobRepository extends JpaRepository<Job, Long> {
 
     Page<Job> findByExperienceLevel(Job.ExperienceLevel experienceLevel, Pageable pageable);
 
-    @Query("SELECT j FROM Job j JOIN FETCH j.client WHERE j.status = :status AND " +
-            "(:category IS NULL OR LOWER(j.category) = LOWER(:category)) AND " +
+    @Query("SELECT j FROM Job j WHERE j.status = :status AND " +
+            "(:category IS NULL OR LOWER(j.category) = LOWER(CAST(:category AS string))) AND " +
             "(:experienceLevel IS NULL OR j.experienceLevel = :experienceLevel) AND " +
             "(:minBudget IS NULL OR j.budget >= :minBudget) AND " +
             "(:maxBudget IS NULL OR j.budget <= :maxBudget)")
@@ -45,12 +46,12 @@ public interface JobRepository extends JpaRepository<Job, Long> {
     @Query("SELECT COUNT(j) FROM Job j WHERE j.client.id = :clientId AND j.status = :status")
     Long countByClientIdAndStatus(@Param("clientId") Long clientId, @Param("status") Job.JobStatus status);
 
-    @Query("SELECT j FROM Job j JOIN FETCH j.client WHERE j.status = 'OPEN' AND " +
+    @Query("SELECT j FROM Job j WHERE j.status = 'OPEN' AND " +
             "(LOWER(j.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
             "LOWER(j.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')))")
     Page<Job> searchJobs(@Param("searchTerm") String searchTerm, Pageable pageable);
 
-    @Query("SELECT j FROM Job j JOIN FETCH j.client WHERE j.client.id = :clientId AND j.status IN :statuses ORDER BY j.createdAt DESC")
+    @Query("SELECT j FROM Job j WHERE j.client.id = :clientId AND j.status IN :statuses ORDER BY j.createdAt DESC")
     List<Job> findTopByClientIdAndStatusIn(@Param("clientId") Long clientId,
             @Param("statuses") List<Job.JobStatus> statuses,
             Pageable pageable);

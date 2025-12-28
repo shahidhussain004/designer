@@ -1,10 +1,11 @@
 'use client';
 
-import React from 'react';
+import AnimatedButton from '@/app/components/animated-button';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FluidAccountDropdown } from './fluid-account-dropdown';
+import React from 'react';
 import { FluidNotificationsDropdown } from './fluid-notifications-dropdown';
+import { FluidLogo, FluidNavLinks } from './FluidHeader';
 import './navbar.css';
 
 // =============================================================================
@@ -18,40 +19,24 @@ export interface NavbarProps extends React.HTMLAttributes<HTMLElement> {
 export const Navbar = ({ className: _className }: NavbarProps) => {
   const pathname = usePathname();
 
-  const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
-
   return (
     <nav className="navbar-container">
       <div className="navbar-inner">
         {/* Left Section: Logo + Nav Links */}
         <div className="navbar-left">
-          <Link href="/" className="navbar-brand">
-            <span>Designer Marketplace</span>
-          </Link>
-          <ul className="nav-links">
-            <li>
-              <Link
-                href="/jobs"
-                className={`nav-item ${isActive('/jobs') ? 'nav-item-active' : ''}`}
-              >
-                Jobs
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/courses"
-                className={`nav-item ${isActive('/courses') ? 'nav-item-active' : ''}`}
-              >
-                Courses
-              </Link>
-            </li>
-          </ul>
+          <FluidLogo />
+          <FluidNavLinks pathname={pathname} />
         </div>
 
         {/* Right Section: Notifications + Account */}
         <div className="navbar-right">
           <FluidNotificationsDropdown />
-          <FluidAccountDropdown />
+          <Link href="/auth/login" className="hover:text-pink-300 transition-colors">Login</Link>
+          <Link href="/get-started">
+            <AnimatedButton variant="slim" className="bg-white text-black hover:bg-gray-100">
+              <span className="flex items-center">Sign Up</span>
+            </AnimatedButton>
+          </Link>
         </div>
       </div>
     </nav>

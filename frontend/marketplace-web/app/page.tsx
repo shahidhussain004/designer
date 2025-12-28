@@ -1,9 +1,9 @@
 'use client'
 
+import { Button, Card, Dialog, Div, Flex, Grid, LinkComponent, Text } from '@/components/green'
+import { PageLayout } from '@/components/layout'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { Flex, Grid, Card, Text, Div, Button, Dialog, LinkComponent } from '@/components/green'
-import { PageLayout } from '@/components/layout'
 import LandingPage from './landing/page'
 
 export default function Home() {
@@ -11,11 +11,36 @@ export default function Home() {
     show?: () => void
     close?: () => void
     showModal?: () => void
+    open?: boolean
   }
 
   const dialogRef = useRef<DialogHandle | null>(null)
   const [hasShownModal, setHasShownModal] = useState(false)
   const [isClient, setIsClient] = useState(false)
+
+  // Helper: detect simple logged-in state by checking common storage/cookie keys
+  const isUserLoggedIn = () => {
+    if (typeof window === 'undefined') return false
+    try {
+      // check localStorage keys
+      const lsKeys = ['authToken', 'token', 'user', 'session']
+      for (const k of lsKeys) {
+        const v = localStorage.getItem(k)
+        if (v) return true
+      }
+    } catch (e) {
+      // ignore
+    }
+
+    // check cookies for common session keys
+    const cookies = typeof document !== 'undefined' ? document.cookie : ''
+    const cookieKeys = ['next-auth.session-token', 'session', 'connect.sid', 'authToken']
+    for (const ck of cookieKeys) {
+      if (cookies.includes(ck + '=')) return true
+    }
+
+    return false
+  }
 
   // Ensure we only run on client to avoid hydration mismatch
   useEffect(() => {
@@ -23,7 +48,9 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    if (isClient && !hasShownModal && dialogRef.current) {
+    // show modal only for non-logged-in users and only if user hasn't dismissed it this session
+    const dismissed = typeof window !== 'undefined' && sessionStorage.getItem('designerHub.dismissed')
+    if (isClient && !hasShownModal && !dismissed && !isUserLoggedIn() && dialogRef.current) {
       // Small delay to ensure web components are registered
       const timer = setTimeout(() => {
         if (dialogRef.current) {
@@ -45,9 +72,32 @@ export default function Home() {
     if (dialogRef.current) {
       if (typeof dialogRef.current.close === 'function') {
         dialogRef.current.close()
+        // mark dismissed for this session
+        try {
+          if (typeof window !== 'undefined') sessionStorage.setItem('designerHub.dismissed', '1')
+        } catch (e) {
+          // ignore
+        }
+        setHasShownModal(true)
       }
     }
   }
+
+  // Close dialog when clicking outside of it
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      const dlg = dialogRef.current
+      if (!dlg) return
+      if (!dlg.open) return
+      if (dlg && !dlg.contains(event.target as Node)) {
+        // use the same close handler to ensure session flag is set
+        handleCloseModal()
+      }
+    }
+
+    document.addEventListener('mousedown', handleOutsideClick)
+    return () => document.removeEventListener('mousedown', handleOutsideClick)
+  }, [])
 
   return (
     <PageLayout showNavbar={false}>
@@ -254,6 +304,14 @@ export default function Home() {
 
       {/* Modal Dialog */}
       <Dialog ref={dialogRef}>
+        <div style={{ position: 'absolute', right: 12, top: 12, zIndex: 40 }}>
+          <button onClick={handleCloseModal} aria-label="Close" className="p-2 rounded-full bg-white/10 hover:bg-white/20">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
         <Grid columns="s{1} m{2}" gap="0" width="100%">
           {/* Left Panel */}
           <Div background="brand-01" padding="s{l} m{2xl}" display="s{none} m{flex}" flex-direction="column" justify-content="center" align-items="flex-start">

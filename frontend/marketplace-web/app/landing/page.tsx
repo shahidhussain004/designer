@@ -1,14 +1,13 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
-import { IconSearch, IconCalendar, IconStar } from '../../components/ui';
 import { VideoBackground } from '@/components/ui/VideoBackground';
-import AnimatedButton from '../components/animated-button';
+import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { IconCalendar, IconSearch, IconStar } from '../../components/ui';
+import AnimatedButton from '../components/animated-button';
 
 const LandingPage = () => {
-   const [showSplash, setShowSplash] = useState(true);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [activeTab, setActiveTab] = useState('talents');
   const [searchQuery, setSearchQuery] = useState('');
@@ -30,31 +29,12 @@ const LandingPage = () => {
   ];
 
   useEffect(() => {
-    const splashTimer = setTimeout(() => {
-      setShowSplash(false);
-    }, 2500);
-
-    return () => clearTimeout(splashTimer);
-  }, []);
-
-  useEffect(() => {
     const interval = setInterval(() => {
       setCurrentWordIndex((prev) => (prev + 1) % rotatingWords.length);
     }, 4000);
 
     return () => clearInterval(interval);
   }, [rotatingWords.length]);
-
-  if (showSplash) {
-    return (
-      <div className="fixed inset-0 bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center z-50">
-          <div className="text-center animate-pulse">
-          <IconStar className="w-20 h-20 text-white mx-auto mb-4" />
-          <h1 className="text-5xl font-bold text-white">Loading Experience...</h1>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="relative min-h-screen overflow-hidden">

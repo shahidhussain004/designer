@@ -1,9 +1,13 @@
 package com.designer.marketplace.service;
 
-import com.designer.marketplace.dto.*;
-import com.designer.marketplace.entity.*;
-import com.designer.marketplace.repository.*;
-import com.designer.marketplace.lms.repository.*;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -12,10 +16,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import com.designer.marketplace.dto.AdminDashboardResponse;
+import com.designer.marketplace.dto.AdminUpdateUserRequest;
+import com.designer.marketplace.dto.AdminUserResponse;
+import com.designer.marketplace.dto.JobResponse;
+import com.designer.marketplace.entity.Job;
+import com.designer.marketplace.entity.Proposal;
+import com.designer.marketplace.entity.User;
+import com.designer.marketplace.entity.User.UserRole;
+import com.designer.marketplace.lms.repository.CertificateRepository;
+import com.designer.marketplace.lms.repository.CourseRepository;
+import com.designer.marketplace.lms.repository.EnrollmentRepository;
+import com.designer.marketplace.repository.JobRepository;
+import com.designer.marketplace.repository.PaymentRepository;
+import com.designer.marketplace.repository.ProposalRepository;
+import com.designer.marketplace.repository.UserRepository;
 
 @Service
 public class AdminService {
@@ -53,8 +68,8 @@ public class AdminService {
 
         // User stats
         long totalUsers = userRepository.count();
-        long totalClients = userRepository.countByRole(User.UserRole.CLIENT);
-        long totalFreelancers = userRepository.countByRole(User.UserRole.FREELANCER);
+        long totalClients = userRepository.countByRole(UserRole.CLIENT);
+        long totalFreelancers = userRepository.countByRole(UserRole.FREELANCER);
         long newUsersToday = userRepository.countByCreatedAtAfter(startOfDay);
         long newUsersThisWeek = userRepository.countByCreatedAtAfter(startOfWeek);
         long newUsersThisMonth = userRepository.countByCreatedAtAfter(startOfMonth);
@@ -110,7 +125,7 @@ public class AdminService {
 
     // ==================== User Management ====================
 
-    public Page<AdminUserResponse> getUsers(String search, User.UserRole role, Boolean enabled, Pageable pageable) {
+    public Page<AdminUserResponse> getUsers(String search, UserRole role, Boolean enabled, Pageable pageable) {
         Page<User> users;
         
         if (search != null && !search.isEmpty()) {

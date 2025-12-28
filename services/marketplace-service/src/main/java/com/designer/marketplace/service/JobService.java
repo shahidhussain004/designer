@@ -1,17 +1,19 @@
 package com.designer.marketplace.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.designer.marketplace.dto.CreateJobRequest;
 import com.designer.marketplace.dto.JobResponse;
 import com.designer.marketplace.dto.UpdateJobRequest;
 import com.designer.marketplace.entity.Job;
 import com.designer.marketplace.entity.User;
 import com.designer.marketplace.repository.JobRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service for job management operations
@@ -77,8 +79,9 @@ public class JobService {
         Job job = jobRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Job not found with id: " + id));
 
-        // Increment view count
-        job.setViewCount(job.getViewCount() + 1);
+        // Increment view count (handle null values)
+        Integer currentViewCount = job.getViewCount();
+        job.setViewCount((currentViewCount != null ? currentViewCount : 0) + 1);
         jobRepository.save(job);
 
         return JobResponse.fromEntity(job);
