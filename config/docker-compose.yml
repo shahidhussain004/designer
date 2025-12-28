@@ -176,6 +176,8 @@ services:
         condition: service_healthy
       lms-service:
         condition: service_healthy
+      content-service:
+        condition: service_healthy
     networks:
       - marketplace-network
     healthcheck:
@@ -216,7 +218,7 @@ services:
     networks:
       - marketplace-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:8080/actuator/health >/dev/null 2>&1 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -245,7 +247,7 @@ services:
     networks:
       - marketplace-network
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8081/health"]
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:8081/health >/dev/null 2>&1 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -276,7 +278,45 @@ services:
     networks:
       - marketplace-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8082/api/health"]
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:8082/api/health >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Node.js Fastify Content Service (Port 8083)
+  content-service:
+    build:
+      context: ../services/content-service
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    environment:
+      NODE_ENV: development
+      PORT: 8083
+      HOST: 0.0.0.0
+      NODE_TLS_REJECT_UNAUTHORIZED: "0"
+      DATABASE_URL: postgresql://marketplace_user:marketplace_pass_dev@postgres:5432/marketplace_db?schema=content
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      KAFKA_BROKERS: kafka:29092
+      KAFKA_CLIENT_ID: content-service
+      KAFKA_GROUP_ID: content-service-group
+      JWT_SECRET: your-256-bit-secret-change-this-in-production-please-make-it-secure
+      JWT_ISSUER: marketplace-service
+      CORS_ORIGIN: http://localhost:3000,http://localhost:3001
+      LOG_LEVEL: info
+      MARKETPLACE_SERVICE_URL: http://marketplace-service:8080/api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - marketplace-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8083/health"]
       interval: 30s
       timeout: 10s
       retries: 5

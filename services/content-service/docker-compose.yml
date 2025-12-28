@@ -1,0 +1,66 @@
+# Docker Compose for Content Service Development
+
+services:
+  content-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    environment:
+      - NODE_ENV=development
+      - PORT=8083
+      - DATABASE_URL=postgresql://postgres:postgres@content-db:5432/content_db
+      - REDIS_HOST=content-redis
+      - REDIS_PORT=6379
+      - KAFKA_BROKERS=kafka:9092
+      - JWT_SECRET=your-jwt-secret-change-in-production
+    depends_on:
+      content-db:
+        condition: service_healthy
+      content-redis:
+        condition: service_started
+    volumes:
+      - content-uploads:/app/uploads
+    networks:
+      - content-network
+      - designer-network
+
+  content-db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=content_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - content-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - content-network
+
+  content-redis:
+    image: redis:7-alpine
+    ports:
+      - "6381:6379"
+    volumes:
+      - content-redis-data:/data
+    networks:
+      - content-network
+
+volumes:
+  content-db-data:
+  content-redis-data:
+  content-uploads:
+
+networks:
+  content-network:
+    driver: bridge
+  designer-network:
+    external: true
+    name: designer_default
