@@ -88,6 +88,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/jobs/").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/jobs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users/*/profile").permitAll()
+                        // Job categories and experience levels (public for browsing)
+                        .requestMatchers(HttpMethod.GET, "/api/job-categories/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/experience-levels/**").permitAll()
                         // LMS public course browsing
                         .requestMatchers(HttpMethod.GET, "/api/lms/courses").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/lms/courses/popular").permitAll()

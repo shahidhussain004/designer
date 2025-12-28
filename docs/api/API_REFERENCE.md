@@ -666,7 +666,7 @@ Get all reviews for a designer.
 #### List Categories
 
 ```http
-GET /api/categories
+GET /api/job-categories
 ```
 
 Get all service categories.

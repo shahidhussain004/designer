@@ -1,26 +1,43 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import {
-  Grid,
-  Flex,
-  Card,
-  Text,
-  Button,
-  Input,
   Badge,
-  Spinner,
+  Button,
+  Card,
   Divider,
+  Flex,
+  Grid,
+  Input,
+  Spinner,
+  Text,
 } from '@/components/green';
 import { PageLayout } from '@/components/layout';
+import { parseCategories, parseExperienceLevels } from '@/lib/apiParsers';
+import type { ExperienceLevel, JobCategory } from '@/lib/apiTypes';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 
 interface Job {
   id: string;
   title: string;
   description: string;
-  category: string;
-  experienceLevel: string;
+  category: {
+    id: number;
+    name: string;
+    slug: string;
+    description: string;
+    icon: string;
+    displayOrder: number;
+  };
+  experienceLevel: {
+    id: number;
+    name: string;
+    code: string;
+    description: string;
+    yearsMin: number;
+    yearsMax: number;
+    displayOrder: number;
+  };
   budget: number;
   status: string;
   createdAt: string;
@@ -35,46 +52,50 @@ interface Job {
   };
 }
 
-const categories = [
-  { value: '', label: 'All Categories' },
-  { value: 'WEB_DESIGN', label: 'Web Design' },
-  { value: 'GRAPHIC_DESIGN', label: 'Graphic Design' },
-  { value: 'UI_UX', label: 'UI/UX Design' },
-  { value: 'BRANDING', label: 'Branding' },
-  { value: 'ILLUSTRATION', label: 'Illustration' },
-  { value: 'MOTION_GRAPHICS', label: 'Motion Graphics' },
-  { value: 'LOGO_DESIGN', label: 'Logo Design' },
-  { value: 'PRINT_DESIGN', label: 'Print Design' },
-  { value: 'PACKAGING', label: 'Packaging' },
-  { value: 'PHOTOGRAPHY', label: 'Photography' },
-  { value: 'VIDEO_EDITING', label: 'Video Editing' },
-  { value: '3D_MODELING', label: '3D Modeling' },
-  { value: 'ANIMATION', label: 'Animation' },
-  { value: 'MOBILE_DESIGN', label: 'Mobile Design' },
-  { value: 'PRODUCT_DESIGN', label: 'Product Design' },
-];
-
-const experienceLevels = [
-  { value: '', label: 'All Levels' },
-  { value: 'ENTRY', label: 'Entry' },
-  { value: 'INTERMEDIATE', label: 'Intermediate' },
-  { value: 'EXPERT', label: 'Expert' },
-];
-
 function JobsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [categories, setCategories] = useState<JobCategory[]>([]);
+  const [experienceLevels, setExperienceLevels] = useState<ExperienceLevel[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Filter states
-  const [category, setCategory] = useState(searchParams.get('category') || '');
-  const [experienceLevel, setExperienceLevel] = useState(searchParams.get('experienceLevel') || '');
+  // Filter states - now using IDs
+  const [categoryId, setCategoryId] = useState(searchParams.get('categoryId') || '');
+  const [experienceLevelId, setExperienceLevelId] = useState(searchParams.get('experienceLevelId') || '');
   const [minBudget, setMinBudget] = useState(searchParams.get('minBudget') || '');
   const [maxBudget, setMaxBudget] = useState(searchParams.get('maxBudget') || '');
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+
+  // Fetch categories and experience levels on mount
+  useEffect(() => {
+    const fetchFilters = async () => {
+      try {
+        const [catsResponse, levelsResponse] = await Promise.all([
+          fetch('/api/job-categories'),
+          fetch('/api/experience-levels')
+        ]);
+        
+        if (catsResponse.ok) {
+          const catsData = await catsResponse.json();
+          const parsed = parseCategories(catsData);
+          setCategories(parsed);
+        }
+        
+        if (levelsResponse.ok) {
+          const levelsData = await levelsResponse.json();
+          const parsed = parseExperienceLevels(levelsData);
+          setExperienceLevels(parsed);
+        }
+      } catch (err) {
+        console.error('Failed to fetch filters:', err);
+      }
+    };
+    
+    fetchFilters();
+  }, []);
 
   const fetchJobs = useCallback(async () => {
     setLoading(true);
@@ -82,8 +103,8 @@ function JobsPageContent() {
     
     try {
       const params = new URLSearchParams();
-      if (category) params.append('category', category);
-      if (experienceLevel) params.append('experienceLevel', experienceLevel);
+      if (categoryId) params.append('categoryId', categoryId);
+      if (experienceLevelId) params.append('experienceLevelId', experienceLevelId);
       if (minBudget) params.append('minBudget', minBudget);
       if (maxBudget) params.append('maxBudget', maxBudget);
       if (searchQuery) params.append('search', searchQuery);
@@ -103,7 +124,7 @@ function JobsPageContent() {
     } finally {
       setLoading(false);
     }
-  }, [category, experienceLevel, minBudget, maxBudget, searchQuery]);
+  }, [categoryId, experienceLevelId, minBudget, maxBudget, searchQuery]);
 
   useEffect(() => {
     fetchJobs();
@@ -111,8 +132,8 @@ function JobsPageContent() {
 
   const handleApplyFilters = () => {
     const params = new URLSearchParams();
-    if (category) params.append('category', category);
-    if (experienceLevel) params.append('experienceLevel', experienceLevel);
+    if (categoryId) params.append('categoryId', categoryId);
+    if (experienceLevelId) params.append('experienceLevelId', experienceLevelId);
     if (minBudget) params.append('minBudget', minBudget);
     if (maxBudget) params.append('maxBudget', maxBudget);
     if (searchQuery) params.append('search', searchQuery);
@@ -121,20 +142,12 @@ function JobsPageContent() {
   };
 
   const handleClearFilters = () => {
-    setCategory('');
-    setExperienceLevel('');
+    setCategoryId('');
+    setExperienceLevelId('');
     setMinBudget('');
     setMaxBudget('');
     setSearchQuery('');
     router.push('/jobs');
-  };
-
-  const getCategoryLabel = (value: string) => {
-    return categories.find(c => c.value === value)?.label || value;
-  };
-
-  const getExperienceLabel = (value: string) => {
-    return experienceLevels.find(e => e.value === value)?.label || value;
   };
 
   const formatDate = (dateString: string) => {
@@ -151,7 +164,7 @@ function JobsPageContent() {
         {/* Page Header */}
         <Flex flex-direction="column" gap="s">
           <Text tag="h1" font-size="heading-l">
-            Browse Jobs
+            Find Work
           </Text>
           <Text color="secondary">
             Find your next design opportunity from our curated job listings
@@ -163,7 +176,7 @@ function JobsPageContent() {
           <Flex gap="m" align-items="flex-end">
             <Flex flex="1">
               <Input
-                label="Search Jobs"
+                label="Search Work"
                 value={searchQuery}
                 onInput={(e: Event) => setSearchQuery((e.target as HTMLInputElement).value)}
               />
@@ -190,12 +203,13 @@ function JobsPageContent() {
                   Category
                 </Text>
                 <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
+                  value={categoryId}
+                  onChange={(e) => setCategoryId(e.target.value)}
                 >
+                  <option value="">All Categories</option>
                   {categories.map((cat) => (
-                    <option key={cat.value} value={cat.value}>
-                      {cat.label}
+                    <option key={cat.id} value={cat.id.toString()}>
+                      {cat.name}
                     </option>
                   ))}
                 </select>
@@ -207,12 +221,13 @@ function JobsPageContent() {
                   Experience Level
                 </Text>
                 <select
-                  value={experienceLevel}
-                  onChange={(e) => setExperienceLevel(e.target.value)}
+                  value={experienceLevelId}
+                  onChange={(e) => setExperienceLevelId(e.target.value)}
                 >
+                  <option value="">All Levels</option>
                   {experienceLevels.map((level) => (
-                    <option key={level.value} value={level.value}>
-                      {level.label}
+                    <option key={level.id} value={level.id.toString()}>
+                      {level.name}
                     </option>
                   ))}
                 </select>
@@ -308,10 +323,10 @@ function JobsPageContent() {
 
                       <Flex gap="s" align-items="center">
                         <Badge variant="notice">
-                          {getCategoryLabel(job.category)}
+                          {job.category.name}
                         </Badge>
                         <Badge variant="information">
-                          {getExperienceLabel(job.experienceLevel)}
+                          {job.experienceLevel.name}
                         </Badge>
                         <Badge variant={job.status === 'OPEN' ? 'positive' : 'information'}>
                           {job.status}

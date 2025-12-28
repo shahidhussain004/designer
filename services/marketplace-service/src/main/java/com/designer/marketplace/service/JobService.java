@@ -1,17 +1,19 @@
 package com.designer.marketplace.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.designer.marketplace.dto.CreateJobRequest;
 import com.designer.marketplace.dto.JobResponse;
 import com.designer.marketplace.dto.UpdateJobRequest;
 import com.designer.marketplace.entity.Job;
 import com.designer.marketplace.entity.User;
 import com.designer.marketplace.repository.JobRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service for job management operations
@@ -23,15 +25,17 @@ public class JobService {
 
     private final JobRepository jobRepository;
     private final UserService userService;
+    private final JobCategoryService categoryService;
+    private final ExperienceLevelService experienceLevelService;
 
     /**
      * Task 3.6: Get all jobs with filters
      */
     @Transactional(readOnly = true)
-    public Page<JobResponse> getJobs(String category, String experienceLevel,
+    public Page<JobResponse> getJobs(Long categoryId, Long experienceLevelId,
             Double minBudget, Double maxBudget, String search, Pageable pageable) {
-        log.info("Getting jobs with filters - category: {}, experienceLevel: {}, minBudget: {}, maxBudget: {}, search: {}",
-                category, experienceLevel, minBudget, maxBudget, search);
+        log.info("Getting jobs with filters - categoryId: {}, experienceLevelId: {}, minBudget: {}, maxBudget: {}, search: {}",
+                categoryId, experienceLevelId, minBudget, maxBudget, search);
 
         // If search term is provided, use search method
         if (search != null && !search.trim().isEmpty()) {
@@ -39,32 +43,8 @@ public class JobService {
         }
 
         Job.JobStatus status = Job.JobStatus.OPEN;
-        Job.ExperienceLevel expLevel = experienceLevel != null
-                ? Job.ExperienceLevel.valueOf(experienceLevel.toUpperCase())
-                : null;
 
-        // Normalize category tokens coming from frontend (e.g., WEB_DESIGN, BRANDING)
-        String normalizedCategory = null;
-        if (category != null && !category.trim().isEmpty()) {
-            // If frontend sent underscored enum-style values (e.g., WEB_DESIGN), convert to 'Web Design'
-            String c = category.trim();
-            if (c.contains("_")) {
-                String[] parts = c.split("_");
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < parts.length; i++) {
-                    if (i > 0) sb.append(' ');
-                    String p = parts[i].toLowerCase();
-                    sb.append(Character.toUpperCase(p.charAt(0))).append(p.substring(1));
-                }
-                normalizedCategory = sb.toString();
-            } else {
-                // For single token like BRANDING or 'Web Development', normalize capitalization
-                String lower = c.toLowerCase();
-                normalizedCategory = Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
-            }
-        }
-
-        Page<Job> jobs = jobRepository.findByFilters(status, normalizedCategory, expLevel, minBudget, maxBudget, pageable);
+        Page<Job> jobs = jobRepository.findByFilters(status, categoryId, experienceLevelId, minBudget, maxBudget, pageable);
         return jobs.map(JobResponse::fromEntity);
     }
 
@@ -77,8 +57,9 @@ public class JobService {
         Job job = jobRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Job not found with id: " + id));
 
-        // Increment view count
-        job.setViewCount(job.getViewCount() + 1);
+        // Increment view count (handle null values)
+        Integer currentViewCount = job.getViewCount();
+        job.setViewCount((currentViewCount != null ? currentViewCount : 0) + 1);
         jobRepository.save(job);
 
         return JobResponse.fromEntity(job);
@@ -102,7 +83,12 @@ public class JobService {
         job.setClient(currentUser);
         job.setTitle(request.getTitle());
         job.setDescription(request.getDescription());
-        job.setCategory(request.getCategory());
+        
+        // Set category using new foreign key relationship
+        if (request.getCategoryId() != null) {
+            job.setJobCategory(categoryService.getCategoryEntityById(request.getCategoryId()));
+        }
+        
         job.setRequiredSkills(request.getRequiredSkills());
         job.setBudget(request.getBudget());
 
@@ -112,8 +98,9 @@ public class JobService {
 
         job.setDuration(request.getDuration());
 
-        if (request.getExperienceLevel() != null) {
-            job.setExperienceLevel(Job.ExperienceLevel.valueOf(request.getExperienceLevel().toUpperCase()));
+        // Set experience level using new foreign key relationship
+        if (request.getExperienceLevelId() != null) {
+            job.setExperienceLevelEntity(experienceLevelService.getExperienceLevelEntityById(request.getExperienceLevelId()));
         }
 
         if (request.getStatus() != null) {
@@ -156,8 +143,8 @@ public class JobService {
             job.setDescription(request.getDescription());
         }
 
-        if (request.getCategory() != null) {
-            job.setCategory(request.getCategory());
+        if (request.getCategoryId() != null) {
+            job.setJobCategory(categoryService.getCategoryEntityById(request.getCategoryId()));
         }
 
         if (request.getRequiredSkills() != null) {
@@ -176,8 +163,8 @@ public class JobService {
             job.setDuration(request.getDuration());
         }
 
-        if (request.getExperienceLevel() != null) {
-            job.setExperienceLevel(Job.ExperienceLevel.valueOf(request.getExperienceLevel().toUpperCase()));
+        if (request.getExperienceLevelId() != null) {
+            job.setExperienceLevelEntity(experienceLevelService.getExperienceLevelEntityById(request.getExperienceLevelId()));
         }
 
         if (request.getStatus() != null) {

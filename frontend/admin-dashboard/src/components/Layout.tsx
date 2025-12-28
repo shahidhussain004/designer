@@ -30,6 +30,7 @@ const navigation = [
 ]
 
 export default function Layout() {
+  const siteTitle = 'Admin Panel'
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
@@ -47,18 +48,20 @@ export default function Layout() {
     <Flex>
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
-        <div onClick={() => setSidebarOpen(false)}
+        <div
+          onClick={() => setSidebarOpen(false)}
+          className="mobile-overlay md:hidden fixed inset-0 bg-black/40 z-40"
         />
       )}
 
       {/* Mobile sidebar */}
-      <div>
+      <div className="md:hidden">
         <Flex
           flex-direction="column">
           <Flex justify-content="space-between" align-items="center" padding="m">
             <Text font-size="heading-s" font-weight="book">
-              Admin Panel
-            </Text>
+                {siteTitle}
+              </Text>
             <Button rank="tertiary" onClick={() => setSidebarOpen(false)}>
               <XMarkIcon width={24} height={24} />
             </Button>
@@ -84,11 +87,11 @@ export default function Layout() {
 
       {/* Desktop sidebar */}
       <Flex
-        flex-direction="column" className="desktop-sidebar"
+        flex-direction="column" className="desktop-sidebar hidden md:flex"
       >
         <Flex padding="m" align-items="center">
           <Text font-size="heading-s" font-weight="book">
-            Designer Marketplace
+            {siteTitle}
           </Text>
         </Flex>
 
@@ -158,11 +161,11 @@ export default function Layout() {
           justify-content="space-between"
           align-items="center"
           padding="m"
-          className="mobile-topbar" >
+          className="mobile-topbar md:hidden" >
           <Button rank="tertiary" onClick={() => setSidebarOpen(true)}>
             <Bars3Icon width={24} height={24} />
           </Button>
-          <Text font-size="heading-s">Admin Panel</Text>
+          <Text font-size="heading-s">{siteTitle}</Text>
           <Button rank="tertiary" onClick={toggleTheme}>
             {theme === 'light' ? (
               <MoonIcon width={20} height={20} />

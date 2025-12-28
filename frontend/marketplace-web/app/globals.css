@@ -322,6 +322,96 @@
     }
   }
 
+  /* Landing page rotating words animations - move to global so client nav works */
+  @keyframes wordSlideReveal {
+    0% {
+      opacity: 0;
+      transform: translateX(-100%);
+      filter: blur(10px);
+    }
+    15% {
+      opacity: 1;
+      transform: translateX(0%);
+      filter: blur(0px);
+    }
+    80% {
+      opacity: 1;
+      transform: translateX(0%);
+      filter: blur(0px);
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(100%);
+      filter: blur(10px);
+    }
+  }
+
+  @keyframes secondLineReveal {
+    0% {
+      opacity: 0;
+      transform: translateX(-100%);
+      filter: blur(10px);
+    }
+    10% {
+      opacity: 0;
+      transform: translateX(-100%);
+      filter: blur(10px);
+    }
+    25% {
+      opacity: 1;
+      transform: translateX(0%);
+      filter: blur(0px);
+    }
+    75% {
+      opacity: 1;
+      transform: translateX(0%);
+      filter: blur(0px);
+    }
+    90% {
+      opacity: 0;
+      transform: translateX(100%);
+      filter: blur(10px);
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(100%);
+      filter: blur(10px);
+    }
+  }
+
+  @keyframes thirdLineReveal {
+    0% {
+      opacity: 0;
+      transform: translateX(-100%);
+      filter: blur(10px);
+    }
+    20% {
+      opacity: 0;
+      transform: translateX(-100%);
+      filter: blur(10px);
+    }
+    35% {
+      opacity: 1;
+      transform: translateX(0%);
+      filter: blur(0px);
+    }
+    70% {
+      opacity: 1;
+      transform: translateX(0%);
+      filter: blur(0px);
+    }
+    85% {
+      opacity: 0;
+      transform: translateX(100%);
+      filter: blur(10px);
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(100%);
+      filter: blur(10px);
+    }
+  }
+
   /* Container queries support */
   .container-type-inline-size {
     container-type: inline-size;

@@ -1,33 +1,37 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { authService } from '@/lib/auth';
-import Link from 'next/link';
 import {
-  Card,
-  Flex,
-  Grid,
-  Text,
+  Alert,
   Button,
-  Input,
+  Card,
   Div,
   Divider,
+  Flex,
+  Grid,
+  Input,
   Spinner,
-  Alert,
+  Text,
 } from '@/components/green';
+import { parseCategories, parseExperienceLevels } from '@/lib/apiParsers';
+import type { ExperienceLevel, JobCategory } from '@/lib/apiTypes';
+import { authService } from '@/lib/auth';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function CreateJobPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [categories, setCategories] = useState<JobCategory[]>([]);
+  const [experienceLevels, setExperienceLevels] = useState<ExperienceLevel[]>([]);
 
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: 'WEB_DESIGN',
-    experienceLevel: 'INTERMEDIATE',
+    categoryId: 1,
+    experienceLevelId: 2,
     budget: 0,
   });
 
@@ -37,6 +41,38 @@ export default function CreateJobPage() {
       router.push('/auth/login');
       return;
     }
+    
+    // Fetch categories and experience levels
+    const fetchFilters = async () => {
+      try {
+        const [catsResponse, levelsResponse] = await Promise.all([
+          fetch('http://localhost:8080/api/job-categories'),
+          fetch('http://localhost:8080/api/experience-levels')
+        ]);
+        
+        if (catsResponse.ok) {
+          const catsData = await catsResponse.json();
+          const mappedCats = parseCategories(catsData);
+          setCategories(mappedCats);
+          if (mappedCats.length > 0) {
+            setFormData(prev => ({ ...prev, categoryId: mappedCats[0].id }));
+          }
+        }
+        
+        if (levelsResponse.ok) {
+          const levelsData = await levelsResponse.json();
+          const mappedLevels = parseExperienceLevels(levelsData);
+          setExperienceLevels(mappedLevels);
+          if (mappedLevels.length > 0) {
+            setFormData(prev => ({ ...prev, experienceLevelId: mappedLevels[0].id }));
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch filters:', err);
+      }
+    };
+    
+    fetchFilters();
     setLoading(false);
   }, [router]);
 
@@ -46,7 +82,8 @@ export default function CreateJobPage() {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'budget' ? parseFloat(value) : value,
+      [name]: name === 'budget' ? parseFloat(value) : 
+              (name === 'categoryId' || name === 'experienceLevelId') ? parseInt(value) : value,
     }));
   };
 
@@ -124,7 +161,7 @@ export default function CreateJobPage() {
                   label=""
                   name="title"
                   value={formData.title}
-                  onInput={(e: Event) => handleChange(e as unknown as React.ChangeEvent<HTMLInputElement>)}
+                  onChange={handleChange}
                   required
                 />
               </Div>
@@ -146,31 +183,30 @@ export default function CreateJobPage() {
                 <Div>
                   <Text>Category *</Text>
                   <select
-                    name="category"
-                    value={formData.category}
+                    name="categoryId"
+                    value={formData.categoryId}
                     onChange={handleChange}
                     required
                   >
-                    <option value="WEB_DESIGN">Web Design</option>
-                    <option value="GRAPHIC_DESIGN">Graphic Design</option>
-                    <option value="MOBILE_DEV">Mobile Development</option>
-                    <option value="WEB_DEV">Web Development</option>
-                    <option value="DATA_ENTRY">Data Entry</option>
-                    <option value="WRITING">Writing</option>
+                    <option value="">Select a category</option>
+                    {categories.map(cat => (
+                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    ))}
                   </select>
                 </Div>
 
                 <Div>
                   <Text>Required Experience Level *</Text>
                   <select
-                    name="experienceLevel"
-                    value={formData.experienceLevel}
+                    name="experienceLevelId"
+                    value={formData.experienceLevelId}
                     onChange={handleChange}
                     required
                   >
-                    <option value="ENTRY">Entry</option>
-                    <option value="INTERMEDIATE">Intermediate</option>
-                    <option value="EXPERT">Expert</option>
+                    <option value="">Select experience level</option>
+                    {experienceLevels.map(level => (
+                      <option key={level.id} value={level.id}>{level.name}</option>
+                    ))}
                   </select>
                 </Div>
               </Grid>
