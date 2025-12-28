@@ -62,10 +62,13 @@ contentClient.interceptors.request.use(
 contentClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    logger.error('Content API Error', {
-      url: error.config?.url,
-      status: error.response?.status,
-      message: error.response?.data?.error?.message,
+    const errorMessage = error.response?.data?.error?.message || error.message;
+    const enhancedError = new Error(errorMessage);
+    enhancedError.name = `ContentAPIError[${error.response?.status || 'Unknown'}]`;
+    
+    logger.error('Content API Error', enhancedError, {
+      url: error.config?.url || 'unknown',
+      status: error.response?.status?.toString() || 'unknown',
     });
     return Promise.reject(error);
   }
