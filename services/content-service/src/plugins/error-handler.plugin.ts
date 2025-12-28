@@ -13,12 +13,15 @@ async function errorHandlerPlugin(fastify: FastifyInstance): Promise<void> {
 
     // Handle custom exceptions
     if (error instanceof BaseException) {
-      logger.warn({
-        requestId,
-        error: error.message,
-        code: error.code,
-        path: request.url,
-      }, 'Request error');
+      logger.warn(
+        {
+          requestId,
+          error: error.message,
+          code: error.code,
+          path: request.url,
+        },
+        'Request error'
+      );
 
       return reply.status(error.statusCode).send(error.toJSON());
     }
@@ -34,11 +37,14 @@ async function errorHandlerPlugin(fastify: FastifyInstance): Promise<void> {
         validationErrors[path].push(err.message);
       });
 
-      logger.warn({
-        requestId,
-        errors: validationErrors,
-        path: request.url,
-      }, 'Validation error');
+      logger.warn(
+        {
+          requestId,
+          errors: validationErrors,
+          path: request.url,
+        },
+        'Validation error'
+      );
 
       return reply.status(422).send({
         success: false,
@@ -52,12 +58,15 @@ async function errorHandlerPlugin(fastify: FastifyInstance): Promise<void> {
 
     // Handle Fastify errors
     if ('statusCode' in error && error.statusCode) {
-      logger.warn({
-        requestId,
-        error: error.message,
-        statusCode: error.statusCode,
-        path: request.url,
-      }, 'Fastify error');
+      logger.warn(
+        {
+          requestId,
+          error: error.message,
+          statusCode: error.statusCode,
+          path: request.url,
+        },
+        'Fastify error'
+      );
 
       return reply.status(error.statusCode).send({
         success: false,
@@ -69,12 +78,15 @@ async function errorHandlerPlugin(fastify: FastifyInstance): Promise<void> {
     }
 
     // Handle unexpected errors
-    logger.error({
-      requestId,
-      error: error.message,
-      stack: error.stack,
-      path: request.url,
-    }, 'Unexpected error');
+    logger.error(
+      {
+        requestId,
+        error: error.message,
+        stack: error.stack,
+        path: request.url,
+      },
+      'Unexpected error'
+    );
 
     return reply.status(500).send({
       success: false,

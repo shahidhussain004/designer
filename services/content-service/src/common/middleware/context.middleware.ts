@@ -14,12 +14,9 @@ declare module 'fastify' {
 /**
  * Attach request context to each request
  */
-export async function requestContext(
-  request: FastifyRequest,
-  _reply: FastifyReply
-): Promise<void> {
+export async function requestContext(request: FastifyRequest, _reply: FastifyReply): Promise<void> {
   const requestId = (request.headers['x-request-id'] as string) || uuidv4();
-  
+
   request.reqContext = {
     requestId,
     userId: request.userId,

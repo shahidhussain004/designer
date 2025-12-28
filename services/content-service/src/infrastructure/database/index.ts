@@ -3,4 +3,3 @@
  */
 
 export { prisma, prismaService } from './prisma.service';
-

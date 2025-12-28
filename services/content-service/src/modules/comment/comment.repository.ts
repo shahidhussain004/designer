@@ -42,15 +42,17 @@ export class CommentRepository {
       parent: {
         select: { id: true, body: true },
       },
-      replies: includeReplies ? {
-        where: { isApproved: true },
-        include: {
-          author: {
-            select: { id: true, name: true, avatarUrl: true },
-          },
-        },
-        orderBy: { createdAt: 'asc' as const },
-      } : false,
+      replies: includeReplies
+        ? {
+            where: { isApproved: true },
+            include: {
+              author: {
+                select: { id: true, name: true, avatarUrl: true },
+              },
+            },
+            orderBy: { createdAt: 'asc' as const },
+          }
+        : false,
     };
 
     return include;
@@ -181,7 +183,7 @@ export class CommentRepository {
     await prisma.comment.deleteMany({
       where: { parentId: id },
     });
-    
+
     await prisma.comment.delete({
       where: { id },
     });

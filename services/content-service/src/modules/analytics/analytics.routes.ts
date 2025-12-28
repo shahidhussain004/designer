@@ -30,10 +30,7 @@ export async function analyticsRoutes(fastify: FastifyInstance): Promise<void> {
     '/like/:contentId',
     { preHandler: [authenticate] },
     async (request: FastifyRequest<{ Params: ContentIdParams }>, reply: FastifyReply) => {
-      const liked = await analyticsService.trackLike(
-        request.params.contentId,
-        request.userId!
-      );
+      const liked = await analyticsService.trackLike(request.params.contentId, request.userId!);
       return reply.send({
         success: true,
         data: { liked },
@@ -46,10 +43,7 @@ export async function analyticsRoutes(fastify: FastifyInstance): Promise<void> {
     '/liked/:contentId',
     { preHandler: [authenticate] },
     async (request: FastifyRequest<{ Params: ContentIdParams }>, reply: FastifyReply) => {
-      const liked = await analyticsService.hasLiked(
-        request.params.contentId,
-        request.userId!
-      );
+      const liked = await analyticsService.hasLiked(request.params.contentId, request.userId!);
       return reply.send({
         success: true,
         data: { liked },
@@ -75,10 +69,7 @@ export async function analyticsRoutes(fastify: FastifyInstance): Promise<void> {
       reply: FastifyReply
     ) => {
       const days = request.query.days || 30;
-      const analytics = await analyticsService.getContentAnalytics(
-        request.params.contentId,
-        days
-      );
+      const analytics = await analyticsService.getContentAnalytics(request.params.contentId, days);
       return reply.send({
         success: true,
         data: analytics,

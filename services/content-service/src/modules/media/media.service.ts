@@ -11,9 +11,7 @@ import { storageService, UploadResult } from '@infrastructure/storage';
 import { MediaAsset } from '@prisma/client';
 
 export class MediaService {
-  async findAll(
-    params: PaginationParams = {}
-  ): Promise<PaginatedResult<MediaAsset>> {
+  async findAll(params: PaginationParams = {}): Promise<PaginatedResult<MediaAsset>> {
     const { page, limit, sortOrder } = normalizePagination(params);
     const skip = (page - 1) * limit;
 
@@ -67,11 +65,7 @@ export class MediaService {
     };
   }
 
-  async upload(
-    file: MultipartFile,
-    uploadedBy: string,
-    altText?: string
-  ): Promise<MediaAsset> {
+  async upload(file: MultipartFile, uploadedBy: string, altText?: string): Promise<MediaAsset> {
     // Upload file to storage
     const result: UploadResult = await storageService.uploadFile(file);
 
@@ -120,7 +114,9 @@ export class MediaService {
     await storageService.deleteFile(asset.filePath);
 
     // Delete thumbnail if exists
-    const thumbnailPath = asset.filePath.replace('/images/', '/thumbnails/').replace(asset.filename, `thumb_${asset.filename}`);
+    const thumbnailPath = asset.filePath
+      .replace('/images/', '/thumbnails/')
+      .replace(asset.filename, `thumb_${asset.filename}`);
     await storageService.deleteFile(thumbnailPath);
 
     // Delete from database

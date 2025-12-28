@@ -129,16 +129,8 @@ class StorageService {
   /**
    * Resize an image and save as thumbnail
    */
-  async createThumbnail(
-    filename: string,
-    options: ImageResizeOptions = {}
-  ): Promise<string> {
-    const {
-      width = 300,
-      height = 200,
-      fit = 'cover',
-      quality = 80,
-    } = options;
+  async createThumbnail(filename: string, options: ImageResizeOptions = {}): Promise<string> {
+    const { width = 300, height = 200, fit = 'cover', quality = 80 } = options;
 
     const sourcePath = path.join(this.uploadPath, 'images', filename);
     const thumbnailFilename = `thumb_${filename}`;
