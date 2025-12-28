@@ -1,6 +1,6 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { render, screen } from '@testing-library/react';
+import React from 'react';
 import { withAppRouter } from './testUtils';
 
 jest.mock('../lib/jobs', () => ({
@@ -8,9 +8,33 @@ jest.mock('../lib/jobs', () => ({
 }));
 
 describe('Jobs Page', () => {
+  beforeEach(() => {
+    // Mock all fetch calls
+    global.fetch = jest.fn();
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('renders empty state when no jobs', async () => {
-    // Mock fetch to return an empty content list
-    (global.fetch as unknown as jest.Mock).mockResolvedValueOnce({ ok: true, json: async () => ({ content: [] }) });
+    // Mock fetch for job-categories
+    (global.fetch as jest.Mock)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ content: [] })
+      })
+      // Mock fetch for experience-levels
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ content: [] })
+      })
+      // Mock fetch for jobs - empty list
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ content: [] })
+      });
+
     // dynamic import to avoid module-level hook runs
     const JobsModule = await import('../app/jobs/page');
     const JobsPage = JobsModule.default;

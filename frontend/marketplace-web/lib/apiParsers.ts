@@ -13,8 +13,11 @@ export function parseCategory(value: unknown): JobCategory | null {
   if (typeof id !== 'number' && typeof id !== 'string') return null
   if (typeof name !== 'string') return null
 
+  const numId = Number(id)
+  if (isNaN(numId)) return null
+
   return {
-    id: Number(id),
+    id: numId,
     name: name.trim(),
     ...(typeof obj['slug'] === 'string' && { slug: obj['slug'] }),
     ...(typeof obj['description'] === 'string' && { description: obj['description'] }),
@@ -34,8 +37,11 @@ export function parseExperienceLevel(value: unknown): ExperienceLevel | null {
   if (typeof id !== 'number' && typeof id !== 'string') return null
   if (typeof name !== 'string') return null
 
+  const numId = Number(id)
+  if (isNaN(numId)) return null
+
   return {
-    id: Number(id),
+    id: numId,
     name: name.trim(),
   }
 }
