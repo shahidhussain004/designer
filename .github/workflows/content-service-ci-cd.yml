@@ -33,12 +33,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: services/content-service/package-lock.json
 
       - name: Install dependencies
         working-directory: ./services/content-service
-        run: npm ci
+        run: npm install
 
       - name: Run ESLint
         working-directory: ./services/content-service
@@ -67,12 +65,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: services/content-service/package-lock.json
 
       - name: Install dependencies
         working-directory: ./services/content-service
-        run: npm ci
+        run: npm install
 
       - name: Generate Prisma Client
         working-directory: ./services/content-service
@@ -134,12 +130,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: services/content-service/package-lock.json
 
       - name: Install dependencies
         working-directory: ./services/content-service
-        run: npm ci
+        run: npm install
 
       - name: Generate Prisma Client
         working-directory: ./services/content-service
@@ -188,8 +182,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: services/content-service/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./services/content-service
+        run: npm install
 
       - name: Run npm audit
         working-directory: ./services/content-service
