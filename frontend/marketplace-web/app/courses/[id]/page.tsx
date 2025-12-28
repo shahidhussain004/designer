@@ -1,29 +1,29 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import Link from 'next/link';
-import Image from 'next/image';
-import { 
-  getCourseById, 
-  getCourseLessons, 
-  enrollInCourse,
-  Course, 
-  Lesson 
-} from '@/lib/courses';
-import { formatCurrency, createCourseCheckoutSession } from '@/lib/payments';
-import { authService } from '@/lib/auth';
 import {
-  Card,
-  Flex,
-  Grid,
-  Text,
+  Badge,
   Button,
+  Card,
   Div,
   Divider,
-  Badge,
+  Flex,
+  Grid,
   Spinner,
+  Text,
 } from '@/components/green';
+import { authService } from '@/lib/auth';
+import {
+  Course,
+  enrollInCourse,
+  getCourseById,
+  getCourseLessons,
+  Lesson
+} from '@/lib/courses';
+import { createCourseCheckoutSession, formatCurrency } from '@/lib/payments';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 
 export default function CourseDetailPage() {
   const router = useRouter();
@@ -127,7 +127,7 @@ export default function CourseDetailPage() {
               </Text>
             </Link>
             <Flex gap="l" className="desktop-nav">
-              <Link href="/jobs">Jobs</Link>
+              <Link href="/jobs">Find Work</Link>
               <Link href="/courses">Courses</Link>
               <Link href="/dashboard">Dashboard</Link>
             </Flex>

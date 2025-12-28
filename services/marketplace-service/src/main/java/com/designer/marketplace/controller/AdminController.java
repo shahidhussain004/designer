@@ -23,7 +23,7 @@ import com.designer.marketplace.dto.AdminDashboardResponse;
 import com.designer.marketplace.dto.AdminUpdateUserRequest;
 import com.designer.marketplace.dto.AdminUserResponse;
 import com.designer.marketplace.dto.JobResponse;
-import com.designer.marketplace.entity.User;
+import com.designer.marketplace.entity.User.UserRole;
 import com.designer.marketplace.security.UserPrincipal;
 import com.designer.marketplace.service.AdminService;
 
@@ -65,7 +65,7 @@ public class AdminController {
     @GetMapping("/users")
     public ResponseEntity<Page<AdminUserResponse>> getUsers(
             @RequestParam(required = false) String search,
-            @RequestParam(required = false) User.UserRole role,
+            @RequestParam(required = false) UserRole role,
             @RequestParam(required = false) Boolean enabled,
             Pageable pageable) {
         return ResponseEntity.ok(adminService.getUsers(search, role, enabled, pageable));

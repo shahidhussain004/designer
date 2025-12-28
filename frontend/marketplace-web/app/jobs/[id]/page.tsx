@@ -1,31 +1,46 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import Link from 'next/link';
 import {
-  Grid,
-  Flex,
-  Card,
-  Text,
-  Button,
-  Input,
   Alert,
   Badge,
-  Spinner,
+  Button,
+  Card,
   Divider,
+  Flex,
+  Grid,
+  Input,
+  Spinner,
+  Text,
 } from '@/components/green';
 import { PageLayout } from '@/components/layout';
 import { authService } from '@/lib/auth';
 import { User } from '@/types';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 
 interface Job {
   id: number;
   title: string;
   description: string;
   budget: number;
-  category: string;
-  experienceLevel: string;
+  category: {
+    id: number;
+    name: string;
+    slug: string;
+    description: string;
+    icon: string;
+    displayOrder: number;
+  };
+  experienceLevel: {
+    id: number;
+    name: string;
+    code: string;
+    description: string;
+    yearsMin: number;
+    yearsMax: number | null;
+    displayOrder: number;
+  };
   clientId: number;
   status: string;
   createdAt: string;
@@ -152,7 +167,7 @@ export default function JobDetailsPage() {
             Error: {error || 'Job not found'}
           </Alert>
           <Link href="/jobs">
-            ← Back to Jobs
+            ← Back to Find Work
           </Link>
         </Flex>
       </PageLayout>
@@ -164,7 +179,7 @@ export default function JobDetailsPage() {
       {/* Header */}
       <Flex flex-direction="column" gap="s" padding="l">
         <Link href="/jobs">
-          ← Back to Jobs
+          ← Back to Find Work
         </Link>
         <Text tag="h1" font-size="heading-xl">
           {job.title}
@@ -192,13 +207,13 @@ export default function JobDetailsPage() {
               <Card padding="m">
                 <Flex flex-direction="column" gap="xs">
                   <Text font-size="body-s" color="secondary">Category</Text>
-                  <Text font-size="heading-s">{job.category}</Text>
+                  <Text font-size="heading-s">{job.category.name}</Text>
                 </Flex>
               </Card>
               <Card padding="m">
                 <Flex flex-direction="column" gap="xs">
                   <Text font-size="body-s" color="secondary">Experience Level</Text>
-                  <Text font-size="heading-s">{job.experienceLevel}</Text>
+                  <Text font-size="heading-s">{job.experienceLevel.name}</Text>
                 </Flex>
               </Card>
               <Card padding="m">

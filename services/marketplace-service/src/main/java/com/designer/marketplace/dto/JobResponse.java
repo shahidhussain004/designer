@@ -1,12 +1,13 @@
 package com.designer.marketplace.dto;
 
+import java.time.LocalDateTime;
+
 import com.designer.marketplace.entity.Job;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 /**
  * DTO for Job responses
@@ -21,12 +22,26 @@ public class JobResponse {
     private ClientInfo client;
     private String title;
     private String description;
-    private String category;
+    
+    // New structured category object
+    private JobCategoryResponse category;
+    
+    // Old category string - kept for backward compatibility
+    @Deprecated
+    private String categoryName;
+    
     private String[] requiredSkills;
     private Double budget;
     private String budgetType;
     private Integer duration;
-    private String experienceLevel;
+    
+    // New structured experience level object
+    private ExperienceLevelResponse experienceLevel;
+    
+    // Old experience level string - kept for backward compatibility
+    @Deprecated
+    private String experienceLevelName;
+    
     private String status;
     private Boolean isFeatured;
     private Integer viewCount;
@@ -78,12 +93,18 @@ public class JobResponse {
                 .client(clientInfo)
                 .title(job.getTitle())
                 .description(job.getDescription())
-                .category(job.getCategory())
+                // New category object
+                .category(job.getJobCategory() != null ? JobCategoryResponse.fromEntity(job.getJobCategory()) : null)
+                // Old category string for backward compatibility
+                .categoryName(job.getCategory())
                 .requiredSkills(job.getRequiredSkills())
                 .budget(job.getBudget())
                 .budgetType(job.getBudgetType() != null ? job.getBudgetType().name() : null)
                 .duration(job.getDuration())
-                .experienceLevel(job.getExperienceLevel() != null ? job.getExperienceLevel().name() : null)
+                // New experience level object
+                .experienceLevel(job.getExperienceLevelEntity() != null ? ExperienceLevelResponse.fromEntity(job.getExperienceLevelEntity()) : null)
+                // Old experience level string for backward compatibility
+                .experienceLevelName(job.getExperienceLevel() != null ? job.getExperienceLevel().name() : null)
                 .status(job.getStatus() != null ? job.getStatus().name() : null)
                 .isFeatured(job.getIsFeatured())
                 .viewCount(job.getViewCount())

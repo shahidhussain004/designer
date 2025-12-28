@@ -1,14 +1,27 @@
 package com.designer.marketplace.entity;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Job entity - represents project postings by clients
@@ -41,6 +54,12 @@ public class Job {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
+    // New foreign key relationship to JobCategory
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private JobCategory jobCategory;
+
+    // Old category column - kept for backward compatibility during migration
     @Column(length = 50)
     private String category;
 
@@ -57,9 +76,15 @@ public class Job {
     @Column
     private Integer duration;
 
+    // New foreign key relationship to ExperienceLevel
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "experience_level_id")
+    private ExperienceLevel experienceLevelEntity;
+
+    // Old experience_level enum column - kept for backward compatibility
     @Enumerated(EnumType.STRING)
     @Column(name = "experience_level", length = 20)
-    private ExperienceLevel experienceLevel = ExperienceLevel.INTERMEDIATE;
+    private ExperienceLevelEnum experienceLevel = ExperienceLevelEnum.INTERMEDIATE;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -90,7 +115,8 @@ public class Job {
         HOURLY
     }
 
-    public enum ExperienceLevel {
+    // Keep old enum for backward compatibility
+    public enum ExperienceLevelEnum {
         ENTRY,
         INTERMEDIATE,
         EXPERT

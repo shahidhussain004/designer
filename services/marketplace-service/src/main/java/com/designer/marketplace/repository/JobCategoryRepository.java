@@ -1,0 +1,30 @@
+package com.designer.marketplace.repository;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import com.designer.marketplace.entity.JobCategory;
+
+/**
+ * Repository for JobCategory entity
+ */
+@Repository
+public interface JobCategoryRepository extends JpaRepository<JobCategory, Long> {
+
+    Optional<JobCategory> findBySlug(String slug);
+
+    Optional<JobCategory> findByName(String name);
+
+    List<JobCategory> findByIsActiveTrueOrderByDisplayOrderAsc();
+
+    @Query("SELECT c FROM JobCategory c WHERE c.isActive = true ORDER BY c.displayOrder ASC")
+    List<JobCategory> findAllActiveCategories();
+
+    boolean existsBySlug(String slug);
+
+    boolean existsByName(String name);
+}
