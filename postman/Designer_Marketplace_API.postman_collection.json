@@ -1,8 +1,8 @@
 {
   "info": {
     "_postman_id": "designer-marketplace-api",
-    "name": "Designer Marketplace API",
-    "description": "Complete API collection for Designer Marketplace Platform\nBase URL: http://localhost:8080/api",
+    "name": "Designer Marketplace API - Complete",
+    "description": "Complete API collection for Designer Marketplace Platform with all services\n\nServices:\n- Marketplace API (Port 8080)\n- LMS Service (Port 8081)\n- Messaging Service (Port 8082)\n- Content Service (Port 8083)\n\nBase URLs:\n- Marketplace: {{marketplaceUrl}}\n- LMS: {{lmsUrl}}\n- Messaging: {{messagingUrl}}\n- Content: {{contentUrl}}",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -24,8 +24,8 @@
               "raw": "{\n  \"email\": \"client@example.com\",\n  \"username\": \"clientuser\",\n  \"password\": \"Password123!\",\n  \"fullName\": \"John Client\",\n  \"role\": \"CLIENT\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/auth/register",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{marketplaceUrl}}/auth/register",
+              "host": ["{{marketplaceUrl}}"],
               "path": ["auth", "register"]
             }
           },
@@ -46,8 +46,8 @@
               "raw": "{\n  \"email\": \"freelancer@example.com\",\n  \"username\": \"freelanceruser\",\n  \"password\": \"Password123!\",\n  \"fullName\": \"Jane Freelancer\",\n  \"role\": \"FREELANCER\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/auth/register",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{marketplaceUrl}}/auth/register",
+              "host": ["{{marketplaceUrl}}"],
               "path": ["auth", "register"]
             }
           },
@@ -84,8 +84,8 @@
               "raw": "{\n  \"emailOrUsername\": \"client1@example.com\",\n  \"password\": \"password123\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/auth/login",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{marketplaceUrl}}/auth/login",
+              "host": ["{{marketplaceUrl}}"],
               "path": ["auth", "login"]
             }
           },
@@ -106,8 +106,8 @@
               "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/auth/refresh",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{marketplaceUrl}}/auth/refresh",
+              "host": ["{{marketplaceUrl}}"],
               "path": ["auth", "refresh"]
             }
           },
@@ -116,7 +116,7 @@
       ]
     },
     {
-      "name": "Users",
+      "name": "Marketplace - Users",
       "item": [
         {
           "name": "Get Current User Profile",
@@ -134,8 +134,8 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/users/me",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{marketplaceUrl}}/users/me",
+              "host": ["{{marketplaceUrl}}"],
               "path": ["users", "me"]
             }
           },
@@ -147,8 +147,8 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/users/1",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{marketplaceUrl}}/users/1",
+              "host": ["{{marketplaceUrl}}"],
               "path": ["users", "1"]
             }
           },
@@ -160,8 +160,8 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/users/1/profile",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{marketplaceUrl}}/users/1/profile",
+              "host": ["{{marketplaceUrl}}"],
               "path": ["users", "1", "profile"]
             }
           },
@@ -192,8 +192,8 @@
               "raw": "{\n  \"fullName\": \"Updated Name\",\n  \"bio\": \"Professional freelancer with 5 years experience\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/users/me",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{marketplaceUrl}}/users/me",
+              "host": ["{{marketplaceUrl}}"],
               "path": ["users", "me"]
             }
           },
@@ -205,8 +205,8 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/users",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{marketplaceUrl}}/users",
+              "host": ["{{marketplaceUrl}}"],
               "path": ["users"]
             }
           },
@@ -215,7 +215,7 @@
       ]
     },
     {
-      "name": "Jobs",
+      "name": "Marketplace - Jobs",
       "item": [
         {
           "name": "Get All Jobs",
@@ -223,8 +223,8 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/jobs",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{marketplaceUrl}}/jobs",
+              "host": ["{{marketplaceUrl}}"],
               "path": ["jobs"]
             }
           },
@@ -236,8 +236,8 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/jobs?category=WEB_DESIGN&minBudget=1000&maxBudget=5000&experienceLevel=INTERMEDIATE",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{marketplaceUrl}}/jobs?category=WEB_DESIGN&minBudget=1000&maxBudget=5000&experienceLevel=INTERMEDIATE",
+              "host": ["{{marketplaceUrl}}"],
               "path": ["jobs"],
               "query": [
                 {
@@ -267,8 +267,8 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/jobs/1",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{marketplaceUrl}}/jobs/1",
+              "host": ["{{marketplaceUrl}}"],
               "path": ["jobs", "1"]
             }
           },
@@ -313,8 +313,8 @@
               "raw": "{\n  \"title\": \"Build E-commerce Website\",\n  \"description\": \"Need a professional e-commerce platform with payment integration\",\n  \"budget\": 5000,\n  \"category\": \"WEB_DEVELOPMENT\",\n  \"experienceLevel\": \"INTERMEDIATE\",\n  \"timelineWeeks\": 8\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/jobs",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{marketplaceUrl}}/jobs",
+              "host": ["{{marketplaceUrl}}"],
               "path": ["jobs"]
             }
           },
@@ -345,8 +345,8 @@
               "raw": "{\n  \"title\": \"Build E-commerce Website - Updated\",\n  \"description\": \"Updated description with more details\",\n  \"budget\": 6000,\n  \"category\": \"WEB_DEVELOPMENT\",\n  \"experienceLevel\": \"ADVANCED\",\n  \"timelineWeeks\": 10\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/jobs/{{jobId}}",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{marketplaceUrl}}/jobs/{{jobId}}",
+              "host": ["{{marketplaceUrl}}"],
               "path": ["jobs", "{{jobId}}"]
             }
           },
@@ -368,8 +368,8 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/jobs/{{jobId}}",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{marketplaceUrl}}/jobs/{{jobId}}",
+              "host": ["{{marketplaceUrl}}"],
               "path": ["jobs", "{{jobId}}"]
             }
           },
@@ -391,8 +391,8 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/jobs/my-jobs",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{marketplaceUrl}}/jobs/my-jobs",
+              "host": ["{{marketplaceUrl}}"],
               "path": ["jobs", "my-jobs"]
             }
           },
@@ -401,7 +401,7 @@
       ]
     },
     {
-      "name": "Proposals",
+      "name": "Marketplace - Proposals",
       "item": [
         {
           "name": "Submit Proposal (FREELANCER)",
@@ -442,8 +442,8 @@
               "raw": "{\n  \"jobId\": {{jobId}},\n  \"coverLetter\": \"I am a senior full-stack developer with 5+ years of experience building e-commerce platforms. I can deliver this project on time and within budget.\",\n  \"proposedRate\": 4500,\n  \"estimatedDuration\": 40\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/proposals",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{marketplaceUrl}}/proposals",
+              "host": ["{{marketplaceUrl}}"],
               "path": ["proposals"]
             }
           },
@@ -465,8 +465,8 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/jobs/{{jobId}}/proposals",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{marketplaceUrl}}/jobs/{{jobId}}/proposals",
+              "host": ["{{marketplaceUrl}}"],
               "path": ["jobs", "{{jobId}}", "proposals"]
             }
           },
@@ -488,8 +488,8 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/proposals/my-proposals",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{marketplaceUrl}}/proposals/my-proposals",
+              "host": ["{{marketplaceUrl}}"],
               "path": ["proposals", "my-proposals"]
             }
           },
@@ -511,8 +511,8 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/proposals/{{proposalId}}",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{marketplaceUrl}}/proposals/{{proposalId}}",
+              "host": ["{{marketplaceUrl}}"],
               "path": ["proposals", "{{proposalId}}"]
             }
           },
@@ -543,8 +543,8 @@
               "raw": ""
             },
             "url": {
-              "raw": "{{baseUrl}}/proposals/{{proposalId}}/accept",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{marketplaceUrl}}/proposals/{{proposalId}}/accept",
+              "host": ["{{marketplaceUrl}}"],
               "path": ["proposals", "{{proposalId}}", "accept"]
             }
           },
@@ -570,8 +570,8 @@
               "raw": ""
             },
             "url": {
-              "raw": "{{baseUrl}}/proposals/{{proposalId}}/reject",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{marketplaceUrl}}/proposals/{{proposalId}}/reject",
+              "host": ["{{marketplaceUrl}}"],
               "path": ["proposals", "{{proposalId}}", "reject"]
             }
           },
@@ -597,8 +597,8 @@
               "raw": ""
             },
             "url": {
-              "raw": "{{baseUrl}}/proposals/{{proposalId}}/withdraw",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{marketplaceUrl}}/proposals/{{proposalId}}/withdraw",
+              "host": ["{{marketplaceUrl}}"],
               "path": ["proposals", "{{proposalId}}", "withdraw"]
             }
           },
@@ -607,7 +607,7 @@
       ]
     },
     {
-      "name": "Dashboard",
+      "name": "Marketplace - Dashboard",
       "item": [
         {
           "name": "Get Client Dashboard Stats",
@@ -625,8 +625,8 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/dashboard/client",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{marketplaceUrl}}/dashboard/client",
+              "host": ["{{marketplaceUrl}}"],
               "path": ["dashboard", "client"]
             }
           },
@@ -648,8 +648,8 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/dashboard/freelancer",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{marketplaceUrl}}/dashboard/freelancer",
+              "host": ["{{marketplaceUrl}}"],
               "path": ["dashboard", "freelancer"]
             }
           },
@@ -658,24 +658,1028 @@
       ]
     },
     {
-      "name": "Health Check",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:8080/actuator/health",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "8080",
-          "path": ["actuator", "health"]
+      "name": "LMS Service - Courses",
+      "item": [
+        {
+          "name": "Get All Courses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{lmsUrl}}/courses",
+              "host": ["{{lmsUrl}}"],
+              "path": ["courses"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Courses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{lmsUrl}}/courses?search=design&category=WEB_DESIGN&level=BEGINNER&page=1&pageSize=20",
+              "host": ["{{lmsUrl}}"],
+              "path": ["courses"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "design"
+                },
+                {
+                  "key": "category",
+                  "value": "WEB_DESIGN"
+                },
+                {
+                  "key": "level",
+                  "value": "BEGINNER"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Course by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{lmsUrl}}/courses/1",
+              "host": ["{{lmsUrl}}"],
+              "path": ["courses", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Course by Slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{lmsUrl}}/courses/slug/web-design-basics",
+              "host": ["{{lmsUrl}}"],
+              "path": ["courses", "slug", "web-design-basics"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Popular Courses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{lmsUrl}}/courses/popular?page=0&size=10",
+              "host": ["{{lmsUrl}}"],
+              "path": ["courses", "popular"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Top-Rated Courses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{lmsUrl}}/courses/top-rated?page=0&size=10",
+              "host": ["{{lmsUrl}}"],
+              "path": ["courses", "top-rated"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Newest Courses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{lmsUrl}}/courses/newest?page=0&size=10",
+              "host": ["{{lmsUrl}}"],
+              "path": ["courses", "newest"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Course (Instructor)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Advanced Web Design\",\n  \"description\": \"Learn advanced web design principles and techniques\",\n  \"category\": \"WEB_DESIGN\",\n  \"level\": \"ADVANCED\",\n  \"price\": 99.99,\n  \"thumbnail\": \"https://example.com/thumb.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{lmsUrl}}/instructor/courses",
+              "host": ["{{lmsUrl}}"],
+              "path": ["instructor", "courses"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Course (Instructor)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Advanced Web Design - Updated\",\n  \"description\": \"Updated description\",\n  \"price\": 119.99\n}"
+            },
+            "url": {
+              "raw": "{{lmsUrl}}/instructor/courses/1",
+              "host": ["{{lmsUrl}}"],
+              "path": ["instructor", "courses", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Instructor Courses",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{lmsUrl}}/instructor/courses",
+              "host": ["{{lmsUrl}}"],
+              "path": ["instructor", "courses"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Publish Course",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{lmsUrl}}/instructor/courses/1/publish",
+              "host": ["{{lmsUrl}}"],
+              "path": ["instructor", "courses", "1", "publish"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Archive Course",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{lmsUrl}}/instructor/courses/1/archive",
+              "host": ["{{lmsUrl}}"],
+              "path": ["instructor", "courses", "1", "archive"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Course",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{lmsUrl}}/instructor/courses/1",
+              "host": ["{{lmsUrl}}"],
+              "path": ["instructor", "courses", "1"]
+            }
+          },
+          "response": []
         }
-      }
-    }
+      ]
+    },
+    {
+      "name": "LMS Service - Enrollments",
+      "item": [
+        {
+          "name": "Enroll in Course",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{lmsUrl}}/courses/1/enroll",
+              "host": ["{{lmsUrl}}"],
+              "path": ["courses", "1", "enroll"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Learning",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{lmsUrl}}/my-learning",
+              "host": ["{{lmsUrl}}"],
+              "path": ["my-learning"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Enrollment Details",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{lmsUrl}}/enrollments/1",
+              "host": ["{{lmsUrl}}"],
+              "path": ["enrollments", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Messaging Service",
+      "item": [
+        {
+          "name": "WebSocket Connect",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "ws://localhost:8082/api/v1/ws",
+              "protocol": "ws",
+              "host": ["localhost"],
+              "port": "8082",
+              "path": ["api", "v1", "ws"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Message Threads",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{messagingUrl}}/messages/threads",
+              "host": ["{{messagingUrl}}"],
+              "path": ["messages", "threads"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Thread Details",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{messagingUrl}}/messages/threads/1",
+              "host": ["{{messagingUrl}}"],
+              "path": ["messages", "threads", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Thread Messages",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{messagingUrl}}/messages/threads/1/messages",
+              "host": ["{{messagingUrl}}"],
+              "path": ["messages", "threads", "1", "messages"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Thread",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"participantId\": \"user-id-2\",\n  \"subject\": \"Project Discussion\"\n}"
+            },
+            "url": {
+              "raw": "{{messagingUrl}}/messages/threads",
+              "host": ["{{messagingUrl}}"],
+              "path": ["messages", "threads"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Send Message",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Hello! How are you doing?\"\n}"
+            },
+            "url": {
+              "raw": "{{messagingUrl}}/messages/threads/1/messages",
+              "host": ["{{messagingUrl}}"],
+              "path": ["messages", "threads", "1", "messages"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Online Users",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{messagingUrl}}/presence/online",
+              "host": ["{{messagingUrl}}"],
+              "path": ["presence", "online"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Presence",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{messagingUrl}}/presence/user/{{userId}}",
+              "host": ["{{messagingUrl}}"],
+              "path": ["presence", "user", "{{userId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Notifications",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{messagingUrl}}/notifications",
+              "host": ["{{messagingUrl}}"],
+              "path": ["notifications"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Notification Read",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{messagingUrl}}/notifications/1/read",
+              "host": ["{{messagingUrl}}"],
+              "path": ["notifications", "1", "read"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark All Notifications Read",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{messagingUrl}}/notifications/read-all",
+              "host": ["{{messagingUrl}}"],
+              "path": ["notifications", "read-all"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Content Service",
+      "item": [
+        {
+          "name": "Search Content",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{contentUrl}}/search?q=design&type=article&category=web",
+              "host": ["{{contentUrl}}"],
+              "path": ["search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "design"
+                },
+                {
+                  "key": "type",
+                  "value": "article"
+                },
+                {
+                  "key": "category",
+                  "value": "web"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Content by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{contentUrl}}/content/1",
+              "host": ["{{contentUrl}}"],
+              "path": ["content", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Content",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Web Design Tips\",\n  \"description\": \"Learn best practices for web design\",\n  \"content\": \"Content here...\",\n  \"type\": \"article\",\n  \"category\": \"web-design\",\n  \"tags\": [\"design\", \"web\"]\n}"
+            },
+            "url": {
+              "raw": "{{contentUrl}}/content",
+              "host": ["{{contentUrl}}"],
+              "path": ["content"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Content",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Web Design Tips - Updated\",\n  \"description\": \"Learn best practices for modern web design\"\n}"
+            },
+            "url": {
+              "raw": "{{contentUrl}}/content/1",
+              "host": ["{{contentUrl}}"],
+              "path": ["content", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Content",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{contentUrl}}/content/1",
+              "host": ["{{contentUrl}}"],
+              "path": ["content", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Comments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{contentUrl}}/comments?contentId=1&approved=true&page=1&limit=20",
+              "host": ["{{contentUrl}}"],
+              "path": ["comments"],
+              "query": [
+                {
+                  "key": "contentId",
+                  "value": "1"
+                },
+                {
+                  "key": "approved",
+                  "value": "true"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Comment",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contentId\": \"1\",\n  \"text\": \"Great article! Very informative.\"\n}"
+            },
+            "url": {
+              "raw": "{{contentUrl}}/comments",
+              "host": ["{{contentUrl}}"],
+              "path": ["comments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{contentUrl}}/categories",
+              "host": ["{{contentUrl}}"],
+              "path": ["categories"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Tags",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{contentUrl}}/tags",
+              "host": ["{{contentUrl}}"],
+              "path": ["tags"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Media",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{contentUrl}}/media/upload",
+              "host": ["{{contentUrl}}"],
+              "path": ["media", "upload"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Analytics",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{contentUrl}}/analytics?contentId=1&period=week",
+              "host": ["{{contentUrl}}"],
+              "path": ["analytics"],
+              "query": [
+                {
+                  "key": "contentId",
+                  "value": "1"
+                },
+                {
+                  "key": "period",
+                  "value": "week"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Health Checks",
+      "item": [
+        {
+          "name": "Marketplace Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/actuator/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["actuator", "health"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "LMS Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["health"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Messaging Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8082/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8082",
+              "path": ["health"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Content Service Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8083/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8083",
+              "path": ["health"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
   ],
   "variable": [
     {
-      "key": "baseUrl",
+      "key": "marketplaceUrl",
       "value": "http://localhost:8080/api",
+      "type": "string"
+    },
+    {
+      "key": "lmsUrl",
+      "value": "http://localhost:8081/api/lms",
+      "type": "string"
+    },
+    {
+      "key": "messagingUrl",
+      "value": "http://localhost:8082/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "contentUrl",
+      "value": "http://localhost:8083/api",
       "type": "string"
     },
     {
@@ -701,6 +1705,21 @@
     {
       "key": "proposalId",
       "value": "",
+      "type": "string"
+    },
+    {
+      "key": "courseId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "threadId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "contentId",
+      "value": "1",
       "type": "string"
     }
   ]
