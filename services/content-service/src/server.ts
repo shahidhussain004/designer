@@ -66,10 +66,13 @@ async function bootstrap(): Promise<void> {
       host: '0.0.0.0',
     });
 
-    logger.info({
-      port: appConfig.port,
-      env: appConfig.nodeEnv,
-    }, 'Content Service started successfully');
+    logger.info(
+      {
+        port: appConfig.port,
+        env: appConfig.nodeEnv,
+      },
+      'Content Service started successfully'
+    );
 
     logger.info(`API Docs available at http://localhost:${appConfig.port}/docs`);
   } catch (error) {

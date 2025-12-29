@@ -64,9 +64,7 @@ describe('AnalyticsService', () => {
     it('should throw NotFoundException when content not found', async () => {
       mockContentRepo.findById.mockResolvedValue(null);
 
-      await expect(
-        service.trackLike('non-existent', 'user-1')
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.trackLike('non-existent', 'user-1')).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -74,9 +72,7 @@ describe('AnalyticsService', () => {
     it('should track content share', async () => {
       mockContentRepo.findById.mockResolvedValue(mockContent as any);
 
-      await expect(
-        service.trackShare('content-1', 'twitter')
-      ).resolves.not.toThrow();
+      await expect(service.trackShare('content-1', 'twitter')).resolves.not.toThrow();
     });
   });
 
@@ -94,9 +90,7 @@ describe('AnalyticsService', () => {
     it('should throw NotFoundException when content not found', async () => {
       mockContentRepo.findById.mockResolvedValue(null);
 
-      await expect(
-        service.getContentAnalytics('non-existent')
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.getContentAnalytics('non-existent')).rejects.toThrow(NotFoundException);
     });
   });
 

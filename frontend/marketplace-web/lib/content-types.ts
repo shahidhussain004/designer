@@ -56,7 +56,7 @@ export interface CreateTagInput {
   description?: string;
 }
 
-export interface UpdateTagInput extends Partial<CreateTagInput> {}
+export type UpdateTagInput = Partial<CreateTagInput>;
 
 // Author
 export interface Author extends BaseEntity {
@@ -82,8 +82,10 @@ export interface Content extends BaseEntity {
   metaDescription: string | null;
   isFeatured: boolean;
   readingTime: number;
+  readingTimeMinutes?: number;
   viewCount: number;
   likeCount: number;
+  shareCount?: number;
   commentCount: number;
   publishedAt: string | null;
 }
@@ -126,10 +128,14 @@ export interface ContentFilters {
 export interface Comment extends BaseEntity {
   contentId: string;
   userId: string;
+  authorId?: string; // Deprecated: use userId instead
+  author?: Pick<Author, 'userId' | 'bio' | 'avatarUrl'>; // Optional populated author
   parentId: string | null;
   body: string;
   isApproved: boolean;
   isFlagged: boolean;
+  isEdited?: boolean;
+  likeCount?: number;
 }
 
 export interface CommentWithReplies extends Comment {

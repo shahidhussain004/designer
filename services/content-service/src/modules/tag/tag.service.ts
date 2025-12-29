@@ -18,7 +18,7 @@ export class TagService {
   async findAll(params: PaginationParams = {}): Promise<PaginatedResult<Tag>> {
     const { tags, total } = await tagRepository.findAll(params);
     const { page = 1, limit = 10 } = params;
-    
+
     return {
       data: tags,
       meta: buildPaginationMeta(total, page, limit),
@@ -27,7 +27,7 @@ export class TagService {
 
   async findById(id: string): Promise<Tag> {
     const cacheKey = redisService.buildTagKey(id);
-    
+
     const cached = await redisService.get<Tag>(cacheKey);
     if (cached) return cached;
 
@@ -42,7 +42,7 @@ export class TagService {
 
   async findBySlug(slug: string): Promise<Tag> {
     const cacheKey = `${this.cachePrefix}slug:${slug}`;
-    
+
     const cached = await redisService.get<Tag>(cacheKey);
     if (cached) return cached;
 
@@ -57,13 +57,13 @@ export class TagService {
 
   async findPopular(limit = 10): Promise<Tag[]> {
     const cacheKey = `${this.cachePrefix}popular:${limit}`;
-    
+
     const cached = await redisService.get<Tag[]>(cacheKey);
     if (cached) return cached;
 
     const tags = await tagRepository.findPopular(limit);
     await redisService.set(cacheKey, tags, this.cacheTtl);
-    
+
     return tags;
   }
 
@@ -92,7 +92,7 @@ export class TagService {
 
     await this.invalidateCache();
     logger.info({ tagId: tag.id }, 'Tag created');
-    
+
     return tag;
   }
 
@@ -111,7 +111,7 @@ export class TagService {
 
     // Generate new slug if name changes
     const slug = input.name ? generateSlug(input.name) : undefined;
-    
+
     if (slug && slug !== existing.slug) {
       if (!(await tagRepository.isSlugUnique(slug, id))) {
         throw new ConflictException(`Tag with slug '${slug}' already exists`);
@@ -126,7 +126,7 @@ export class TagService {
 
     await this.invalidateCache();
     logger.info({ tagId: id }, 'Tag updated');
-    
+
     return tag;
   }
 
@@ -138,7 +138,7 @@ export class TagService {
 
     await tagRepository.delete(id);
     await this.invalidateCache();
-    
+
     logger.info({ tagId: id }, 'Tag deleted');
   }
 

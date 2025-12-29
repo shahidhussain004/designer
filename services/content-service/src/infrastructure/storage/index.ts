@@ -3,4 +3,3 @@
  */
 
 export { ImageResizeOptions, storageService, UploadResult } from './storage.service';
-

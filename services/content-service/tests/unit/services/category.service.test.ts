@@ -120,9 +120,9 @@ describe('CategoryService', () => {
     it('should throw NotFoundException when category not found', async () => {
       mockRepository.findById.mockResolvedValue(null);
 
-      await expect(
-        service.update('non-existent', { name: 'Updated' })
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.update('non-existent', { name: 'Updated' })).rejects.toThrow(
+        NotFoundException
+      );
     });
   });
 

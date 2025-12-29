@@ -38,7 +38,7 @@ export class SearchService {
       data: ContentWithRelations[];
       total: number;
     }>(cacheKey);
-    
+
     if (cached) {
       return {
         data: cached.data,

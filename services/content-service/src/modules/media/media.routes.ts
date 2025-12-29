@@ -78,7 +78,7 @@ export async function mediaRoutes(fastify: FastifyInstance): Promise<void> {
     { preHandler: [authenticate] },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const data = await request.file();
-      
+
       if (!data) {
         throw new BadRequestException('No file uploaded');
       }

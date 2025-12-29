@@ -110,7 +110,7 @@ export class AnalyticsService {
         data: { contentId, userId },
       });
       await contentRepository.incrementLikeCount(contentId);
-      
+
       // Publish event
       await kafkaService.publishContentLiked(contentId, {
         contentId,
@@ -151,10 +151,7 @@ export class AnalyticsService {
   /**
    * Get analytics for a specific content
    */
-  async getContentAnalytics(
-    contentId: string,
-    days = 30
-  ): Promise<ContentAnalytics> {
+  async getContentAnalytics(contentId: string, days = 30): Promise<ContentAnalytics> {
     const content = await contentRepository.findById(contentId);
     if (!content) {
       throw new NotFoundException('Content', contentId);
@@ -258,15 +255,13 @@ export class AnalyticsService {
   /**
    * Get trending content (based on recent views)
    */
-  async getTrendingContent(limit = 10): Promise<
-    Array<{ id: string; title: string; recentViews: number }>
-  > {
+  async getTrendingContent(
+    limit = 10
+  ): Promise<Array<{ id: string; title: string; recentViews: number }>> {
     const oneDayAgo = new Date();
     oneDayAgo.setDate(oneDayAgo.getDate() - 1);
 
-    const trending = await prisma.$queryRaw<
-      Array<{ content_id: string; view_count: bigint }>
-    >`
+    const trending = await prisma.$queryRaw<Array<{ content_id: string; view_count: bigint }>>`
       SELECT content_id, COUNT(*) as view_count
       FROM content_views
       WHERE viewed_at >= ${oneDayAgo}

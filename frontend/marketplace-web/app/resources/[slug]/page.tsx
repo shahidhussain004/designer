@@ -96,7 +96,6 @@ export default function ResourceDetailPage() {
       const comment = await commentsApi.create({
         contentId: content.id,
         body: newComment,
-        authorId: 'anonymous', // This would be the actual user ID in production
       });
       setComments((prev) => [comment, ...prev]);
       setNewComment('');
@@ -129,7 +128,7 @@ export default function ResourceDetailPage() {
     return (
       <PageLayout title="Loading... | Designer Marketplace">
         <Flex className="min-h-screen items-center justify-center">
-          <Spinner size="lg" />
+          <Spinner />
         </Flex>
       </PageLayout>
     );
@@ -194,7 +193,7 @@ export default function ResourceDetailPage() {
           </Flex>
 
           {/* Title */}
-          <Text as="h1" className="text-4xl font-bold mb-4">
+          <Text tag="h1" className="text-4xl font-bold mb-4">
             {content.title}
           </Text>
 
@@ -230,7 +229,7 @@ export default function ResourceDetailPage() {
 
             {/* Actions */}
             <Flex className="gap-2">
-              <Button variant="ghost" onClick={handleLike} className="gap-2">
+              <Button rank="tertiary" onClick={handleLike} className="gap-2">
                 <svg
                   className="w-5 h-5"
                   fill="none"
@@ -246,7 +245,7 @@ export default function ResourceDetailPage() {
                 </svg>
                 {content.likeCount || 0}
               </Button>
-              <Button variant="ghost" onClick={handleShare}>
+              <Button rank="tertiary" onClick={handleShare}>
                 <svg
                   className="w-5 h-5"
                   fill="none"
@@ -338,7 +337,7 @@ export default function ResourceDetailPage() {
 
           {/* Comments Section */}
           <section>
-            <Text as="h2" className="text-2xl font-bold mb-6">
+            <Text tag="h2" className="text-2xl font-bold mb-6">
               Comments ({comments.length})
             </Text>
 
@@ -355,7 +354,7 @@ export default function ResourceDetailPage() {
                 <Flex className="justify-end mt-3">
                   <Button
                     type="submit"
-                    variant="primary"
+                    rank="primary"
                     disabled={submittingComment || !newComment.trim()}
                   >
                     {submittingComment ? 'Submitting...' : 'Post Comment'}
@@ -438,7 +437,7 @@ export default function ResourceDetailPage() {
           {/* Navigation */}
           <Flex className="justify-between mt-12">
             <Button
-              variant="ghost"
+              rank="tertiary"
               onClick={() => router.push('/resources')}
               className="gap-2"
             >

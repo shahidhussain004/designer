@@ -305,7 +305,7 @@ export function useComments(contentId: string) {
     try {
       setLoading(true);
       const result = await commentsApi.getByContent(contentId);
-      setComments(result);
+      setComments(result.data);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to fetch comments'));
