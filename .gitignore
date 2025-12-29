@@ -275,3 +275,6 @@ postman/*.environment.json
 secrets/
 private/
 .git-credentials
+
+# Ignore repository backup folder
+backup/
