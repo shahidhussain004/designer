@@ -1,79 +1,122 @@
-import { PrismaClient } from '@prisma/client';
-import { mockDeep, mockReset } from 'jest-mock-extended';
+import { vi, beforeEach, afterEach } from 'vitest';
 
 // Mock Prisma Client
-export const prismaMock = mockDeep<PrismaClient>();
+const prismaMock = {
+  content: {
+    findMany: vi.fn(),
+    findUnique: vi.fn(),
+    findFirst: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+    count: vi.fn(),
+  },
+  category: {
+    findMany: vi.fn(),
+    findUnique: vi.fn(),
+    findFirst: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+  },
+  tag: {
+    findMany: vi.fn(),
+    findUnique: vi.fn(),
+    findFirst: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+  },
+  comment: {
+    findMany: vi.fn(),
+    findUnique: vi.fn(),
+    findFirst: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+    count: vi.fn(),
+  },
+  $transaction: vi.fn((fn: (prisma: typeof prismaMock) => Promise<unknown>) =>
+    fn(prismaMock)
+  ),
+};
 
-jest.mock('./src/infrastructure/database/prisma.service', () => ({
+export { prismaMock };
+
+vi.mock('@infrastructure/database/prisma.service', () => ({
   prismaService: {
     getClient: () => prismaMock,
-    connect: jest.fn(),
-    disconnect: jest.fn(),
-    healthCheck: jest.fn().mockResolvedValue(true),
+    connect: vi.fn(),
+    disconnect: vi.fn(),
+    healthCheck: vi.fn().mockResolvedValue(true),
   },
 }));
 
 // Mock Redis
-jest.mock('./src/infrastructure/cache/redis.service', () => ({
+vi.mock('@infrastructure/cache/redis.service', () => ({
   redisService: {
-    connect: jest.fn(),
-    disconnect: jest.fn(),
-    get: jest.fn(),
-    set: jest.fn(),
-    delete: jest.fn(),
-    deletePattern: jest.fn(),
-    getCategoryById: jest.fn(),
-    setCategoryById: jest.fn(),
-    invalidateCategoryCache: jest.fn(),
-    getTagById: jest.fn(),
-    setTagById: jest.fn(),
-    invalidateTagCache: jest.fn(),
-    getContentById: jest.fn(),
-    setContentById: jest.fn(),
-    getContentBySlug: jest.fn(),
-    setContentBySlug: jest.fn(),
-    invalidateContentCache: jest.fn(),
-    getSearchResults: jest.fn(),
-    setSearchResults: jest.fn(),
-    healthCheck: jest.fn().mockResolvedValue(true),
+    connect: vi.fn(),
+    disconnect: vi.fn(),
+    get: vi.fn(),
+    set: vi.fn(),
+    delete: vi.fn(),
+    deletePattern: vi.fn(),
+    getCategoryById: vi.fn(),
+    setCategoryById: vi.fn(),
+    invalidateCategoryCache: vi.fn(),
+    getTagById: vi.fn(),
+    setTagById: vi.fn(),
+    invalidateTagCache: vi.fn(),
+    getContentById: vi.fn(),
+    setContentById: vi.fn(),
+    getContentBySlug: vi.fn(),
+    setContentBySlug: vi.fn(),
+    invalidateContentCache: vi.fn(),
+    getSearchResults: vi.fn(),
+    setSearchResults: vi.fn(),
+    healthCheck: vi.fn().mockResolvedValue(true),
   },
 }));
 
 // Mock Kafka
-jest.mock('./src/infrastructure/messaging/kafka.service', () => ({
+vi.mock('@infrastructure/messaging/kafka.service', () => ({
   kafkaService: {
-    connect: jest.fn(),
-    disconnect: jest.fn(),
-    publishContentCreated: jest.fn(),
-    publishContentUpdated: jest.fn(),
-    publishContentPublished: jest.fn(),
-    publishContentDeleted: jest.fn(),
-    publishCommentCreated: jest.fn(),
-    publishContentViewed: jest.fn(),
-    publishContentLiked: jest.fn(),
-    healthCheck: jest.fn().mockResolvedValue(true),
+    connect: vi.fn(),
+    disconnect: vi.fn(),
+    publishContentCreated: vi.fn(),
+    publishContentUpdated: vi.fn(),
+    publishContentPublished: vi.fn(),
+    publishContentDeleted: vi.fn(),
+    publishCommentCreated: vi.fn(),
+    publishContentViewed: vi.fn(),
+    publishContentLiked: vi.fn(),
+    healthCheck: vi.fn().mockResolvedValue(true),
   },
 }));
 
 // Mock Storage
-jest.mock('./src/infrastructure/storage/storage.service', () => ({
+vi.mock('@infrastructure/storage/storage.service', () => ({
   storageService: {
-    initialize: jest.fn(),
-    uploadImage: jest.fn(),
-    deleteFile: jest.fn(),
+    initialize: vi.fn(),
+    uploadImage: vi.fn(),
+    deleteFile: vi.fn(),
   },
 }));
 
 beforeEach(() => {
-  mockReset(prismaMock);
+  vi.clearAllMocks();
+});
+
+afterEach(() => {
+  vi.resetAllMocks();
 });
 
 // Suppress console output during tests
 global.console = {
   ...console,
-  log: jest.fn(),
-  debug: jest.fn(),
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
+  log: vi.fn() as unknown as typeof console.log,
+  debug: vi.fn() as unknown as typeof console.debug,
+  info: vi.fn() as unknown as typeof console.info,
+  warn: vi.fn() as unknown as typeof console.warn,
+  error: vi.fn() as unknown as typeof console.error,
 };

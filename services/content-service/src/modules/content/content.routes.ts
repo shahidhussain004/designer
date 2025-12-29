@@ -3,10 +3,10 @@
  */
 import { authenticate, optionalAuth, requireAdmin } from '@common/middleware';
 import {
-    contentListSchema,
-    contentTypeSchema,
-    createContentSchema,
-    updateContentSchema,
+  contentListSchema,
+  contentTypeSchema,
+  createContentSchema,
+  updateContentSchema,
 } from '@common/utils/validation';
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { contentService } from './content.service';
@@ -27,17 +27,23 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
   // Get all published content (public)
   fastify.get('/', async (request: FastifyRequest, reply: FastifyReply) => {
     const parsed = contentListSchema.parse(request.query);
-    
+
     // Transform date strings to Date objects
     const params = {
       ...parsed,
-      filters: parsed.filters ? {
-        ...parsed.filters,
-        publishedAfter: parsed.filters.publishedAfter ? new Date(parsed.filters.publishedAfter) : undefined,
-        publishedBefore: parsed.filters.publishedBefore ? new Date(parsed.filters.publishedBefore) : undefined,
-      } : undefined,
+      filters: parsed.filters
+        ? {
+            ...parsed.filters,
+            publishedAfter: parsed.filters.publishedAfter
+              ? new Date(parsed.filters.publishedAfter)
+              : undefined,
+            publishedBefore: parsed.filters.publishedBefore
+              ? new Date(parsed.filters.publishedBefore)
+              : undefined,
+          }
+        : undefined,
     };
-    
+
     const result = await contentService.findPublished(params);
     return reply.send({
       success: true,
@@ -183,11 +189,7 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
     { preHandler: [authenticate] },
     async (request: FastifyRequest<{ Params: IdParams }>, reply: FastifyReply) => {
       const isAdmin = request.user?.role === 'admin';
-      const content = await contentService.publish(
-        request.params.id,
-        request.userId!,
-        isAdmin
-      );
+      const content = await contentService.publish(request.params.id, request.userId!, isAdmin);
       return reply.send({
         success: true,
         data: content,
@@ -201,11 +203,7 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
     { preHandler: [authenticate] },
     async (request: FastifyRequest<{ Params: IdParams }>, reply: FastifyReply) => {
       const isAdmin = request.user?.role === 'admin';
-      const content = await contentService.unpublish(
-        request.params.id,
-        request.userId!,
-        isAdmin
-      );
+      const content = await contentService.unpublish(request.params.id, request.userId!, isAdmin);
       return reply.send({
         success: true,
         data: content,

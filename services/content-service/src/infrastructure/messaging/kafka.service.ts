@@ -39,17 +39,17 @@ class KafkaService {
     try {
       // Connect admin
       await this.admin.connect();
-      
+
       // Create topics if they don't exist
       await this.ensureTopicsExist();
-      
+
       // Connect producer
       this.producer = this.kafka.producer({
         createPartitioner: Partitioners.DefaultPartitioner,
       });
       await this.producer.connect();
       this.isProducerConnected = true;
-      
+
       logger.info('Kafka connected successfully');
     } catch (error) {
       logger.error({ error }, 'Failed to connect to Kafka');
@@ -63,15 +63,15 @@ class KafkaService {
         await this.producer.disconnect();
         this.isProducerConnected = false;
       }
-      
+
       for (const [groupId, consumer] of this.consumers) {
         await consumer.disconnect();
         logger.info({ groupId }, 'Consumer disconnected');
       }
       this.consumers.clear();
-      
+
       await this.admin.disconnect();
-      
+
       logger.info('Kafka disconnected');
     } catch (error) {
       logger.error({ error }, 'Error disconnecting from Kafka');
@@ -137,12 +137,12 @@ class KafkaService {
             value: JSON.stringify(event),
             headers: {
               'event-type': eventType,
-              'timestamp': new Date().toISOString(),
+              timestamp: new Date().toISOString(),
             },
           },
         ],
       });
-      
+
       logger.debug({ topic, eventType }, 'Event published');
     } catch (error) {
       logger.error({ error, topic, eventType }, 'Failed to publish event');
@@ -152,39 +152,19 @@ class KafkaService {
 
   // Convenience methods for common events
   async publishContentCreated(contentId: string, data: unknown): Promise<void> {
-    await this.publish(
-      kafkaConfig.topics.contentEvents,
-      'content.created',
-      data,
-      contentId
-    );
+    await this.publish(kafkaConfig.topics.contentEvents, 'content.created', data, contentId);
   }
 
   async publishContentUpdated(contentId: string, data: unknown): Promise<void> {
-    await this.publish(
-      kafkaConfig.topics.contentEvents,
-      'content.updated',
-      data,
-      contentId
-    );
+    await this.publish(kafkaConfig.topics.contentEvents, 'content.updated', data, contentId);
   }
 
   async publishContentPublished(contentId: string, data: unknown): Promise<void> {
-    await this.publish(
-      kafkaConfig.topics.contentEvents,
-      'content.published',
-      data,
-      contentId
-    );
+    await this.publish(kafkaConfig.topics.contentEvents, 'content.published', data, contentId);
   }
 
   async publishContentDeleted(contentId: string, data: unknown): Promise<void> {
-    await this.publish(
-      kafkaConfig.topics.contentEvents,
-      'content.deleted',
-      data,
-      contentId
-    );
+    await this.publish(kafkaConfig.topics.contentEvents, 'content.deleted', data, contentId);
   }
 
   async publishCommentCreated(contentId: string, data: unknown): Promise<void> {
@@ -197,21 +177,11 @@ class KafkaService {
   }
 
   async publishContentViewed(contentId: string, data: unknown): Promise<void> {
-    await this.publish(
-      kafkaConfig.topics.analyticsEvents,
-      'content.viewed',
-      data,
-      contentId
-    );
+    await this.publish(kafkaConfig.topics.analyticsEvents, 'content.viewed', data, contentId);
   }
 
   async publishContentLiked(contentId: string, data: unknown): Promise<void> {
-    await this.publish(
-      kafkaConfig.topics.analyticsEvents,
-      'content.liked',
-      data,
-      contentId
-    );
+    await this.publish(kafkaConfig.topics.analyticsEvents, 'content.liked', data, contentId);
   }
 
   // Consumer methods
@@ -221,15 +191,15 @@ class KafkaService {
     handler: (message: EventPayload) => Promise<void>
   ): Promise<void> {
     const consumer = this.kafka.consumer({ groupId });
-    
+
     try {
       await consumer.connect();
       await consumer.subscribe({ topic, fromBeginning: false });
-      
+
       await consumer.run({
         eachMessage: async ({ message }) => {
           if (!message.value) return;
-          
+
           try {
             const event = JSON.parse(message.value.toString()) as EventPayload;
             await handler(event);
@@ -238,7 +208,7 @@ class KafkaService {
           }
         },
       });
-      
+
       this.consumers.set(groupId, consumer);
       logger.info({ groupId, topic }, 'Consumer subscribed');
     } catch (error) {

@@ -167,10 +167,7 @@ export class ContentRepository {
     }) as Promise<ContentWithRelations[]>;
   }
 
-  async findRecent(
-    contentType?: ContentType,
-    limit = 10
-  ): Promise<ContentWithRelations[]> {
+  async findRecent(contentType?: ContentType, limit = 10): Promise<ContentWithRelations[]> {
     return prisma.content.findMany({
       where: {
         deletedAt: null,
@@ -183,10 +180,7 @@ export class ContentRepository {
     }) as Promise<ContentWithRelations[]>;
   }
 
-  async findRelated(
-    contentId: string,
-    limit = 5
-  ): Promise<ContentWithRelations[]> {
+  async findRelated(contentId: string, limit = 5): Promise<ContentWithRelations[]> {
     const content = await prisma.content.findUnique({
       where: { id: contentId },
       include: { tags: true },
@@ -201,10 +195,7 @@ export class ContentRepository {
         id: { not: contentId },
         deletedAt: null,
         status: 'published',
-        OR: [
-          { categoryId: content.categoryId },
-          { tags: { some: { tagId: { in: tagIds } } } },
-        ],
+        OR: [{ categoryId: content.categoryId }, { tags: { some: { tagId: { in: tagIds } } } }],
       },
       include: this.getInclude(),
       orderBy: { publishedAt: 'desc' },
@@ -212,10 +203,7 @@ export class ContentRepository {
     }) as Promise<ContentWithRelations[]>;
   }
 
-  async create(
-    data: Prisma.ContentCreateInput,
-    tagIds?: string[]
-  ): Promise<ContentWithRelations> {
+  async create(data: Prisma.ContentCreateInput, tagIds?: string[]): Promise<ContentWithRelations> {
     return prisma.$transaction(async (tx) => {
       const content = await tx.content.create({
         data,

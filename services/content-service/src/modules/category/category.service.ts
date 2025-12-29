@@ -1,11 +1,7 @@
 /**
  * Category service
  */
-import {
-    BadRequestException,
-    ConflictException,
-    NotFoundException,
-} from '@common/exceptions';
+import { BadRequestException, ConflictException, NotFoundException } from '@common/exceptions';
 import { generateSlug } from '@common/utils';
 import { CreateCategoryInput, UpdateCategoryInput } from '@common/utils/validation';
 import { logger } from '@config/logger.config';
@@ -24,19 +20,19 @@ export class CategoryService {
 
   async findAll(includeInactive = false): Promise<Category[]> {
     const cacheKey = `${this.cachePrefix}all:${includeInactive}`;
-    
+
     const cached = await redisService.get<Category[]>(cacheKey);
     if (cached) return cached;
 
     const categories = await categoryRepository.findAll(includeInactive);
     await redisService.set(cacheKey, categories, this.cacheTtl);
-    
+
     return categories;
   }
 
   async findById(id: string): Promise<Category> {
     const cacheKey = redisService.buildCategoryKey(id);
-    
+
     const cached = await redisService.get<Category>(cacheKey);
     if (cached) return cached;
 
@@ -51,7 +47,7 @@ export class CategoryService {
 
   async findBySlug(slug: string): Promise<Category> {
     const cacheKey = `${this.cachePrefix}slug:${slug}`;
-    
+
     const cached = await redisService.get<Category>(cacheKey);
     if (cached) return cached;
 
@@ -66,13 +62,13 @@ export class CategoryService {
 
   async getTree(): Promise<CategoryTree[]> {
     const cacheKey = `${this.cachePrefix}tree`;
-    
+
     const cached = await redisService.get<CategoryTree[]>(cacheKey);
     if (cached) return cached;
 
     const allCategories = await categoryRepository.findAll();
     const tree = this.buildTree(allCategories);
-    
+
     await redisService.set(cacheKey, tree, this.cacheTtl);
     return tree;
   }
@@ -119,7 +115,7 @@ export class CategoryService {
 
     await this.invalidateCache();
     logger.info({ categoryId: category.id }, 'Category created');
-    
+
     return category;
   }
 
@@ -138,7 +134,7 @@ export class CategoryService {
 
     // Generate new slug if name changes
     const slug = input.name ? generateSlug(input.name) : undefined;
-    
+
     if (slug && slug !== existing.slug) {
       if (!(await categoryRepository.isSlugUnique(slug, id))) {
         throw new ConflictException(`Category with slug '${slug}' already exists`);
@@ -162,14 +158,18 @@ export class CategoryService {
       name: input.name,
       slug,
       description: input.description,
-      parent: input.parentId ? { connect: { id: input.parentId } } : input.parentId === null ? { disconnect: true } : undefined,
+      parent: input.parentId
+        ? { connect: { id: input.parentId } }
+        : input.parentId === null
+          ? { disconnect: true }
+          : undefined,
       icon: input.icon,
       sortOrder: input.sortOrder,
     });
 
     await this.invalidateCache();
     logger.info({ categoryId: id }, 'Category updated');
-    
+
     return category;
   }
 
@@ -195,7 +195,7 @@ export class CategoryService {
 
     await categoryRepository.delete(id);
     await this.invalidateCache();
-    
+
     logger.info({ categoryId: id }, 'Category deleted');
   }
 

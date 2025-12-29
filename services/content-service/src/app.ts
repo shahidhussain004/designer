@@ -5,21 +5,21 @@ import { requestContext } from '@common/middleware';
 import { logger } from '@config/logger.config';
 import Fastify, { FastifyInstance } from 'fastify';
 import {
-    analyticsRoutes,
-    categoryRoutes,
-    commentRoutes,
-    contentRoutes,
-    mediaRoutes,
-    searchRoutes,
-    tagRoutes,
+  analyticsRoutes,
+  categoryRoutes,
+  commentRoutes,
+  contentRoutes,
+  mediaRoutes,
+  searchRoutes,
+  tagRoutes,
 } from './modules';
 import {
-    corsPlugin,
-    errorHandlerPlugin,
-    healthPlugin,
-    multipartPlugin,
-    rateLimitPlugin,
-    swaggerPlugin,
+  corsPlugin,
+  errorHandlerPlugin,
+  healthPlugin,
+  multipartPlugin,
+  rateLimitPlugin,
+  swaggerPlugin,
 } from './plugins';
 
 export async function buildApp(): Promise<FastifyInstance> {
@@ -42,22 +42,28 @@ export async function buildApp(): Promise<FastifyInstance> {
 
   // Request logging
   app.addHook('onRequest', async (request) => {
-    logger.info({
-      method: request.method,
-      url: request.url,
-      requestId: request.id,
-    }, 'Incoming request');
+    logger.info(
+      {
+        method: request.method,
+        url: request.url,
+        requestId: request.id,
+      },
+      'Incoming request'
+    );
   });
 
   // Response logging
   app.addHook('onResponse', async (request, reply) => {
-    logger.info({
-      method: request.method,
-      url: request.url,
-      statusCode: reply.statusCode,
-      responseTime: reply.elapsedTime,
-      requestId: request.id,
-    }, 'Request completed');
+    logger.info(
+      {
+        method: request.method,
+        url: request.url,
+        statusCode: reply.statusCode,
+        responseTime: reply.elapsedTime,
+        requestId: request.id,
+      },
+      'Request completed'
+    );
   });
 
   // Register API routes

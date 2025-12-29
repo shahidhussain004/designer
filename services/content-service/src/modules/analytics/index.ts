@@ -4,9 +4,8 @@
 
 export { analyticsRoutes } from './analytics.routes';
 export {
-    analyticsService,
-    AnalyticsService,
-    ContentAnalytics,
-    OverallAnalytics
+  analyticsService,
+  AnalyticsService,
+  ContentAnalytics,
+  OverallAnalytics,
 } from './analytics.service';
-

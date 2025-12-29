@@ -3,9 +3,9 @@
  */
 import { authenticate, requireAdmin } from '@common/middleware';
 import {
-    createCommentSchema,
-    paginationSchema,
-    updateCommentSchema,
+  createCommentSchema,
+  paginationSchema,
+  updateCommentSchema,
 } from '@common/utils/validation';
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { commentService } from './comment.service';

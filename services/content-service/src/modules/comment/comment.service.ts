@@ -1,11 +1,7 @@
 /**
  * Comment service
  */
-import {
-    BadRequestException,
-    ForbiddenException,
-    NotFoundException,
-} from '@common/exceptions';
+import { BadRequestException, ForbiddenException, NotFoundException } from '@common/exceptions';
 import { PaginatedResult, PaginationParams } from '@common/interfaces';
 import { buildPaginationMeta } from '@common/utils';
 import { CreateCommentInput, UpdateCommentInput } from '@common/utils/validation';
@@ -67,9 +63,7 @@ export class CommentService {
     };
   }
 
-  async findFlagged(
-    params: PaginationParams = {}
-  ): Promise<PaginatedResult<CommentWithAuthor>> {
+  async findFlagged(params: PaginationParams = {}): Promise<PaginatedResult<CommentWithAuthor>> {
     const { comments, total } = await commentRepository.findFlagged(params);
     const { page = 1, limit = 10 } = params;
 
@@ -79,10 +73,7 @@ export class CommentService {
     };
   }
 
-  async create(
-    input: CreateCommentInput,
-    authorId: string
-  ): Promise<CommentWithAuthor> {
+  async create(input: CreateCommentInput, authorId: string): Promise<CommentWithAuthor> {
     // Verify content exists and allows comments
     const content = await contentRepository.findById(input.contentId);
     if (!content) {

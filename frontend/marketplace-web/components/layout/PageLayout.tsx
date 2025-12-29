@@ -1,14 +1,15 @@
 'use client'
 
+import { Div, Flex } from '@/components/green'
 import React from 'react'
-import { Flex, Div } from '@/components/green'
-import Navbar from './Navbar'
 import Footer from './Footer'
+import Navbar from './Navbar'
 
 interface PageLayoutProps {
   children: React.ReactNode
   showNavbar?: boolean
   showFooter?: boolean
+  title?: string
 }
 
 /**

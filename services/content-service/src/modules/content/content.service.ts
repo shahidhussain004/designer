@@ -1,26 +1,16 @@
 /**
  * Content service
  */
+import { ForbiddenException, NotFoundException } from '@common/exceptions';
+import { ContentListParams, ContentStats, PaginatedResult } from '@common/interfaces';
 import {
-    ForbiddenException,
-    NotFoundException
-} from '@common/exceptions';
-import {
-    ContentListParams,
-    ContentStats,
-    PaginatedResult
-} from '@common/interfaces';
-import {
-    buildPaginationMeta,
-    calculateReadingTime,
-    generateExcerpt,
-    generateSlug,
-    generateUniqueSlug,
+  buildPaginationMeta,
+  calculateReadingTime,
+  generateExcerpt,
+  generateSlug,
+  generateUniqueSlug,
 } from '@common/utils';
-import {
-    CreateContentInput,
-    UpdateContentInput,
-} from '@common/utils/validation';
+import { CreateContentInput, UpdateContentInput } from '@common/utils/validation';
 import { logger } from '@config/logger.config';
 import { redisConfig } from '@config/redis.config';
 import { redisService } from '@infrastructure/cache';
@@ -33,9 +23,7 @@ export class ContentService {
   private readonly listCachePrefix = redisConfig.keyPatterns.contentList;
   private readonly cacheTtl = redisConfig.ttl.content;
 
-  async findAll(
-    params: ContentListParams = {}
-  ): Promise<PaginatedResult<ContentWithRelations>> {
+  async findAll(params: ContentListParams = {}): Promise<PaginatedResult<ContentWithRelations>> {
     const { content, total } = await contentRepository.findAll(params);
     const { page = 1, limit = 10 } = params;
 
@@ -91,10 +79,7 @@ export class ContentService {
     authorId: string,
     params: ContentListParams = {}
   ): Promise<PaginatedResult<ContentWithRelations>> {
-    const { content, total } = await contentRepository.findByAuthor(
-      authorId,
-      params
-    );
+    const { content, total } = await contentRepository.findByAuthor(authorId, params);
     const { page = 1, limit = 10 } = params;
 
     return {
@@ -127,10 +112,7 @@ export class ContentService {
     return content;
   }
 
-  async findRecent(
-    contentType?: ContentType,
-    limit = 10
-  ): Promise<ContentWithRelations[]> {
+  async findRecent(contentType?: ContentType, limit = 10): Promise<ContentWithRelations[]> {
     const cacheKey = `${this.listCachePrefix}recent:${contentType || 'all'}:${limit}`;
 
     const cached = await redisService.get<ContentWithRelations[]>(cacheKey);
@@ -142,17 +124,11 @@ export class ContentService {
     return content;
   }
 
-  async findRelated(
-    contentId: string,
-    limit = 5
-  ): Promise<ContentWithRelations[]> {
+  async findRelated(contentId: string, limit = 5): Promise<ContentWithRelations[]> {
     return contentRepository.findRelated(contentId, limit);
   }
 
-  async create(
-    input: CreateContentInput,
-    authorId: string
-  ): Promise<ContentWithRelations> {
+  async create(input: CreateContentInput, authorId: string): Promise<ContentWithRelations> {
     // Generate slug
     let slug = generateSlug(input.title);
 
@@ -175,9 +151,7 @@ export class ContentService {
         excerpt,
         contentType: input.contentType,
         author: { connect: { id: authorId } },
-        category: input.categoryId
-          ? { connect: { id: input.categoryId } }
-          : undefined,
+        category: input.categoryId ? { connect: { id: input.categoryId } } : undefined,
         featuredImage: input.featuredImage,
         featuredImageAlt: input.featuredImageAlt,
         metaTitle: input.metaTitle || input.title,
@@ -186,7 +160,9 @@ export class ContentService {
         scheduledAt: input.scheduledAt ? new Date(input.scheduledAt) : null,
         isFeatured: input.isFeatured || false,
         allowComments: input.allowComments ?? true,
-        customFields: input.customFields ? JSON.parse(JSON.stringify(input.customFields)) : undefined,
+        customFields: input.customFields
+          ? JSON.parse(JSON.stringify(input.customFields))
+          : undefined,
         readingTimeMinutes,
       },
       input.tagIds
@@ -233,9 +209,7 @@ export class ContentService {
     }
 
     // Recalculate reading time if body changed
-    const readingTimeMinutes = input.body
-      ? calculateReadingTime(input.body)
-      : undefined;
+    const readingTimeMinutes = input.body ? calculateReadingTime(input.body) : undefined;
 
     // Handle status change to published
     let publishedAt: Date | undefined;
@@ -251,9 +225,7 @@ export class ContentService {
         body: input.body,
         excerpt: input.excerpt,
         status: input.status,
-        category: input.categoryId
-          ? { connect: { id: input.categoryId } }
-          : undefined,
+        category: input.categoryId ? { connect: { id: input.categoryId } } : undefined,
         featuredImage: input.featuredImage,
         featuredImageAlt: input.featuredImageAlt,
         metaTitle: input.metaTitle,
@@ -262,7 +234,9 @@ export class ContentService {
         scheduledAt: input.scheduledAt ? new Date(input.scheduledAt) : undefined,
         isFeatured: input.isFeatured,
         allowComments: input.allowComments,
-        customFields: input.customFields ? JSON.parse(JSON.stringify(input.customFields)) : undefined,
+        customFields: input.customFields
+          ? JSON.parse(JSON.stringify(input.customFields))
+          : undefined,
         readingTimeMinutes,
         publishedAt,
       },
@@ -292,19 +266,11 @@ export class ContentService {
     return content;
   }
 
-  async publish(
-    id: string,
-    userId: string,
-    isAdmin = false
-  ): Promise<ContentWithRelations> {
+  async publish(id: string, userId: string, isAdmin = false): Promise<ContentWithRelations> {
     return this.update(id, { status: 'published' }, userId, isAdmin);
   }
 
-  async unpublish(
-    id: string,
-    userId: string,
-    isAdmin = false
-  ): Promise<ContentWithRelations> {
+  async unpublish(id: string, userId: string, isAdmin = false): Promise<ContentWithRelations> {
     return this.update(id, { status: 'draft' }, userId, isAdmin);
   }
 

@@ -30,9 +30,7 @@ export class BaseException extends Error {
 
 export class NotFoundException extends BaseException {
   constructor(resource: string, id?: string) {
-    const message = id
-      ? `${resource} with id '${id}' not found`
-      : `${resource} not found`;
+    const message = id ? `${resource} with id '${id}' not found` : `${resource} not found`;
     super(message, 404, 'NOT_FOUND');
   }
 }

@@ -8,4 +8,3 @@ export { default as healthPlugin } from './health.plugin';
 export { default as multipartPlugin } from './multipart.plugin';
 export { default as rateLimitPlugin } from './rate-limit.plugin';
 export { default as swaggerPlugin } from './swagger.plugin';
-

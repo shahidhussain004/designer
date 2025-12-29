@@ -143,7 +143,7 @@ export default function ResourcesPage() {
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-green-600 to-green-800 text-white py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <Text as="h1" className="text-3xl font-bold mb-4">
+            <Text tag="h1" className="text-3xl font-bold mb-4">
               Resources & Insights
             </Text>
             <Text className="text-green-100 max-w-2xl">
@@ -211,10 +211,10 @@ export default function ResourcesPage() {
                   <option value="viewCount-desc">Most Viewed</option>
                   <option value="likeCount-desc">Most Liked</option>
                 </select>
-                <Button type="submit" variant="primary">
+                <Button type="submit" rank="primary">
                   Search
                 </Button>
-                <Button type="button" variant="ghost" onClick={clearFilters}>
+                <Button type="button" rank="tertiary" onClick={clearFilters}>
                   Clear
                 </Button>
               </Flex>
@@ -261,7 +261,7 @@ export default function ResourcesPage() {
           {/* Loading State */}
           {loading && (
             <Flex className="justify-center py-12">
-              <Spinner size="lg" />
+              <Spinner />
             </Flex>
           )}
 
@@ -273,7 +273,7 @@ export default function ResourcesPage() {
                   <Text className="text-gray-500 text-lg">
                     No resources found matching your criteria.
                   </Text>
-                  <Button onClick={clearFilters} className="mt-4" variant="primary">
+                  <Button onClick={clearFilters} className="mt-4" rank="primary">
                     Clear Filters
                   </Button>
                 </Card>
@@ -336,7 +336,7 @@ export default function ResourcesPage() {
                             </Text>
                           )}
 
-                          <Text as="h3" className="font-semibold text-lg mb-2 line-clamp-2">
+                          <Text tag="h3" className="font-semibold text-lg mb-2 line-clamp-2">
                             {item.title}
                           </Text>
 
@@ -413,7 +413,7 @@ export default function ResourcesPage() {
               {totalPages > 1 && (
                 <Flex className="justify-center gap-2 mt-8">
                   <Button
-                    variant="secondary"
+                    rank="secondary"
                     disabled={page === 1}
                     onClick={() => setPage((p) => p - 1)}
                   >
@@ -426,7 +426,7 @@ export default function ResourcesPage() {
                       return (
                         <Button
                           key={pageNum}
-                          variant={page === pageNum ? 'primary' : 'ghost'}
+                          rank={page === pageNum ? 'primary' : 'tertiary'}
                           onClick={() => setPage(pageNum)}
                         >
                           {pageNum}
@@ -435,7 +435,7 @@ export default function ResourcesPage() {
                     })}
                   </Flex>
                   <Button
-                    variant="secondary"
+                    rank="secondary"
                     disabled={page === totalPages}
                     onClick={() => setPage((p) => p + 1)}
                   >

@@ -31,7 +31,7 @@ export class CategoryRepository {
     });
   }
 
-  async findWithChildren(id: string): Promise<Category & { children: Category[] } | null> {
+  async findWithChildren(id: string): Promise<(Category & { children: Category[] }) | null> {
     return prisma.category.findUnique({
       where: { id },
       include: {

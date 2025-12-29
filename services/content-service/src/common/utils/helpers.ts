@@ -28,11 +28,7 @@ export function calculateReadingTime(text: string): number {
 /**
  * Build pagination metadata
  */
-export function buildPaginationMeta(
-  total: number,
-  page: number,
-  limit: number
-): PaginationMeta {
+export function buildPaginationMeta(total: number, page: number, limit: number): PaginationMeta {
   const totalPages = Math.ceil(total / limit);
   return {
     total,
@@ -94,9 +90,7 @@ export function safeJsonParse<T>(json: string, fallback: T): T {
  * Remove undefined values from object
  */
 export function removeUndefined<T extends Record<string, unknown>>(obj: T): Partial<T> {
-  return Object.fromEntries(
-    Object.entries(obj).filter(([_, v]) => v !== undefined)
-  ) as Partial<T>;
+  return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== undefined)) as Partial<T>;
 }
 
 /**
