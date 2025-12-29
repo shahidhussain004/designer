@@ -206,7 +206,7 @@ Desktop.ini
 # General
 *.sublime-project
 *.sublime-workspace
-*.code-workspace
+designer.code-workspace
 
 # ============================================================================
 # Build Artifacts & Caches
