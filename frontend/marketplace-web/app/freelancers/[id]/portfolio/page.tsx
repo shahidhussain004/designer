@@ -124,7 +124,7 @@ export default function FreelancerPortfolioPage() {
               {freelancer.fullName?.charAt(0).toUpperCase()}
             </div>
             <Flex flex-direction="column" gap="s" style={{ flex: 1 }}>
-              <Text font-size="heading-l">{freelancer.fullName}'s Portfolio</Text>
+              <Text font-size="heading-l">{freelancer.fullName}&rsquo;s Portfolio</Text>
               <Text font-size="body-l" color="neutral-02">
                 @{freelancer.username}
               </Text>
@@ -152,7 +152,7 @@ export default function FreelancerPortfolioPage() {
             <Flex flex-direction="column" align-items="center" gap="m">
               <Text font-size="heading-s">No Portfolio Items</Text>
               <Text font-size="body-l" color="neutral-02">
-                This freelancer hasn't added any portfolio items yet
+                This freelancer has not added any portfolio items yet
               </Text>
             </Flex>
           </Card>
