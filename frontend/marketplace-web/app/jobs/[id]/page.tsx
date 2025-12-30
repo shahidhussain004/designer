@@ -179,7 +179,10 @@ export default function JobDetailsPage() {
         if (data.errors && Array.isArray(data.errors)) {
           const fe: typeof fieldErrors = {}
           data.errors.forEach((e: any) => {
-            if (e.field && e.message) fe[e.field] = e.message
+            if (e.field && e.message) {
+              const fieldKey = e.field as keyof typeof fieldErrors
+              fe[fieldKey] = e.message
+            }
           })
           setFieldErrors(fe)
           message = 'Please fix the highlighted fields'
