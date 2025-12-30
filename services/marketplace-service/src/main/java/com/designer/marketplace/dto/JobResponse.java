@@ -23,24 +23,16 @@ public class JobResponse {
     private String title;
     private String description;
     
-    // New structured category object
+    // Structured category object
     private JobCategoryResponse category;
-    
-    // Old category string - kept for backward compatibility
-    @Deprecated
-    private String categoryName;
     
     private String[] requiredSkills;
     private Double budget;
     private String budgetType;
     private Integer duration;
     
-    // New structured experience level object
+    // Structured experience level object
     private ExperienceLevelResponse experienceLevel;
-    
-    // Old experience level string - kept for backward compatibility
-    @Deprecated
-    private String experienceLevelName;
     
     private String status;
     private Boolean isFeatured;
@@ -93,18 +85,12 @@ public class JobResponse {
                 .client(clientInfo)
                 .title(job.getTitle())
                 .description(job.getDescription())
-                // New category object
                 .category(job.getJobCategory() != null ? JobCategoryResponse.fromEntity(job.getJobCategory()) : null)
-                // Old category string for backward compatibility
-                .categoryName(job.getCategory())
                 .requiredSkills(job.getRequiredSkills())
                 .budget(job.getBudget())
                 .budgetType(job.getBudgetType() != null ? job.getBudgetType().name() : null)
                 .duration(job.getDuration())
-                // New experience level object
                 .experienceLevel(job.getExperienceLevelEntity() != null ? ExperienceLevelResponse.fromEntity(job.getExperienceLevelEntity()) : null)
-                // Old experience level string for backward compatibility
-                .experienceLevelName(job.getExperienceLevel() != null ? job.getExperienceLevel().name() : null)
                 .status(job.getStatus() != null ? job.getStatus().name() : null)
                 .isFeatured(job.getIsFeatured())
                 .viewCount(job.getViewCount())

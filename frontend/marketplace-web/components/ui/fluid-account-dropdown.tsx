@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import { authService } from '@/lib/auth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { authService } from '@/lib/auth';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from './Button';
 
 export const FluidAccountDropdown = () => {
@@ -58,12 +58,12 @@ export const FluidAccountDropdown = () => {
   if (!user) {
     return (
       <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-        <Link href="/login">
+        <Link href="/auth/login">
           <Button variant="ghost" size="sm">
             Login
           </Button>
         </Link>
-        <Link href="/signup">
+        <Link href="/auth/register">
           <Button size="sm">
             Sign Up
           </Button>

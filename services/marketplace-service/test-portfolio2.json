@@ -1,0 +1,9 @@
+{
+  "title": "Mobile Banking App",
+  "description": "iOS and Android app redesign for major financial institution",
+  "imageUrl": "https://example.com/portfolio/banking-app.jpg",
+  "projectUrl": "https://example.com/project/banking-app",
+  "technologies": ["React Native", "TypeScript", "GraphQL", "Firebase"],
+  "isVisible": true,
+  "displayOrder": 2
+}

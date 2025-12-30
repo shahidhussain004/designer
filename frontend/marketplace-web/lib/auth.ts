@@ -82,12 +82,48 @@ export const authService = {
   },
 
   /**
-   * Check if user is authenticated
+   * Check if user is authenticated and token is valid
    */
   isAuthenticated(): boolean {
     if (typeof window !== 'undefined') {
-      return !!localStorage.getItem('access_token');
+      const token = localStorage.getItem('access_token');
+      if (!token) return false;
+      
+      // Try to decode JWT and check expiration
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const isExpired = payload.exp && payload.exp * 1000 < Date.now();
+        
+        if (isExpired) {
+          // Clear expired tokens
+          this.logout();
+          return false;
+        }
+        
+        return true;
+      } catch {
+        // If token is malformed, clear it
+        this.logout();
+        return false;
+      }
     }
     return false;
+  },
+
+  /**
+   * Verify token with backend
+   */
+  async verifyToken(): Promise<boolean> {
+    if (!this.isAuthenticated()) return false;
+    
+    try {
+      // Try to fetch current user profile to verify token
+      await apiClient.get('/users/me');
+      return true;
+    } catch (error) {
+      // Token is invalid, clear it
+      this.logout();
+      return false;
+    }
   },
 };

@@ -1,18 +1,27 @@
 package com.designer.marketplace.kafka;
 
-import com.designer.marketplace.entity.Job;
-import com.designer.marketplace.entity.Payment;
-import com.designer.marketplace.entity.Proposal;
-import com.designer.marketplace.entity.User;
-import com.designer.marketplace.kafka.events.*;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
+
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.concurrent.CompletableFuture;
+import com.designer.marketplace.entity.Job;
+import com.designer.marketplace.entity.Payment;
+import com.designer.marketplace.entity.Proposal;
+import com.designer.marketplace.entity.User;
+import com.designer.marketplace.kafka.events.CertificateEventPayload;
+import com.designer.marketplace.kafka.events.ContractEventPayload;
+import com.designer.marketplace.kafka.events.CourseEventPayload;
+import com.designer.marketplace.kafka.events.JobEventPayload;
+import com.designer.marketplace.kafka.events.MessageEventPayload;
+import com.designer.marketplace.kafka.events.PaymentEventPayload;
+import com.designer.marketplace.kafka.events.ProposalEventPayload;
+import com.designer.marketplace.kafka.events.UserEventPayload;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Kafka producer service for publishing events to various topics.
@@ -35,13 +44,15 @@ public class KafkaProducerService {
                 .description(job.getDescription())
                 .clientId(client.getId())
                 .clientName(client.getFullName())
-                .category(job.getCategory())
+                .categoryId(job.getJobCategory() != null ? job.getJobCategory().getId() : null)
+                .categoryName(job.getJobCategory() != null ? job.getJobCategory().getName() : null)
                 .budget(job.getBudget())
                 .budgetType(job.getBudgetType() != null ? job.getBudgetType().name() : null)
                 .status(job.getStatus() != null ? job.getStatus().name() : null)
                 .requiredSkills(job.getRequiredSkills() != null ? Arrays.asList(job.getRequiredSkills()) : null)
                 .duration(job.getDuration())
-                .experienceLevel(job.getExperienceLevel() != null ? job.getExperienceLevel().name() : null)
+                .experienceLevelId(job.getExperienceLevelEntity() != null ? job.getExperienceLevelEntity().getId() : null)
+                .experienceLevelName(job.getExperienceLevelEntity() != null ? job.getExperienceLevelEntity().getName() : null)
                 .build();
 
         publishEvent(KafkaTopics.JOBS_POSTED, job.getId().toString(),

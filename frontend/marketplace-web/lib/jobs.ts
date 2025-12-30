@@ -1,7 +1,11 @@
 export type JobItem = {
   id: string;
   title?: string;
-  category?: string | null;
+  category?: {
+    id: number;
+    name: string;
+    slug?: string;
+  } | null;
   budget?: number | null;
 };
 
@@ -11,11 +15,6 @@ export type JobsResponse = {
   page: number;
   size: number;
 };
-
-function normalizeCategory(cat?: string | null) {
-  if (!cat) return null;
-  return cat.trim().toUpperCase().replace(/\s+/g, '_');
-}
 
 export async function getJobs(opts?: { page?: number; size?: number }): Promise<JobsResponse> {
   const page = (opts && typeof opts.page === 'number') ? opts.page : 0;
@@ -28,11 +27,16 @@ export async function getJobs(opts?: { page?: number; size?: number }): Promise<
     if (!res.ok) return { jobs: [], totalCount: 0, page, size };
     const json = await res.json();
     const items = Array.isArray(json.items) ? json.items : [];
-    type ApiJob = { id: string; title?: string; category?: string | null; budget?: number | null };
+    type ApiJob = { 
+      id: string; 
+      title?: string; 
+      category?: { id: number; name: string; slug?: string } | null; 
+      budget?: number | null 
+    };
     const jobs = (items as ApiJob[]).map((i) => ({
         id: i.id,
         title: i.title,
-        category: normalizeCategory(i.category),
+        category: i.category || null,
         budget: i.budget ?? null,
       }));
     return { jobs, totalCount: json.totalCount ?? jobs.length, page, size };

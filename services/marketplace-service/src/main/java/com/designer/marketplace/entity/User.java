@@ -90,6 +90,41 @@ public class User {
     @Column(name = "rating_count", nullable = false)
     private Integer ratingCount = 0;
 
+    // Enhanced profile fields from V11 migration
+    @Column(name = "github_url", length = 500)
+    private String githubUrl;
+
+    @Column(name = "linkedin_url", length = 500)
+    private String linkedinUrl;
+
+    @Column(columnDefinition = "TEXT[]")
+    private String[] certifications;
+
+    @Column(columnDefinition = "TEXT[]")
+    private String[] languages;
+
+    @Column(name = "experience_years")
+    private Integer experienceYears;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "verification_status", length = 20)
+    private VerificationStatus verificationStatus = VerificationStatus.UNVERIFIED;
+
+    @Column(name = "identity_verified", nullable = false)
+    private Boolean identityVerified = false;
+
+    @Column(name = "identity_verified_at")
+    private LocalDateTime identityVerifiedAt;
+
+    @Column(name = "completion_rate", columnDefinition = "NUMERIC(5,2)")
+    private Double completionRate = 100.0;
+
+    @Column(name = "response_time_hours", columnDefinition = "NUMERIC(5,1)")
+    private Double responseTimeHours;
+
+    @Column(name = "response_rate", columnDefinition = "NUMERIC(5,2)")
+    private Double responseRate;
+
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -97,6 +132,10 @@ public class User {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    public enum VerificationStatus {
+        UNVERIFIED, PENDING, VERIFIED, REJECTED
+    }
 
     public enum UserRole {
         CLIENT,
@@ -120,7 +159,10 @@ public class User {
                 UserRole role, String bio, String profileImageUrl, String location, String phone,
                 Double hourlyRate, String[] skills, String portfolioUrl, String stripeCustomerId,
                 String stripeAccountId, Boolean emailVerified, Boolean isActive, Double ratingAvg,
-                Integer ratingCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
+                Integer ratingCount, String githubUrl, String linkedinUrl, String[] certifications,
+                String[] languages, Integer experienceYears, VerificationStatus verificationStatus,
+                Boolean identityVerified, LocalDateTime identityVerifiedAt, Double completionRate,
+                Double responseTimeHours, Double responseRate, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.email = email;
         this.username = username;
@@ -140,6 +182,17 @@ public class User {
         this.isActive = isActive;
         this.ratingAvg = ratingAvg;
         this.ratingCount = ratingCount;
+        this.githubUrl = githubUrl;
+        this.linkedinUrl = linkedinUrl;
+        this.certifications = certifications;
+        this.languages = languages;
+        this.experienceYears = experienceYears;
+        this.verificationStatus = verificationStatus;
+        this.identityVerified = identityVerified;
+        this.identityVerifiedAt = identityVerifiedAt;
+        this.completionRate = completionRate;
+        this.responseTimeHours = responseTimeHours;
+        this.responseRate = responseRate;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -164,6 +217,17 @@ public class User {
     public Boolean getIsActive() { return isActive; }
     public Double getRatingAvg() { return ratingAvg; }
     public Integer getRatingCount() { return ratingCount; }
+    public String getGithubUrl() { return githubUrl; }
+    public String getLinkedinUrl() { return linkedinUrl; }
+    public String[] getCertifications() { return certifications; }
+    public String[] getLanguages() { return languages; }
+    public Integer getExperienceYears() { return experienceYears; }
+    public VerificationStatus getVerificationStatus() { return verificationStatus; }
+    public Boolean getIdentityVerified() { return identityVerified; }
+    public LocalDateTime getIdentityVerifiedAt() { return identityVerifiedAt; }
+    public Double getCompletionRate() { return completionRate; }
+    public Double getResponseTimeHours() { return responseTimeHours; }
+    public Double getResponseRate() { return responseRate; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
 
@@ -187,6 +251,17 @@ public class User {
     public void setIsActive(Boolean isActive) { this.isActive = isActive; }
     public void setRatingAvg(Double ratingAvg) { this.ratingAvg = ratingAvg; }
     public void setRatingCount(Integer ratingCount) { this.ratingCount = ratingCount; }
+    public void setGithubUrl(String githubUrl) { this.githubUrl = githubUrl; }
+    public void setLinkedinUrl(String linkedinUrl) { this.linkedinUrl = linkedinUrl; }
+    public void setCertifications(String[] certifications) { this.certifications = certifications; }
+    public void setLanguages(String[] languages) { this.languages = languages; }
+    public void setExperienceYears(Integer experienceYears) { this.experienceYears = experienceYears; }
+    public void setVerificationStatus(VerificationStatus verificationStatus) { this.verificationStatus = verificationStatus; }
+    public void setIdentityVerified(Boolean identityVerified) { this.identityVerified = identityVerified; }
+    public void setIdentityVerifiedAt(LocalDateTime identityVerifiedAt) { this.identityVerifiedAt = identityVerifiedAt; }
+    public void setCompletionRate(Double completionRate) { this.completionRate = completionRate; }
+    public void setResponseTimeHours(Double responseTimeHours) { this.responseTimeHours = responseTimeHours; }
+    public void setResponseRate(Double responseRate) { this.responseRate = responseRate; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 
