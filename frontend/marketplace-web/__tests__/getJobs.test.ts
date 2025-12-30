@@ -13,10 +13,15 @@ describe('getJobs adapter', () => {
     (global.fetch as jest.MockedFunction<typeof fetch>).mockReset();
   });
 
-  it('transforms LMS job items and normalizes category tokens', async () => {
+  it('transforms API job items with category object', async () => {
     const apiResponse = {
       items: [
-        { id: 'j1', title: 'Design Logo', category: 'web design', budget: 100 }
+        { 
+          id: 'j1', 
+          title: 'Design Logo', 
+          category: { id: 1, name: 'Web Design', slug: 'web-design' }, 
+          budget: 100 
+        }
       ],
       totalCount: 1,
       page: 1,
@@ -30,8 +35,7 @@ describe('getJobs adapter', () => {
     expect(result).toHaveProperty('jobs');
     expect(Array.isArray(result.jobs)).toBe(true);
     expect(result.jobs.length).toBe(1);
-    // Category normalization expected to be uppercase with underscores
-    expect(result.jobs[0].category).toBe('WEB_DESIGN');
+    expect(result.jobs[0].category).toEqual({ id: 1, name: 'Web Design', slug: 'web-design' });
     expect(result.totalCount).toBe(1);
     expect(result.page).toBe(0);
     expect(result.size).toBe(10);

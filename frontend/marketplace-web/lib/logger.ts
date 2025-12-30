@@ -51,6 +51,23 @@ class Logger {
   }
 
   /**
+   * Safely stringify data for logging (avoids throwing on circular structures)
+   */
+  private safeStringify(value: unknown, maxLen = 200): string | undefined {
+    if (value === undefined || value === null) return undefined;
+    try {
+      const str = typeof value === 'string' ? value : JSON.stringify(value);
+      return str.length > maxLen ? str.substring(0, maxLen) : str;
+    } catch (e) {
+      try {
+        return String(value).substring(0, maxLen);
+      } catch {
+        return '[unserializable]';
+      }
+    }
+  }
+
+  /**
    * Create formatted log entry
    */
   private createLogEntry(
@@ -99,26 +116,54 @@ class Logger {
   ) {
     if (!this.enableConsole) return;
 
-    const timestamp = this.getTimestamp();
-    const color = this.getColor(level);
-    const emoji = {
-      debug: '🔍',
-      info: 'ℹ️',
-      warn: '⚠️',
-      error: '❌',
-    }[level];
+    // Protect logging from throwing (e.g., circular structures, console issues)
+    try {
+      const timestamp = this.getTimestamp();
+      const color = this.getColor(level);
+      const emoji = {
+        debug: '🔍',
+        info: 'ℹ️',
+        warn: '⚠️',
+        error: '❌',
+      }[level];
 
-    const prefix = `%c${emoji} [${level.toUpperCase()}] ${timestamp}`;
-    const style = `color: ${color}; font-weight: bold;`;
+      const prefix = `%c${emoji} [${level.toUpperCase()}] ${timestamp}`;
+      const style = `color: ${color}; font-weight: bold;`;
 
-    if (level === 'error' && error) {
-      console.error(prefix, style, message, context || '', error);
-    } else if (level === 'warn') {
-      console.warn(prefix, style, message, context || '');
-    } else if (level === 'debug' && this.isDevelopment) {
-      console.debug(prefix, style, message, context || '');
-    } else if (level === 'info') {
-      console.info(prefix, style, message, context || '');
+      // Provide a safe, short string for context when available
+      const safeContext = context ? this.safeStringify(context, 500) : '';
+
+      // Build a single safe output string to avoid console formatting issues
+      const safeErrorString = error ? `${error.name}: ${error.message}\n${error.stack || ''}` : '';
+      const output = `${emoji} [${level.toUpperCase()}] ${timestamp} - ${message} ${safeContext || ''} ${safeErrorString}`;
+
+      try {
+        if (level === 'error') {
+          if (typeof console !== 'undefined' && console.error) console.error(output);
+        } else if (level === 'warn') {
+          if (typeof console !== 'undefined' && console.warn) console.warn(output);
+        } else if (level === 'debug' && this.isDevelopment) {
+          if (typeof console !== 'undefined' && console.debug) console.debug(output);
+        } else if (level === 'info') {
+          if (typeof console !== 'undefined' && console.info) console.info(output);
+        }
+      } catch (e) {
+        // If console methods themselves throw, fallback to basic console.log when available
+        try {
+          if (typeof console !== 'undefined' && console.log) console.log(output);
+        } catch {
+          // ignore
+        }
+      }
+    } catch (e) {
+      // Swallow logging errors to avoid impacting application flow
+      try {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Logger output failed:', e);
+        }
+      } catch {
+        // final fallback: nothing we can do
+      }
     }
   }
 
@@ -173,7 +218,7 @@ class Logger {
       action: 'request',
       method,
       url,
-      data: data ? JSON.stringify(data).substring(0, 200) : undefined,
+      data: this.safeStringify(data, 200),
     });
   }
 
@@ -263,4 +308,5 @@ const logger = new Logger();
 export default logger;
 
 // Export class for testing or custom instances
-export { Logger, type LogLevel, type LogContext };
+export { Logger, type LogContext, type LogLevel };
+

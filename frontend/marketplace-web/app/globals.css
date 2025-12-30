@@ -289,6 +289,17 @@
     @apply disabled:bg-secondary-50 disabled:text-secondary-500 disabled:cursor-not-allowed;
   }
 
+  /* Ensure plain textarea elements get consistent input styles as a fallback */
+  textarea {
+    @apply w-full px-4 py-3 rounded-lg border border-secondary-300;
+    @apply bg-white text-secondary-900 placeholder:text-secondary-400;
+    @apply transition-all duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
+    @apply hover:border-secondary-400;
+    @apply disabled:bg-secondary-50 disabled:text-secondary-500 disabled:cursor-not-allowed;
+    @apply min-h-[120px] resize-y;
+  }
+
   /* Card base styles */
   .card {
     @apply bg-white rounded-xl border border-secondary-200 shadow-sm;

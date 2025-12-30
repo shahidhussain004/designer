@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Notification {
   id: string;
@@ -293,6 +293,7 @@ export const FluidNotificationsDropdown = () => {
               }}
               onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
               onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
+              onClick={() => { window.location.href = '/notifications' }}
             >
               View all notifications
             </button>

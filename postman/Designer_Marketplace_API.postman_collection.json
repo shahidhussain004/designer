@@ -25,8 +25,13 @@
             },
             "url": {
               "raw": "{{marketplaceUrl}}/auth/register",
-              "host": ["{{marketplaceUrl}}"],
-              "path": ["auth", "register"]
+              "host": [
+                "{{marketplaceUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
             }
           },
           "response": []
@@ -47,8 +52,13 @@
             },
             "url": {
               "raw": "{{marketplaceUrl}}/auth/register",
-              "host": ["{{marketplaceUrl}}"],
-              "path": ["auth", "register"]
+              "host": [
+                "{{marketplaceUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
             }
           },
           "response": []
@@ -85,8 +95,13 @@
             },
             "url": {
               "raw": "{{marketplaceUrl}}/auth/login",
-              "host": ["{{marketplaceUrl}}"],
-              "path": ["auth", "login"]
+              "host": [
+                "{{marketplaceUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
             }
           },
           "response": []
@@ -107,8 +122,13 @@
             },
             "url": {
               "raw": "{{marketplaceUrl}}/auth/refresh",
-              "host": ["{{marketplaceUrl}}"],
-              "path": ["auth", "refresh"]
+              "host": [
+                "{{marketplaceUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
             }
           },
           "response": []
@@ -135,8 +155,13 @@
             "header": [],
             "url": {
               "raw": "{{marketplaceUrl}}/users/me",
-              "host": ["{{marketplaceUrl}}"],
-              "path": ["users", "me"]
+              "host": [
+                "{{marketplaceUrl}}"
+              ],
+              "path": [
+                "users",
+                "me"
+              ]
             }
           },
           "response": []
@@ -148,8 +173,13 @@
             "header": [],
             "url": {
               "raw": "{{marketplaceUrl}}/users/1",
-              "host": ["{{marketplaceUrl}}"],
-              "path": ["users", "1"]
+              "host": [
+                "{{marketplaceUrl}}"
+              ],
+              "path": [
+                "users",
+                "1"
+              ]
             }
           },
           "response": []
@@ -161,8 +191,14 @@
             "header": [],
             "url": {
               "raw": "{{marketplaceUrl}}/users/1/profile",
-              "host": ["{{marketplaceUrl}}"],
-              "path": ["users", "1", "profile"]
+              "host": [
+                "{{marketplaceUrl}}"
+              ],
+              "path": [
+                "users",
+                "1",
+                "profile"
+              ]
             }
           },
           "response": []
@@ -193,8 +229,13 @@
             },
             "url": {
               "raw": "{{marketplaceUrl}}/users/me",
-              "host": ["{{marketplaceUrl}}"],
-              "path": ["users", "me"]
+              "host": [
+                "{{marketplaceUrl}}"
+              ],
+              "path": [
+                "users",
+                "me"
+              ]
             }
           },
           "response": []
@@ -206,15 +247,19 @@
             "header": [],
             "url": {
               "raw": "{{marketplaceUrl}}/users",
-              "host": ["{{marketplaceUrl}}"],
-              "path": ["users"]
+              "host": [
+                "{{marketplaceUrl}}"
+              ],
+              "path": [
+                "users"
+              ]
             }
           },
           "response": []
         }
       ]
     },
-    {
+        {
       "name": "Marketplace - Jobs",
       "item": [
         {
@@ -224,8 +269,12 @@
             "header": [],
             "url": {
               "raw": "{{marketplaceUrl}}/jobs",
-              "host": ["{{marketplaceUrl}}"],
-              "path": ["jobs"]
+              "host": [
+                "{{marketplaceUrl}}"
+              ],
+              "path": [
+                "jobs"
+              ]
             }
           },
           "response": []
@@ -237,8 +286,12 @@
             "header": [],
             "url": {
               "raw": "{{marketplaceUrl}}/jobs?category=WEB_DESIGN&minBudget=1000&maxBudget=5000&experienceLevel=INTERMEDIATE",
-              "host": ["{{marketplaceUrl}}"],
-              "path": ["jobs"],
+              "host": [
+                "{{marketplaceUrl}}"
+              ],
+              "path": [
+                "jobs"
+              ],
               "query": [
                 {
                   "key": "category",
@@ -268,8 +321,13 @@
             "header": [],
             "url": {
               "raw": "{{marketplaceUrl}}/jobs/1",
-              "host": ["{{marketplaceUrl}}"],
-              "path": ["jobs", "1"]
+              "host": [
+                "{{marketplaceUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "1"
+              ]
             }
           },
           "response": []
@@ -314,8 +372,12 @@
             },
             "url": {
               "raw": "{{marketplaceUrl}}/jobs",
-              "host": ["{{marketplaceUrl}}"],
-              "path": ["jobs"]
+              "host": [
+                "{{marketplaceUrl}}"
+              ],
+              "path": [
+                "jobs"
+              ]
             }
           },
           "response": []
@@ -346,8 +408,13 @@
             },
             "url": {
               "raw": "{{marketplaceUrl}}/jobs/{{jobId}}",
-              "host": ["{{marketplaceUrl}}"],
-              "path": ["jobs", "{{jobId}}"]
+              "host": [
+                "{{marketplaceUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "{{jobId}}"
+              ]
             }
           },
           "response": []
@@ -369,8 +436,13 @@
             "header": [],
             "url": {
               "raw": "{{marketplaceUrl}}/jobs/{{jobId}}",
-              "host": ["{{marketplaceUrl}}"],
-              "path": ["jobs", "{{jobId}}"]
+              "host": [
+                "{{marketplaceUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "{{jobId}}"
+              ]
             }
           },
           "response": []
@@ -392,8 +464,13 @@
             "header": [],
             "url": {
               "raw": "{{marketplaceUrl}}/jobs/my-jobs",
-              "host": ["{{marketplaceUrl}}"],
-              "path": ["jobs", "my-jobs"]
+              "host": [
+                "{{marketplaceUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "my-jobs"
+              ]
             }
           },
           "response": []
@@ -443,8 +520,12 @@
             },
             "url": {
               "raw": "{{marketplaceUrl}}/proposals",
-              "host": ["{{marketplaceUrl}}"],
-              "path": ["proposals"]
+              "host": [
+                "{{marketplaceUrl}}"
+              ],
+              "path": [
+                "proposals"
+              ]
             }
           },
           "response": []
@@ -466,8 +547,14 @@
             "header": [],
             "url": {
               "raw": "{{marketplaceUrl}}/jobs/{{jobId}}/proposals",
-              "host": ["{{marketplaceUrl}}"],
-              "path": ["jobs", "{{jobId}}", "proposals"]
+              "host": [
+                "{{marketplaceUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "{{jobId}}",
+                "proposals"
+              ]
             }
           },
           "response": []
@@ -489,8 +576,13 @@
             "header": [],
             "url": {
               "raw": "{{marketplaceUrl}}/proposals/my-proposals",
-              "host": ["{{marketplaceUrl}}"],
-              "path": ["proposals", "my-proposals"]
+              "host": [
+                "{{marketplaceUrl}}"
+              ],
+              "path": [
+                "proposals",
+                "my-proposals"
+              ]
             }
           },
           "response": []
@@ -512,8 +604,13 @@
             "header": [],
             "url": {
               "raw": "{{marketplaceUrl}}/proposals/{{proposalId}}",
-              "host": ["{{marketplaceUrl}}"],
-              "path": ["proposals", "{{proposalId}}"]
+              "host": [
+                "{{marketplaceUrl}}"
+              ],
+              "path": [
+                "proposals",
+                "{{proposalId}}"
+              ]
             }
           },
           "response": []
@@ -544,8 +641,14 @@
             },
             "url": {
               "raw": "{{marketplaceUrl}}/proposals/{{proposalId}}/accept",
-              "host": ["{{marketplaceUrl}}"],
-              "path": ["proposals", "{{proposalId}}", "accept"]
+              "host": [
+                "{{marketplaceUrl}}"
+              ],
+              "path": [
+                "proposals",
+                "{{proposalId}}",
+                "accept"
+              ]
             }
           },
           "response": []
@@ -571,8 +674,14 @@
             },
             "url": {
               "raw": "{{marketplaceUrl}}/proposals/{{proposalId}}/reject",
-              "host": ["{{marketplaceUrl}}"],
-              "path": ["proposals", "{{proposalId}}", "reject"]
+              "host": [
+                "{{marketplaceUrl}}"
+              ],
+              "path": [
+                "proposals",
+                "{{proposalId}}",
+                "reject"
+              ]
             }
           },
           "response": []
@@ -598,15 +707,21 @@
             },
             "url": {
               "raw": "{{marketplaceUrl}}/proposals/{{proposalId}}/withdraw",
-              "host": ["{{marketplaceUrl}}"],
-              "path": ["proposals", "{{proposalId}}", "withdraw"]
+              "host": [
+                "{{marketplaceUrl}}"
+              ],
+              "path": [
+                "proposals",
+                "{{proposalId}}",
+                "withdraw"
+              ]
             }
           },
           "response": []
         }
       ]
     },
-    {
+        {
       "name": "Marketplace - Dashboard",
       "item": [
         {
@@ -626,8 +741,13 @@
             "header": [],
             "url": {
               "raw": "{{marketplaceUrl}}/dashboard/client",
-              "host": ["{{marketplaceUrl}}"],
-              "path": ["dashboard", "client"]
+              "host": [
+                "{{marketplaceUrl}}"
+              ],
+              "path": [
+                "dashboard",
+                "client"
+              ]
             }
           },
           "response": []
@@ -649,8 +769,13 @@
             "header": [],
             "url": {
               "raw": "{{marketplaceUrl}}/dashboard/freelancer",
-              "host": ["{{marketplaceUrl}}"],
-              "path": ["dashboard", "freelancer"]
+              "host": [
+                "{{marketplaceUrl}}"
+              ],
+              "path": [
+                "dashboard",
+                "freelancer"
+              ]
             }
           },
           "response": []
@@ -667,8 +792,12 @@
             "header": [],
             "url": {
               "raw": "{{lmsUrl}}/courses",
-              "host": ["{{lmsUrl}}"],
-              "path": ["courses"]
+              "host": [
+                "{{lmsUrl}}"
+              ],
+              "path": [
+                "courses"
+              ]
             }
           },
           "response": []
@@ -680,8 +809,12 @@
             "header": [],
             "url": {
               "raw": "{{lmsUrl}}/courses?search=design&category=WEB_DESIGN&level=BEGINNER&page=1&pageSize=20",
-              "host": ["{{lmsUrl}}"],
-              "path": ["courses"],
+              "host": [
+                "{{lmsUrl}}"
+              ],
+              "path": [
+                "courses"
+              ],
               "query": [
                 {
                   "key": "search",
@@ -715,8 +848,13 @@
             "header": [],
             "url": {
               "raw": "{{lmsUrl}}/courses/1",
-              "host": ["{{lmsUrl}}"],
-              "path": ["courses", "1"]
+              "host": [
+                "{{lmsUrl}}"
+              ],
+              "path": [
+                "courses",
+                "1"
+              ]
             }
           },
           "response": []
@@ -728,8 +866,14 @@
             "header": [],
             "url": {
               "raw": "{{lmsUrl}}/courses/slug/web-design-basics",
-              "host": ["{{lmsUrl}}"],
-              "path": ["courses", "slug", "web-design-basics"]
+              "host": [
+                "{{lmsUrl}}"
+              ],
+              "path": [
+                "courses",
+                "slug",
+                "web-design-basics"
+              ]
             }
           },
           "response": []
@@ -741,8 +885,13 @@
             "header": [],
             "url": {
               "raw": "{{lmsUrl}}/courses/popular?page=0&size=10",
-              "host": ["{{lmsUrl}}"],
-              "path": ["courses", "popular"],
+              "host": [
+                "{{lmsUrl}}"
+              ],
+              "path": [
+                "courses",
+                "popular"
+              ],
               "query": [
                 {
                   "key": "page",
@@ -764,8 +913,13 @@
             "header": [],
             "url": {
               "raw": "{{lmsUrl}}/courses/top-rated?page=0&size=10",
-              "host": ["{{lmsUrl}}"],
-              "path": ["courses", "top-rated"],
+              "host": [
+                "{{lmsUrl}}"
+              ],
+              "path": [
+                "courses",
+                "top-rated"
+              ],
               "query": [
                 {
                   "key": "page",
@@ -787,8 +941,13 @@
             "header": [],
             "url": {
               "raw": "{{lmsUrl}}/courses/newest?page=0&size=10",
-              "host": ["{{lmsUrl}}"],
-              "path": ["courses", "newest"],
+              "host": [
+                "{{lmsUrl}}"
+              ],
+              "path": [
+                "courses",
+                "newest"
+              ],
               "query": [
                 {
                   "key": "page",
@@ -829,8 +988,13 @@
             },
             "url": {
               "raw": "{{lmsUrl}}/instructor/courses",
-              "host": ["{{lmsUrl}}"],
-              "path": ["instructor", "courses"]
+              "host": [
+                "{{lmsUrl}}"
+              ],
+              "path": [
+                "instructor",
+                "courses"
+              ]
             }
           },
           "response": []
@@ -861,8 +1025,14 @@
             },
             "url": {
               "raw": "{{lmsUrl}}/instructor/courses/1",
-              "host": ["{{lmsUrl}}"],
-              "path": ["instructor", "courses", "1"]
+              "host": [
+                "{{lmsUrl}}"
+              ],
+              "path": [
+                "instructor",
+                "courses",
+                "1"
+              ]
             }
           },
           "response": []
@@ -884,8 +1054,13 @@
             "header": [],
             "url": {
               "raw": "{{lmsUrl}}/instructor/courses",
-              "host": ["{{lmsUrl}}"],
-              "path": ["instructor", "courses"]
+              "host": [
+                "{{lmsUrl}}"
+              ],
+              "path": [
+                "instructor",
+                "courses"
+              ]
             }
           },
           "response": []
@@ -907,8 +1082,15 @@
             "header": [],
             "url": {
               "raw": "{{lmsUrl}}/instructor/courses/1/publish",
-              "host": ["{{lmsUrl}}"],
-              "path": ["instructor", "courses", "1", "publish"]
+              "host": [
+                "{{lmsUrl}}"
+              ],
+              "path": [
+                "instructor",
+                "courses",
+                "1",
+                "publish"
+              ]
             }
           },
           "response": []
@@ -930,8 +1112,15 @@
             "header": [],
             "url": {
               "raw": "{{lmsUrl}}/instructor/courses/1/archive",
-              "host": ["{{lmsUrl}}"],
-              "path": ["instructor", "courses", "1", "archive"]
+              "host": [
+                "{{lmsUrl}}"
+              ],
+              "path": [
+                "instructor",
+                "courses",
+                "1",
+                "archive"
+              ]
             }
           },
           "response": []
@@ -953,8 +1142,14 @@
             "header": [],
             "url": {
               "raw": "{{lmsUrl}}/instructor/courses/1",
-              "host": ["{{lmsUrl}}"],
-              "path": ["instructor", "courses", "1"]
+              "host": [
+                "{{lmsUrl}}"
+              ],
+              "path": [
+                "instructor",
+                "courses",
+                "1"
+              ]
             }
           },
           "response": []
@@ -981,8 +1176,14 @@
             "header": [],
             "url": {
               "raw": "{{lmsUrl}}/courses/1/enroll",
-              "host": ["{{lmsUrl}}"],
-              "path": ["courses", "1", "enroll"]
+              "host": [
+                "{{lmsUrl}}"
+              ],
+              "path": [
+                "courses",
+                "1",
+                "enroll"
+              ]
             }
           },
           "response": []
@@ -1004,8 +1205,12 @@
             "header": [],
             "url": {
               "raw": "{{lmsUrl}}/my-learning",
-              "host": ["{{lmsUrl}}"],
-              "path": ["my-learning"]
+              "host": [
+                "{{lmsUrl}}"
+              ],
+              "path": [
+                "my-learning"
+              ]
             }
           },
           "response": []
@@ -1027,8 +1232,13 @@
             "header": [],
             "url": {
               "raw": "{{lmsUrl}}/enrollments/1",
-              "host": ["{{lmsUrl}}"],
-              "path": ["enrollments", "1"]
+              "host": [
+                "{{lmsUrl}}"
+              ],
+              "path": [
+                "enrollments",
+                "1"
+              ]
             }
           },
           "response": []
@@ -1051,9 +1261,15 @@
             "url": {
               "raw": "ws://localhost:8082/api/v1/ws",
               "protocol": "ws",
-              "host": ["localhost"],
+              "host": [
+                "localhost"
+              ],
               "port": "8082",
-              "path": ["api", "v1", "ws"]
+              "path": [
+                "api",
+                "v1",
+                "ws"
+              ]
             }
           },
           "response": []
@@ -1075,8 +1291,13 @@
             "header": [],
             "url": {
               "raw": "{{messagingUrl}}/messages/threads",
-              "host": ["{{messagingUrl}}"],
-              "path": ["messages", "threads"]
+              "host": [
+                "{{messagingUrl}}"
+              ],
+              "path": [
+                "messages",
+                "threads"
+              ]
             }
           },
           "response": []
@@ -1098,8 +1319,14 @@
             "header": [],
             "url": {
               "raw": "{{messagingUrl}}/messages/threads/1",
-              "host": ["{{messagingUrl}}"],
-              "path": ["messages", "threads", "1"]
+              "host": [
+                "{{messagingUrl}}"
+              ],
+              "path": [
+                "messages",
+                "threads",
+                "1"
+              ]
             }
           },
           "response": []
@@ -1121,8 +1348,15 @@
             "header": [],
             "url": {
               "raw": "{{messagingUrl}}/messages/threads/1/messages",
-              "host": ["{{messagingUrl}}"],
-              "path": ["messages", "threads", "1", "messages"]
+              "host": [
+                "{{messagingUrl}}"
+              ],
+              "path": [
+                "messages",
+                "threads",
+                "1",
+                "messages"
+              ]
             }
           },
           "response": []
@@ -1153,8 +1387,13 @@
             },
             "url": {
               "raw": "{{messagingUrl}}/messages/threads",
-              "host": ["{{messagingUrl}}"],
-              "path": ["messages", "threads"]
+              "host": [
+                "{{messagingUrl}}"
+              ],
+              "path": [
+                "messages",
+                "threads"
+              ]
             }
           },
           "response": []
@@ -1185,8 +1424,15 @@
             },
             "url": {
               "raw": "{{messagingUrl}}/messages/threads/1/messages",
-              "host": ["{{messagingUrl}}"],
-              "path": ["messages", "threads", "1", "messages"]
+              "host": [
+                "{{messagingUrl}}"
+              ],
+              "path": [
+                "messages",
+                "threads",
+                "1",
+                "messages"
+              ]
             }
           },
           "response": []
@@ -1208,8 +1454,13 @@
             "header": [],
             "url": {
               "raw": "{{messagingUrl}}/presence/online",
-              "host": ["{{messagingUrl}}"],
-              "path": ["presence", "online"]
+              "host": [
+                "{{messagingUrl}}"
+              ],
+              "path": [
+                "presence",
+                "online"
+              ]
             }
           },
           "response": []
@@ -1231,8 +1482,14 @@
             "header": [],
             "url": {
               "raw": "{{messagingUrl}}/presence/user/{{userId}}",
-              "host": ["{{messagingUrl}}"],
-              "path": ["presence", "user", "{{userId}}"]
+              "host": [
+                "{{messagingUrl}}"
+              ],
+              "path": [
+                "presence",
+                "user",
+                "{{userId}}"
+              ]
             }
           },
           "response": []
@@ -1254,8 +1511,12 @@
             "header": [],
             "url": {
               "raw": "{{messagingUrl}}/notifications",
-              "host": ["{{messagingUrl}}"],
-              "path": ["notifications"]
+              "host": [
+                "{{messagingUrl}}"
+              ],
+              "path": [
+                "notifications"
+              ]
             }
           },
           "response": []
@@ -1277,8 +1538,14 @@
             "header": [],
             "url": {
               "raw": "{{messagingUrl}}/notifications/1/read",
-              "host": ["{{messagingUrl}}"],
-              "path": ["notifications", "1", "read"]
+              "host": [
+                "{{messagingUrl}}"
+              ],
+              "path": [
+                "notifications",
+                "1",
+                "read"
+              ]
             }
           },
           "response": []
@@ -1300,8 +1567,13 @@
             "header": [],
             "url": {
               "raw": "{{messagingUrl}}/notifications/read-all",
-              "host": ["{{messagingUrl}}"],
-              "path": ["notifications", "read-all"]
+              "host": [
+                "{{messagingUrl}}"
+              ],
+              "path": [
+                "notifications",
+                "read-all"
+              ]
             }
           },
           "response": []
@@ -1318,8 +1590,12 @@
             "header": [],
             "url": {
               "raw": "{{contentUrl}}/search?q=design&type=article&category=web",
-              "host": ["{{contentUrl}}"],
-              "path": ["search"],
+              "host": [
+                "{{contentUrl}}"
+              ],
+              "path": [
+                "search"
+              ],
               "query": [
                 {
                   "key": "q",
@@ -1345,8 +1621,13 @@
             "header": [],
             "url": {
               "raw": "{{contentUrl}}/content/1",
-              "host": ["{{contentUrl}}"],
-              "path": ["content", "1"]
+              "host": [
+                "{{contentUrl}}"
+              ],
+              "path": [
+                "content",
+                "1"
+              ]
             }
           },
           "response": []
@@ -1377,8 +1658,12 @@
             },
             "url": {
               "raw": "{{contentUrl}}/content",
-              "host": ["{{contentUrl}}"],
-              "path": ["content"]
+              "host": [
+                "{{contentUrl}}"
+              ],
+              "path": [
+                "content"
+              ]
             }
           },
           "response": []
@@ -1409,8 +1694,13 @@
             },
             "url": {
               "raw": "{{contentUrl}}/content/1",
-              "host": ["{{contentUrl}}"],
-              "path": ["content", "1"]
+              "host": [
+                "{{contentUrl}}"
+              ],
+              "path": [
+                "content",
+                "1"
+              ]
             }
           },
           "response": []
@@ -1432,8 +1722,13 @@
             "header": [],
             "url": {
               "raw": "{{contentUrl}}/content/1",
-              "host": ["{{contentUrl}}"],
-              "path": ["content", "1"]
+              "host": [
+                "{{contentUrl}}"
+              ],
+              "path": [
+                "content",
+                "1"
+              ]
             }
           },
           "response": []
@@ -1445,8 +1740,12 @@
             "header": [],
             "url": {
               "raw": "{{contentUrl}}/comments?contentId=1&approved=true&page=1&limit=20",
-              "host": ["{{contentUrl}}"],
-              "path": ["comments"],
+              "host": [
+                "{{contentUrl}}"
+              ],
+              "path": [
+                "comments"
+              ],
               "query": [
                 {
                   "key": "contentId",
@@ -1495,8 +1794,12 @@
             },
             "url": {
               "raw": "{{contentUrl}}/comments",
-              "host": ["{{contentUrl}}"],
-              "path": ["comments"]
+              "host": [
+                "{{contentUrl}}"
+              ],
+              "path": [
+                "comments"
+              ]
             }
           },
           "response": []
@@ -1508,8 +1811,12 @@
             "header": [],
             "url": {
               "raw": "{{contentUrl}}/categories",
-              "host": ["{{contentUrl}}"],
-              "path": ["categories"]
+              "host": [
+                "{{contentUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
             }
           },
           "response": []
@@ -1521,8 +1828,12 @@
             "header": [],
             "url": {
               "raw": "{{contentUrl}}/tags",
-              "host": ["{{contentUrl}}"],
-              "path": ["tags"]
+              "host": [
+                "{{contentUrl}}"
+              ],
+              "path": [
+                "tags"
+              ]
             }
           },
           "response": []
@@ -1554,8 +1865,13 @@
             },
             "url": {
               "raw": "{{contentUrl}}/media/upload",
-              "host": ["{{contentUrl}}"],
-              "path": ["media", "upload"]
+              "host": [
+                "{{contentUrl}}"
+              ],
+              "path": [
+                "media",
+                "upload"
+              ]
             }
           },
           "response": []
@@ -1577,8 +1893,12 @@
             "header": [],
             "url": {
               "raw": "{{contentUrl}}/analytics?contentId=1&period=week",
-              "host": ["{{contentUrl}}"],
-              "path": ["analytics"],
+              "host": [
+                "{{contentUrl}}"
+              ],
+              "path": [
+                "analytics"
+              ],
               "query": [
                 {
                   "key": "contentId",
@@ -1606,9 +1926,14 @@
             "url": {
               "raw": "http://localhost:8080/actuator/health",
               "protocol": "http",
-              "host": ["localhost"],
+              "host": [
+                "localhost"
+              ],
               "port": "8080",
-              "path": ["actuator", "health"]
+              "path": [
+                "actuator",
+                "health"
+              ]
             }
           },
           "response": []
@@ -1621,9 +1946,13 @@
             "url": {
               "raw": "http://localhost:8081/health",
               "protocol": "http",
-              "host": ["localhost"],
+              "host": [
+                "localhost"
+              ],
               "port": "8081",
-              "path": ["health"]
+              "path": [
+                "health"
+              ]
             }
           },
           "response": []
@@ -1636,9 +1965,13 @@
             "url": {
               "raw": "http://localhost:8082/health",
               "protocol": "http",
-              "host": ["localhost"],
+              "host": [
+                "localhost"
+              ],
               "port": "8082",
-              "path": ["health"]
+              "path": [
+                "health"
+              ]
             }
           },
           "response": []
@@ -1651,17 +1984,21 @@
             "url": {
               "raw": "http://localhost:8083/health",
               "protocol": "http",
-              "host": ["localhost"],
+              "host": [
+                "localhost"
+              ],
               "port": "8083",
-              "path": ["health"]
+              "path": [
+                "health"
+              ]
             }
           },
           "response": []
         }
       ]
-    },
+    }
   ],
-  "variable": [
+   "variable": [
     {
       "key": "marketplaceUrl",
       "value": "http://localhost:8080/api",

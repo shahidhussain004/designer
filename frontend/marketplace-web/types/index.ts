@@ -18,12 +18,19 @@ export interface Job {
   id: number;
   title: string;
   description: string;
-  category?: string;
+  category?: {
+    id: number;
+    name: string;
+    slug?: string;
+  };
   requiredSkills?: string[];
   budget?: number;
   budgetType: 'FIXED' | 'HOURLY';
   duration?: number;
-  experienceLevel: 'ENTRY' | 'INTERMEDIATE' | 'EXPERT';
+  experienceLevel?: {
+    id: number;
+    name: string;
+  };
   status: 'DRAFT' | 'OPEN' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'CLOSED';
   clientId: number;
   viewCount?: number;
