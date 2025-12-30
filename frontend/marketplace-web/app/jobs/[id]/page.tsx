@@ -11,9 +11,12 @@ import {
   Input,
   Spinner,
   Text,
+  Textarea,
 } from '@/components/green';
 import { PageLayout } from '@/components/layout';
+import { apiClient } from '@/lib/api-client';
 import { authService } from '@/lib/auth';
+import logger from '@/lib/logger';
 import { User } from '@/types';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -71,6 +74,9 @@ export default function JobDetailsPage() {
     estimatedDuration: 30,
   });
   const [submittingProposal, setSubmittingProposal] = useState(false);
+  const [proposalSuccess, setProposalSuccess] = useState(false);
+  const [proposalError, setProposalError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<{ coverLetter?: string; proposedRate?: string; estimatedDuration?: string }>({});
 
   useEffect(() => {
     const currentUser = authService.getCurrentUser();
@@ -103,7 +109,7 @@ export default function JobDetailsPage() {
               setClient(clientData);
             }
           } catch (err) {
-            console.error('Error fetching client details:', err);
+                logger.error('Error fetching client details', err as Error);
           }
         }
       } catch (err) {
@@ -120,32 +126,83 @@ export default function JobDetailsPage() {
     e.preventDefault();
 
     if (!user || user.role !== 'FREELANCER') {
-      alert('Only freelancers can submit proposals');
+      setProposalError('Only freelancers can submit proposals');
+      return;
+    }
+
+    // Clear previous errors
+    setFieldErrors({});
+    setProposalError(null);
+
+    // Client-side validation - populate fieldErrors map for field-level display
+    const newFieldErrors: { coverLetter?: string; proposedRate?: string; estimatedDuration?: string } = {};
+    if (!proposalData.jobId || proposalData.jobId <= 0) {
+      setProposalError('Invalid job selected for proposal');
+      return;
+    }
+
+    if (!proposalData.coverLetter || proposalData.coverLetter.trim().length === 0) {
+      newFieldErrors.coverLetter = 'Cover letter is required';
+    }
+
+    if (!isFinite(proposalData.proposedRate) || proposalData.proposedRate <= 0) {
+      newFieldErrors.proposedRate = 'Please enter a valid proposed rate';
+    }
+
+    if (Object.keys(newFieldErrors).length > 0) {
+      setFieldErrors(newFieldErrors);
       return;
     }
 
     setSubmittingProposal(true);
+    setProposalSuccess(false);
+    
     try {
-      const response = await fetch(`http://localhost:8080/api/proposals`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
-        body: JSON.stringify(proposalData),
-      });
+      const { data } = await apiClient.post('/proposals', proposalData)
 
-      if (!response.ok) {
-        throw new Error('Failed to submit proposal');
+      setProposalSuccess(true)
+      setProposalOpen(false)
+      setProposalData({ jobId: job!.id, coverLetter: '', proposedRate: 0, estimatedDuration: 30 })
+
+      // Auto-hide success message after 5 seconds
+      setTimeout(() => setProposalSuccess(false), 5000)
+    } catch (err: any) {
+      logger.error('Proposal submission failed', err)
+
+      // Try to extract a user-friendly message from axios error structure
+      let message = 'Failed to submit proposal'
+      if (err?.response?.data) {
+        const data = err.response.data
+
+        // If backend returned a map of field errors, map them
+        // e.g., { errors: [{ field: 'coverLetter', message: 'required' }, ...] }
+        if (data.errors && Array.isArray(data.errors)) {
+          const fe: typeof fieldErrors = {}
+          data.errors.forEach((e: any) => {
+            if (e.field && e.message) fe[e.field] = e.message
+          })
+          setFieldErrors(fe)
+          message = 'Please fix the highlighted fields'
+        } else if (typeof data === 'object') {
+          // Try common patterns
+          if (data.field && data.message) {
+            setFieldErrors({ [data.field]: data.message })
+            message = data.message
+          } else if (data.message) {
+            message = data.message
+          } else if (data.error) {
+            message = data.error
+          }
+        } else if (typeof data === 'string') {
+          message = data
+        }
+      } else if (err?.message) {
+        message = err.message
       }
 
-      alert('Proposal submitted successfully!');
-      setProposalOpen(false);
-      setProposalData({ jobId: job!.id, coverLetter: '', proposedRate: 0, estimatedDuration: 30 });
-    } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to submit proposal');
+      setProposalError(message)
     } finally {
-      setSubmittingProposal(false);
+      setSubmittingProposal(false)
     }
   };
 
@@ -176,6 +233,23 @@ export default function JobDetailsPage() {
 
   return (
     <PageLayout>
+      {/* Success/Error Notifications */}
+      {proposalSuccess && (
+        <div style={{ padding: '1rem' }}>
+          <Alert variant="positive">
+            Proposal submitted successfully! The client will review your proposal.
+          </Alert>
+        </div>
+      )}
+      
+      {proposalError && (
+        <div style={{ padding: '1rem' }}>
+          <Alert variant="negative">
+            {proposalError}
+          </Alert>
+        </div>
+      )}
+
       {/* Header */}
       <Flex flex-direction="column" gap="s" padding="l">
         <Link href="/jobs">
@@ -271,7 +345,18 @@ export default function JobDetailsPage() {
                 {user && user.role === 'FREELANCER' && user.id !== job.clientId ? (
                   <Button
                     variant={proposalOpen ? 'neutral' : 'brand'}
-                    onClick={() => setProposalOpen(!proposalOpen)}
+                    onClick={() => {
+                      if (!proposalOpen) {
+                        // Initialize proposal data with correct jobId when opening form
+                        setProposalData({
+                          jobId: job.id,
+                          coverLetter: '',
+                          proposedRate: 0,
+                          estimatedDuration: 30
+                        });
+                      }
+                      setProposalOpen(!proposalOpen);
+                    }}
                   >
                     {proposalOpen ? 'Cancel' : 'Send Proposal'}
                   </Button>
@@ -312,6 +397,9 @@ export default function JobDetailsPage() {
                       }
                       required
                     />
+                    {fieldErrors.proposedRate && (
+                      <div className="text-red-600 text-sm mt-1">{fieldErrors.proposedRate}</div>
+                    )}
 
                     <Input
                       label="Estimated Duration (days)"
@@ -324,12 +412,13 @@ export default function JobDetailsPage() {
                         })
                       }
                     />
+                    {fieldErrors.estimatedDuration && (
+                      <div className="text-red-600 text-sm mt-1">{fieldErrors.estimatedDuration}</div>
+                    )}
 
                     <Flex flex-direction="column" gap="xs">
-                      <Text font-size="body-s" font-weight="book">
-                        Cover Letter
-                      </Text>
-                      <textarea
+                      <Textarea
+                        label="Cover Letter"
                         value={proposalData.coverLetter}
                         onChange={(e) =>
                           setProposalData({
@@ -338,7 +427,11 @@ export default function JobDetailsPage() {
                           })
                         }
                         rows={6}
+                        required
                       />
+                      {fieldErrors.coverLetter && (
+                        <div className="text-red-600 text-sm mt-1">{fieldErrors.coverLetter}</div>
+                      )}
                     </Flex>
 
                     <Button type="submit" disabled={submittingProposal}>

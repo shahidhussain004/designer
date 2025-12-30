@@ -1,0 +1,12 @@
+{
+  "job": {"id": 2},
+  "client": {"id": 1},
+  "freelancer": {"id": 3},
+  "title": "Website Design Contract",
+  "description": "Full website redesign and development contract",
+  "contractType": "FIXED_PRICE",
+  "totalAmount": 5000.00,
+  "paymentSchedule": "MILESTONE_BASED",
+  "status": "ACTIVE",
+  "startDate": "2025-01-01"
+}

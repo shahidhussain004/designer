@@ -1,11 +1,11 @@
 package com.designer.marketplace.kafka.events;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 /**
  * Event payload for job-related events.
@@ -20,11 +20,13 @@ public class JobEventPayload {
     private String description;
     private Long clientId;
     private String clientName;
-    private String category;
+    private Long categoryId;
+    private String categoryName;
     private Double budget;
     private String budgetType;
     private String status;
     private List<String> requiredSkills;
     private Integer duration;
-    private String experienceLevel;
+    private Long experienceLevelId;
+    private String experienceLevelName;
 }
