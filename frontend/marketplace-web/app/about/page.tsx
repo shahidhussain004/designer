@@ -53,7 +53,7 @@ export default function AboutPage() {
             <Text font-size="heading-s">Hiring & Partnerships</Text>
             <Text font-size="body-l">
               We partner with agencies, consultancies, and enterprises to provide customized
-              talent solutions. If you're interested in a strategic partnership or embedded team,
+              talent solutions. If you&rsquo;re interested in a strategic partnership or embedded team,
               contact us at partnerships@designer-marketplace.com.
             </Text>
 

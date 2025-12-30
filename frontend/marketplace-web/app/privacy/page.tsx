@@ -84,7 +84,7 @@ export default function PrivacyPage() {
             <div>
                 <Text font-size="heading-s">8. Changes to This Policy</Text>
                 <Text font-size="body-l">
-                We may update this privacy policy from time to time. We will notify you of any changes by posting the new policy on this page and updating the "Last updated" date.
+                We may update this privacy policy from time to time. We will notify you of any changes by posting the new policy on this page and updating the &quot;Last updated&quot; date.
               </Text>
             </div>
 
