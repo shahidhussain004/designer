@@ -1,0 +1,9 @@
+{
+  "title": "E-commerce Website Design",
+  "description": "Full redesign of e-commerce platform with modern UI/UX",
+  "imageUrl": "https://example.com/portfolio/ecommerce.jpg",
+  "projectUrl": "https://example.com/project/ecommerce",
+  "technologies": ["React", "Node.js", "PostgreSQL", "AWS"],
+  "isVisible": true,
+  "displayOrder": 1
+}

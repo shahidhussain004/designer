@@ -1,17 +1,20 @@
 package com.designer.marketplace.service;
 
-import com.designer.marketplace.dto.UserResponse;
-import com.designer.marketplace.dto.UserUpdateRequest;
-import com.designer.marketplace.entity.User;
-import com.designer.marketplace.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.designer.marketplace.dto.UserResponse;
+import com.designer.marketplace.dto.UserUpdateRequest;
+import com.designer.marketplace.entity.User;
+import com.designer.marketplace.exception.UnauthorizedException;
+import com.designer.marketplace.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Service for user management operations
@@ -29,7 +32,7 @@ public class UserService {
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new RuntimeException("User not authenticated");
+            throw new UnauthorizedException("User not authenticated");
         }
 
         String username = authentication.getName();
@@ -144,5 +147,10 @@ public class UserService {
     public boolean isCurrentUserAdmin() {
         User currentUser = getCurrentUser();
         return isAdmin(currentUser);
+    }
+
+    public Page<UserResponse> findUsersByRole(User.UserRole role, Pageable pageable) {
+        Page<User> users = userRepository.findByRole(role, pageable);
+        return users.map(UserResponse::fromEntity);
     }
 }

@@ -122,6 +122,12 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Jackson Hibernate Module for lazy loading support -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-hibernate6</artifactId>
+        </dependency>
+
         <!-- AOP for logging and monitoring -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

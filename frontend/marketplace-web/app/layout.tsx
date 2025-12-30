@@ -1,8 +1,9 @@
+import { SkipLink } from '@/components/ui/Accessibility'
+import { CookiesConsent } from '@/components/ui/CookiesConsent'
+import { AuthProvider } from '@/lib/context/AuthContext'
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import PWARegister from './PWARegister'
-import { SkipLink } from '@/components/ui/Accessibility'
-import { CookiesConsent } from '@/components/ui/CookiesConsent'
 
 export const metadata: Metadata = {
   title: 'Designer Marketplace - Find Freelance Talent',
@@ -43,9 +44,11 @@ export default function RootLayout({
         <PWARegister />
         
         {/* Main content wrapper with ARIA landmark */}
-        <div id="main-content" role="main" tabIndex={-1}>
-          {children}
-        </div>
+        <AuthProvider>
+          <div id="main-content" role="main" tabIndex={-1}>
+            {children}
+          </div>
+        </AuthProvider>
         
         {/* Cookies Consent Component */}
         <CookiesConsent />

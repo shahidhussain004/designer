@@ -31,7 +31,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "jobs", indexes = {
         @Index(name = "idx_jobs_client", columnList = "client_id"),
         @Index(name = "idx_jobs_status", columnList = "status"),
-        @Index(name = "idx_jobs_category", columnList = "category"),
+        @Index(name = "idx_jobs_category_fk", columnList = "category_id"),
         @Index(name = "idx_jobs_created", columnList = "created_at")
 })
 @EntityListeners(AuditingEntityListener.class)
@@ -54,14 +54,10 @@ public class Job {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    // New foreign key relationship to JobCategory
+    // Foreign key relationship to JobCategory
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private JobCategory jobCategory;
-
-    // Old category column - kept for backward compatibility during migration
-    @Column(length = 50)
-    private String category;
 
     @Column(name = "required_skills", columnDefinition = "TEXT[]")
     private String[] requiredSkills;
