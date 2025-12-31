@@ -4,9 +4,11 @@
  * User avatars with image, initials, or icon fallbacks
  */
 
-import React, { forwardRef, useState } from 'react';
-import Image from 'next/image';
+"use client";
+
 import { cn } from '@/lib/design-system/utils';
+import Image from 'next/image';
+import React, { forwardRef, useState } from 'react';
 
 export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Image source URL */

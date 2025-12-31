@@ -80,7 +80,7 @@ export default function FreelancerPortfolioPage() {
             <Flex flex-direction="column" align-items="center" gap="m">
               <Text font-size="heading-s">Portfolio Not Found</Text>
               <Text font-size="body-l" color="neutral-02">{error || 'Unable to load portfolio'}</Text>
-              <Link href="/talent">
+              <Link href="/talents">
                 <Button>Browse Other Talent</Button>
               </Link>
             </Flex>
@@ -97,7 +97,7 @@ export default function FreelancerPortfolioPage() {
         <div>
           {/* Breadcrumb & Navigation */}
           <Flex gap="m" align-items="center" style={{ marginBottom: '1.5rem' }}>
-            <Link href="/talent">
+            <Link href="/talents">
               <Button rank="tertiary" size="small">← Back to Talent</Button>
             </Link>
             <Text font-size="body-s" color="neutral-02">/</Text>
@@ -273,7 +273,7 @@ export default function FreelancerPortfolioPage() {
 
         {/* Footer Navigation */}
         <Flex gap="m" justify-content="center" padding="l">
-          <Link href="/talent">
+          <Link href="/talents">
             <Button rank="tertiary">← Browse More Talent</Button>
           </Link>
         </Flex>

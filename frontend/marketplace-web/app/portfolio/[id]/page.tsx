@@ -245,7 +245,7 @@ export default function PortfolioPage() {
                 {error || 'Unable to load portfolio'}
               </Text>
               <Flex gap="m">
-                <Link href="/talent">
+                <Link href="/talents">
                   <Button>Browse Talent</Button>
                 </Link>
                 {isOwnPortfolio && (
@@ -269,7 +269,7 @@ export default function PortfolioPage() {
           {/* Breadcrumb Navigation */}
           {!isOwnPortfolio && (
             <Flex gap="m" align-items="center" style={{ marginBottom: '1.5rem' }}>
-              <Link href="/talent">
+              <Link href="/talents">
                 <Button rank="tertiary" size="small">
                   ← Back to Talent
                 </Button>
@@ -764,7 +764,7 @@ export default function PortfolioPage() {
               <Button rank="tertiary">← Back to Dashboard</Button>
             </Link>
           ) : (
-            <Link href="/talent">
+            <Link href="/talents">
               <Button rank="tertiary">← Browse More Talent</Button>
             </Link>
           )}

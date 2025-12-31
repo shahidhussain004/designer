@@ -78,7 +78,7 @@ export default function FreelancerProfilePage() {
             <Flex flex-direction="column" align-items="center" gap="m">
               <Text font-size="heading-s">Profile Not Found</Text>
               <Text font-size="body-l" color="neutral-02">{error || 'Unable to load profile'}</Text>
-              <Link href="/talent">
+              <Link href="/talents">
                 <Button>Browse Other Talent</Button>
               </Link>
             </Flex>
@@ -330,7 +330,7 @@ export default function FreelancerProfilePage() {
 
         {/* Navigation */}
         <Flex gap="m" justify-content="center" padding="l">
-          <Link href="/talent">
+          <Link href="/talents">
             <Button rank="tertiary">← Back to Talent List</Button>
           </Link>
         </Flex>

@@ -39,6 +39,8 @@ export type { ConfirmDialogProps, ModalBodyProps, ModalFooterProps, ModalHeaderP
 
 // Navigation Components
 export { default as Breadcrumb, type BreadcrumbItem, type BreadcrumbProps } from './Breadcrumb';
+export { FluidAccountDropdown } from './FluidAccountDropdown';
+export { FluidNotificationsDropdown } from './FluidNotificationsDropdown';
 export { Footer, type FooterLink, type FooterProps, type FooterSection } from './Footer';
 export { default as Navbar } from './Navbar';
 export { default as PageLayout, type PageLayoutProps } from './PageLayout';
