@@ -1,9 +1,9 @@
  'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
 import { Dialog } from '@/components/green';
-import { Logo } from './Icons';
 import { cn } from '@/lib/design-system/utils';
+import React, { useEffect, useRef, useState } from 'react';
+import { Logo } from './Icons';
 
 interface CookieCategory {
   id: string;
@@ -56,6 +56,9 @@ export const CookiesConsent: React.FC<CookiesConsentProps> = ({ onAccept, onReje
     'performance': false,
     'targeting': false,
   });
+  const [acknowledged, setAcknowledged] = useState(false);
+
+  const ACK_KEY = 'cookie-consent-ack';
 
   type DialogRef = HTMLDialogElement & { show?: () => void; close?: () => void };
   const dialogRef = useRef<DialogRef | null>(null);
@@ -63,15 +66,25 @@ export const CookiesConsent: React.FC<CookiesConsentProps> = ({ onAccept, onReje
   useEffect(() => {
     setIsMounted(true);
     try {
+      // if user already acknowledged (accepted/rejected/closed), keep banner hidden
+      const ack = localStorage.getItem(ACK_KEY);
+      if (ack) {
+        setAcknowledged(true);
+        return;
+      }
+
       const stored = localStorage.getItem('cookie-consent');
       if (stored) {
         const parsed = JSON.parse(stored) as CookiePreferences;
         setPreferences((p) => ({ ...p, ...parsed }));
-      } else {
-        // show after small delay
-        const t = setTimeout(() => setIsOpen(true), 500);
-        return () => clearTimeout(t);
+        // previous choices exist — hide banner by default
+        setAcknowledged(true);
+        return;
       }
+
+      // show after small delay for first-time visitors
+      const t = setTimeout(() => setIsOpen(true), 500);
+      return () => clearTimeout(t);
     } catch (err: unknown) {
       console.error('CookiesConsent init error:', err);
     }
@@ -99,6 +112,8 @@ export const CookiesConsent: React.FC<CookiesConsentProps> = ({ onAccept, onReje
 
   const handleConfirm = () => {
     localStorage.setItem('cookie-consent', JSON.stringify(preferences));
+    localStorage.setItem(ACK_KEY, '1');
+    setAcknowledged(true);
     setIsOpen(false);
     onAccept?.(preferences);
   };
@@ -110,10 +125,14 @@ export const CookiesConsent: React.FC<CookiesConsentProps> = ({ onAccept, onReje
       'targeting': false,
     };
     localStorage.setItem('cookie-consent', JSON.stringify(rejected));
+    localStorage.setItem(ACK_KEY, '1');
+    setAcknowledged(true);
     setPreferences(rejected);
     setIsOpen(false);
     onReject?.();
   };
+
+  if (acknowledged) return null;
 
   return (
     <>

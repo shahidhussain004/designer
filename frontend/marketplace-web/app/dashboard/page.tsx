@@ -1,63 +1,22 @@
-'use client'
+'use server'
 
-import { Flex, Spinner, Text } from '@/components/green'
 import { PageLayout } from '@/components/ui'
-import { authService } from '@/lib/auth'
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
-
-interface User {
-  id: number
-  email: string
-  username: string
-  fullName: string
-  role: string
-}
+import Link from 'next/link'
 
 export default function DashboardPage() {
-  const router = useRouter()
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, _setLoading] = useState(true)
-  const [error, _setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (!authService.isAuthenticated()) {
-      router.push('/auth/login')
-      return
-    }
-
-    const currentUser = authService.getCurrentUser()
-    if (currentUser) {
-      setUser(currentUser)
-    }
-  }, [router])
-
-  // Redirect to role-specific dashboard pages when user is available
-  useEffect(() => {
-    if (!user) return
-    const rolePath = user.role === 'CLIENT' ? 'client' : 'freelancer'
-    router.replace(`/dashboard/${rolePath}`)
-  }, [router, user])
-
-  if (loading) {
-    return (
-      <PageLayout>
-        <Flex justify-content="center" align-items="center" min-height="50vh">
-          <Spinner />
-        </Flex>
-      </PageLayout>
-    )
-  }
-
-  if (error) {
-    return (
-      <PageLayout>
-        <Flex justify-content="center" align-items="center" min-height="50vh">
-          <Text font="body-regular-l" color="negative-01">{error}</Text>
-        </Flex>
-      </PageLayout>
-    )
-  }
-
-  return null
+  // Render a simple server-side landing with links to role-specific dashboards.
+  // The client-side auth flow will redirect users after mount; this ensures
+  // the page exists during build-time page data collection.
+  return (
+    <PageLayout>
+      <div className="max-w-4xl mx-auto py-24 text-center">
+        <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
+        <p className="text-gray-700 mb-8">Choose your dashboard view:</p>
+        <div className="flex items-center justify-center gap-4">
+          <Link href="/dashboard/client" className="px-4 py-2 bg-blue-600 text-white rounded">Client Dashboard</Link>
+          <Link href="/dashboard/freelancer" className="px-4 py-2 bg-gray-100 text-gray-800 rounded">Freelancer Dashboard</Link>
+        </div>
+      </div>
+    </PageLayout>
+  )
 }
