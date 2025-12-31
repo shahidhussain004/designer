@@ -347,22 +347,22 @@ public class MilestoneService {
     }
 
     /**
-     * Get milestones for a job.
+     * Get milestones for a project.
      */
     @Transactional(readOnly = true)
-    public List<MilestoneResponse> getMilestonesByJobId(Long jobId) {
-        return milestoneRepository.findByJobIdOrderBySequenceOrderAsc(jobId)
+    public List<MilestoneResponse> getMilestonesByJobId(Long projectId) {
+        return milestoneRepository.findByProjectIdOrderBySequenceOrderAsc(projectId)
                 .stream()
                 .map(MilestoneResponse::fromEntity)
                 .collect(Collectors.toList());
     }
 
     /**
-     * Get milestone summary for a job.
+     * Get milestone summary for a project.
      */
     @Transactional(readOnly = true)
-    public MilestoneSummary getMilestoneSummary(Long jobId) {
-        List<Milestone> milestones = milestoneRepository.findByJobIdOrderBySequenceOrderAsc(jobId);
+    public MilestoneSummary getMilestoneSummary(Long projectId) {
+        List<Milestone> milestones = milestoneRepository.findByProjectIdOrderBySequenceOrderAsc(projectId);
 
         int total = milestones.size();
         int completed = (int) milestones.stream()
@@ -395,7 +395,7 @@ public class MilestoneService {
         double progressPercentage = total > 0 ? (completed * 100.0) / total : 0;
 
         return MilestoneSummary.builder()
-                .jobId(jobId)
+                .projectId(projectId)
                 .totalMilestones(total)
                 .completedMilestones(completed)
                 .pendingMilestones(pending)

@@ -96,8 +96,8 @@ public class MilestoneDTOs {
     @AllArgsConstructor
     public static class MilestoneResponse {
         private Long id;
-        private Long jobId;
-        private String jobTitle;
+        private Long projectId;
+        private String projectTitle;
         private Long proposalId;
         private String title;
         private String description;
@@ -118,8 +118,8 @@ public class MilestoneDTOs {
         public static MilestoneResponse fromEntity(Milestone milestone) {
             return MilestoneResponse.builder()
                     .id(milestone.getId())
-                    .jobId(milestone.getProject().getId())
-                    .jobTitle(milestone.getProject().getTitle())
+                    .projectId(milestone.getProject().getId())
+                    .projectTitle(milestone.getProject().getTitle())
                     .proposalId(milestone.getProposal() != null ? milestone.getProposal().getId() : null)
                     .title(milestone.getTitle())
                     .description(milestone.getDescription())
@@ -145,7 +145,7 @@ public class MilestoneDTOs {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MilestoneSummary {
-        private Long jobId;
+        private Long projectId;
         private int totalMilestones;
         private int completedMilestones;
         private int pendingMilestones;

@@ -82,8 +82,8 @@ public class InvoiceDTOs {
         private Long freelancerId;
         private String freelancerName;
         private String freelancerEmail;
-        private Long jobId;
-        private String jobTitle;
+        private Long projectId;
+        private String projectTitle;
         private InvoiceType invoiceType;
         private Long subtotal;
         private Long platformFee;
@@ -113,8 +113,8 @@ public class InvoiceDTOs {
                     .freelancerId(invoice.getFreelancer().getId())
                     .freelancerName(invoice.getFreelancer().getFullName())
                     .freelancerEmail(invoice.getFreelancer().getEmail())
-                    .jobId(invoice.getProject().getId())
-                    .jobTitle(invoice.getProject().getTitle())
+                    .projectId(invoice.getProject().getId())
+                    .projectTitle(invoice.getProject().getTitle())
                     .invoiceType(invoice.getInvoiceType())
                     .subtotal(invoice.getSubtotal())
                     .platformFee(invoice.getPlatformFee())
