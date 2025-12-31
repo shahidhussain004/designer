@@ -1,0 +1,158 @@
+package com.designer.marketplace.dto;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import com.designer.marketplace.entity.EmploymentJob;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * DTO for Employment Job responses
+ */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class EmploymentJobResponse {
+    private Long id;
+    private Long employerId;
+    private String employerName;
+    private Long categoryId;
+    private String categoryName;
+    
+    // Basic information
+    private String title;
+    private String description;
+    private String responsibilities;
+    private String requirements;
+    
+    // Job details
+    private String jobType;
+    private String employmentType;
+    private String experienceLevel;
+    
+    // Location
+    private String location;
+    private String city;
+    private String state;
+    private String country;
+    private Boolean isRemote;
+    private String remoteType;
+    
+    // Compensation
+    private BigDecimal salaryMin;
+    private BigDecimal salaryMax;
+    private String salaryCurrency;
+    private String salaryPeriod;
+    private Boolean showSalary;
+    
+    // Benefits
+    private String[] benefits;
+    private String[] perks;
+    
+    // Skills
+    private String[] requiredSkills;
+    private String[] preferredSkills;
+    private String educationLevel;
+    private String[] certifications;
+    
+    // Application
+    private LocalDateTime applicationDeadline;
+    private String applicationEmail;
+    private String applicationUrl;
+    private String applyInstructions;
+    
+    // Company
+    private String companyName;
+    private String companyDescription;
+    private String companyLogoUrl;
+    private String companyWebsite;
+    private String companySize;
+    private String industry;
+    
+    // Employment details
+    private LocalDate startDate;
+    private Integer positionsAvailable;
+    private String travelRequirement;
+    private Boolean securityClearanceRequired;
+    private Boolean visaSponsorship;
+    
+    // Status
+    private String status;
+    private Integer viewsCount;
+    private Integer applicationsCount;
+    private Boolean isFeatured;
+    private Boolean isUrgent;
+    
+    // Timestamps
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime publishedAt;
+    private LocalDateTime closedAt;
+
+    /**
+     * Convert EmploymentJob entity to DTO
+     */
+    public static EmploymentJobResponse fromEntity(EmploymentJob job) {
+        return EmploymentJobResponse.builder()
+                .id(job.getId())
+                .employerId(job.getEmployer() != null ? job.getEmployer().getId() : null)
+                .employerName(job.getEmployer() != null ? job.getEmployer().getFullName() : null)
+                .categoryId(job.getCategory() != null ? job.getCategory().getId() : null)
+                .categoryName(job.getCategory() != null ? job.getCategory().getName() : null)
+                .title(job.getTitle())
+                .description(job.getDescription())
+                .responsibilities(job.getResponsibilities())
+                .requirements(job.getRequirements())
+                .jobType(job.getJobType() != null ? job.getJobType().name() : null)
+                .employmentType(job.getEmploymentType() != null ? job.getEmploymentType().name() : null)
+                .experienceLevel(job.getExperienceLevel() != null ? job.getExperienceLevel().name() : null)
+                .location(job.getLocation())
+                .city(job.getCity())
+                .state(job.getState())
+                .country(job.getCountry())
+                .isRemote(job.getIsRemote())
+                .remoteType(job.getRemoteType() != null ? job.getRemoteType().name() : null)
+                .salaryMin(job.getSalaryMin())
+                .salaryMax(job.getSalaryMax())
+                .salaryCurrency(job.getSalaryCurrency())
+                .salaryPeriod(job.getSalaryPeriod() != null ? job.getSalaryPeriod().name() : null)
+                .showSalary(job.getShowSalary())
+                .benefits(job.getBenefits())
+                .perks(job.getPerks())
+                .requiredSkills(job.getRequiredSkills())
+                .preferredSkills(job.getPreferredSkills())
+                .educationLevel(job.getEducationLevel() != null ? job.getEducationLevel().name() : null)
+                .certifications(job.getCertifications())
+                .applicationDeadline(job.getApplicationDeadline())
+                .applicationEmail(job.getApplicationEmail())
+                .applicationUrl(job.getApplicationUrl())
+                .applyInstructions(job.getApplyInstructions())
+                .companyName(job.getCompanyName())
+                .companyDescription(job.getCompanyDescription())
+                .companyLogoUrl(job.getCompanyLogoUrl())
+                .companyWebsite(job.getCompanyWebsite())
+                .companySize(job.getCompanySize() != null ? job.getCompanySize().name() : null)
+                .industry(job.getIndustry())
+                .startDate(job.getStartDate())
+                .positionsAvailable(job.getPositionsAvailable())
+                .travelRequirement(job.getTravelRequirement() != null ? job.getTravelRequirement().name() : null)
+                .securityClearanceRequired(job.getSecurityClearanceRequired())
+                .visaSponsorship(job.getVisaSponsorship())
+                .status(job.getStatus() != null ? job.getStatus().name() : null)
+                .viewsCount(job.getViewsCount())
+                .applicationsCount(job.getApplicationsCount())
+                .isFeatured(job.getIsFeatured())
+                .isUrgent(job.getIsUrgent())
+                .createdAt(job.getCreatedAt())
+                .updatedAt(job.getUpdatedAt())
+                .publishedAt(job.getPublishedAt())
+                .closedAt(job.getClosedAt())
+                .build();
+    }
+}
