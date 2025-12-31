@@ -1,8 +1,12 @@
 "use client"
 
-import { useRef, useState } from "react"
-import { motion, useInView, AnimatePresence } from "framer-motion"
+import { AnimatePresence, motion, useInView } from "framer-motion"
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react"
+import type React from "react"
+import { useRef, useState } from "react"
+
+const MotionDiv = motion.div as unknown as React.ComponentType<React.ComponentProps<'div'> & any>
+const MotionButton = motion.button as unknown as React.ComponentType<React.ComponentProps<'button'> & any>
 
 const testimonials = [
   {
@@ -33,7 +37,7 @@ const testimonials = [
 
 export function TestimonialsSection() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const isInView = useInView(containerRef, { once: true, margin: "-100px" })
+  const isInView = useInView(containerRef as unknown as React.RefObject<HTMLElement>, { once: true, margin: "-100px" })
   const [activeIndex, setActiveIndex] = useState(0)
 
   const nextTestimonial = () => {
@@ -48,7 +52,7 @@ export function TestimonialsSection() {
     <section id="testimonials" ref={containerRef} className="relative py-32 lg:py-40 bg-background">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         {/* Section Header */}
-        <motion.div
+        <MotionDiv
           initial={{ opacity: 0, y: 40 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
@@ -62,24 +66,24 @@ export function TestimonialsSection() {
           <h2 className="text-4xl lg:text-5xl xl:text-6xl font-medium tracking-tight">
             Client <span className="italic font-normal text-accent">voices</span>
           </h2>
-        </motion.div>
+        </MotionDiv>
 
         {/* Testimonial Carousel */}
         <div className="relative max-w-4xl mx-auto">
           {/* Quote Icon */}
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0, scale: 0.8 }}
             animate={isInView ? { opacity: 1, scale: 1 } : {}}
             transition={{ duration: 0.8, delay: 0.2 }}
             className="absolute -top-8 left-1/2 -translate-x-1/2"
           >
             <Quote className="w-16 h-16 text-accent/20" />
-          </motion.div>
+          </MotionDiv>
 
           {/* Testimonial Content */}
           <div className="relative min-h-[300px] flex items-center justify-center">
             <AnimatePresence mode="wait">
-              <motion.div
+              <MotionDiv
                 key={activeIndex}
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -103,13 +107,13 @@ export function TestimonialsSection() {
                     <p className="text-sm text-muted-foreground">{testimonials[activeIndex].role}</p>
                   </div>
                 </div>
-              </motion.div>
+              </MotionDiv>
             </AnimatePresence>
           </div>
 
           {/* Navigation */}
           <div className="flex items-center justify-center gap-6 mt-12">
-            <motion.button
+            <MotionButton
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               onClick={prevTestimonial}
@@ -117,7 +121,7 @@ export function TestimonialsSection() {
               aria-label="Previous testimonial"
             >
               <ChevronLeft className="w-5 h-5 text-foreground" />
-            </motion.button>
+            </MotionButton>
 
             {/* Dots */}
             <div className="flex items-center gap-2">
@@ -133,7 +137,7 @@ export function TestimonialsSection() {
               ))}
             </div>
 
-            <motion.button
+            <MotionButton
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               onClick={nextTestimonial}
@@ -141,7 +145,7 @@ export function TestimonialsSection() {
               aria-label="Next testimonial"
             >
               <ChevronRight className="w-5 h-5 text-foreground" />
-            </motion.button>
+            </MotionButton>
           </div>
         </div>
       </div>

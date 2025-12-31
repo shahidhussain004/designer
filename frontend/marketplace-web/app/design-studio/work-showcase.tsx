@@ -1,8 +1,13 @@
 "use client"
 
-import { useRef, useState } from "react"
-import { motion, useInView, AnimatePresence } from "framer-motion"
+import { AnimatePresence, motion, useInView } from "framer-motion"
 import { ArrowUpRight, Plus } from "lucide-react"
+import type React from "react"
+import { useRef, useState } from "react"
+
+const MotionDiv = motion.div as unknown as React.ComponentType<React.ComponentProps<'div'> & any>
+const MotionA = motion.a as unknown as React.ComponentType<React.ComponentProps<'a'> & any>
+const MotionImg = motion.img as unknown as React.ComponentType<React.ComponentProps<'img'> & any>
 
 const projects = [
   {
@@ -41,7 +46,7 @@ const projects = [
 
 export function WorkShowcase() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const isInView = useInView(containerRef, { once: true, margin: "-100px" })
+  const isInView = useInView(containerRef as unknown as React.RefObject<HTMLElement>, { once: true, margin: "-100px" })
   const [activeProject, setActiveProject] = useState<number | null>(null)
 
   return (
@@ -49,7 +54,7 @@ export function WorkShowcase() {
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         {/* Section Header */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16 lg:mb-24">
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0, y: 40 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8 }}
@@ -61,8 +66,8 @@ export function WorkShowcase() {
             <h2 className="text-4xl lg:text-5xl xl:text-6xl font-medium tracking-tight">
               Featured <span className="italic font-normal text-accent">projects</span>
             </h2>
-          </motion.div>
-          <motion.a
+          </MotionDiv>
+          <MotionA
             href="#"
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : {}}
@@ -71,13 +76,13 @@ export function WorkShowcase() {
           >
             <span>View all projects</span>
             <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-          </motion.a>
+          </MotionA>
         </div>
 
         {/* Projects Grid */}
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
           {projects.map((project, index) => (
-            <motion.div
+            <MotionDiv
               key={project.id}
               initial={{ opacity: 0, y: 80 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -88,7 +93,7 @@ export function WorkShowcase() {
             >
               {/* Image Container */}
               <div className="relative aspect-[16/10] rounded-2xl overflow-hidden mb-6">
-                <motion.img
+                <MotionImg
                   src={project.image}
                   alt={project.title}
                   className="w-full h-full object-cover"
@@ -104,7 +109,7 @@ export function WorkShowcase() {
                 {/* Hover Action */}
                 <AnimatePresence>
                   {activeProject === project.id && (
-                    <motion.div
+                    <MotionDiv
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
@@ -114,7 +119,7 @@ export function WorkShowcase() {
                       <div className="w-16 h-16 rounded-full bg-card flex items-center justify-center shadow-2xl">
                         <Plus className="w-6 h-6 text-foreground" />
                       </div>
-                    </motion.div>
+                    </MotionDiv>
                   )}
                 </AnimatePresence>
 
@@ -134,7 +139,7 @@ export function WorkShowcase() {
                   </h3>
                   <p className="text-muted-foreground mt-1">{project.year}</p>
                 </div>
-                <motion.div
+                <MotionDiv
                   animate={{
                     x: activeProject === project.id ? 0 : -10,
                     opacity: activeProject === project.id ? 1 : 0,
@@ -142,9 +147,9 @@ export function WorkShowcase() {
                   transition={{ duration: 0.3 }}
                 >
                   <ArrowUpRight className="w-6 h-6 text-accent" />
-                </motion.div>
+                </MotionDiv>
               </div>
-            </motion.div>
+            </MotionDiv>
           ))}
         </div>
       </div>

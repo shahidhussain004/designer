@@ -1,7 +1,9 @@
 "use client"
 
-import { useRef } from "react"
+
 import { motion, useInView, useScroll, useTransform } from "framer-motion"
+import type React from "react"
+import { useRef } from "react"
 
 const principles = [
   {
@@ -23,14 +25,16 @@ const principles = [
 
 export function PhilosophySection() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const isInView = useInView(containerRef, { once: true, margin: "-100px" })
+  const isInView = useInView(containerRef as unknown as React.RefObject<HTMLElement>, { once: true, margin: "-100px" })
 
   const { scrollYProgress } = useScroll({
-    target: containerRef,
+    target: containerRef as unknown as React.RefObject<HTMLElement>,
     offset: ["start end", "end start"],
   })
 
   const y = useTransform(scrollYProgress, [0, 1], [100, -100])
+
+  const MotionDiv = motion.div as unknown as React.ComponentType<React.ComponentProps<'div'> & any>
 
   return (
     <section
@@ -44,7 +48,7 @@ export function PhilosophySection() {
       <div className="relative max-w-7xl mx-auto px-6 lg:px-12">
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
           {/* Left - Quote */}
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0, x: -60 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 1 }}
@@ -59,7 +63,7 @@ export function PhilosophySection() {
               <span className="italic font-normal text-accent">how it works</span>
               <span className="text-accent">&rdquo;</span>
             </blockquote>
-            <motion.div style={{ y }} className="mt-12 flex items-center gap-4">
+            <MotionDiv style={{ y }} className="mt-12 flex items-center gap-4">
               <div className="w-16 h-16 rounded-full bg-background/10 overflow-hidden">
                 <img src="/minimalist-professional-portrait.png" alt="Founder" className="w-full h-full object-cover" />
               </div>
@@ -67,35 +71,37 @@ export function PhilosophySection() {
                 <p className="font-medium text-background">Alexander Chen</p>
                 <p className="text-sm text-background/60">Founder & Creative Director</p>
               </div>
-            </motion.div>
-          </motion.div>
+            </MotionDiv>
+          </MotionDiv>
 
           {/* Right - Principles */}
           <div className="space-y-8">
-            {principles.map((principle, index) => (
-              <motion.div
-                key={principle.number}
-                initial={{ opacity: 0, x: 60 }}
-                animate={isInView ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.8, delay: index * 0.2 }}
-                className="group"
-              >
-                <div className="flex gap-6 p-6 rounded-xl transition-colors duration-300 hover:bg-background/5">
-                  <span className="text-sm font-mono text-accent">{principle.number}</span>
-                  <div>
-                    <h3 className="text-xl lg:text-2xl font-medium mb-2 group-hover:text-accent transition-colors duration-300">
-                      {principle.title}
-                    </h3>
-                    <p className="text-background/60 leading-relaxed">{principle.description}</p>
+            {principles.map((principle, index) => {
+              return (
+                <MotionDiv
+                  key={principle.number}
+                  initial={{ opacity: 0, x: 60 }}
+                  animate={isInView ? { opacity: 1, x: 0 } : {}}
+                  transition={{ duration: 0.8, delay: index * 0.2 }}
+                  className="group"
+                >
+                  <div className="flex gap-6 p-6 rounded-xl transition-colors duration-300 hover:bg-background/5">
+                    <span className="text-sm font-mono text-accent">{principle.number}</span>
+                    <div>
+                      <h3 className="text-xl lg:text-2xl font-medium mb-2 group-hover:text-accent transition-colors duration-300">
+                        {principle.title}
+                      </h3>
+                      <p className="text-background/60 leading-relaxed">{principle.description}</p>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </MotionDiv>
+              )
+            })}
           </div>
         </div>
 
         {/* Stats */}
-        <motion.div
+        <MotionDiv
           initial={{ opacity: 0, y: 60 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 0.6 }}
@@ -112,7 +118,7 @@ export function PhilosophySection() {
               <p className="text-sm text-background/60 tracking-wide">{stat.label}</p>
             </div>
           ))}
-        </motion.div>
+        </MotionDiv>
       </div>
     </section>
   )

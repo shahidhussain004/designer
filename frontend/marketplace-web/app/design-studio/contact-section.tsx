@@ -1,14 +1,19 @@
 "use client"
 
+import { motion, useInView } from "framer-motion"
+import { ArrowUpRight, CheckCircle, Send } from "lucide-react"
 import type React from "react"
 
 import { useRef, useState } from "react"
-import { motion, useInView } from "framer-motion"
-import { ArrowUpRight, Send, CheckCircle } from "lucide-react"
+
+const MotionA = motion.a as unknown as React.ComponentType<React.ComponentProps<'a'> & any>
+const MotionLabel = motion.label as unknown as React.ComponentType<React.ComponentProps<'label'> & any>
+const MotionDiv = motion.div as unknown as React.ComponentType<React.ComponentProps<'div'> & any>
+const MotionButton = motion.button as unknown as React.ComponentType<React.ComponentProps<'button'> & any>
 
 export function ContactSection() {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const isInView = useInView(containerRef, { once: true, margin: "-100px" })
+  const containerRef = useRef<HTMLElement | null>(null)
+  const isInView = useInView(containerRef as unknown as React.RefObject<Element>, { once: true, margin: "-100px" })
   const [formState, setFormState] = useState({
     name: "",
     email: "",
@@ -52,11 +57,7 @@ export function ContactSection() {
 
             {/* Contact Info */}
             <div className="space-y-6">
-              <motion.a
-                href="mailto:hello@atelier.design"
-                whileHover={{ x: 4 }}
-                className="group flex items-center gap-4"
-              >
+              <MotionA whileHover={{ x: 4 }} href="mailto:hello@atelier.design" className="group flex items-center gap-4 w-full">
                 <span className="w-12 h-12 rounded-full bg-card border border-border flex items-center justify-center group-hover:border-accent group-hover:bg-accent/5 transition-all duration-300">
                   <Send className="w-5 h-5 text-foreground group-hover:text-accent transition-colors duration-300" />
                 </span>
@@ -66,7 +67,7 @@ export function ContactSection() {
                     hello@atelier.design
                   </p>
                 </div>
-              </motion.a>
+              </MotionA>
             </div>
 
             {/* Social Links */}
@@ -74,14 +75,14 @@ export function ContactSection() {
               <p className="text-sm text-muted-foreground mb-4">Follow us</p>
               <div className="flex gap-4">
                 {["Twitter", "LinkedIn", "Dribbble", "Instagram"].map((social) => (
-                  <motion.a
-                    key={social}
-                    href="#"
-                    whileHover={{ y: -2 }}
-                    className="px-4 py-2 rounded-full border border-border text-sm text-foreground hover:border-accent hover:text-accent transition-all duration-300"
-                  >
-                    {social}
-                  </motion.a>
+                  <motion.div key={social} whileHover={{ y: -2 }}>
+                    <a
+                      href="#"
+                      className="inline-block px-4 py-2 rounded-full border border-border text-sm text-foreground hover:border-accent hover:text-accent transition-all duration-300"
+                    >
+                      {social}
+                    </a>
+                  </motion.div>
                 ))}
               </div>
             </div>
@@ -94,14 +95,10 @@ export function ContactSection() {
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             {isSubmitted ? (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="h-full flex flex-col items-center justify-center text-center p-12 rounded-2xl bg-card border border-border"
-              >
+              <div className="h-full flex flex-col items-center justify-center text-center p-12 rounded-2xl bg-card border border-border">
                 <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
                 >
                   <CheckCircle className="w-16 h-16 text-accent mb-6" />
@@ -110,22 +107,22 @@ export function ContactSection() {
                 <p className="text-muted-foreground max-w-sm">
                   Thank you for reaching out. We&apos;ll get back to you within 24 hours.
                 </p>
-              </motion.div>
+              </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Name & Email */}
                 <div className="grid sm:grid-cols-2 gap-6">
                   <div className="relative">
-                    <motion.label
+                    <MotionLabel
                       animate={{
                         y: focusedField === "name" || formState.name ? -24 : 0,
                         scale: focusedField === "name" || formState.name ? 0.85 : 1,
-                        color: focusedField === "name" ? "var(--accent)" : "var(--muted-foreground)",
+                        color: focusedField === "name" ? "hsl(var(--accent))" : "hsl(var(--muted-foreground))",
                       }}
-                      className="absolute left-0 top-4 text-muted-foreground origin-left pointer-events-none transition-all duration-300"
+                      className="absolute left-0 top-4 origin-left pointer-events-none transition-all duration-300"
                     >
                       Name
-                    </motion.label>
+                    </MotionLabel>
                     <input
                       type="text"
                       value={formState.name}
@@ -137,16 +134,16 @@ export function ContactSection() {
                     />
                   </div>
                   <div className="relative">
-                    <motion.label
+                    <MotionLabel
                       animate={{
                         y: focusedField === "email" || formState.email ? -24 : 0,
                         scale: focusedField === "email" || formState.email ? 0.85 : 1,
-                        color: focusedField === "email" ? "var(--accent)" : "var(--muted-foreground)",
+                        color: focusedField === "email" ? "hsl(var(--accent))" : "hsl(var(--muted-foreground))",
                       }}
-                      className="absolute left-0 top-4 text-muted-foreground origin-left pointer-events-none transition-all duration-300"
+                      className="absolute left-0 top-4 origin-left pointer-events-none transition-all duration-300"
                     >
                       Email
-                    </motion.label>
+                    </MotionLabel>
                     <input
                       type="email"
                       value={formState.email}
@@ -161,16 +158,16 @@ export function ContactSection() {
 
                 {/* Company */}
                 <div className="relative">
-                  <motion.label
+                  <MotionLabel
                     animate={{
                       y: focusedField === "company" || formState.company ? -24 : 0,
                       scale: focusedField === "company" || formState.company ? 0.85 : 1,
-                      color: focusedField === "company" ? "var(--accent)" : "var(--muted-foreground)",
+                      color: focusedField === "company" ? "hsl(var(--accent))" : "hsl(var(--muted-foreground))",
                     }}
-                    className="absolute left-0 top-4 text-muted-foreground origin-left pointer-events-none transition-all duration-300"
+                    className="absolute left-0 top-4 origin-left pointer-events-none transition-all duration-300"
                   >
                     Company (Optional)
-                  </motion.label>
+                  </MotionLabel>
                   <input
                     type="text"
                     value={formState.company}
@@ -183,16 +180,16 @@ export function ContactSection() {
 
                 {/* Message */}
                 <div className="relative">
-                  <motion.label
+                  <MotionLabel
                     animate={{
                       y: focusedField === "message" || formState.message ? -24 : 0,
                       scale: focusedField === "message" || formState.message ? 0.85 : 1,
-                      color: focusedField === "message" ? "var(--accent)" : "var(--muted-foreground)",
+                      color: focusedField === "message" ? "hsl(var(--accent))" : "hsl(var(--muted-foreground))",
                     }}
-                    className="absolute left-0 top-4 text-muted-foreground origin-left pointer-events-none transition-all duration-300"
+                    className="absolute left-0 top-4 origin-left pointer-events-none transition-all duration-300"
                   >
                     Tell us about your project
-                  </motion.label>
+                  </MotionLabel>
                   <textarea
                     value={formState.message}
                     onChange={(e) => setFormState({ ...formState, message: e.target.value })}
@@ -205,7 +202,7 @@ export function ContactSection() {
                 </div>
 
                 {/* Submit Button */}
-                <motion.button
+                <MotionButton
                   type="submit"
                   disabled={isSubmitting}
                   whileHover={{ scale: 1.02 }}
@@ -213,7 +210,7 @@ export function ContactSection() {
                   className="group w-full flex items-center justify-center gap-3 px-8 py-5 bg-foreground text-background rounded-full text-sm tracking-wide font-medium transition-all duration-300 hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed mt-8"
                 >
                   {isSubmitting ? (
-                    <motion.div
+                    <MotionDiv
                       animate={{ rotate: 360 }}
                       transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
                       className="w-5 h-5 border-2 border-background/30 border-t-background rounded-full"
@@ -224,7 +221,7 @@ export function ContactSection() {
                       <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </>
                   )}
-                </motion.button>
+                </MotionButton>
               </form>
             )}
           </motion.div>

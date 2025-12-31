@@ -1,8 +1,11 @@
 "use client"
 
-import { useRef, useState } from "react"
 import { motion, useInView } from "framer-motion"
-import { ArrowUpRight, Palette, Code, Lightbulb, Layers } from "lucide-react"
+import { ArrowUpRight, Code, Layers, Lightbulb, Palette } from "lucide-react"
+import type React from "react"
+import { useRef, useState } from "react"
+
+const MotionDiv = motion.div as unknown as React.ComponentType<React.ComponentProps<'div'> & any>
 
 const services = [
   {
@@ -40,7 +43,7 @@ const services = [
 
 export function ServicesSection() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const isInView = useInView(containerRef, { once: true, margin: "-100px" })
+  const isInView = useInView(containerRef as unknown as React.RefObject<HTMLElement>, { once: true, margin: "-100px" })
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
   return (
@@ -48,7 +51,7 @@ export function ServicesSection() {
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         {/* Section Header */}
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 mb-20 lg:mb-32">
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0, y: 40 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8 }}
@@ -60,8 +63,8 @@ export function ServicesSection() {
             <h2 className="text-4xl lg:text-5xl xl:text-6xl font-medium tracking-tight text-balance">
               What we do <span className="italic font-normal text-accent">best</span>
             </h2>
-          </motion.div>
-          <motion.div
+          </MotionDiv>
+          <MotionDiv
             initial={{ opacity: 0, y: 40 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -71,13 +74,13 @@ export function ServicesSection() {
               We offer a comprehensive suite of design services, each crafted with precision and tailored to elevate
               your brand&apos;s unique story.
             </p>
-          </motion.div>
+          </MotionDiv>
         </div>
 
         {/* Services Grid */}
         <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
           {services.map((service, index) => (
-            <motion.div
+            <MotionDiv
               key={service.title}
               initial={{ opacity: 0, y: 60 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -88,7 +91,7 @@ export function ServicesSection() {
             >
               <div className="relative p-8 lg:p-10 rounded-2xl bg-card border border-border/50 transition-all duration-500 hover:border-accent/30 hover:shadow-xl overflow-hidden">
                 {/* Background glow on hover */}
-                <motion.div
+                <MotionDiv
                   className="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                   initial={false}
                 />
@@ -103,7 +106,7 @@ export function ServicesSection() {
                       </div>
                       <span className="text-sm text-muted-foreground font-mono">{service.number}</span>
                     </div>
-                    <motion.div
+                    <MotionDiv
                       animate={{
                         x: hoveredIndex === index ? 0 : 10,
                         opacity: hoveredIndex === index ? 1 : 0,
@@ -111,7 +114,7 @@ export function ServicesSection() {
                       transition={{ duration: 0.3 }}
                     >
                       <ArrowUpRight className="w-5 h-5 text-accent" />
-                    </motion.div>
+                    </MotionDiv>
                   </div>
 
                   {/* Title & Description */}
@@ -134,14 +137,14 @@ export function ServicesSection() {
                 </div>
 
                 {/* Bottom line indicator */}
-                <motion.div
+                <MotionDiv
                   className="absolute bottom-0 left-0 h-[2px] bg-accent"
                   initial={{ width: 0 }}
                   animate={{ width: hoveredIndex === index ? "100%" : 0 }}
                   transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                 />
               </div>
-            </motion.div>
+            </MotionDiv>
           ))}
         </div>
       </div>
