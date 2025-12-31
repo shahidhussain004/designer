@@ -19,18 +19,20 @@ const navItems: NavItem[] = [
 ];
 
 export const FluidLogo: React.FC = () => (
-  <Link href="/" className="navbar-brand">
-    <Image src="/logo-reverse-designer.png" alt="Designer Marketplace" width={160} height={36} className="object-contain" />
+  <Link href="/" className="navbar-brand flex items-center">
+    <Image src="/logo-reverse-designer.png" alt="Designer Marketplace" width={160} height={36} className="object-contain invert" />
   </Link>
 );
 
 export const FluidNavLinks: React.FC<{ pathname?: string }> = ({ pathname = '/' }) => (
-  <ul className="nav-links">
+  <ul className="nav-links flex gap-8">
     {navItems.map((item) => (
       <li key={item.href}>
         <Link
           href={item.href}
-          className={`nav-item ${pathname === item.href ? 'nav-item-active' : ''}`}
+          className={`text-white hover:text-gray-200 transition-colors text-sm font-medium ${
+            pathname === item.href ? 'border-b-2 border-white' : ''
+          }`}
         >
           {item.label}
         </Link>

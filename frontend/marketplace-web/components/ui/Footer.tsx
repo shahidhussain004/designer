@@ -70,14 +70,14 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
         <footer
           ref={ref}
           className={cn(
-            'w-full border-t border-secondary-200 bg-white py-6',
+            'w-full border-t border-gray-700 bg-gray-900 py-6',
             className
           )}
           {...props}
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <p className="text-sm text-secondary-500">
+              <p className="text-sm text-gray-400">
                 &copy; {copyrightYear} {companyName}. All rights reserved.
               </p>
               <div className="flex items-center gap-6">
@@ -85,7 +85,7 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="text-sm text-secondary-500 hover:text-secondary-700"
+                    className="text-sm text-gray-400 hover:text-gray-200 transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -101,7 +101,7 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
       <footer
         ref={ref}
         className={cn(
-          'w-full border-t border-secondary-200 bg-secondary-50',
+          'w-full border-t border-gray-700 bg-gray-900',
           className
         )}
         {...props}
@@ -116,12 +116,12 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
                   <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center">
                     <span className="text-white font-bold text-lg">D</span>
                   </div>
-                  <span className="font-semibold text-xl text-secondary-900">
+                  <span className="font-semibold text-xl text-white">
                     {companyName}
                   </span>
                 </Link>
               )}
-              <p className="mt-4 text-secondary-600 max-w-sm">
+              <p className="mt-4 text-gray-400 max-w-sm">
                 {description}
               </p>
 
@@ -133,7 +133,7 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
                       href={socialLinks.twitter}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-secondary-400 hover:text-secondary-600 transition-colors"
+                      className="text-gray-400 hover:text-white transition-colors"
                       aria-label="Twitter"
                     >
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -146,7 +146,7 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
                       href={socialLinks.github}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-secondary-400 hover:text-secondary-600 transition-colors"
+                      className="text-gray-400 hover:text-white transition-colors"
                       aria-label="GitHub"
                     >
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -159,7 +159,7 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
                       href={socialLinks.linkedin}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-secondary-400 hover:text-secondary-600 transition-colors"
+                      className="text-gray-400 hover:text-white transition-colors"
                       aria-label="LinkedIn"
                     >
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -172,7 +172,7 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
                       href={socialLinks.facebook}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-secondary-400 hover:text-secondary-600 transition-colors"
+                      className="text-gray-400 hover:text-white transition-colors"
                       aria-label="Facebook"
                     >
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -185,7 +185,7 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
                       href={socialLinks.youtube}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-secondary-400 hover:text-secondary-600 transition-colors"
+                      className="text-gray-400 hover:text-white transition-colors"
                       aria-label="YouTube"
                     >
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -200,7 +200,7 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
             {/* Link sections */}
             {sections.map((section) => (
               <div key={section.title}>
-                <h3 className="text-sm font-semibold text-secondary-900 uppercase tracking-wider">
+                <h3 className="text-sm font-semibold text-white uppercase tracking-wider">
                   {section.title}
                 </h3>
                 <ul className="mt-4 space-y-3">
@@ -211,14 +211,14 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
                           href={link.href}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-secondary-600 hover:text-primary-600 transition-colors"
+                          className="text-gray-400 hover:text-primary-400 transition-colors"
                         >
                           {link.label}
                         </a>
                       ) : (
                         <Link
                           href={link.href}
-                          className="text-secondary-600 hover:text-primary-600 transition-colors"
+                          className="text-gray-400 hover:text-primary-400 transition-colors"
                         >
                           {link.label}
                         </Link>
@@ -231,9 +231,9 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
           </div>
 
           {/* Bottom bar */}
-          <div className="py-6 border-t border-secondary-200">
+          <div className="py-6 border-t border-gray-700">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <p className="text-sm text-secondary-500">
+              <p className="text-sm text-gray-400">
                 &copy; {copyrightYear} {companyName}. All rights reserved.
               </p>
               <div className="flex items-center gap-6">
@@ -241,7 +241,7 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="text-sm text-secondary-500 hover:text-secondary-700 transition-colors"
+                    className="text-sm text-gray-400 hover:text-gray-200 transition-colors"
                   >
                     {link.label}
                   </Link>
