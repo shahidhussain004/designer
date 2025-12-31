@@ -21,8 +21,8 @@ public class MilestoneDTOs {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateMilestoneRequest {
-        @NotNull(message = "Job ID is required")
-        private Long jobId;
+        @NotNull(message = "Project ID is required")
+        private Long projectId;
 
         private Long proposalId;
 
@@ -118,8 +118,8 @@ public class MilestoneDTOs {
         public static MilestoneResponse fromEntity(Milestone milestone) {
             return MilestoneResponse.builder()
                     .id(milestone.getId())
-                    .jobId(milestone.getJob().getId())
-                    .jobTitle(milestone.getJob().getTitle())
+                    .jobId(milestone.getProject().getId())
+                    .jobTitle(milestone.getProject().getTitle())
                     .proposalId(milestone.getProposal() != null ? milestone.getProposal().getId() : null)
                     .title(milestone.getTitle())
                     .description(milestone.getDescription())

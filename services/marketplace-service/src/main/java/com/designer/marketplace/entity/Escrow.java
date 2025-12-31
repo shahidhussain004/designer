@@ -58,7 +58,7 @@ public class Escrow {
     @Enumerated(EnumType.STRING)
     @Column(name = "release_condition", length = 100)
     @Builder.Default
-    private ReleaseCondition releaseCondition = ReleaseCondition.JOB_COMPLETED;
+    private ReleaseCondition releaseCondition = ReleaseCondition.PROJECT_COMPLETED;
 
     @Column(name = "auto_release_date")
     private LocalDateTime autoReleaseDate;

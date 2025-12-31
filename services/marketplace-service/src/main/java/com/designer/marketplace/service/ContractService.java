@@ -27,12 +27,12 @@ public class ContractService {
         List<Contract> contracts = contractRepository.findAll();
         // Use Hibernate.initialize to eagerly load all associations
         contracts.forEach(c -> {
-            Hibernate.initialize(c.getJob());
+            Hibernate.initialize(c.getProject());
             Hibernate.initialize(c.getClient());
             Hibernate.initialize(c.getFreelancer());
             Hibernate.initialize(c.getProposal());
-            if (c.getJob() != null) {
-                Hibernate.initialize(c.getJob().getJobCategory());
+            if (c.getProject() != null) {
+                Hibernate.initialize(c.getProject().getProjectCategory());
             }
         });
         return contracts;
@@ -42,12 +42,12 @@ public class ContractService {
         Contract contract = contractRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Contract not found: " + id));
         // Use Hibernate.initialize to eagerly load all associations
-        Hibernate.initialize(contract.getJob());
+        Hibernate.initialize(contract.getProject());
         Hibernate.initialize(contract.getClient());
         Hibernate.initialize(contract.getFreelancer());
         Hibernate.initialize(contract.getProposal());
-        if (contract.getJob() != null) {
-            Hibernate.initialize(contract.getJob().getJobCategory());
+        if (contract.getProject() != null) {
+            Hibernate.initialize(contract.getProject().getProjectCategory());
         }
         return contract;
     }
@@ -56,12 +56,12 @@ public class ContractService {
         List<Contract> contracts = contractRepository.findByUserId(userId);
         // Use Hibernate.initialize to eagerly load all associations
         contracts.forEach(c -> {
-            Hibernate.initialize(c.getJob());
+            Hibernate.initialize(c.getProject());
             Hibernate.initialize(c.getClient());
             Hibernate.initialize(c.getFreelancer());
             Hibernate.initialize(c.getProposal());
-            if (c.getJob() != null) {
-                Hibernate.initialize(c.getJob().getJobCategory());
+            if (c.getProject() != null) {
+                Hibernate.initialize(c.getProject().getProjectCategory());
             }
         });
         return contracts;

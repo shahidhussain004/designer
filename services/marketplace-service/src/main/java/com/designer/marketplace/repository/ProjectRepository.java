@@ -1,5 +1,7 @@
 package com.designer.marketplace.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -44,6 +46,11 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     @Query("SELECT COUNT(p) FROM Project p WHERE p.client.id = :clientId AND p.status = :status")
     Long countByClientIdAndStatus(@Param("clientId") Long clientId, @Param("status") Project.ProjectStatus status);
+
+    @Query("SELECT p FROM Project p WHERE p.client.id = :clientId AND p.status IN :statuses ORDER BY p.createdAt DESC")
+    List<Project> findTopByClientIdAndStatusIn(@Param("clientId") Long clientId, 
+                                                @Param("statuses") List<Project.ProjectStatus> statuses,
+                                                Pageable pageable);
 
     @Query("SELECT COUNT(p) FROM Project p WHERE p.status = 'OPEN'")
     Long countOpenProjects();

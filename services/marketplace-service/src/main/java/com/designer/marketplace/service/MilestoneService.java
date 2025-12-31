@@ -124,9 +124,9 @@ public class MilestoneService {
         Milestone milestone = milestoneRepository.findById(milestoneId)
                 .orElseThrow(() -> new IllegalArgumentException("Milestone not found"));
 
-        // Verify client owns the job
-        if (!milestone.getJob().getClient().getId().equals(clientId)) {
-            throw new IllegalArgumentException("Only the job client can fund milestones");
+        // Verify client owns the project
+        if (!milestone.getProject().getClient().getId().equals(clientId)) {
+            throw new IllegalArgumentException("Only the project client can fund milestones");
         }
 
         if (milestone.getStatus() != MilestoneStatus.PENDING) {
@@ -153,7 +153,7 @@ public class MilestoneService {
             // Create Stripe PaymentIntent
             Map<String, String> metadata = new HashMap<>();
             metadata.put("milestone_id", milestone.getId().toString());
-            metadata.put("job_id", milestone.getJob().getId().toString());
+            metadata.put("project_id", milestone.getProject().getId().toString());
             metadata.put("client_id", client.getId().toString());
             metadata.put("freelancer_id", freelancer.getId().toString());
 
@@ -175,7 +175,7 @@ public class MilestoneService {
                     .paymentIntentId(paymentIntent.getId())
                     .client(client)
                     .freelancer(freelancer)
-                    .job(milestone.getJob())
+                    .project(milestone.getProject())
                     .proposal(milestone.getProposal())
                     .amount(amount)
                     .platformFee(platformFee)
@@ -191,7 +191,7 @@ public class MilestoneService {
             // Create escrow record
             Escrow escrow = Escrow.builder()
                     .payment(payment)
-                    .job(milestone.getJob())
+                    .project(milestone.getProject())
                     .amount(freelancerAmount)
                     .currency(milestone.getCurrency())
                     .status(EscrowHoldStatus.HELD)
@@ -285,8 +285,8 @@ public class MilestoneService {
         Milestone milestone = milestoneRepository.findById(milestoneId)
                 .orElseThrow(() -> new IllegalArgumentException("Milestone not found"));
 
-        if (!milestone.getJob().getClient().getId().equals(clientId)) {
-            throw new IllegalArgumentException("Only the job client can approve milestones");
+        if (!milestone.getProject().getClient().getId().equals(clientId)) {
+            throw new IllegalArgumentException("Only the project client can approve milestones");
         }
 
         if (milestone.getStatus() != MilestoneStatus.SUBMITTED) {
@@ -330,8 +330,8 @@ public class MilestoneService {
         Milestone milestone = milestoneRepository.findById(milestoneId)
                 .orElseThrow(() -> new IllegalArgumentException("Milestone not found"));
 
-        if (!milestone.getJob().getClient().getId().equals(clientId)) {
-            throw new IllegalArgumentException("Only the job client can request revisions");
+        if (!milestone.getProject().getClient().getId().equals(clientId)) {
+            throw new IllegalArgumentException("Only the project client can request revisions");
         }
 
         if (milestone.getStatus() != MilestoneStatus.SUBMITTED) {
