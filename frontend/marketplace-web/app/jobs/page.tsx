@@ -187,7 +187,15 @@ function JobsPageContent() {
     switch (viewMode) {
       case 'compact':
         return (
-          <Card key={job.id} padding="m" className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => router.push(`/jobs/${job.id}`)}>
+          <Card
+            key={job.id}
+            padding="m"
+            className="hover:shadow-md transition-shadow cursor-pointer"
+            role="button"
+            tabIndex={0}
+            onClick={() => router.push(`/jobs/${job.id}`)}
+            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && router.push(`/jobs/${job.id}`)}
+          >
             <Flex justify-content="space-between" align-items="flex-start" gap="m">
               <Flex flex-direction="column" gap="xs" flex="1">
                 <Text tag="h4" font-size="body-l" font-weight="book">
@@ -204,6 +212,9 @@ function JobsPageContent() {
                 <Badge variant={job.status === 'OPEN' ? 'positive' : 'information'} className="text-xs">
                   {job.status}
                 </Badge>
+                <Button rank="secondary" onClick={(e) => { e.stopPropagation(); router.push(`/jobs/${job.id}`); }} className="mt-2">
+                  View Details →
+                </Button>
               </Flex>
             </Flex>
           </Card>
@@ -258,7 +269,15 @@ function JobsPageContent() {
       case 'grid':
       default:
         return (
-          <Card key={job.id} padding="l" className="h-full flex flex-col hover:shadow-lg transition-shadow cursor-pointer hover:scale-105 transform" onClick={() => router.push(`/jobs/${job.id}`)}>
+          <Card
+            key={job.id}
+            padding="l"
+            className="h-full flex flex-col hover:shadow-lg transition-shadow cursor-pointer hover:scale-105 transform"
+            role="button"
+            tabIndex={0}
+            onClick={() => router.push(`/jobs/${job.id}`)}
+            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && router.push(`/jobs/${job.id}`)}
+          >
             <Flex flex-direction="column" gap="m" flex="1">
               <Flex flex-direction="column" gap="xs" flex="1">
                 <Badge variant="notice" className="w-fit">{job.category.name}</Badge>
@@ -300,6 +319,11 @@ function JobsPageContent() {
                 <Text font-size="body-xs" color="secondary" className="whitespace-nowrap">
                   {formatDate(job.createdAt)}
                 </Text>
+                <div className="ml-3">
+                  <Button rank="secondary" onClick={(e) => { e.stopPropagation(); router.push(`/jobs/${job.id}`); }}>
+                    View Details →
+                  </Button>
+                </div>
               </Flex>
             </Flex>
           </Card>

@@ -1,9 +1,8 @@
 'use client'
 
-import { Div, Flex } from '@/components/green'
-import React from 'react'
-import Footer from './Footer'
-import Navbar from './Navbar'
+import { Div, Flex } from '@/components/green';
+import { Footer, Navbar } from '@/components/ui';
+import React from 'react';
 
 interface PageLayoutProps {
   children: React.ReactNode
@@ -32,5 +31,5 @@ export default function PageLayout({
   )
 }
 
-export type { PageLayoutProps }
+export type { PageLayoutProps };
 

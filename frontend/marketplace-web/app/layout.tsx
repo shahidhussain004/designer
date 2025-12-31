@@ -1,5 +1,4 @@
-import { SkipLink } from '@/components/ui/Accessibility'
-import { CookiesConsent } from '@/components/ui/CookiesConsent'
+import { CookiesConsent, SkipLink } from '@/components/ui'
 import { AuthProvider } from '@/lib/context/AuthContext'
 import type { Metadata, Viewport } from 'next'
 import './globals.css'

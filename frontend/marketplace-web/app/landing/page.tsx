@@ -1,11 +1,10 @@
 'use client'
 
-import { VideoBackground } from '@/components/ui/VideoBackground';
+import { IconCalendar, IconSearch, IconStar, VideoBackground } from '@/components/ui';
 import { parseCategories } from '@/lib/apiParsers';
 import type { JobCategory } from '@/lib/apiTypes';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { IconCalendar, IconSearch, IconStar } from '../../components/ui';
 
 type Category = JobCategory
 
@@ -64,14 +63,14 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
-      {/* Video Background */}
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+      {/* Video Background - replaced with gradient */}
       <VideoBackground />
 
      {/* Main Content */}
       <main className="relative z-20 flex flex-col items-center justify-end px-8 pt-12">
         {/* Hero Section */}
-        <div className="text-left mb-8 w-full max-w-5xl">
+        <div className="text-left mb-8 w-full max-w-5xl text-white">
           <div className="relative h-64 flex flex-col items-start justify-end overflow-visible">
             
             {/* First line */}

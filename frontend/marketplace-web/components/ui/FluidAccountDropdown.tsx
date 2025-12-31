@@ -87,9 +87,10 @@ export const FluidAccountDropdown = () => {
           cursor: 'pointer',
           fontSize: '0.875rem',
           fontWeight: '500',
+          color: 'rgb(229, 231, 235)',
           transition: 'background-color 0.2s'
         }}
-        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f3f4f6')}
+        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)')}
         onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
       >
         <span>{user?.fullName || 'Account'}</span>
@@ -101,7 +102,8 @@ export const FluidAccountDropdown = () => {
           stroke="currentColor"
           style={{
             transition: 'transform 0.2s',
-            transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)'
+            transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+            color: 'rgb(229, 231, 235)'
           }}
         >
           <polyline points="6 9 12 15 18 9"></polyline>
@@ -117,20 +119,20 @@ export const FluidAccountDropdown = () => {
             marginTop: '0.5rem',
             width: '224px',
             zIndex: 50,
-            backgroundColor: '#ffffff',
-            border: '1px solid #e5e7eb',
+            backgroundColor: '#0b1220',
+            border: '1px solid rgba(255,255,255,0.06)',
             borderRadius: '0.5rem',
-            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.3)',
             overflow: 'hidden'
           }}
         >
           <div style={{ padding: '0.75rem' }}>
             <div style={{ padding: '0.5rem 1rem' }}>
-              <p style={{ fontSize: '0.875rem', fontWeight: '600', color: '#1f2937', margin: 0 }}>{user?.fullName}</p>
-              <p style={{ fontSize: '0.75rem', color: '#6b7280', margin: '0.25rem 0 0 0' }}>{user?.email}</p>
+              <p style={{ fontSize: '0.875rem', fontWeight: '600', color: 'rgb(229, 231, 235)', margin: 0 }}>{user?.fullName}</p>
+              <p style={{ fontSize: '0.75rem', color: 'rgb(156, 163, 175)', margin: '0.25rem 0 0 0' }}>{user?.email}</p>
             </div>
 
-            <div style={{ margin: '0.5rem 0', borderTop: '1px solid #e5e7eb' }} />
+            <div style={{ margin: '0.5rem 0', borderTop: '1px solid rgba(255,255,255,0.06)' }} />
 
             <button
               onClick={() => { router.push('/dashboard'); setIsOpen(false); }}
@@ -140,13 +142,13 @@ export const FluidAccountDropdown = () => {
                 padding: '0.5rem 1rem',
                 textAlign: 'left',
                 fontSize: '0.875rem',
-                color: '#374151',
+                color: 'rgb(209, 213, 219)',
                 backgroundColor: 'transparent',
                 border: 'none',
                 cursor: 'pointer',
                 transition: 'background-color 0.2s'
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f3f4f6')}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.06)')}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
             >
               Dashboard
@@ -160,13 +162,13 @@ export const FluidAccountDropdown = () => {
                 padding: '0.5rem 1rem',
                 textAlign: 'left',
                 fontSize: '0.875rem',
-                color: '#374151',
+                color: 'rgb(209, 213, 219)',
                 backgroundColor: 'transparent',
                 border: 'none',
                 cursor: 'pointer',
                 transition: 'background-color 0.2s'
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f3f4f6')}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.06)')}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
             >
               Profile
@@ -180,19 +182,19 @@ export const FluidAccountDropdown = () => {
                 padding: '0.5rem 1rem',
                 textAlign: 'left',
                 fontSize: '0.875rem',
-                color: '#374151',
+                color: 'rgb(209, 213, 219)',
                 backgroundColor: 'transparent',
                 border: 'none',
                 cursor: 'pointer',
                 transition: 'background-color 0.2s'
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f3f4f6')}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.06)')}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
             >
               Settings
             </button>
 
-            <div style={{ margin: '0.5rem 0', borderTop: '1px solid #e5e7eb' }} />
+            <div style={{ margin: '0.5rem 0', borderTop: '1px solid rgba(255,255,255,0.06)' }} />
 
             <button
               onClick={handleLogout}
@@ -208,7 +210,7 @@ export const FluidAccountDropdown = () => {
                 cursor: 'pointer',
                 transition: 'background-color 0.2s'
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#fee2e2')}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)')}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
             >
               Logout

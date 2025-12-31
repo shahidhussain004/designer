@@ -1,19 +1,11 @@
 "use client"
 
-import { motion, useInView } from "framer-motion"
 import { ArrowUpRight, CheckCircle, Send } from "lucide-react"
 import type React from "react"
 
-import { useRef, useState } from "react"
-
-const MotionA = motion.a as unknown as React.ComponentType<React.ComponentProps<'a'> & any>
-const MotionLabel = motion.label as unknown as React.ComponentType<React.ComponentProps<'label'> & any>
-const MotionDiv = motion.div as unknown as React.ComponentType<React.ComponentProps<'div'> & any>
-const MotionButton = motion.button as unknown as React.ComponentType<React.ComponentProps<'button'> & any>
+import { useState } from "react"
 
 export function ContactSection() {
-  const containerRef = useRef<HTMLElement | null>(null)
-  const isInView = useInView(containerRef as unknown as React.RefObject<Element>, { once: true, margin: "-100px" })
   const [formState, setFormState] = useState({
     name: "",
     email: "",
@@ -22,7 +14,7 @@ export function ContactSection() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
-  const [focusedField, setFocusedField] = useState<string | null>(null)
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -34,15 +26,11 @@ export function ContactSection() {
   }
 
   return (
-    <section id="contact" ref={containerRef} className="relative py-32 lg:py-40 bg-secondary/30">
+    <section id="contact" className="relative py-32 lg:py-40 bg-secondary/30">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-24">
           {/* Left - Info */}
-          <motion.div
-            initial={{ opacity: 0, x: -60 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8 }}
-          >
+          <div>
             <span className="inline-flex items-center gap-3 text-sm tracking-[0.2em] uppercase text-muted-foreground mb-6">
               <span className="w-8 h-[1px] bg-accent" />
               Contact
@@ -57,7 +45,7 @@ export function ContactSection() {
 
             {/* Contact Info */}
             <div className="space-y-6">
-              <MotionA whileHover={{ x: 4 }} href="mailto:hello@atelier.design" className="group flex items-center gap-4 w-full">
+              <a href="mailto:hello@atelier.design" className="group flex items-center gap-4 w-full hover:translate-x-1 transition-transform duration-200">
                 <span className="w-12 h-12 rounded-full bg-card border border-border flex items-center justify-center group-hover:border-accent group-hover:bg-accent/5 transition-all duration-300">
                   <Send className="w-5 h-5 text-foreground group-hover:text-accent transition-colors duration-300" />
                 </span>
@@ -67,7 +55,7 @@ export function ContactSection() {
                     hello@atelier.design
                   </p>
                 </div>
-              </MotionA>
+              </a>
             </div>
 
             {/* Social Links */}
@@ -75,34 +63,26 @@ export function ContactSection() {
               <p className="text-sm text-muted-foreground mb-4">Follow us</p>
               <div className="flex gap-4">
                 {["Twitter", "LinkedIn", "Dribbble", "Instagram"].map((social) => (
-                  <motion.div key={social} whileHover={{ y: -2 }}>
+                  <div key={social} className="inline-block transition-transform duration-150 hover:-translate-y-0.5">
                     <a
                       href="#"
                       className="inline-block px-4 py-2 rounded-full border border-border text-sm text-foreground hover:border-accent hover:text-accent transition-all duration-300"
                     >
                       {social}
                     </a>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Right - Form */}
-          <motion.div
-            initial={{ opacity: 0, x: 60 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
+          <div>
             {isSubmitted ? (
               <div className="h-full flex flex-col items-center justify-center text-center p-12 rounded-2xl bg-card border border-border">
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                >
+                <div>
                   <CheckCircle className="w-16 h-16 text-accent mb-6" />
-                </motion.div>
+                </div>
                 <h3 className="text-2xl font-medium mb-4">Message Sent!</h3>
                 <p className="text-muted-foreground max-w-sm">
                   Thank you for reaching out. We&apos;ll get back to you within 24 hours.
@@ -113,43 +93,27 @@ export function ContactSection() {
                 {/* Name & Email */}
                 <div className="grid sm:grid-cols-2 gap-6">
                   <div className="relative">
-                    <MotionLabel
-                      animate={{
-                        y: focusedField === "name" || formState.name ? -24 : 0,
-                        scale: focusedField === "name" || formState.name ? 0.85 : 1,
-                        color: focusedField === "name" ? "hsl(var(--accent))" : "hsl(var(--muted-foreground))",
-                      }}
-                      className="absolute left-0 top-4 origin-left pointer-events-none transition-all duration-300"
-                    >
-                      Name
-                    </MotionLabel>
+                      <label className="absolute left-0 top-4 origin-left pointer-events-none transition-all duration-300 text-muted-foreground">
+                        Name
+                      </label>
                     <input
                       type="text"
                       value={formState.name}
                       onChange={(e) => setFormState({ ...formState, name: e.target.value })}
-                      onFocus={() => setFocusedField("name")}
-                      onBlur={() => setFocusedField(null)}
+                      
                       required
                       className="w-full pt-4 pb-3 bg-transparent border-b-2 border-border focus:border-accent outline-none transition-colors duration-300 text-foreground"
                     />
                   </div>
                   <div className="relative">
-                    <MotionLabel
-                      animate={{
-                        y: focusedField === "email" || formState.email ? -24 : 0,
-                        scale: focusedField === "email" || formState.email ? 0.85 : 1,
-                        color: focusedField === "email" ? "hsl(var(--accent))" : "hsl(var(--muted-foreground))",
-                      }}
-                      className="absolute left-0 top-4 origin-left pointer-events-none transition-all duration-300"
-                    >
+                    <label className="absolute left-0 top-4 origin-left pointer-events-none transition-all duration-300 text-muted-foreground">
                       Email
-                    </MotionLabel>
+                    </label>
                     <input
                       type="email"
                       value={formState.email}
                       onChange={(e) => setFormState({ ...formState, email: e.target.value })}
-                      onFocus={() => setFocusedField("email")}
-                      onBlur={() => setFocusedField(null)}
+                      
                       required
                       className="w-full pt-4 pb-3 bg-transparent border-b-2 border-border focus:border-accent outline-none transition-colors duration-300 text-foreground"
                     />
@@ -158,43 +122,27 @@ export function ContactSection() {
 
                 {/* Company */}
                 <div className="relative">
-                  <MotionLabel
-                    animate={{
-                      y: focusedField === "company" || formState.company ? -24 : 0,
-                      scale: focusedField === "company" || formState.company ? 0.85 : 1,
-                      color: focusedField === "company" ? "hsl(var(--accent))" : "hsl(var(--muted-foreground))",
-                    }}
-                    className="absolute left-0 top-4 origin-left pointer-events-none transition-all duration-300"
-                  >
+                  <label className="absolute left-0 top-4 origin-left pointer-events-none transition-all duration-300 text-muted-foreground">
                     Company (Optional)
-                  </MotionLabel>
+                  </label>
                   <input
                     type="text"
                     value={formState.company}
                     onChange={(e) => setFormState({ ...formState, company: e.target.value })}
-                    onFocus={() => setFocusedField("company")}
-                    onBlur={() => setFocusedField(null)}
+                    
                     className="w-full pt-4 pb-3 bg-transparent border-b-2 border-border focus:border-accent outline-none transition-colors duration-300 text-foreground"
                   />
                 </div>
 
                 {/* Message */}
                 <div className="relative">
-                  <MotionLabel
-                    animate={{
-                      y: focusedField === "message" || formState.message ? -24 : 0,
-                      scale: focusedField === "message" || formState.message ? 0.85 : 1,
-                      color: focusedField === "message" ? "hsl(var(--accent))" : "hsl(var(--muted-foreground))",
-                    }}
-                    className="absolute left-0 top-4 origin-left pointer-events-none transition-all duration-300"
-                  >
+                  <label className="absolute left-0 top-4 origin-left pointer-events-none transition-all duration-300 text-muted-foreground">
                     Tell us about your project
-                  </MotionLabel>
+                  </label>
                   <textarea
                     value={formState.message}
                     onChange={(e) => setFormState({ ...formState, message: e.target.value })}
-                    onFocus={() => setFocusedField("message")}
-                    onBlur={() => setFocusedField(null)}
+                    
                     required
                     rows={4}
                     className="w-full pt-4 pb-3 bg-transparent border-b-2 border-border focus:border-accent outline-none transition-colors duration-300 resize-none text-foreground"
@@ -202,29 +150,23 @@ export function ContactSection() {
                 </div>
 
                 {/* Submit Button */}
-                <MotionButton
+                <button
                   type="submit"
                   disabled={isSubmitting}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
                   className="group w-full flex items-center justify-center gap-3 px-8 py-5 bg-foreground text-background rounded-full text-sm tracking-wide font-medium transition-all duration-300 hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed mt-8"
                 >
                   {isSubmitting ? (
-                    <MotionDiv
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-                      className="w-5 h-5 border-2 border-background/30 border-t-background rounded-full"
-                    />
+                    <div className="w-5 h-5 border-2 border-background/30 border-t-background rounded-full animate-spin" />
                   ) : (
                     <>
                       <span>Send Message</span>
                       <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </>
                   )}
-                </MotionButton>
+                </button>
               </form>
             )}
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>
