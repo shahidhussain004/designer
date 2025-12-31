@@ -15,7 +15,7 @@ const navItems: NavItem[] = [
   { label: 'Tutorials', href: '/tutorials' },
   { label: 'Courses', href: '/courses' },
   { label: 'Resources', href: '/resources' },
-
+  { label: 'Design Studio', href: '/design-studio' },
 ];
 
 export const FluidLogo: React.FC = () => (
