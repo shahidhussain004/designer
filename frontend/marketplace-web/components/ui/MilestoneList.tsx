@@ -346,7 +346,7 @@ export default function MilestoneList({
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <h3 className="text-lg font-semibold mb-4">Submit Milestone for Review</h3>
             <p className="text-gray-600 mb-4">
-              Describe the work you've completed and any deliverables for the client to review.
+              Describe the work you&apos;ve completed and any deliverables for the client to review.
             </p>
             <textarea
               value={deliverables}

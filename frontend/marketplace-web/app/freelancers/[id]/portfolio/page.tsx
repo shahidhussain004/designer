@@ -2,6 +2,7 @@
 
 import { Button, Card, Divider, Flex, Grid, Spinner, Text } from '@/components/green'
 import { PageLayout } from '@/components/ui'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -178,13 +179,12 @@ export default function FreelancerPortfolioPage() {
                     padding: '1rem'
                   }}>
                     {item.imageUrl && (
-                      <img 
-                        src={item.imageUrl} 
+                      <Image
+                        src={item.imageUrl}
                         alt={item.title}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none'
-                        }}
+                        fill
+                        className="object-cover"
+                        onError={() => {}}
                       />
                     )}
                   </div>

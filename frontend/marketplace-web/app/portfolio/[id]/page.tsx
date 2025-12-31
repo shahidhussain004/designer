@@ -6,6 +6,7 @@ import apiClient from '@/lib/api-client'
 import { authService } from '@/lib/auth'
 import logger from '@/lib/logger'
 import { Edit, Eye, EyeOff, Plus, Trash2 } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
@@ -588,13 +589,12 @@ export default function PortfolioPage() {
                   }}
                 >
                   {item.imageUrl && (
-                    <img
+                    <Image
                       src={item.imageUrl}
                       alt={item.title}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      onError={(e) => {
-                        ;(e.target as HTMLImageElement).style.display = 'none'
-                      }}
+                      fill
+                      className="object-cover"
+                      onError={() => {}}
                     />
                   )}
 
