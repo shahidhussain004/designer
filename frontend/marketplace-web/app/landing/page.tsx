@@ -71,7 +71,7 @@ const LandingPage = () => {
      {/* Main Content */}
       <main className="relative z-20 flex flex-col items-center justify-end px-8 pt-12">
         {/* Hero Section */}
-        <div className="text-left mb-8 w-full max-w-5xl">
+        <div className="text-left mb-8 w-full max-w-5xl text-white">
           <div className="relative h-64 flex flex-col items-start justify-end overflow-visible">
             
             {/* First line */}

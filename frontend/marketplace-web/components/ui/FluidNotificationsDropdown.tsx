@@ -87,7 +87,7 @@ export const FluidNotificationsDropdown = () => {
           cursor: 'pointer',
           transition: 'background-color 0.2s'
         }}
-        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f3f4f6')}
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(100, 123, 161, 0.79)')}
         onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
       >
         <svg
@@ -95,7 +95,7 @@ export const FluidNotificationsDropdown = () => {
           height="20"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="currentColor"
+          stroke="#ffffff"
           strokeWidth="2"
         >
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
@@ -110,13 +110,15 @@ export const FluidNotificationsDropdown = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: '20px',
+              minWidth: '20px',
               height: '20px',
-              borderRadius: '50%',
+              padding: '0 6px',
+              borderRadius: '999px',
               backgroundColor: '#ef4444',
               color: '#ffffff',
               fontSize: '0.75rem',
-              fontWeight: '600'
+              fontWeight: '600',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.4)'
             }}
           >
             {unreadCount}
@@ -133,10 +135,10 @@ export const FluidNotificationsDropdown = () => {
             marginTop: '0.5rem',
             width: '320px',
             zIndex: 50,
-            backgroundColor: '#ffffff',
-            border: '1px solid #e5e7eb',
+            backgroundColor: '#0b1220',
+            border: '1px solid rgba(255,255,255,0.06)',
             borderRadius: '0.5rem',
-            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+            boxShadow: '0 10px 30px -10px rgba(0, 0, 0, 0.6)',
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
@@ -146,13 +148,13 @@ export const FluidNotificationsDropdown = () => {
           <div
             style={{
               padding: '1rem',
-              borderBottom: '1px solid #e5e7eb',
+              borderBottom: '1px solid rgba(255,255,255,0.04)',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center'
             }}
           >
-            <h3 style={{ fontSize: '0.875rem', fontWeight: '600', color: '#1f2937', margin: 0 }}>
+            <h3 style={{ fontSize: '0.875rem', fontWeight: '600', color: '#e6eef8', margin: 0 }}>
               Notifications
             </h3>
             {unreadCount > 0 && (
@@ -160,9 +162,9 @@ export const FluidNotificationsDropdown = () => {
                 style={{
                   padding: '0.25rem 0.5rem',
                   borderRadius: '0.25rem',
-                  backgroundColor: '#fee2e2',
+                  backgroundColor: 'rgba(255,255,255,0.03)',
                   fontSize: '0.75rem',
-                  color: '#991b1b',
+                  color: '#ef4444',
                   fontWeight: '500'
                 }}
               >
@@ -178,12 +180,12 @@ export const FluidNotificationsDropdown = () => {
               flex: 1
             }}
           >
-            {notifications.length === 0 ? (
+              {notifications.length === 0 ? (
               <div
                 style={{
                   padding: '2rem 1rem',
                   textAlign: 'center',
-                  color: '#6b7280'
+                  color: '#94a3b8'
                 }}
               >
                 <p style={{ fontSize: '0.875rem', margin: 0 }}>No notifications</p>
@@ -194,17 +196,17 @@ export const FluidNotificationsDropdown = () => {
                   key={notification.id}
                   style={{
                     padding: '1rem',
-                    borderBottom: '1px solid #f3f4f6',
-                    backgroundColor: notification.read ? '#ffffff' : '#f9fafb',
+                    borderBottom: '1px solid rgba(255,255,255,0.04)',
+                    backgroundColor: notification.read ? 'transparent' : 'rgba(255,255,255,0.02)',
                     transition: 'background-color 0.2s'
                   }}
                   onMouseEnter={(e) => {
                     if (!notification.read) {
-                      e.currentTarget.style.backgroundColor = '#f3f4f6';
+                      e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.04)';
                     }
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = notification.read ? '#ffffff' : '#f9fafb';
+                    e.currentTarget.style.backgroundColor = notification.read ? 'transparent' : 'rgba(255,255,255,0.02)';
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -213,7 +215,7 @@ export const FluidNotificationsDropdown = () => {
                         style={{
                           fontSize: '0.875rem',
                           fontWeight: notification.read ? '400' : '600',
-                          color: '#1f2937',
+                          color: '#e6eef8',
                           margin: 0
                         }}
                       >
@@ -222,7 +224,7 @@ export const FluidNotificationsDropdown = () => {
                       <p
                         style={{
                           fontSize: '0.75rem',
-                          color: '#6b7280',
+                          color: '#94a3b8',
                           margin: '0.25rem 0 0 0'
                         }}
                       >
@@ -231,7 +233,7 @@ export const FluidNotificationsDropdown = () => {
                       <p
                         style={{
                           fontSize: '0.75rem',
-                          color: '#9ca3af',
+                          color: '#7f8a98',
                           margin: '0.25rem 0 0 0'
                         }}
                       >
@@ -251,11 +253,11 @@ export const FluidNotificationsDropdown = () => {
                         backgroundColor: 'transparent',
                         border: 'none',
                         cursor: 'pointer',
-                        color: '#6b7280',
+                        color: '#94a3b8',
                         transition: 'color 0.2s'
                       }}
                       onMouseEnter={(e) => (e.currentTarget.style.color = '#ef4444')}
-                      onMouseLeave={(e) => (e.currentTarget.style.color = '#6b7280')}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = '#94a3b8')}
                     >
                       <svg
                         width="16"

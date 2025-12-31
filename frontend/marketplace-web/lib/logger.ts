@@ -58,7 +58,7 @@ class Logger {
     try {
       const str = typeof value === 'string' ? value : JSON.stringify(value);
       return str.length > maxLen ? str.substring(0, maxLen) : str;
-    } catch (e) {
+    } catch {
       try {
         return String(value).substring(0, maxLen);
       } catch {
@@ -127,8 +127,8 @@ class Logger {
         error: '❌',
       }[level];
 
-      const prefix = `%c${emoji} [${level.toUpperCase()}] ${timestamp}`;
-      const style = `color: ${color}; font-weight: bold;`;
+      const _prefix = `%c${emoji} [${level.toUpperCase()}] ${timestamp}`;
+      const _style = `color: ${color}; font-weight: bold;`;
 
       // Provide a safe, short string for context when available
       const safeContext = context ? this.safeStringify(context, 500) : '';
@@ -147,7 +147,7 @@ class Logger {
         } else if (level === 'info') {
           if (typeof console !== 'undefined' && console.info) console.info(output);
         }
-      } catch (e) {
+      } catch {
         // If console methods themselves throw, fallback to basic console.log when available
         try {
           if (typeof console !== 'undefined' && console.log) console.log(output);

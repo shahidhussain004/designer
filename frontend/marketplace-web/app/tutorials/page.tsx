@@ -1,6 +1,6 @@
 'use client';
 
-import { Footer, Navbar } from '@/components/ui';
+import { PageLayout } from '@/components/ui';
 import { BookOpen, Clock, Headphones, TrendingUp, Video } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -100,23 +100,20 @@ const TutorialsPage = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Navbar />
+      <PageLayout>
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-gray-300 border-t-transparent rounded-full animate-spin mx-auto"></div>
             <p className="mt-4 text-gray-600 dark:text-gray-300">Loading tutorials...</p>
           </div>
         </div>
-        <Footer />
-      </div>
+      </PageLayout>
     );
   }
 
   if (error) {
     return (
-      <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Navbar />
+      <PageLayout>
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <p className="text-red-500 text-lg">Error: {error}</p>
@@ -128,14 +125,12 @@ const TutorialsPage = () => {
             </button>
           </div>
         </div>
-        <Footer />
-      </div>
+      </PageLayout>
     );
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-      <Navbar />
+    <PageLayout>
       {/* Hero Section */}
       <div className="bg-gray-900 text-white py-16 px-4">
         <div className="container mx-auto max-w-6xl">
@@ -287,8 +282,7 @@ const TutorialsPage = () => {
           </div>
         )}
       </div>
-      <Footer />
-    </div>
+    </PageLayout>
   );
 };
 

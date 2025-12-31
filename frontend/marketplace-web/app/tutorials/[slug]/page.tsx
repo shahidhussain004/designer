@@ -1,6 +1,6 @@
 'use client';
 
-import { Breadcrumb, Footer, Navbar } from '@/components/ui';
+import { Breadcrumb, PageLayout } from '@/components/ui';
 import { BookOpen, ChevronRight, Clock, Code, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -110,23 +110,20 @@ const TutorialDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Navbar />
+      <PageLayout>
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-gray-300 border-t-transparent rounded-full animate-spin mx-auto"></div>
             <p className="mt-4 text-gray-600 dark:text-gray-300">Loading tutorial...</p>
           </div>
         </div>
-        <Footer />
-      </div>
+      </PageLayout>
     );
   }
 
   if (error || !tutorial) {
     return (
-      <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Navbar />
+      <PageLayout>
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <p className="text-red-500 text-lg">Error: {error || 'Tutorial not found'}</p>
@@ -138,8 +135,7 @@ const TutorialDetailPage = () => {
             </Link>
           </div>
         </div>
-        <Footer />
-      </div>
+      </PageLayout>
     );
   }
 
@@ -168,9 +164,7 @@ const TutorialDetailPage = () => {
   );
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Navbar />
-
+    <PageLayout>
       <main className="flex-1">
         {/* Hero Section */}
         <div className="bg-gray-900 text-white py-12 px-4 relative overflow-hidden">
@@ -319,9 +313,7 @@ const TutorialDetailPage = () => {
           </div>
         </div>
       </main>
-
-      <Footer />
-    </div>
+    </PageLayout>
   );
 };
 
