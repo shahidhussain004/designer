@@ -1,0 +1,170 @@
+'use client';
+
+import {
+    Alert,
+    Badge,
+    Card,
+    Flex,
+    Spinner,
+    Text,
+} from '@/components/green';
+import { PageLayout } from '@/components/ui';
+import { authService } from '@/lib/auth';
+import logger from '@/lib/logger';
+import { User } from '@/types';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+interface JobApplication {
+  id: number;
+  jobId: number;
+  jobTitle: string;
+  companyName: string;
+  coverLetter: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export default function MyApplicationsPage() {
+  const router = useRouter();
+  const [applications, setApplications] = useState<JobApplication[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const currentUser = authService.getCurrentUser();
+    if (currentUser) {
+      if (currentUser.role !== 'FREELANCER') {
+        router.push('/jobs');
+      } else {
+        setUser(currentUser);
+      }
+    }
+  }, [router]);
+
+  useEffect(() => {
+    const fetchApplications = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await fetch('http://localhost:8080/api/job-applications/my-applications');
+        if (!response.ok) {
+          throw new Error('Failed to fetch applications');
+        }
+        const data = await response.json();
+        setApplications(Array.isArray(data) ? data : data.content || []);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+        logger.error('Error fetching applications', err as Error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user && user.role === 'FREELANCER') {
+      fetchApplications();
+    }
+  }, [user]);
+
+  if (loading) {
+    return (
+      <PageLayout>
+        <Flex justify-content="center" align-items="center" padding="xl">
+          <Spinner />
+        </Flex>
+      </PageLayout>
+    );
+  }
+
+  return (
+    <PageLayout>
+      {error && (
+        <div style={{ padding: '1rem' }}>
+          <Alert variant="negative">{error}</Alert>
+        </div>
+      )}
+
+      <Flex flex-direction="column" gap="s" padding="l">
+        <Link href="/jobs">← Back to Jobs</Link>
+        <Text tag="h1" font-size="heading-xl">
+          My Applications
+        </Text>
+        <Text color="secondary">
+          Track the status of your job applications
+        </Text>
+      </Flex>
+
+      <Flex padding="l">
+        {applications.length === 0 ? (
+          <Card padding="xl" style={{ width: '100%' }}>
+            <Flex flex-direction="column" gap="m" align-items="center">
+              <Text font-size="heading-m">No applications yet</Text>
+              <Text color="secondary">
+                Start applying to jobs to track them here
+              </Text>
+              <Link href="/jobs">
+                Browse Jobs →
+              </Link>
+            </Flex>
+          </Card>
+        ) : (
+          <Flex flex-direction="column" gap="m" style={{ width: '100%' }}>
+            {applications.map((application) => (
+              <Link
+                key={application.id}
+                href={`/jobs/${application.jobId}`}
+              >
+                <Card padding="l" variant="interactive">
+                  <Flex
+                    flex-direction="column"
+                    gap="m"
+                    justify-content="space-between"
+                  >
+                    <Flex
+                      justify-content="space-between"
+                      align-items="start"
+                    >
+                      <Flex flex-direction="column" gap="xs" flex="1">
+                        <Text tag="h2" font-size="heading-m">
+                          {application.jobTitle}
+                        </Text>
+                        <Text color="secondary">
+                          {application.companyName}
+                        </Text>
+                      </Flex>
+                      <Badge
+                        variant={
+                          application.status === 'PENDING'
+                            ? 'information'
+                            : application.status === 'ACCEPTED'
+                            ? 'positive'
+                            : 'negative'
+                        }
+                      >
+                        {application.status}
+                      </Badge>
+                    </Flex>
+
+                    <Text>{application.coverLetter.substring(0, 150)}...</Text>
+
+                    <Flex justify-content="space-between" align-items="center">
+                      <Text font-size="body-s" color="secondary">
+                        Applied {new Date(application.createdAt).toLocaleDateString()}
+                      </Text>
+                      <Text font-size="body-s" color="secondary">
+                        Last updated {new Date(application.updatedAt).toLocaleDateString()}
+                      </Text>
+                    </Flex>
+                  </Flex>
+                </Card>
+              </Link>
+            ))}
+          </Flex>
+        )}
+      </Flex>
+    </PageLayout>
+  );
+}

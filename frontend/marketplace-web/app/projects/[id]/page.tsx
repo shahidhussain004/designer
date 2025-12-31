@@ -22,7 +22,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
-interface Job {
+interface Project {
   id: number;
   title: string;
   description: string;
@@ -51,24 +51,24 @@ interface Job {
 }
 
 interface ProposalRequest {
-  jobId: number;
+  projectId: number;
   coverLetter: string;
   proposedRate: number;
   estimatedDuration?: number;
 }
 
-export default function JobDetailsPage() {
+export default function ProjectDetailsPage() {
   const params = useParams();
-  const jobId = params.id as string;
+  const projectId = params.id as string;
 
-  const [job, setJob] = useState<Job | null>(null);
+  const [project, setProject] = useState<Project | null>(null);
   const [client, setClient] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [proposalOpen, setProposalOpen] = useState(false);
   const [proposalData, setProposalData] = useState<ProposalRequest>({
-    jobId: 0,
+    projectId: 0,
     coverLetter: '',
     proposedRate: 0,
     estimatedDuration: 30,
@@ -86,18 +86,18 @@ export default function JobDetailsPage() {
   }, []);
 
   useEffect(() => {
-    const fetchJobDetails = async () => {
+    const fetchProjectDetails = async () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(`http://localhost:8080/api/jobs/${jobId}`);
+        const response = await fetch(`http://localhost:8080/api/projects/${projectId}`);
         if (!response.ok) {
-          throw new Error('Failed to fetch job details');
+          throw new Error('Failed to fetch project details');
         }
         const data = await response.json();
-        setJob(data);
+        setProject(data);
 
-        setProposalData((prev) => ({ ...prev, jobId: data.id }));
+        setProposalData((prev) => ({ ...prev, projectId: data.id }));
 
         if (data.clientId) {
           try {
@@ -119,8 +119,8 @@ export default function JobDetailsPage() {
       }
     };
 
-    fetchJobDetails();
-  }, [jobId]);
+    fetchProjectDetails();
+  }, [projectId]);
 
   const handleProposalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -136,8 +136,8 @@ export default function JobDetailsPage() {
 
     // Client-side validation - populate fieldErrors map for field-level display
     const newFieldErrors: { coverLetter?: string; proposedRate?: string; estimatedDuration?: string } = {};
-    if (!proposalData.jobId || proposalData.jobId <= 0) {
-      setProposalError('Invalid job selected for proposal');
+    if (!proposalData.projectId || proposalData.projectId <= 0) {
+      setProposalError('Invalid project selected for proposal');
       return;
     }
 
@@ -162,7 +162,7 @@ export default function JobDetailsPage() {
 
       setProposalSuccess(true)
       setProposalOpen(false)
-      setProposalData({ jobId: job!.id, coverLetter: '', proposedRate: 0, estimatedDuration: 30 })
+      setProposalData({ projectId: project!.id, coverLetter: '', proposedRate: 0, estimatedDuration: 30 })
 
       // Auto-hide success message after 5 seconds
       setTimeout(() => setProposalSuccess(false), 5000)
@@ -219,15 +219,15 @@ export default function JobDetailsPage() {
     );
   }
 
-  if (error || !job) {
+  if (error || !project) {
     return (
       <PageLayout>
         <Flex flex-direction="column" padding="l" gap="m">
           <Alert variant="negative">
-            Error: {error || 'Job not found'}
+            Error: {error || 'Project not found'}
           </Alert>
-          <Link href="/jobs">
-            ← Back to Find Work
+          <Link href="/projects">
+            ← Back to Browse Projects
           </Link>
         </Flex>
       </PageLayout>
@@ -255,11 +255,11 @@ export default function JobDetailsPage() {
 
       {/* Header */}
       <Flex flex-direction="column" gap="s" padding="l">
-        <Link href="/jobs">
-          ← Back to Find Work
+        <Link href="/projects">
+          ← Back to Browse Projects
         </Link>
         <Text tag="h1" font-size="heading-xl">
-          {job.title}
+          {project.title}
         </Text>
       </Flex>
 
@@ -267,37 +267,37 @@ export default function JobDetailsPage() {
         <Grid columns="1; m{3}" gap="l">
           {/* Main Content */}
           <Flex flex-direction="column" gap="m">
-            {/* Job Description */}
+            {/* Project Description */}
             <Card padding="l">
               <Flex flex-direction="column" gap="m">
                 <Text tag="h2" font-size="heading-m">
-                  Job Description
+                  Project Description
                 </Text>
                 <Text>
-                  {job.description}
+                  {project.description}
                 </Text>
               </Flex>
             </Card>
 
-            {/* Job Meta */}
+            {/* Project Meta */}
             <Grid columns="2" gap="m">
               <Card padding="m">
                 <Flex flex-direction="column" gap="xs">
                   <Text font-size="body-s" color="secondary">Category</Text>
-                  <Text font-size="heading-s">{job.category.name}</Text>
+                  <Text font-size="heading-s">{project.category.name}</Text>
                 </Flex>
               </Card>
               <Card padding="m">
                 <Flex flex-direction="column" gap="xs">
                   <Text font-size="body-s" color="secondary">Experience Level</Text>
-                  <Text font-size="heading-s">{job.experienceLevel.name}</Text>
+                  <Text font-size="heading-s">{project.experienceLevel.name}</Text>
                 </Flex>
               </Card>
               <Card padding="m">
                 <Flex flex-direction="column" gap="xs">
                   <Text font-size="body-s" color="secondary">Status</Text>
-                  <Badge variant={job.status === 'OPEN' ? 'positive' : 'information'}>
-                    {job.status}
+                  <Badge variant={project.status === 'OPEN' ? 'positive' : 'information'}>
+                    {project.status}
                   </Badge>
                 </Flex>
               </Card>
@@ -305,7 +305,7 @@ export default function JobDetailsPage() {
                 <Flex flex-direction="column" gap="xs">
                   <Text font-size="body-s" color="secondary">Posted</Text>
                   <Text font-size="heading-s">
-                    {new Date(job.createdAt).toLocaleDateString()}
+                    {new Date(project.createdAt).toLocaleDateString()}
                   </Text>
                 </Flex>
               </Card>
@@ -342,10 +342,10 @@ export default function JobDetailsPage() {
               <Flex flex-direction="column" gap="m">
                 <Flex flex-direction="column" gap="xs">
                   <Text font-size="body-s">Budget</Text>
-                  <Text font-size="heading-xl">${job.budget}</Text>
+                  <Text font-size="heading-xl">${project.budget}</Text>
                 </Flex>
                 
-                {user && user.role === 'FREELANCER' && user.id !== job.clientId ? (
+                {user && user.role === 'FREELANCER' && user.id !== project.clientId ? (
                   <Button
                     variant={proposalOpen ? 'neutral' : 'brand'}
                     onClick={() => {
