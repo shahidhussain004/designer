@@ -86,3 +86,5 @@ export * from '@/lib/design-system/tokens';
 export { announceToScreenReader, cn, debounce, getContrastRatio, lockBodyScroll, throttle, trapFocus } from '@/lib/design-system/utils';
 
 
+export { VideoBackground } from './VideoBackground';
+

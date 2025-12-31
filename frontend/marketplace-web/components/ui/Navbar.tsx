@@ -1,9 +1,8 @@
 'use client';
 
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
-import AnimatedButton from './AnimatedButton';
+import { FluidAccountDropdown } from './FluidAccountDropdown';
 import { FluidLogo, FluidNavLinks } from './FluidHeader';
 import { FluidNotificationsDropdown } from './FluidNotificationsDropdown';
 import './styles/navbar.css';
@@ -31,12 +30,7 @@ export const Navbar = ({ className: _className }: NavbarProps) => {
         {/* Right Section: Notifications + Account */}
         <div className="navbar-right">
           <FluidNotificationsDropdown />
-          <Link href="/auth/login" className="hover:text-pink-300 transition-colors">Login</Link>
-          <Link href="/get-started">
-            <AnimatedButton variant="slim" className="bg-white text-black hover:bg-gray-100">
-              <span className="flex items-center">Sign Up</span>
-            </AnimatedButton>
-          </Link>
+          <FluidAccountDropdown />
         </div>
       </div>
     </nav>

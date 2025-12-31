@@ -53,8 +53,8 @@ export default function FreelancerDashboardPage() {
       <Div background="brand-01" padding="l">
         <Flex justify-content="space-between" align-items="center" max-width="1280px" margin="0 auto" width="100%">
           <Flex flex-direction="column" gap="xs">
-            <Text font="heading-l" color="inversed">Freelancer Dashboard</Text>
-            <Text font="body-regular-m" color="inversed">Welcome back</Text>
+            <Text font="heading-l" color="neutral-01">Freelancer Dashboard</Text>
+            <Text font="body-regular-m" color="neutral-01">Welcome back</Text>
           </Flex>
         </Flex>
       </Div>
