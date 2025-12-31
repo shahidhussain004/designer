@@ -62,14 +62,14 @@ CREATE TABLE jobs (
     show_salary BOOLEAN DEFAULT TRUE,
     
     -- Benefits and perks
-    benefits TEXT[], -- array of benefits
-    perks TEXT[], -- array of perks
+    benefits text[], -- array of benefits
+    perks text[], -- array of perks
     
     -- Skills and qualifications
-    required_skills TEXT[], -- array of required skills
-    preferred_skills TEXT[], -- array of preferred skills
+    required_skills text[], -- array of required skills
+    preferred_skills text[], -- array of preferred skills
     education_level VARCHAR(50), -- HIGH_SCHOOL, ASSOCIATE, BACHELOR, MASTER, PHD
-    certifications TEXT[], -- array of required certifications
+    certifications text[], -- array of required certifications
     
     -- Application details
     application_deadline TIMESTAMP,
@@ -149,7 +149,7 @@ CREATE TABLE job_applications (
     resume_url TEXT,
     portfolio_url TEXT,
     linkedin_url TEXT,
-    additional_documents TEXT[], -- array of document URLs
+    additional_documents text[], -- array of document URLs
     
     -- Answers to screening questions
     answers JSONB, -- flexible structure for custom questions
