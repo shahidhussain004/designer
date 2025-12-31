@@ -15,6 +15,7 @@ import { PageLayout, Tabs } from '@/components/ui'
 import { authService } from '@/lib/auth'
 import { Course, getInstructorCourseById, publishCourse, updateCourse } from '@/lib/courses'
 import { ChevronDown, Plus } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -343,11 +344,13 @@ export default function EditCoursePage() {
                 </Text>
                 
                 {course.thumbnailUrl && (
-                  <div className="mb-6 h-64 bg-gray-200 rounded-lg overflow-hidden">
-                    <img 
-                      src={course.thumbnailUrl} 
+                  <div className="mb-6 h-64 bg-gray-200 rounded-lg overflow-hidden relative">
+                    <Image
+                      src={course.thumbnailUrl}
                       alt={course.title}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
+                      priority
                     />
                   </div>
                 )}
