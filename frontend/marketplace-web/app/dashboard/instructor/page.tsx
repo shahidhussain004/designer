@@ -1,14 +1,14 @@
 'use client'
 
 import {
-    Badge,
-    Button,
-    Card,
-    Divider,
-    Flex,
-    Grid,
-    Spinner,
-    Text,
+  Badge,
+  Button,
+  Card,
+  Divider,
+  Flex,
+  Grid,
+  Spinner,
+  Text,
 } from '@/components/green'
 import { PageLayout } from '@/components/ui'
 import { authService } from '@/lib/auth'
@@ -113,7 +113,7 @@ export default function InstructorDashboardPage() {
                     </Flex>
                     <Flex gap="s">
                       <Link href={`/dashboard/instructor/courses/${course.id}/edit`} style={{ flex: 1 }}>
-                        <Button variant="secondary" style={{ width: '100%' }}>
+                        <Button variant="neutral" style={{ width: '100%' }}>
                           <Edit size={16} /> Edit
                         </Button>
                       </Link>
@@ -151,7 +151,7 @@ export default function InstructorDashboardPage() {
                     </Flex>
                     <Flex gap="s">
                       <Link href={`/dashboard/instructor/courses/${course.id}/edit`} style={{ flex: 1 }}>
-                        <Button variant="secondary" style={{ width: '100%' }}>
+                        <Button variant="neutral" style={{ width: '100%' }}>
                           <Edit size={16} /> Edit
                         </Button>
                       </Link>

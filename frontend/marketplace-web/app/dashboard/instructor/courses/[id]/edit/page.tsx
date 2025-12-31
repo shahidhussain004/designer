@@ -106,7 +106,7 @@ export default function EditCoursePage() {
   if (loading) {
     return (
       <PageLayout>
-        <Flex py={8}>
+        <Flex className="py-8">
           <Spinner />
           <Text>Loading course...</Text>
         </Flex>
@@ -118,7 +118,7 @@ export default function EditCoursePage() {
     return (
       <PageLayout>
         <Card className="bg-red-50 border-red-200 p-6">
-          <Text color="red" weight="medium">
+          <Text color="negative-01" className="font-medium">
             Course not found
           </Text>
         </Card>
@@ -134,7 +134,7 @@ export default function EditCoursePage() {
             <Link href="/dashboard/instructor" className="text-blue-600 hover:text-blue-700 text-sm mb-2 block">
               ← Back to Dashboard
             </Link>
-            <Text as="h1" className="text-2xl font-bold">
+            <Text tag="h1" className="text-2xl font-bold">
               {course.title}
             </Text>
           </div>
@@ -156,7 +156,7 @@ export default function EditCoursePage() {
           </Card>
         )}
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <Tabs value={activeTab} onChange={setActiveTab}>
           <div className="flex gap-4 border-b mb-6">
             <button
               onClick={() => setActiveTab('details')}
@@ -194,7 +194,7 @@ export default function EditCoursePage() {
           {activeTab === 'details' && (
             <div className="space-y-6">
               <Card className="p-6">
-                <Text as="h2" size="lg" weight="bold" mb={6}>
+                <Text tag="h2" className="text-lg font-bold" style={{ marginBottom: '1.5rem' }}>
                   Course Information
                 </Text>
 
@@ -231,7 +231,7 @@ export default function EditCoursePage() {
                     />
                   </div>
 
-                  <Grid columns={2} gap={4}>
+                  <Grid columns="2" gap="m">
                     <div>
                       <label className="block text-sm font-medium mb-2">Category</label>
                       <select
@@ -289,12 +289,12 @@ export default function EditCoursePage() {
 
                 <Divider className="my-6" />
 
-                <Flex gap={4}>
+                <Flex gap="m">
                   <Button onClick={handleSave} disabled={saving}>
                     {saving ? 'Saving...' : 'Save Changes'}
                   </Button>
                   <Link href="/dashboard/instructor">
-                    <Button variant="outline">Cancel</Button>
+                    <Button variant="neutral">Cancel</Button>
                   </Link>
                 </Flex>
               </Card>
@@ -305,21 +305,21 @@ export default function EditCoursePage() {
           {activeTab === 'modules' && (
             <div className="space-y-6">
               <Card className="p-6">
-                <Flex justify="between" align="center" mb={6}>
-                  <Text as="h2" size="lg" weight="bold">
+                <Flex style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                  <Text tag="h2" className="text-lg font-bold">
                     Modules & Lessons
                   </Text>
-                  <Button size="sm" variant="outline">
+                  <Button size="small" variant="neutral">
                     <Plus size={16} /> Add Module
                   </Button>
                 </Flex>
 
                 <div className="space-y-4">
                   <Card className="p-4 bg-gray-50">
-                    <Flex justify="between" align="center">
+                    <Flex style={{ justifyContent: 'space-between', alignItems: 'center' }}>
                       <div>
-                        <Text weight="bold">Module 1: Getting Started</Text>
-                        <Text color="gray" size="sm">2 lessons</Text>
+                        <Text className="font-bold">Module 1: Getting Started</Text>
+                        <Text color="secondary" className="text-sm">2 lessons</Text>
                       </div>
                       <ChevronDown size={20} />
                     </Flex>
@@ -327,7 +327,7 @@ export default function EditCoursePage() {
                 </div>
 
                 <Divider className="my-6" />
-                <Text color="gray" size="sm">
+                <Text color="secondary" className="text-sm">
                   Click on a module to expand and manage lessons, or add a new module to get started.
                 </Text>
               </Card>
@@ -338,7 +338,7 @@ export default function EditCoursePage() {
           {activeTab === 'preview' && (
             <div className="space-y-6">
               <Card className="p-6">
-                <Text as="h2" size="lg" weight="bold" mb={6}>
+                <Text tag="h2" className="text-lg font-bold" style={{ marginBottom: '1.5rem' }}>
                   Course Preview
                 </Text>
                 
@@ -352,39 +352,39 @@ export default function EditCoursePage() {
                   </div>
                 )}
 
-                <Text as="h3" size="xl" weight="bold" mb={2}>
+                <Text tag="h3" className="text-xl font-bold" style={{ marginBottom: '0.5rem' }}>
                   {formData.title}
                 </Text>
                 
-                <Text color="gray" mb={4}>
+                <Text color="secondary" style={{ marginBottom: '1rem' }}>
                   {formData.shortDescription}
                 </Text>
 
-                <Grid columns={4} gap={4} mb={6}>
+                <Grid columns="4" gap="m" style={{ marginBottom: '1.5rem' }}>
                   <div>
-                    <Text color="gray" size="xs">PRICE</Text>
-                    <Text weight="bold">${(formData.price).toFixed(2)}</Text>
+                    <Text color="secondary" className="text-xs">PRICE</Text>
+                    <Text className="font-bold">${(formData.price).toFixed(2)}</Text>
                   </div>
                   <div>
-                    <Text color="gray" size="xs">LEVEL</Text>
-                    <Text weight="bold">{formData.level}</Text>
+                    <Text color="secondary" className="text-xs">LEVEL</Text>
+                    <Text className="font-bold">{formData.level}</Text>
                   </div>
                   <div>
-                    <Text color="gray" size="xs">CATEGORY</Text>
-                    <Text weight="bold">{formData.category}</Text>
+                    <Text color="secondary" className="text-xs">CATEGORY</Text>
+                    <Text className="font-bold">{formData.category}</Text>
                   </div>
                   <div>
-                    <Text color="gray" size="xs">LESSONS</Text>
-                    <Text weight="bold">{course.lessonsCount || 0}</Text>
+                    <Text color="secondary" className="text-xs">LESSONS</Text>
+                    <Text className="font-bold">{course.lessonsCount || 0}</Text>
                   </div>
                 </Grid>
 
                 <Divider className="my-6" />
 
-                <Text as="h4" size="lg" weight="bold" mb={3}>
+                <Text tag="h4" className="text-lg font-bold" style={{ marginBottom: '0.75rem' }}>
                   About this course
                 </Text>
-                <Text color="gray" className="whitespace-pre-wrap">
+                <Text color="secondary" className="whitespace-pre-wrap">
                   {formData.description}
                 </Text>
               </Card>

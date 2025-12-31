@@ -1,13 +1,13 @@
 'use client'
 
 import {
-    Button,
-    Card,
-    Divider,
-    Flex,
-    Input,
-    Text,
-    Textarea,
+  Button,
+  Card,
+  Divider,
+  Flex,
+  Input,
+  Text,
+  Textarea,
 } from '@/components/green'
 import { PageLayout } from '@/components/ui'
 import { COURSE_CATEGORIES, createCourse, SKILL_LEVELS } from '@/lib/courses'
@@ -268,9 +268,9 @@ export default function CreateCoursePage() {
               <Divider />
 
               {/* Actions */}
-              <Flex gap="m" justify-content="flex-end">
+              <Flex gap="m" style={{ justifyContent: 'flex-end' }}>
                 <Button
-                  variant="secondary"
+                  variant="neutral"
                   onClick={() => router.back()}
                   disabled={loading}
                 >
