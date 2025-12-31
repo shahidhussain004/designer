@@ -11,5 +11,17 @@
     }],
     "react-hooks/exhaustive-deps": "warn",
     "react-hooks/rules-of-hooks": "error"
+    ,
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          {
+            "group": ["@/components/ui/*"],
+            "message": "Import UI components from the barrel '@/components/ui' to keep imports consistent and enable refactoring. Use direct imports only when absolutely necessary (e.g., large component requiring a separate chunk)."
+          }
+        ]
+      }
+    ]
   }
 }

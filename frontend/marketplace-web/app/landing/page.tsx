@@ -1,6 +1,6 @@
 'use client'
 
-import { VideoBackground } from '@/components/ui/VideoBackground';
+import { VideoBackground } from '@/components/ui';
 import { parseCategories } from '@/lib/apiParsers';
 import type { JobCategory } from '@/lib/apiTypes';
 import Link from 'next/link';

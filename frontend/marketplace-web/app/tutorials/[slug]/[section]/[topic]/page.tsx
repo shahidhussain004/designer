@@ -1,6 +1,6 @@
 'use client';
 
-import { Breadcrumb, Navbar } from '@/components/ui';
+import { Breadcrumb, PageLayout } from '@/components/ui';
 import {
   BookOpen,
   ChevronLeft,
@@ -114,34 +114,37 @@ const TopicReadingPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-gray-300 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading content...</p>
+      <PageLayout>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-gray-300 border-t-transparent rounded-full animate-spin mx-auto"></div>
+            <p className="mt-4 text-gray-600 dark:text-gray-300">Loading content...</p>
+          </div>
         </div>
-      </div>
+      </PageLayout>
     );
   }
 
   if (error || !topic) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-500 text-lg">Error: {error || 'Content not found'}</p>
-          <Link
-            href="/tutorials"
-            className="mt-4 inline-block px-6 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
-          >
-            Back to Tutorials
-          </Link>
+      <PageLayout>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-red-500 text-lg">Error: {error || 'Content not found'}</p>
+            <Link
+              href="/tutorials"
+              className="mt-4 inline-block px-6 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
+            >
+              Back to Tutorials
+            </Link>
+          </div>
         </div>
-      </div>
+      </PageLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Navbar />
+    <PageLayout>
       <div className="container mx-auto max-w-5xl px-4 py-4">
         <Breadcrumb
           items={[
@@ -228,7 +231,7 @@ const TopicReadingPage = () => {
           ) : null}
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 
