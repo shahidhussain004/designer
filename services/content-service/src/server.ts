@@ -48,17 +48,25 @@ async function bootstrap(): Promise<void> {
     // Initialize infrastructure
     logger.info('Connecting to infrastructure services...');
 
+    logger.debug('Before prismaService.connect');
     // Database (required)
     await prismaService.connect();
+    logger.debug('After prismaService.connect');
 
+    logger.debug('Before storageService.init');
     // Storage (required)
     await storageService.init();
+    logger.debug('After storageService.init');
 
+    logger.debug('Before redisService.connect');
     // Redis (optional - graceful degradation)
     await redisService.connect();
+    logger.debug('After redisService.connect');
 
+    logger.debug('Before kafkaService.connect');
     // Kafka (optional - graceful degradation)
     await kafkaService.connect();
+    logger.debug('After kafkaService.connect');
 
     // Start server
     await app.listen({

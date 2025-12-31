@@ -223,3 +223,231 @@ export const COURSE_CATEGORIES = [
 ];
 
 export const SKILL_LEVELS = ['Beginner', 'Intermediate', 'Advanced'] as const;
+
+// ==================== INSTRUCTOR COURSE MANAGEMENT ====================
+
+/**
+ * Create a new course as instructor
+ */
+export async function createCourse(data: {
+  title: string;
+  description: string;
+  shortDescription: string;
+  category: string;
+  level: string;
+  price: number;
+  currency?: string;
+  thumbnailUrl?: string;
+  previewVideoUrl?: string;
+  tags?: string[];
+  objectives?: string[];
+  requirements?: string[];
+}): Promise<Course> {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  
+  const response = await fetch(`${LMS_API_URL}/instructor/courses`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+    body: JSON.stringify(data),
+  });
+  
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to create course');
+  }
+  
+  return response.json();
+}
+
+/**
+ * Update an existing course
+ */
+export async function updateCourse(
+  courseId: string,
+  data: Partial<{
+    title: string;
+    description: string;
+    shortDescription: string;
+    category: string;
+    level: string;
+    price: number;
+    currency: string;
+    thumbnailUrl: string;
+    previewVideoUrl: string;
+    tags: string[];
+    objectives: string[];
+    requirements: string[];
+  }>
+): Promise<Course> {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  
+  const response = await fetch(`${LMS_API_URL}/instructor/courses/${courseId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+    body: JSON.stringify(data),
+  });
+  
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to update course');
+  }
+  
+  return response.json();
+}
+
+/**
+ * Delete a course (draft only)
+ */
+export async function deleteCourse(courseId: string): Promise<void> {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  
+  const response = await fetch(`${LMS_API_URL}/instructor/courses/${courseId}`, {
+    method: 'DELETE',
+    headers: {
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to delete course');
+  }
+}
+
+/**
+ * Publish a course (make it available for enrollment)
+ */
+export async function publishCourse(courseId: string): Promise<Course> {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  
+  const response = await fetch(`${LMS_API_URL}/instructor/courses/${courseId}/publish`, {
+    method: 'POST',
+    headers: {
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to publish course');
+  }
+  
+  return response.json();
+}
+
+/**
+ * Get instructor's courses
+ */
+export async function getInstructorCourses(
+  page = 0,
+  size = 20
+): Promise<{
+  items: Course[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}> {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  
+  const response = await fetch(
+    `${LMS_API_URL}/instructor/courses?page=${page}&pageSize=${size}`,
+    {
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    }
+  );
+  
+  if (!response.ok) {
+    throw new Error('Failed to fetch instructor courses');
+  }
+  
+  return response.json();
+}
+
+/**
+ * Add a module to a course
+ */
+export async function addModule(
+  courseId: string,
+  data: {
+    title: string;
+    description?: string;
+    orderIndex?: number;
+  }
+): Promise<Course> {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  
+  const response = await fetch(`${LMS_API_URL}/courses/${courseId}/modules`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+    body: JSON.stringify(data),
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to add module');
+  }
+  
+  return response.json();
+}
+
+/**
+ * Add a lesson to a module
+ */
+export async function addLesson(
+  courseId: string,
+  data: {
+    moduleId: string;
+    title: string;
+    description?: string;
+    type: 'Video' | 'Text' | 'Quiz';
+    content?: string;
+    videoUrl?: string;
+    durationMinutes?: number;
+    orderIndex?: number;
+    isFree?: boolean;
+  }
+): Promise<Course> {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  
+  const response = await fetch(`${LMS_API_URL}/courses/${courseId}/lessons`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+    body: JSON.stringify(data),
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to add lesson');
+  }
+  
+  return response.json();
+}
+
+/**
+ * Get course for instructor (with draft courses)
+ */
+export async function getInstructorCourseById(courseId: string): Promise<Course> {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  
+  const response = await fetch(`${LMS_API_URL}/courses/${courseId}`, {
+    headers: {
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to fetch course');
+  }
+  
+  return response.json();
+}

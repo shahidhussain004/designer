@@ -1,6 +1,6 @@
 "use client";
 
-import { PageLayout } from '@/components/layout';
+import { PageLayout } from '@/components/ui';
 import { apiClient } from '@/lib/api-client';
 import { useAuth } from '@/lib/context/AuthContext';
 import { Edit, Eye, EyeOff, Plus, Trash2 } from 'lucide-react';

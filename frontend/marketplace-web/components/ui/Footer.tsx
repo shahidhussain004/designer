@@ -4,9 +4,9 @@
  * Professional footer with multiple sections and responsive design
  */
 
-import React, { forwardRef } from 'react';
-import Link from 'next/link';
 import { cn } from '@/lib/design-system/utils';
+import Link from 'next/link';
+import React, { forwardRef } from 'react';
 
 export interface FooterLink {
   label: string;

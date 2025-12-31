@@ -38,7 +38,10 @@ export { ConfirmDialog, Modal, ModalBody, ModalFooter, ModalHeader } from './Mod
 export type { ConfirmDialogProps, ModalBodyProps, ModalFooterProps, ModalHeaderProps, ModalProps } from './Modal';
 
 // Navigation Components
+export { default as Breadcrumb, type BreadcrumbItem, type BreadcrumbProps } from './Breadcrumb';
 export { Footer, type FooterLink, type FooterProps, type FooterSection } from './Footer';
+export { default as Navbar } from './Navbar';
+export { default as PageLayout, type PageLayoutProps } from './PageLayout';
 export { Tab, TabList, TabPanel, Tabs } from './Tabs';
 export type { TabListProps, TabPanelProps, TabProps, TabsProps } from './Tabs';
 
@@ -54,6 +57,7 @@ export type {
 } from './Accessibility';
 
 // Brand & Icons
+export { default as AnimatedButton, type AnimatedButtonProps } from './AnimatedButton';
 export {
   IconAlertCircle,
   IconAlertTriangle, IconArrowLeft, IconArrowRight, IconBell, IconCalendar, IconCheck,
@@ -71,6 +75,9 @@ export {
 export type {
   AspectRatioProps, ContainerProps, DividerProps, GridProps, MainLayoutProps, ResponsiveProps, SectionProps, StackProps
 } from './Layout';
+
+// Business Components
+export { default as MilestoneList, type MilestoneListProps } from './MilestoneList';
 
 // Design System
 export * from '@/lib/design-system/tokens';

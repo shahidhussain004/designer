@@ -1,9 +1,9 @@
 'use client';
 
-import AnimatedButton from '@/app/components/animated-button';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
+import AnimatedButton from './AnimatedButton';
 import { FluidNotificationsDropdown } from './fluid-notifications-dropdown';
 import { FluidLogo, FluidNavLinks } from './FluidHeader';
 import './navbar.css';

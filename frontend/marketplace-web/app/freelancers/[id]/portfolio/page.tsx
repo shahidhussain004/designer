@@ -1,7 +1,7 @@
 "use client"
 
 import { Button, Card, Divider, Flex, Grid, Spinner, Text } from '@/components/green'
-import { PageLayout } from '@/components/layout'
+import { PageLayout } from '@/components/ui'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
