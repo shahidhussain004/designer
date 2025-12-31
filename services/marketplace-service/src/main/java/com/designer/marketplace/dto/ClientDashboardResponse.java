@@ -1,11 +1,11 @@
 package com.designer.marketplace.dto;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 /**
  * DTO for Client Dashboard response
@@ -17,7 +17,7 @@ import java.util.List;
 public class ClientDashboardResponse {
 
     private DashboardStats stats;
-    private List<JobResponse> activeJobs;
+    private List<ProjectResponse> activeProjects;
     private List<ProposalResponse> recentProposals;
 
     @Data
@@ -25,9 +25,9 @@ public class ClientDashboardResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class DashboardStats {
-        private Long totalJobsPosted;
-        private Long activeJobs;
-        private Long completedJobs;
+        private Long totalProjectsPosted;
+        private Long activeProjects;
+        private Long completedProjects;
         private Long totalProposalsReceived;
         private Long pendingProposals;
     }
