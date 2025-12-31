@@ -98,7 +98,7 @@ export default function CreateJobPage() {
         throw new Error('Not authenticated');
       }
 
-      const response = await fetch('http://localhost:8080/api/jobs', {
+      const response = await fetch('http://localhost:8080/api/projects', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -110,13 +110,13 @@ export default function CreateJobPage() {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(
-          errorData.message || `Failed to create job (${response.status})`
+          errorData.message || `Failed to create project (${response.status})`
         );
       }
 
-      const newJob = await response.json();
-      alert('Job created successfully!');
-      router.push(`/jobs/${newJob.id}`);
+      const newProject = await response.json();
+      alert('Project created successfully!');
+      router.push(`/projects/${newProject.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {

@@ -20,7 +20,7 @@ import { Suspense, useCallback, useEffect, useState } from 'react';
 type ViewMode = 'list' | 'grid' | 'compact';
 type SortBy = 'recent' | 'budget-high' | 'budget-low';
 
-interface Job {
+interface Project {
   id: string;
   title: string;
   description: string;
@@ -55,11 +55,11 @@ interface Job {
   };
 }
 
-function JobsPageContent() {
+function ProjectsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  const [jobs, setJobs] = useState<Job[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [categories, setCategories] = useState<JobCategory[]>([]);
   const [experienceLevels, setExperienceLevels] = useState<ExperienceLevel[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,7 +82,7 @@ function JobsPageContent() {
     const fetchFilters = async () => {
       try {
         const [catsResponse, levelsResponse] = await Promise.all([
-          fetch('/api/job-categories'),
+          fetch('/api/projects/categories'),
           fetch('/api/experience-levels')
         ]);
         
@@ -105,7 +105,7 @@ function JobsPageContent() {
     fetchFilters();
   }, []);
 
-  const fetchJobs = useCallback(async () => {
+  const fetchProjects = useCallback(async () => {
     setLoading(true);
     setError(null);
     
@@ -118,15 +118,15 @@ function JobsPageContent() {
       if (searchQuery) params.append('search', searchQuery);
       
       const queryString = params.toString();
-      const url = queryString ? `/api/jobs?${queryString}` : '/api/jobs';
+      const url = queryString ? `/api/projects?${queryString}` : '/api/projects';
       const response = await fetch(url);
       
       if (!response.ok) {
-        throw new Error('Failed to fetch jobs');
+        throw new Error('Failed to fetch projects');
       }
       
       const data = await response.json();
-      setJobs(data.content || []);
+      setProjects(data.content || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -135,8 +135,8 @@ function JobsPageContent() {
   }, [categoryId, experienceLevelId, minBudget, maxBudget, searchQuery]);
 
   useEffect(() => {
-    fetchJobs();
-  }, [fetchJobs]);
+    fetchProjects();
+  }, [fetchProjects]);
 
   const handleApplyFilters = () => {
     const params = new URLSearchParams();
@@ -146,7 +146,7 @@ function JobsPageContent() {
     if (maxBudget) params.append('maxBudget', maxBudget);
     if (searchQuery) params.append('search', searchQuery);
     
-    router.push(`/jobs?${params.toString()}`);
+    router.push(`/projects?${params.toString()}`);
   };
 
   const handleClearFilters = () => {
@@ -155,7 +155,7 @@ function JobsPageContent() {
     setMinBudget('');
     setMaxBudget('');
     setSearchQuery('');
-    router.push('/jobs');
+    router.push('/projects');
   };
 
   const formatDate = (dateString: string) => {
@@ -166,8 +166,8 @@ function JobsPageContent() {
     });
   };
 
-  // Sort jobs based on selection
-  const sortedJobs = [...jobs].sort((a, b) => {
+  // Sort projects based on selection
+  const sortedJobs = [...projects].sort((a, b) => {
     switch (sortBy) {
       case 'budget-high':
         return b.budget - a.budget;
@@ -182,37 +182,37 @@ function JobsPageContent() {
   // Count active filters
   const activeFilterCount = [categoryId, experienceLevelId, minBudget, maxBudget, searchQuery].filter(Boolean).length;
 
-  // Render job card based on view mode
-  const renderJobCard = (job: Job) => {
+  // Render project card based on view mode
+  const renderJobCard = (project: project) => {
     switch (viewMode) {
       case 'compact':
         return (
           <Card
-            key={job.id}
+            key={project.id}
             padding="m"
             className="hover:shadow-md transition-shadow cursor-pointer"
             role="button"
             tabIndex={0}
-            onClick={() => router.push(`/jobs/${job.id}`)}
-            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && router.push(`/jobs/${job.id}`)}
+            onClick={() => router.push(`/projects/${project.id}`)}
+            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && router.push(`/projects/${project.id}`)}
           >
             <Flex justify-content="space-between" align-items="flex-start" gap="m">
               <Flex flex-direction="column" gap="xs" flex="1">
                 <Text tag="h4" font-size="body-l" font-weight="book">
-                  {job.title}
+                  {project.title}
                 </Text>
                 <Text font-size="body-s" color="secondary">
-                  {job.client.fullName} • {job.category.name}
+                  {project.client.fullName} • {project.category.name}
                 </Text>
               </Flex>
               <Flex flex-direction="column" gap="xs" align-items="flex-end">
                 <Text font-size="body-l" font-weight="book" color="positive">
-                  ${job.budget.toLocaleString()}
+                  ${project.budget.toLocaleString()}
                 </Text>
-                <Badge variant={job.status === 'OPEN' ? 'positive' : 'information'} className="text-xs">
-                  {job.status}
+                <Badge variant={project.status === 'OPEN' ? 'positive' : 'information'} className="text-xs">
+                  {project.status}
                 </Badge>
-                <Button rank="secondary" onClick={(e) => { e.stopPropagation(); router.push(`/jobs/${job.id}`); }} className="mt-2">
+                <Button rank="secondary" onClick={(e) => { e.stopPropagation(); router.push(`/projects/${project.id}`); }} className="mt-2">
                   View Details →
                 </Button>
               </Flex>
@@ -222,33 +222,33 @@ function JobsPageContent() {
 
       case 'list':
         return (
-          <Card key={job.id} padding="l" className="hover:shadow-md transition-shadow">
+          <Card key={project.id} padding="l" className="hover:shadow-md transition-shadow">
             <Flex flex-direction="column" gap="m">
               <Flex justify-content="space-between" align-items="flex-start">
                 <Flex flex-direction="column" gap="xs" flex="1">
-                  <Text tag="h3" font-size="heading-s" className="cursor-pointer hover:text-primary-600 transition-colors" onClick={() => router.push(`/jobs/${job.id}`)}>
-                    {job.title}
+                  <Text tag="h3" font-size="heading-s" className="cursor-pointer hover:text-primary-600 transition-colors" onClick={() => router.push(`/projects/${project.id}`)}>
+                    {project.title}
                   </Text>
                   <Text font-size="body-s" color="secondary">
-                    Posted by {job.client.fullName} • {formatDate(job.createdAt)}
+                    Posted by {project.client.fullName} • {formatDate(project.createdAt)}
                   </Text>
                 </Flex>
                 <Text font-size="heading-s" color="positive" className="whitespace-nowrap ml-4">
-                  ${job.budget.toLocaleString()}
+                  ${project.budget.toLocaleString()}
                 </Text>
               </Flex>
 
               <Text className="line-clamp-2 text-secondary-700">
-                {job.description.length > 250
-                  ? `${job.description.substring(0, 250)}...`
-                  : job.description}
+                {project.description.length > 250
+                  ? `${project.description.substring(0, 250)}...`
+                  : project.description}
               </Text>
 
               <Flex gap="s" align-items="center" className="flex-wrap">
-                <Badge variant="notice">{job.category.name}</Badge>
-                <Badge variant="information">{job.experienceLevel.name}</Badge>
-                <Badge variant={job.status === 'OPEN' ? 'positive' : 'information'}>
-                  {job.status}
+                <Badge variant="notice">{project.category.name}</Badge>
+                <Badge variant="information">{project.experienceLevel.name}</Badge>
+                <Badge variant={project.status === 'OPEN' ? 'positive' : 'information'}>
+                  {project.status}
                 </Badge>
               </Flex>
 
@@ -257,7 +257,7 @@ function JobsPageContent() {
               <Flex justify-content="flex-end">
                 <Button
                   rank="secondary"
-                  onClick={() => router.push(`/jobs/${job.id}`)}
+                  onClick={() => router.push(`/projects/${project.id}`)}
                 >
                   View Details →
                 </Button>
@@ -270,27 +270,27 @@ function JobsPageContent() {
       default:
         return (
           <Card
-            key={job.id}
+            key={project.id}
             padding="l"
             className="h-full flex flex-col hover:shadow-lg transition-shadow cursor-pointer hover:scale-105 transform"
             role="button"
             tabIndex={0}
-            onClick={() => router.push(`/jobs/${job.id}`)}
-            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && router.push(`/jobs/${job.id}`)}
+            onClick={() => router.push(`/projects/${project.id}`)}
+            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && router.push(`/projects/${project.id}`)}
           >
             <Flex flex-direction="column" gap="m" flex="1">
               <Flex flex-direction="column" gap="xs" flex="1">
-                <Badge variant="notice" className="w-fit">{job.category.name}</Badge>
+                <Badge variant="notice" className="w-fit">{project.category.name}</Badge>
                 <Text tag="h4" font-size="heading-s" className="line-clamp-2">
-                  {job.title}
+                  {project.title}
                 </Text>
                 <Text font-size="body-s" color="secondary">
-                  {job.client.fullName}
+                  {project.client.fullName}
                 </Text>
               </Flex>
 
               <Text className="line-clamp-3 text-sm text-secondary-600">
-                {job.description}
+                {project.description}
               </Text>
 
               <Divider />
@@ -301,26 +301,26 @@ function JobsPageContent() {
                     Budget
                   </Text>
                   <Text font-size="body-l" font-weight="book" color="positive">
-                    ${job.budget.toLocaleString()}
+                    ${project.budget.toLocaleString()}
                   </Text>
                 </Flex>
                 <Flex justify-content="space-between" align-items="center">
                   <Text font-size="body-s" color="secondary">
                     Level
                   </Text>
-                  <Text font-size="body-s">{job.experienceLevel.name}</Text>
+                  <Text font-size="body-s">{project.experienceLevel.name}</Text>
                 </Flex>
               </Flex>
 
               <Flex gap="s" align-items="center" className="mt-auto pt-2">
-                <Badge variant={job.status === 'OPEN' ? 'positive' : 'information'} className="flex-1 text-center">
-                  {job.status}
+                <Badge variant={project.status === 'OPEN' ? 'positive' : 'information'} className="flex-1 text-center">
+                  {project.status}
                 </Badge>
                 <Text font-size="body-xs" color="secondary" className="whitespace-nowrap">
-                  {formatDate(job.createdAt)}
+                  {formatDate(project.createdAt)}
                 </Text>
                 <div className="ml-3">
-                  <Button rank="secondary" onClick={(e) => { e.stopPropagation(); router.push(`/jobs/${job.id}`); }}>
+                  <Button rank="secondary" onClick={(e) => { e.stopPropagation(); router.push(`/projects/${project.id}`); }}>
                     View Details →
                   </Button>
                 </div>
@@ -349,7 +349,7 @@ function JobsPageContent() {
           <Flex gap="m" align-items="flex-end">
             <Flex flex="1">
               <Input
-                label="Search by job title, skills, or keywords"
+                label="Search by project title, skills, or keywords"
                 value={searchQuery}
                 onInput={(e: Event) => setSearchQuery((e.target as HTMLInputElement).value)}
                 placeholder="e.g., Logo Design, Web Development..."
@@ -374,7 +374,7 @@ function JobsPageContent() {
                 {filtersOpen ? '✕ Hide' : '⊞ Show'} Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
               </Button>
               <Text font-size="body-s" color="secondary" className="hidden lg:block">
-                Showing {jobs.length} job{jobs.length !== 1 ? 's' : ''}
+                Showing {projects.length} project{projects.length !== 1 ? 's' : ''}
                 {activeFilterCount > 0 && ` • ${activeFilterCount} filter${activeFilterCount !== 1 ? 's' : ''} applied`}
               </Text>
             </Flex>
@@ -524,7 +524,7 @@ function JobsPageContent() {
             </Card>
           )}
 
-          {/* Jobs List/Grid (right) */}
+          {/* projects List/Grid (right) */}
           <Flex flex-direction="column" gap="m" className="col-span-1 lg:col-span-2">
             {loading ? (
               <Flex justify-content="center" padding="xl" className="min-h-96">
@@ -541,11 +541,11 @@ function JobsPageContent() {
                   </Button>
                 </Flex>
               </Card>
-            ) : sortedJobs.length === 0 ? (
+            ) : sortedProjects.length === 0 ? (
               <Card padding="xl" className="text-center">
                 <Flex flex-direction="column" align-items="center" gap="m">
                   <Text font-size="heading-s" color="secondary">
-                    🔍 No jobs found
+                    🔍 No projects found
                   </Text>
                   <Text color="secondary" className="max-w-sm">
                     Try adjusting your search filters or check back later for new opportunities
@@ -557,22 +557,22 @@ function JobsPageContent() {
               </Card>
             ) : (
               <>
-                {/* Jobs Count Summary on Mobile */}
+                {/* projects Count Summary on Mobile */}
                 <Text font-size="body-s" color="secondary" className="lg:hidden px-2">
-                  Found {jobs.length} job{jobs.length !== 1 ? 's' : ''}
+                  Found {projects.length} project{projects.length !== 1 ? 's' : ''}
                   {activeFilterCount > 0 && ` • ${activeFilterCount} filter${activeFilterCount !== 1 ? 's' : ''} active`}
                 </Text>
 
                 {/* Grid layout for grid view mode */}
                 {viewMode === 'grid' && (
                   <Grid columns="1; m{2} l{3}" gap="m">
-                    {sortedJobs.map((job) => renderJobCard(job))}
+                    {sortedProjects.map((project) => renderProjectCard(project))}
                   </Grid>
                 )}
 
                 {/* Stack layout for list/compact view modes */}
                 {(viewMode === 'list' || viewMode === 'compact') && (
-                  sortedJobs.map((job) => renderJobCard(job))
+                  sortedProjects.map((project) => renderProjectCard(project))
                 )}
               </>
             )}
@@ -583,10 +583,11 @@ function JobsPageContent() {
   );
 }
 
-export default function JobsPage() {
+export default function ProjectsPage() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <JobsPageContent />
+      <ProjectsPageContent />
     </Suspense>
   );
 }
+
