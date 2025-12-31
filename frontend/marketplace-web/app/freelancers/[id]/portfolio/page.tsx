@@ -1,7 +1,8 @@
 "use client"
 
 import { Button, Card, Divider, Flex, Grid, Spinner, Text } from '@/components/green'
-import { PageLayout } from '@/components/layout'
+import { PageLayout } from '@/components/ui'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -80,7 +81,7 @@ export default function FreelancerPortfolioPage() {
             <Flex flex-direction="column" align-items="center" gap="m">
               <Text font-size="heading-s">Portfolio Not Found</Text>
               <Text font-size="body-l" color="neutral-02">{error || 'Unable to load portfolio'}</Text>
-              <Link href="/talent">
+              <Link href="/talents">
                 <Button>Browse Other Talent</Button>
               </Link>
             </Flex>
@@ -97,7 +98,7 @@ export default function FreelancerPortfolioPage() {
         <div>
           {/* Breadcrumb & Navigation */}
           <Flex gap="m" align-items="center" style={{ marginBottom: '1.5rem' }}>
-            <Link href="/talent">
+            <Link href="/talents">
               <Button rank="tertiary" size="small">← Back to Talent</Button>
             </Link>
             <Text font-size="body-s" color="neutral-02">/</Text>
@@ -178,13 +179,12 @@ export default function FreelancerPortfolioPage() {
                     padding: '1rem'
                   }}>
                     {item.imageUrl && (
-                      <img 
-                        src={item.imageUrl} 
+                      <Image
+                        src={item.imageUrl}
                         alt={item.title}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none'
-                        }}
+                        fill
+                        className="object-cover"
+                        onError={() => {}}
                       />
                     )}
                   </div>
@@ -273,7 +273,7 @@ export default function FreelancerPortfolioPage() {
 
         {/* Footer Navigation */}
         <Flex gap="m" justify-content="center" padding="l">
-          <Link href="/talent">
+          <Link href="/talents">
             <Button rank="tertiary">← Browse More Talent</Button>
           </Link>
         </Flex>

@@ -4,8 +4,10 @@
  * Textarea, Checkbox, Radio, and Switch components
  */
 
-import React, { forwardRef } from 'react';
+'use client';
+
 import { cn } from '@/lib/design-system/utils';
+import React, { forwardRef } from 'react';
 
 // =============================================================================
 // TEXTAREA
@@ -420,3 +422,4 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
 Switch.displayName = 'Switch';
 
 export { Textarea as default };
+

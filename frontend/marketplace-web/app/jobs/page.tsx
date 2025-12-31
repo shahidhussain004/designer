@@ -11,7 +11,7 @@ import {
   Spinner,
   Text,
 } from '@/components/green';
-import { PageLayout } from '@/components/layout';
+import { PageLayout } from '@/components/ui';
 import { parseCategories, parseExperienceLevels } from '@/lib/apiParsers';
 import type { ExperienceLevel, JobCategory } from '@/lib/apiTypes';
 import { useRouter, useSearchParams } from 'next/navigation';

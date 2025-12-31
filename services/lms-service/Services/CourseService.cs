@@ -17,6 +17,7 @@ public interface ICourseService
     Task<CourseResponse> AddModuleAsync(string courseId, long instructorId, AddModuleRequest request);
     Task<CourseResponse> AddLessonAsync(string courseId, long instructorId, AddLessonRequest request);
     Task<CourseResponse> PublishCourseAsync(string courseId, long instructorId);
+    Task<List<Course>> GetAllCoursesDebugAsync();
 }
 
 public class CourseService : ICourseService
@@ -292,7 +293,22 @@ public class CourseService : ICourseService
         course.TotalLessons,
         course.Slug
     );
-}
+    public async Task<List<Course>> GetAllCoursesDebugAsync()
+    {
+        _logger.LogInformation("Debug: GetAllCoursesDebugAsync called");
+        try
+        {
+            // Try to get courses directly from repository without filters
+            var courses = await _courseRepository.GetPopularCoursesAsync(100);
+            _logger.LogInformation("Debug: Found {Count} popular courses (Published status)", courses.Count);
+            return courses;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Debug: Error getting courses");
+            throw;
+        }
+    }}
 
 public record PagedResult<T>(List<T> Items, long TotalCount, int Page, int PageSize)
 {

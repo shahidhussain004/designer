@@ -1,7 +1,7 @@
 'use client'
 
 import { Button, Card, Dialog, Div, Flex, Grid, LinkComponent, Text } from '@/components/green'
-import { PageLayout } from '@/components/layout'
+import { PageLayout } from '@/components/ui'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import LandingPage from './landing/page'

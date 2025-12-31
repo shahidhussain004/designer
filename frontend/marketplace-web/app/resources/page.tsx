@@ -11,7 +11,7 @@ import {
     Spinner,
     Text,
 } from '@/components/green';
-import { PageLayout } from '@/components/layout';
+import { PageLayout } from '@/components/ui';
 import { categoriesApi, contentApi, tagsApi } from '@/lib/content-api';
 import type { Category, ContentType, ContentWithRelations, Tag } from '@/lib/content-types';
 import Image from 'next/image';

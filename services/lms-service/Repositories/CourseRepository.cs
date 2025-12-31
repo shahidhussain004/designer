@@ -1,6 +1,7 @@
 using LmsService.Configuration;
 using LmsService.Models;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace LmsService.Repositories;
@@ -65,7 +66,7 @@ public class CourseRepository : ICourseRepository
     public async Task<List<Course>> GetByInstructorIdAsync(long instructorId, int skip, int take)
     {
         return await _courses
-            .Find(c => c.InstructorId == instructorId)
+            .Find(Builders<Course>.Filter.Eq("instructorId", instructorId))
             .SortByDescending(c => c.CreatedAt)
             .Skip(skip)
             .Limit(take)
@@ -74,39 +75,27 @@ public class CourseRepository : ICourseRepository
 
     public async Task<List<Course>> SearchAsync(string? searchTerm, CourseCategory? category, CourseLevel? level, CourseStatus? status, int skip, int take)
     {
-        var filterBuilder = Builders<Course>.Filter;
-        var filters = new List<FilterDefinition<Course>>();
-
+        // Build filters manually using BsonDocument for more control
+        var statusToFilter = status.HasValue ? status.Value : CourseStatus.Published;
+        var filter = new BsonDocument("status", (int)statusToFilter);
+        
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            filters.Add(filterBuilder.Text(searchTerm));
+            filter.Add("$text", new BsonDocument("$search", searchTerm));
         }
-
+        
         if (category.HasValue)
         {
-            filters.Add(filterBuilder.Eq(c => c.Category, category.Value));
+            filter.Add("category", (int)category.Value);
         }
-
+        
         if (level.HasValue)
         {
-            filters.Add(filterBuilder.Eq(c => c.Level, level.Value));
+            filter.Add("level", (int)level.Value);
         }
-
-        if (status.HasValue)
-        {
-            filters.Add(filterBuilder.Eq(c => c.Status, status.Value));
-        }
-        else
-        {
-            filters.Add(filterBuilder.Eq(c => c.Status, CourseStatus.Published));
-        }
-
-        var combinedFilter = filters.Count > 0 
-            ? filterBuilder.And(filters) 
-            : filterBuilder.Empty;
 
         return await _courses
-            .Find(combinedFilter)
+            .Find(filter)
             .SortByDescending(c => c.TotalEnrollments)
             .Skip(skip)
             .Limit(take)
@@ -115,38 +104,26 @@ public class CourseRepository : ICourseRepository
 
     public async Task<long> CountAsync(string? searchTerm, CourseCategory? category, CourseLevel? level, CourseStatus? status)
     {
-        var filterBuilder = Builders<Course>.Filter;
-        var filters = new List<FilterDefinition<Course>>();
-
+        // Build filters manually using BsonDocument for more control
+        var statusToFilter = status.HasValue ? status.Value : CourseStatus.Published;
+        var filter = new BsonDocument("status", (int)statusToFilter);
+        
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            filters.Add(filterBuilder.Text(searchTerm));
+            filter.Add("$text", new BsonDocument("$search", searchTerm));
         }
-
+        
         if (category.HasValue)
         {
-            filters.Add(filterBuilder.Eq(c => c.Category, category.Value));
+            filter.Add("category", (int)category.Value);
         }
-
+        
         if (level.HasValue)
         {
-            filters.Add(filterBuilder.Eq(c => c.Level, level.Value));
+            filter.Add("level", (int)level.Value);
         }
 
-        if (status.HasValue)
-        {
-            filters.Add(filterBuilder.Eq(c => c.Status, status.Value));
-        }
-        else
-        {
-            filters.Add(filterBuilder.Eq(c => c.Status, CourseStatus.Published));
-        }
-
-        var combinedFilter = filters.Count > 0 
-            ? filterBuilder.And(filters) 
-            : filterBuilder.Empty;
-
-        return await _courses.CountDocumentsAsync(combinedFilter);
+        return await _courses.CountDocumentsAsync(filter);
     }
 
     public async Task<Course> CreateAsync(Course course)
@@ -171,11 +148,28 @@ public class CourseRepository : ICourseRepository
 
     public async Task<List<Course>> GetPopularCoursesAsync(int take)
     {
-        return await _courses
-            .Find(c => c.Status == CourseStatus.Published)
-            .SortByDescending(c => c.TotalEnrollments)
-            .Limit(take)
-            .ToListAsync();
+        try
+        {
+            // Test: just try to count all documents first
+            var allCount = await _courses.CountDocumentsAsync(new BsonDocument());
+            Console.WriteLine($"[CourseRepository] Total documents in collection: {allCount}");
+            
+            // Now try the actual filter
+            var filter = new BsonDocument("status", (int)CourseStatus.Published);
+            var courses = await _courses
+                .Find(filter)
+                .SortByDescending(c => c.TotalEnrollments)
+                .Limit(take)
+                .ToListAsync();
+            
+            Console.WriteLine($"[CourseRepository] Found {courses.Count} published courses");
+            return courses;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[CourseRepository] Error in GetPopularCoursesAsync: {ex}");
+            throw;
+        }
     }
 
     public async Task IncrementEnrollmentCountAsync(string courseId)

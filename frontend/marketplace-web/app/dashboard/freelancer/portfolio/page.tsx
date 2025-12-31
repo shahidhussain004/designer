@@ -1,9 +1,10 @@
 "use client";
 
-import { PageLayout } from '@/components/layout';
+import { PageLayout } from '@/components/ui';
 import { apiClient } from '@/lib/api-client';
 import { useAuth } from '@/lib/context/AuthContext';
 import { Edit, Eye, EyeOff, Plus, Trash2 } from 'lucide-react';
+import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
 interface PortfolioItem {
@@ -344,8 +345,14 @@ export default function PortfolioPage() {
               className={`bg-white rounded-lg shadow-md overflow-hidden ${!item.isVisible ? 'opacity-80 border-l-4 border-yellow-300' : ''}`}
             >
               <div className="md:flex">
-                <div className="md:w-1/3">
-                  <img src={item.imageUrl} alt={item.title} className="w-full h-64 object-cover" />
+                <div className="md:w-1/3 relative h-64">
+                  <Image
+                    src={item.imageUrl}
+                    alt={item.title}
+                    fill
+                    className="object-cover"
+                    priority
+                  />
                 </div>
 
                 <div className="p-6 md:w-2/3">

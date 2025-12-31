@@ -9,7 +9,7 @@ import {
     Spinner,
     Text,
 } from '@/components/green';
-import { PageLayout } from '@/components/layout';
+import { PageLayout } from '@/components/ui';
 import { commentsApi, contentApi } from '@/lib/content-api';
 import type { Comment, ContentWithRelations } from '@/lib/content-types';
 import Image from 'next/image';

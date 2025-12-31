@@ -9,3 +9,5 @@ export * from './content';
 export * from './media';
 export * from './search';
 export * from './tag';
+export * from './tutorials';
+

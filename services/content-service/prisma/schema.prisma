@@ -207,3 +207,167 @@ model MediaAsset {
   @@index([uploadedBy])
   @@map("media_assets")
 }
+  
+// =====================================================
+// TUTORIALS FEATURE MODELS
+// =====================================================
+
+enum DifficultyLevel {
+  beginner
+  intermediate
+  advanced
+
+  @@map("difficulty_level")
+}
+
+enum TutorialMediaType {
+  audio
+  video
+  image
+
+  @@map("tutorial_media_type")
+}
+
+enum MediaStatus {
+  processing
+  ready
+  failed
+
+  @@map("media_status")
+}
+
+// Main tutorials table (Java, JavaScript, Python, etc.)
+model Tutorial {
+  id              Int              @id @default(autoincrement())
+  slug            String           @unique
+  title           String
+  description     String?          @db.Text
+  icon            String?          @db.VarChar(100)
+  difficultyLevel DifficultyLevel? @map("difficulty_level")
+  colorTheme      String?          @map("color_theme") @db.VarChar(50)
+  estimatedHours  Int?             @map("estimated_hours")
+  isPublished     Boolean          @default(false) @map("is_published")
+  displayOrder    Int              @default(0) @map("display_order")
+  metaTags        Json?            @map("meta_tags")
+  stats           Json             @default("{\"total_topics\": 0, \"total_views\": 0}")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  sections TutorialSection[]
+  progress TutorialProgress[]
+
+  @@index([slug])
+  @@index([isPublished, displayOrder])
+  @@map("tutorials")
+}
+
+// Sections within tutorials (Methods, Classes, etc.)
+model TutorialSection {
+  id           Int      @id @default(autoincrement())
+  tutorialId   Int      @map("tutorial_id")
+  slug         String
+  title        String
+  description  String?  @db.Text
+  icon         String?  @db.VarChar(50)
+  displayOrder Int      @default(0) @map("display_order")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  tutorial Tutorial        @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
+  topics   TutorialTopic[]
+
+  @@unique([tutorialId, slug])
+  @@index([tutorialId, displayOrder])
+  @@index([tutorialId, slug])
+  @@map("tutorial_sections")
+}
+
+// Individual tutorial topics (actual content pages)
+model TutorialTopic {
+  id                 Int       @id @default(autoincrement())
+  sectionId          Int       @map("section_id")
+  slug               String
+  title              String
+  content            String    @db.Text
+  codeExamples       Json?     @map("code_examples")
+  estimatedReadTime  Int       @default(5) @map("estimated_read_time")
+  displayOrder       Int       @default(0) @map("display_order")
+  hasAudio           Boolean   @default(false) @map("has_audio")
+  audioUrl           String?   @map("audio_url") @db.VarChar(500)
+  audioDuration      Int?      @map("audio_duration")
+  hasVideo           Boolean   @default(false) @map("has_video")
+  videoUrl           String?   @map("video_url") @db.VarChar(500)
+  videoDuration      Int?      @map("video_duration")
+  isPublished        Boolean   @default(true) @map("is_published")
+  viewsCount         Int       @default(0) @map("views_count")
+  metaDescription    String?   @map("meta_description") @db.Text
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  section    TutorialSection    @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  progress   TutorialProgress[]
+  bookmarks  TutorialBookmark[]
+  media      TutorialMedia[]
+
+  @@unique([sectionId, slug])
+  @@index([sectionId, displayOrder])
+  @@index([sectionId, slug])
+  @@index([isPublished])
+  @@map("tutorial_topics")
+}
+
+// Track user progress through tutorials
+model TutorialProgress {
+  id              Int      @id @default(autoincrement())
+  userId          Int      @map("user_id")
+  tutorialId      Int      @map("tutorial_id")
+  topicId         Int      @map("topic_id")
+  isCompleted     Boolean  @default(false) @map("is_completed")
+  lastReadAt      DateTime @default(now()) @map("last_read_at")
+  timeSpentSeconds Int     @default(0) @map("time_spent_seconds")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  tutorial Tutorial      @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
+  topic    TutorialTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, topicId])
+  @@index([userId, tutorialId])
+  @@index([topicId])
+  @@map("tutorial_progress")
+}
+
+// Bookmarks/favorites
+model TutorialBookmark {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  topicId   Int      @map("topic_id")
+  notes     String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  topic TutorialTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, topicId])
+  @@index([userId])
+  @@map("tutorial_bookmarks")
+}
+
+// Media files for AI-generated audio/video
+model TutorialMedia {
+  id           Int                @id @default(autoincrement())
+  topicId      Int                @map("topic_id")
+  mediaType    TutorialMediaType  @map("media_type")
+  url          String             @db.VarChar(500)
+  duration     Int?
+  fileSize     BigInt?            @map("file_size")
+  mimeType     String?            @map("mime_type") @db.VarChar(100)
+  status       MediaStatus        @default(processing)
+  aiGenerated  Boolean            @default(false) @map("ai_generated")
+  createdAt    DateTime           @default(now()) @map("created_at")
+  updatedAt    DateTime           @updatedAt @map("updated_at")
+
+  topic TutorialTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@index([topicId, mediaType])
+  @@map("tutorial_media")
+}

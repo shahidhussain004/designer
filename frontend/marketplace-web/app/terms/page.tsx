@@ -1,5 +1,5 @@
 import { Card, Divider, Flex, Text } from '@/components/green'
-import { PageLayout } from '@/components/layout'
+import { PageLayout } from '@/components/ui'
 
 export const metadata = {
   title: 'Terms of Service',
