@@ -73,6 +73,14 @@ public class JobApplicationResponse {
                     .build();
         }
 
+        // Convert JsonNode to Map
+        Map<String, Object> answersMap = null;
+        if (application.getAnswers() != null) {
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            answersMap = mapper.convertValue(application.getAnswers(), 
+                    new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
+        }
+
         return JobApplicationResponse.builder()
                 .id(application.getId())
                 .jobId(application.getJob() != null ? application.getJob().getId() : null)
@@ -86,7 +94,7 @@ public class JobApplicationResponse {
                 .coverLetter(application.getCoverLetter())
                 .portfolioUrl(application.getPortfolioUrl())
                 .linkedinUrl(application.getLinkedinUrl())
-                .answers(application.getAnswers())
+                .answers(answersMap)
                 .status(application.getStatus() != null ? application.getStatus().name() : null)
                 .employerNotes(application.getEmployerNotes())
                 .appliedAt(application.getAppliedAt())

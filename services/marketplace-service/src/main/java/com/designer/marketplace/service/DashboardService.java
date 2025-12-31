@@ -57,8 +57,8 @@ public class DashboardService {
                                 jobRepository.countByClientIdAndStatus(currentUser.getId(), Job.JobStatus.IN_PROGRESS);
                 Long completedJobs = jobRepository.countByClientIdAndStatus(currentUser.getId(),
                                 Job.JobStatus.COMPLETED);
-                Long totalProposalsReceived = proposalRepository.countByJobClientId(currentUser.getId());
-                Long pendingProposals = proposalRepository.countByJobClientIdAndStatus(
+                Long totalProposalsReceived = proposalRepository.countByProjectClientId(currentUser.getId());
+                Long pendingProposals = proposalRepository.countByProjectClientIdAndStatus(
                                 currentUser.getId(), Proposal.ProposalStatus.SUBMITTED);
 
                 ClientDashboardResponse.DashboardStats stats = ClientDashboardResponse.DashboardStats.builder()
@@ -79,9 +79,9 @@ public class DashboardService {
                                 .map(JobResponse::fromEntity)
                                 .collect(Collectors.toList());
 
-                // Get recent proposals for all client's jobs
+                // Get recent proposals for all client's projects
                 Pageable proposalsPageable = PageRequest.of(0, 10);
-                List<Proposal> recentProposalsList = proposalRepository.findTopByJobClientId(
+                List<Proposal> recentProposalsList = proposalRepository.findTopByProjectClientId(
                                 currentUser.getId(), proposalsPageable);
                 List<ProposalResponse> recentProposalsResponse = recentProposalsList.stream()
                                 .map(ProposalResponse::fromEntity)

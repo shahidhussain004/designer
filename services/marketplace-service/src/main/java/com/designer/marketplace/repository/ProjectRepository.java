@@ -47,4 +47,11 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     @Query("SELECT COUNT(p) FROM Project p WHERE p.status = 'OPEN'")
     Long countOpenProjects();
+
+    // Search query
+    @Query("SELECT p FROM Project p WHERE " +
+            "LOWER(p.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+            "LOWER(p.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+            "LOWER(p.projectCategory.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
+    Page<Project> searchProjects(@Param("searchTerm") String searchTerm, Pageable pageable);
 }

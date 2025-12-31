@@ -56,6 +56,16 @@ public class JobApplication {
     @JoinColumn(name = "applicant_id", nullable = false)
     private User applicant;
 
+    // Contact information (separate from user profile)
+    @Column(name = "full_name", nullable = false)
+    private String fullName;
+
+    @Column(nullable = false)
+    private String email;
+
+    @Column(length = 20)
+    private String phone;
+
     // Application details
     @Column(name = "cover_letter", columnDefinition = "TEXT")
     private String coverLetter;
@@ -80,15 +90,18 @@ public class JobApplication {
     // Status tracking
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
-    private ApplicationStatus status = ApplicationStatus.SUBMITTED;
+    private ApplicationStatus status = ApplicationStatus.PENDING;
 
-    @Column(name = "recruiter_notes", columnDefinition = "TEXT")
-    private String recruiterNotes;
+    @Column(name = "employer_notes", columnDefinition = "TEXT")
+    private String employerNotes;
 
     @Column(name = "rejection_reason", columnDefinition = "TEXT")
     private String rejectionReason;
 
     // Timestamps
+    @Column(name = "applied_at")
+    private LocalDateTime appliedAt;
+
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -101,13 +114,12 @@ public class JobApplication {
     private LocalDateTime reviewedAt;
 
     public enum ApplicationStatus {
-        SUBMITTED,
+        PENDING,
         REVIEWING,
         SHORTLISTED,
         INTERVIEWING,
-        OFFERED,
+        ACCEPTED,
         REJECTED,
-        WITHDRAWN,
-        ACCEPTED
+        WITHDRAWN
     }
 }

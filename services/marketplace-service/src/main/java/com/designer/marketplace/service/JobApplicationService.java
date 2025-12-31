@@ -85,7 +85,7 @@ public class JobApplicationService {
                 .orElseThrow(() -> new RuntimeException("Job not found with id: " + request.getJobId()));
 
         // Validate job is active
-        if (!job.getIsActive()) {
+        if (job.getStatus() != EmploymentJob.JobStatus.ACTIVE) {
             throw new RuntimeException("Cannot apply to an inactive job");
         }
 
@@ -104,7 +104,13 @@ public class JobApplicationService {
         application.setCoverLetter(request.getCoverLetter());
         application.setPortfolioUrl(request.getPortfolioUrl());
         application.setLinkedinUrl(request.getLinkedinUrl());
-        application.setAnswers(request.getAnswers());
+        
+        // Convert Map to JsonNode
+        if (request.getAnswers() != null) {
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            application.setAnswers(mapper.valueToTree(request.getAnswers()));
+        }
+        
         application.setStatus(JobApplication.ApplicationStatus.PENDING);
         application.setAppliedAt(LocalDateTime.now());
 
