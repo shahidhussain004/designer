@@ -1,27 +1,27 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
 import {
-  Grid,
-  Flex,
-  Card,
-  Text,
-  Button,
-  Input,
-  Badge,
-  Spinner,
-  Divider,
+    Badge,
+    Button,
+    Card,
+    Divider,
+    Flex,
+    Grid,
+    Input,
+    Spinner,
+    Text,
 } from '@/components/green';
-import { PageLayout } from '@/components/layout';
+import { PageLayout } from '@/components/ui';
 import {
-  getCourses,
-  Course,
-  COURSE_CATEGORIES,
-  SKILL_LEVELS,
+    Course,
+    COURSE_CATEGORIES,
+    getCourses,
+    SKILL_LEVELS,
 } from '@/lib/courses';
 import { formatCurrency } from '@/lib/payments';
+import Image from 'next/image';
+import Link from 'next/link';
+import React, { useCallback, useEffect, useState } from 'react';
 
 export default function CoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);

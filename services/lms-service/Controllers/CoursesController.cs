@@ -30,8 +30,31 @@ public class CoursesController : ControllerBase
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20)
     {
+        _logger.LogInformation("GetCourses called with: search={Search}, category={Category}, level={Level}, page={Page}, pageSize={PageSize}", 
+            search, category, level, page, pageSize);
         var result = await _courseService.SearchCoursesAsync(search, category, level, page, pageSize);
+        _logger.LogInformation("GetCourses result: totalCount={TotalCount}, items={ItemCount}", result.TotalCount, result.Items.Count);
         return Ok(result);
+    }
+
+    /// <summary>
+    /// Debug endpoint to get all courses without filters
+    /// </summary>
+    [HttpGet("debug/all")]
+    public async Task<ActionResult> GetAllCoursesDebug()
+    {
+        try
+        {
+            _logger.LogInformation("Debug: Getting all courses without filter");
+            var result = await _courseService.GetAllCoursesDebugAsync();
+            _logger.LogInformation("Debug: Found {Count} courses", result.Count);
+            return Ok(new { totalCount = result.Count, courses = result });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Debug endpoint error");
+            return StatusCode(500, new { error = ex.Message });
+        }
     }
 
     /// <summary>

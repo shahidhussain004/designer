@@ -1,8 +1,8 @@
 "use client"
 
+import { cn } from '@/lib/utils'
 import type * as React from "react"
 import { useState } from "react"
-import { cn } from "../../lib/utils"
 
 interface AnimatedButtonProps {
   children: React.ReactNode
@@ -49,7 +49,6 @@ export default function AnimatedButton({
       onMouseEnter={() => !disabled && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Rainbow border on hover */}
       <div
         className={cn(
           "absolute -inset-0.5 rounded-xl transition-opacity duration-200",
@@ -57,11 +56,7 @@ export default function AnimatedButton({
         )}
       />
 
-      {/* Button container with 3D transform */}
-      <div
-        className="relative"
-      >
-        {/* Front face */}
+      <div className="relative">
         <div
           className={cn(
             "relative z-10 rounded-xl font-medium flex items-center justify-center",
@@ -72,8 +67,7 @@ export default function AnimatedButton({
         >
           {children}
         </div>
-        
-        {/* Back face */}
+
         <div
           className={cn(
             "absolute inset-0 z-10 rounded-xl font-medium flex items-center justify-center",
@@ -85,8 +79,7 @@ export default function AnimatedButton({
           {children}
         </div>
       </div>
-      
-      {/* Keyframe animation style */}
+
       <style jsx>{`
         @keyframes gradient-shift {
           0% { background-position: 0% 50%; }
@@ -111,3 +104,6 @@ export default function AnimatedButton({
     </button>
   )
 }
+
+export type { AnimatedButtonProps }
+

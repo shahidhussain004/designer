@@ -1,11 +1,12 @@
 "use client"
 
 import { Button, Card, Divider, Flex, Grid, Spinner, Text } from '@/components/green'
-import { PageLayout } from '@/components/layout'
+import { PageLayout } from '@/components/ui'
 import apiClient from '@/lib/api-client'
 import { authService } from '@/lib/auth'
 import logger from '@/lib/logger'
 import { Edit, Eye, EyeOff, Plus, Trash2 } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
@@ -245,7 +246,7 @@ export default function PortfolioPage() {
                 {error || 'Unable to load portfolio'}
               </Text>
               <Flex gap="m">
-                <Link href="/talent">
+                <Link href="/talents">
                   <Button>Browse Talent</Button>
                 </Link>
                 {isOwnPortfolio && (
@@ -269,7 +270,7 @@ export default function PortfolioPage() {
           {/* Breadcrumb Navigation */}
           {!isOwnPortfolio && (
             <Flex gap="m" align-items="center" style={{ marginBottom: '1.5rem' }}>
-              <Link href="/talent">
+              <Link href="/talents">
                 <Button rank="tertiary" size="small">
                   ← Back to Talent
                 </Button>
@@ -588,13 +589,12 @@ export default function PortfolioPage() {
                   }}
                 >
                   {item.imageUrl && (
-                    <img
+                    <Image
                       src={item.imageUrl}
                       alt={item.title}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      onError={(e) => {
-                        ;(e.target as HTMLImageElement).style.display = 'none'
-                      }}
+                      fill
+                      className="object-cover"
+                      onError={() => {}}
                     />
                   )}
 
@@ -764,7 +764,7 @@ export default function PortfolioPage() {
               <Button rank="tertiary">← Back to Dashboard</Button>
             </Link>
           ) : (
-            <Link href="/talent">
+            <Link href="/talents">
               <Button rank="tertiary">← Browse More Talent</Button>
             </Link>
           )}

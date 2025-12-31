@@ -18,7 +18,7 @@ const customJestConfig = {
   ],
   moduleNameMapper: {
     '^next/navigation$': '<rootDir>/__mocks__/next-navigation.js',
-    '^@/components/layout$': '<rootDir>/__mocks__/components-layout.js',
+    '^@/components/ui$': '<rootDir>/__mocks__/components-ui.js',
     '^@/(.*)$': '<rootDir>/$1',
   },
   testMatch: [

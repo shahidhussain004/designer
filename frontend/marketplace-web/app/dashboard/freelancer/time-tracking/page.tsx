@@ -1,6 +1,6 @@
 "use client";
 
-import { PageLayout } from '@/components/layout';
+import { PageLayout } from '@/components/ui';
 import { useAuth } from '@/lib/context/AuthContext';
 import logger from '@/lib/logger';
 import { Calendar, Check, Clock, Plus, X } from 'lucide-react';

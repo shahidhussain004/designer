@@ -12,6 +12,7 @@ import {
   mediaRoutes,
   searchRoutes,
   tagRoutes,
+  tutorialsRoutes,
 } from './modules';
 import {
   corsPlugin,
@@ -79,6 +80,9 @@ export async function buildApp(): Promise<FastifyInstance> {
     },
     { prefix: '/api/v1' }
   );
+
+  // Register tutorials routes (no prefix for clean URLs)
+  await app.register(tutorialsRoutes);
 
   return app;
 }

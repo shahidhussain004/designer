@@ -1,7 +1,7 @@
 "use client"
 
 import { Card, Div, Flex } from '@/components/green'
-import { PageLayout } from '@/components/layout'
+import { PageLayout } from '@/components/ui'
 import { dashboardService, Notification } from '@/lib/dashboard'
 import { useEffect, useState } from 'react'
 

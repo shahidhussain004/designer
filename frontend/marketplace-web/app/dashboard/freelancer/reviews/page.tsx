@@ -1,6 +1,6 @@
 "use client";
 
-import { PageLayout } from '@/components/layout';
+import { PageLayout } from '@/components/ui';
 import { useAuth } from '@/lib/context/AuthContext';
 import { Flag, MessageSquare, Star, User } from 'lucide-react';
 import { useEffect, useState } from 'react';

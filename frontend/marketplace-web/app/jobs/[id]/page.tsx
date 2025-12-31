@@ -13,7 +13,7 @@ import {
   Text,
   Textarea,
 } from '@/components/green';
-import { PageLayout } from '@/components/layout';
+import { PageLayout } from '@/components/ui';
 import { apiClient } from '@/lib/api-client';
 import { authService } from '@/lib/auth';
 import logger from '@/lib/logger';

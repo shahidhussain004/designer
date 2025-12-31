@@ -1,7 +1,7 @@
 "use client"
 
 import { Badge, Button, Card, Divider, Flex, Grid, Input, Spinner, Text } from '@/components/green'
-import { PageLayout } from '@/components/layout'
+import { PageLayout } from '@/components/ui'
 import { apiClient } from '@/lib/api-client'
 import logger from '@/lib/logger'
 import Link from 'next/link'

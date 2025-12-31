@@ -12,23 +12,6 @@ interface PageLayoutProps {
   title?: string
 }
 
-/**
- * Loading skeleton shown while Green Core components are loading on client side.
- * This prevents flash of unstyled content and hydration mismatches.
- */
-function _LoadingSkeleton() {
-  return (
-    <div>
-      {/* Navbar skeleton */}
-      <div>
-        {/* Content skeleton */}
-      </div>
-      <div />
-      {/* Footer skeleton */}
-    </div>
-  )
-}
-
 export default function PageLayout({ 
   children, 
   showNavbar = true, 
@@ -48,3 +31,6 @@ export default function PageLayout({
       </Flex>
   )
 }
+
+export type { PageLayoutProps }
+

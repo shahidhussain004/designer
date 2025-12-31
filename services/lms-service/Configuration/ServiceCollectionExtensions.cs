@@ -2,9 +2,14 @@ using Amazon;
 using Amazon.CloudFront;
 using Amazon.S3;
 using LmsService.Configuration;
+using LmsService.Models;
 using LmsService.Repositories;
 using LmsService.Services;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Conventions;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using StackExchange.Redis;
 
@@ -14,6 +19,21 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddLmsServices(this IServiceCollection services, IConfiguration configuration)
     {
+        // Configure MongoDB to serialize enums as integers
+        try
+        {
+            var pack = new ConventionPack();
+            pack.Add(new EnumRepresentationConvention(BsonType.Int32));
+            ConventionRegistry.Register("EnumAsInt32", pack, t => true);
+
+            // Also register explicit enum serializers
+            BsonSerializer.RegisterSerializer(new EnumSerializer<CourseStatus>(BsonType.Int32));
+            BsonSerializer.RegisterSerializer(new EnumSerializer<CourseCategory>(BsonType.Int32));
+            BsonSerializer.RegisterSerializer(new EnumSerializer<CourseLevel>(BsonType.Int32));
+            BsonSerializer.RegisterSerializer(new EnumSerializer<LessonType>(BsonType.String));
+        }
+        catch { }
+
         // Configure settings
         services.Configure<MongoDbSettings>(configuration.GetSection("MongoDbSettings"));
         services.Configure<AwsSettings>(configuration.GetSection("AwsSettings"));

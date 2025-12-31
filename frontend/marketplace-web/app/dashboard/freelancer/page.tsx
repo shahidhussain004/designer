@@ -1,7 +1,7 @@
 "use client"
 
 import { Badge, Button, Card, Div, Divider, Flex, Grid, Spinner, Text } from '@/components/green'
-import { PageLayout } from '@/components/layout'
+import { PageLayout } from '@/components/ui'
 import { authService } from '@/lib/auth'
 import { FreelancerDashboard, getDashboardData } from '@/lib/dashboard'
 import Link from 'next/link'

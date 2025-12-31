@@ -1,5 +1,5 @@
 import { Card, Flex, Text } from '@/components/green';
-import { PageLayout } from '@/components/layout';
+import { PageLayout } from '@/components/ui';
 import ContactForm from './ContactForm';
 
 export default function ContactPage() {

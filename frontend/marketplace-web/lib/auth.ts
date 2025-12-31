@@ -126,4 +126,22 @@ export const authService = {
       return false;
     }
   },
+
+  /**
+   * Check if current user can create courses
+   */
+  canCreateCourses(): boolean {
+    if (typeof window === 'undefined') return false;
+    const user = this.getCurrentUser();
+    return user?.role === 'INSTRUCTOR' || user?.role === 'ADMIN';
+  },
+
+  /**
+   * Check if current user is an instructor
+   */
+  isInstructor(): boolean {
+    if (typeof window === 'undefined') return false;
+    const user = this.getCurrentUser();
+    return user?.role === 'INSTRUCTOR' || user?.role === 'ADMIN';
+  },
 };

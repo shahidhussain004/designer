@@ -7,7 +7,26 @@ export const appConfig = {
   nodeEnv: process.env.NODE_ENV || 'development',
 
   cors: {
-    origin: (process.env.CORS_ORIGIN || 'http://localhost:3000,http://localhost:3001').split(','),
+    // Accept either a comma-separated string or a single origin.
+    origin: (() => {
+      const raw =
+        process.env.CORS_ORIGIN ||
+        'http://localhost:3000,http://localhost:3001,http://localhost:3002';
+      const list = Array.isArray(raw)
+        ? raw
+        : String(raw)
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean);
+      // Ensure local frontend dev origin is present in development
+      if (
+        (process.env.NODE_ENV || 'development') === 'development' &&
+        !list.includes('http://localhost:3002')
+      ) {
+        list.push('http://localhost:3002');
+      }
+      return list;
+    })(),
   },
 
   rateLimit: {
