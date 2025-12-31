@@ -79,7 +79,8 @@ public class JobApplication {
     @Column(name = "linkedin_url", columnDefinition = "TEXT")
     private String linkedinUrl;
 
-    @Column(name = "additional_documents", columnDefinition = "TEXT[]")
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(name = "additional_documents", columnDefinition = "text[]")
     private String[] additionalDocuments;
 
     // Answers to screening questions

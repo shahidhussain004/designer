@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -123,24 +125,29 @@ public class EmploymentJob {
     private Boolean showSalary = true;
 
     // Benefits and perks
-    @Column(columnDefinition = "TEXT[]")
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(columnDefinition = "text[]")
     private String[] benefits;
 
-    @Column(columnDefinition = "TEXT[]")
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(columnDefinition = "text[]")
     private String[] perks;
 
     // Skills and qualifications
-    @Column(name = "required_skills", columnDefinition = "TEXT[]")
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(name = "required_skills", columnDefinition = "text[]")
     private String[] requiredSkills;
 
-    @Column(name = "preferred_skills", columnDefinition = "TEXT[]")
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(name = "preferred_skills", columnDefinition = "text[]")
     private String[] preferredSkills;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "education_level", length = 50)
     private EducationLevel educationLevel;
 
-    @Column(columnDefinition = "TEXT[]")
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(columnDefinition = "text[]")
     private String[] certifications;
 
     // Application details
