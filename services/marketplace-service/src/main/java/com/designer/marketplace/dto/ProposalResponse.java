@@ -1,12 +1,13 @@
 package com.designer.marketplace.dto;
 
+import java.time.LocalDateTime;
+
 import com.designer.marketplace.entity.Proposal;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 /**
  * DTO for Proposal responses
@@ -18,8 +19,8 @@ import java.time.LocalDateTime;
 public class ProposalResponse {
 
     private Long id;
-    private Long jobId;
-    private String jobTitle;
+    private Long projectId;
+    private String projectTitle;
     private FreelancerInfo freelancer;
     private String coverLetter;
     private Double proposedRate;
@@ -77,8 +78,8 @@ public class ProposalResponse {
 
         return ProposalResponse.builder()
                 .id(proposal.getId())
-                .jobId(proposal.getJob() != null ? proposal.getJob().getId() : null)
-                .jobTitle(proposal.getJob() != null ? proposal.getJob().getTitle() : null)
+                .projectId(proposal.getProject() != null ? proposal.getProject().getId() : null)
+                .projectTitle(proposal.getProject() != null ? proposal.getProject().getTitle() : null)
                 .freelancer(freelancerInfo)
                 .coverLetter(proposal.getCoverLetter())
                 .proposedRate(proposal.getProposedRate())
