@@ -20,7 +20,7 @@ const navItems: NavItem[] = [
 
 export const FluidLogo: React.FC = () => (
   <Link href="/" className="navbar-brand flex items-center">
-    <Image src="/logo-reverse-designer.png" alt="Designer Marketplace" width={160} height={36} className="object-contain invert" />
+    <Image src="/logo-reverse-designer.png" alt="Designer Marketplace" width={160} height={36} className="object-contain" />
   </Link>
 );
 
@@ -30,15 +30,13 @@ export const FluidNavLinks: React.FC<{ pathname?: string }> = ({ pathname = '/' 
       <li key={item.href}>
         <Link
           href={item.href}
-          className={`text-white hover:text-gray-200 transition-colors text-sm font-medium ${
-            pathname === item.href ? 'border-b-2 border-white' : ''
-          }`}
+          className={`nav-item ${pathname === item.href ? 'nav-item-active' : ''}`}
         >
           {item.label}
         </Link>
       </li>
     ))}
   </ul>
-);
+)
 
 // Named exports only
