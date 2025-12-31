@@ -25,13 +25,33 @@ COMMENT ON TABLE project_categories IS 'Project categories lookup table for free
 ALTER TABLE jobs RENAME TO projects;
 
 -- Rename column: category_id still makes sense, but we'll update comments
--- Rename indexes
-ALTER INDEX idx_jobs_client RENAME TO idx_projects_client;
-ALTER INDEX idx_jobs_status RENAME TO idx_projects_status;
-ALTER INDEX idx_jobs_category_fk RENAME TO idx_projects_category_fk;
-ALTER INDEX idx_jobs_created RENAME TO idx_projects_created;
-ALTER INDEX idx_jobs_budget RENAME TO idx_projects_budget;
-ALTER INDEX idx_jobs_status_created_client RENAME TO idx_projects_status_created_client;
+-- Rename indexes (using IF EXISTS equivalent for PostgreSQL)
+DO $$ 
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_jobs_client') THEN
+        ALTER INDEX idx_jobs_client RENAME TO idx_projects_client;
+    END IF;
+    
+    IF EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_jobs_status') THEN
+        ALTER INDEX idx_jobs_status RENAME TO idx_projects_status;
+    END IF;
+    
+    IF EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_jobs_category_fk') THEN
+        ALTER INDEX idx_jobs_category_fk RENAME TO idx_projects_category_fk;
+    END IF;
+    
+    IF EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_jobs_created') THEN
+        ALTER INDEX idx_jobs_created RENAME TO idx_projects_created;
+    END IF;
+    
+    IF EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_jobs_budget') THEN
+        ALTER INDEX idx_jobs_budget RENAME TO idx_projects_budget;
+    END IF;
+    
+    IF EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_jobs_status_created_client') THEN
+        ALTER INDEX idx_jobs_status_created_client RENAME TO idx_projects_status_created_client;
+    END IF;
+END $$;
 
 -- Update table comment
 COMMENT ON TABLE projects IS 'Projects table - freelance/gig work posted by clients';
@@ -46,16 +66,33 @@ COMMENT ON COLUMN projects.category_id IS 'Foreign key reference to project_cate
 -- Update proposals table
 ALTER TABLE proposals RENAME COLUMN job_id TO project_id;
 
--- Rename the foreign key constraint
-ALTER TABLE proposals DROP CONSTRAINT proposals_job_id_fkey;
+-- Rename the foreign key constraint (check if exists first)
+DO $$ 
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'proposals_job_id_fkey') THEN
+        ALTER TABLE proposals DROP CONSTRAINT proposals_job_id_fkey;
+    END IF;
+END $$;
+
 ALTER TABLE proposals ADD CONSTRAINT proposals_project_id_fkey 
     FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
 
 -- Rename indexes on proposals
-ALTER INDEX idx_proposals_job RENAME TO idx_proposals_project;
+DO $$ 
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_proposals_job') THEN
+        ALTER INDEX idx_proposals_job RENAME TO idx_proposals_project;
+    END IF;
+END $$;
 
 -- Update unique constraint
-ALTER TABLE proposals DROP CONSTRAINT proposals_job_id_freelancer_id_key;
+DO $$ 
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'proposals_job_id_freelancer_id_key') THEN
+        ALTER TABLE proposals DROP CONSTRAINT proposals_job_id_freelancer_id_key;
+    END IF;
+END $$;
+
 ALTER TABLE proposals ADD CONSTRAINT proposals_project_id_freelancer_id_key 
     UNIQUE(project_id, freelancer_id);
 
