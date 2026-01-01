@@ -354,7 +354,7 @@ export const contentApi = {
 
     if (options.filters) {
       if (options.filters.contentType) {
-        params.type = options.filters.contentType;
+        params.type = String(options.filters.contentType).toLowerCase();
       }
       if (options.filters.categoryId) {
         params.categoryId = options.filters.categoryId;
