@@ -1,23 +1,30 @@
 package com.designer.marketplace.service;
 
-import com.designer.marketplace.dto.InvoiceDTOs.*;
-import com.designer.marketplace.entity.*;
-import com.designer.marketplace.entity.Invoice.InvoiceStatus;
-import com.designer.marketplace.entity.Invoice.InvoiceType;
-import com.designer.marketplace.repository.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
+import com.designer.marketplace.dto.InvoiceDTOs.InvoiceLineItem;
+import com.designer.marketplace.dto.InvoiceDTOs.InvoiceResponse;
+import com.designer.marketplace.entity.Invoice;
+import com.designer.marketplace.entity.Invoice.InvoiceStatus;
+import com.designer.marketplace.entity.Invoice.InvoiceType;
+import com.designer.marketplace.entity.Milestone;
+import com.designer.marketplace.entity.Payment;
+import com.designer.marketplace.repository.InvoiceRepository;
+import com.designer.marketplace.repository.MilestoneRepository;
+import com.designer.marketplace.repository.PaymentRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Service for generating and managing invoices.
@@ -59,7 +66,7 @@ public class InvoiceService {
                 .payment(payment)
                 .client(payment.getClient())
                 .freelancer(payment.getFreelancer())
-                .job(payment.getJob())
+                .project(payment.getProject())
                 .invoiceType(InvoiceType.PAYMENT)
                 .subtotal(payment.getFreelancerAmount())
                 .platformFee(payment.getPlatformFee())
@@ -110,7 +117,7 @@ public class InvoiceService {
                 .milestone(milestone)
                 .client(payment.getClient())
                 .freelancer(payment.getFreelancer())
-                .job(payment.getJob())
+                .project(payment.getProject())
                 .invoiceType(InvoiceType.MILESTONE)
                 .subtotal(payment.getFreelancerAmount())
                 .platformFee(payment.getPlatformFee())
@@ -179,11 +186,11 @@ public class InvoiceService {
     }
 
     /**
-     * Get invoices for a job.
+     * Get invoices for a project.
      */
     @Transactional(readOnly = true)
-    public List<InvoiceResponse> getInvoicesForJob(Long jobId) {
-        return invoiceRepository.findByJobId(jobId).stream()
+    public List<InvoiceResponse> getInvoicesForProject(Long projectId) {
+        return invoiceRepository.findByProjectId(projectId).stream()
                 .map(InvoiceResponse::fromEntity)
                 .toList();
     }
@@ -234,7 +241,7 @@ public class InvoiceService {
      */
     private String createLineItemsJson(Payment payment) {
         InvoiceLineItem lineItem = InvoiceLineItem.builder()
-                .description("Service: " + payment.getJob().getTitle())
+                .description("Service: " + payment.getProject().getTitle())
                 .quantity(1L)
                 .unitPrice(payment.getFreelancerAmount())
                 .amount(payment.getFreelancerAmount())

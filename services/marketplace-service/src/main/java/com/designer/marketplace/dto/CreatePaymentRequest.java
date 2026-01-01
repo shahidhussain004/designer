@@ -16,8 +16,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CreatePaymentRequest {
 
-    @NotNull(message = "Job ID is required")
-    private Long jobId;
+    @NotNull(message = "Project ID is required")
+    private Long projectId;
 
     @NotNull(message = "Proposal ID is required")
     private Long proposalId;

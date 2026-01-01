@@ -83,10 +83,19 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/**").permitAll()
                         // Stripe webhooks must be accessible without authentication
                         .requestMatchers("/api/webhooks/**").permitAll()
+
+                        // GET requests for projects are public (browsing)
+                        .requestMatchers(HttpMethod.GET, "/api/projects").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/projects/").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/projects/**").permitAll()
+
                         // GET requests for jobs are public (browsing)
                         .requestMatchers(HttpMethod.GET, "/api/jobs").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/jobs/").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/jobs/**").permitAll()
+                        
+                        .requestMatchers(HttpMethod.GET, "/api/employment-jobs/**").permitAll()
+
                         .requestMatchers(HttpMethod.GET, "/api/users/*/profile").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users/freelancers").permitAll()
                         // Portfolio browsing (public)
@@ -99,6 +108,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/time-entries/**").permitAll()
                         // Job categories and experience levels (public for browsing)
                         .requestMatchers(HttpMethod.GET, "/api/job-categories/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/project-categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/experience-levels/**").permitAll()
                         // LMS public course browsing
                         .requestMatchers(HttpMethod.GET, "/api/lms/courses").permitAll()

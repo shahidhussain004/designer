@@ -149,6 +149,34 @@ public class CoursesController : ControllerBase
     }
 
     /// <summary>
+    /// Get lessons for a course (flattened)
+    /// </summary>
+    [HttpGet("{courseId}/lessons")]
+    public async Task<ActionResult<List<LessonResponse>>> GetCourseLessons(string courseId)
+    {
+        var course = await _courseService.GetCourseAsync(courseId);
+        if (course == null)
+            return NotFound();
+
+        var lessons = course.Modules
+            .SelectMany(m => m.Lessons)
+            .Select(l => new LessonResponse(
+                l.Id,
+                l.Title,
+                l.Description,
+                l.Type,
+                l.VideoUrl,
+                l.Content,
+                l.DurationMinutes,
+                l.OrderIndex,
+                l.IsFree,
+                l.Resources.Select(r => new LessonResourceResponse(r.Name, r.Url, r.Type)).ToList()
+            )).ToList();
+
+        return Ok(lessons);
+    }
+
+    /// <summary>
     /// Publish a course (make it available for enrollment)
     /// </summary>
     [HttpPost("{id}/publish")]

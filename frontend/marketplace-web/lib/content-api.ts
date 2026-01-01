@@ -5,28 +5,28 @@
 
 import axios from 'axios';
 import type {
-    ApiResponse,
-    Category,
-    CategoryWithChildren,
-    Comment,
-    CommentWithReplies,
-    ContentAnalytics,
-    ContentFilters,
-    ContentWithRelations,
-    CreateCategoryInput,
-    CreateCommentInput,
-    CreateContentInput,
-    CreateTagInput,
-    LikeResponse,
-    MediaAsset,
-    OverallAnalytics,
-    PaginationMeta,
-    SearchParams,
-    Tag,
-    UpdateCategoryInput,
-    UpdateCommentInput,
-    UpdateContentInput,
-    UpdateTagInput
+  ApiResponse,
+  Category,
+  CategoryWithChildren,
+  Comment,
+  CommentWithReplies,
+  ContentAnalytics,
+  ContentFilters,
+  ContentWithRelations,
+  CreateCategoryInput,
+  CreateCommentInput,
+  CreateContentInput,
+  CreateTagInput,
+  LikeResponse,
+  MediaAsset,
+  OverallAnalytics,
+  PaginationMeta,
+  SearchParams,
+  Tag,
+  UpdateCategoryInput,
+  UpdateCommentInput,
+  UpdateContentInput,
+  UpdateTagInput
 } from './content-types';
 import logger from './logger';
 
@@ -597,6 +597,76 @@ export const mediaApi = {
   },
 };
 
+// ============================================================================
+// Tutorials API
+// ============================================================================
+
+export interface Tutorial {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  icon: string;
+  difficulty_level: 'beginner' | 'intermediate' | 'advanced';
+  color_theme: string;
+  estimated_hours: number;
+  is_published: boolean;
+  sections_count: number;
+  stats?: {
+    total_topics?: number;
+    total_read_time?: number;
+    completion_rate?: number;
+  } | null;
+  display_order?: number;
+  created_at?: string;
+}
+
+export interface TutorialSection {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  icon: string;
+  display_order: number;
+  topics_count: number;
+  topics: TutorialTopic[];
+}
+
+export interface TutorialTopic {
+  id: string;
+  slug: string;
+  title: string;
+  estimated_read_time: number;
+  has_audio: boolean;
+  has_video: boolean;
+  display_order: number;
+}
+
+export interface TutorialWithSections extends Tutorial {
+  meta_tags: Record<string, unknown> | null;
+  sections: TutorialSection[];
+}
+
+export const tutorialsApi = {
+  /**
+   * Get all tutorials
+   */
+  async getAll(publishedOnly = true): Promise<Tutorial[]> {
+    const response = await contentClient.get<ApiResponse<Tutorial[]>>('/tutorials', {
+      params: { published: publishedOnly },
+    });
+    return response.data.data;
+  },
+
+  /**
+   * Get tutorial by slug with sections
+   */
+  async getBySlug(slug: string): Promise<TutorialWithSections> {
+    const response = await contentClient.get<ApiResponse<TutorialWithSections>>(`/tutorials/${slug}`);
+    return response.data.data;
+  },
+};
+
 // Export combined API
 export const contentServiceApi = {
   categories: categoriesApi,
@@ -606,6 +676,7 @@ export const contentServiceApi = {
   search: searchApi,
   analytics: analyticsApi,
   media: mediaApi,
+  tutorials: tutorialsApi,
 };
 
 export default contentServiceApi;

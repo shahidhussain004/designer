@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { apiClient } from './api-client';
 
 export interface LoginCredentials {
@@ -145,3 +146,36 @@ export const authService = {
     return user?.role === 'INSTRUCTOR' || user?.role === 'ADMIN';
   },
 };
+
+/**
+ * React hook to access current user from localStorage.
+ * Returns `{ user, setUser }` for simple usage in client components.
+ */
+export function useAuth() {
+  const [user, setUser] = useState<any>(() => {
+    if (typeof window !== 'undefined') {
+      const userStr = localStorage.getItem('user');
+      return userStr ? JSON.parse(userStr) : null;
+    }
+    return null;
+  });
+
+  useEffect(() => {
+    const handleStorage = () => {
+      const userStr = localStorage.getItem('user');
+      setUser(userStr ? JSON.parse(userStr) : null);
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', handleStorage);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('storage', handleStorage);
+      }
+    };
+  }, []);
+
+  return { user, setUser };
+}

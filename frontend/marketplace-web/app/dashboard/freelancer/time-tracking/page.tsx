@@ -1,6 +1,7 @@
 "use client";
 
 import { PageLayout } from '@/components/ui';
+import { apiClient } from '@/lib/api-client';
 import { useAuth } from '@/lib/context/AuthContext';
 import logger from '@/lib/logger';
 import { Calendar, Check, Clock, Plus, X } from 'lucide-react';
@@ -65,21 +66,13 @@ export default function TimeTrackingPage() {
 
   const fetchData = async () => {
     try {
-      const [entriesRes, contractsRes] = await Promise.all([
-        fetch(`/api/time-entries/freelancer/${user?.id}`),
-        fetch('/api/contracts'),
+      const [{ data: entriesData }, { data: contractsData }] = await Promise.all([
+        apiClient.get(`/time-entries/freelancer/${user?.id}`),
+        apiClient.get('/contracts'),
       ]);
 
-      if (entriesRes.ok) {
-        const entriesData = await entriesRes.json();
-        setTimeEntries(entriesData);
-      }
-
-      if (contractsRes.ok) {
-        const contractsData = await contractsRes.json();
-        // Only show active contracts
-        setContracts(contractsData.filter((c: Contract) => c.status === 'ACTIVE'));
-      }
+      if (entriesData) setTimeEntries(entriesData);
+      if (contractsData) setContracts((contractsData as Contract[]).filter((c) => c.status === 'ACTIVE'));
     } catch (error) {
       logger.error('Failed to fetch data', error as Error);
     } finally {
@@ -101,13 +94,8 @@ export default function TimeTrackingPage() {
     };
 
     try {
-      const res = await fetch('/api/time-entries', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (res.ok) {
+      const res = await apiClient.post('/time-entries', payload);
+      if (res && res.status >= 200 && res.status < 300) {
         await fetchData();
         resetForm();
       }

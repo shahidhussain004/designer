@@ -4,8 +4,8 @@
  * Tailwind CSS UI Components
  */
 
-import React, { forwardRef, HTMLAttributes, ButtonHTMLAttributes, InputHTMLAttributes, TextareaHTMLAttributes, AnchorHTMLAttributes } from 'react'
 import { cn } from '@/lib/design-system/utils'
+import React, { AnchorHTMLAttributes, ButtonHTMLAttributes, forwardRef, HTMLAttributes, InputHTMLAttributes, TextareaHTMLAttributes } from 'react'
 
 // ============================================================================
 // LAYOUT COMPONENTS
@@ -818,7 +818,33 @@ export const Theme: React.FC<ThemeProps> = ({ children, 'color-scheme': colorSch
 // ============================================================================
 
 export const RadioGroup = Checkbox // Placeholder
-export const Select = Input // Placeholder
+
+interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+  label?: string
+}
+
+export const Select = forwardRef<HTMLSelectElement, SelectProps>(({ className, label, children, ...props }, ref) => (
+  <div className="w-full">
+    {label && (
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        {label}
+      </label>
+    )}
+    <select
+      ref={ref}
+      className={cn(
+        'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-white',
+        'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </select>
+  </div>
+))
+Select.displayName = 'Select'
+
 export const Dropdown = Input // Placeholder
 export const Datepicker = Input // Placeholder
 export const Fab = Button

@@ -10,7 +10,8 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { label: 'Find Work', href: '/jobs' },
+  { label: 'Browse Projects', href: '/projects' },
+  { label: 'Jobs', href: '/jobs' },
   { label: 'Hire Talent', href: '/talents' },
   { label: 'Tutorials', href: '/tutorials' },
   { label: 'Courses', href: '/courses' },

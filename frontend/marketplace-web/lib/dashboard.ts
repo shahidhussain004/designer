@@ -1,5 +1,5 @@
 import apiClient from './api-client';
-import type { ExperienceLevel, JobCategory } from './apiTypes';
+import type { ExperienceLevel, PostCategory } from './apiTypes';
 import { authService } from './auth';
 
 export interface DashboardStats {
@@ -21,7 +21,7 @@ export interface JobSummary {
   title: string;
   description: string;
   budget: number;
-  category: string | JobCategory;
+  category: string | PostCategory;
   experienceLevel: string | ExperienceLevel;
   status: string;
   proposalCount: number;

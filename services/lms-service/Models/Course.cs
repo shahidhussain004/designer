@@ -3,6 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace LmsService.Models;
 
+[BsonIgnoreExtraElements]
 public class Course
 {
     [BsonId]
@@ -60,8 +61,30 @@ public class Course
     [BsonElement("totalEnrollments")]
     public int TotalEnrollments { get; set; }
 
+    // Legacy field name used in older documents: 'enrollmentCount'
+    // Keep nullable so deserialization succeeds when it's absent.
+    [BsonElement("enrollmentCount")]
+    [BsonIgnoreIfNull]
+    public int? EnrollmentCount { get; set; }
+
     [BsonElement("averageRating")]
     public double AverageRating { get; set; }
+
+    // Legacy field name used in older documents: 'rating'
+    // Map it to the same backing value as AverageRating so deserialization
+    // succeeds when older documents use 'rating'. Keep nullable to avoid
+    // issues when the field is absent.
+    [BsonElement("rating")]
+    [BsonIgnoreIfNull]
+    public double? Rating
+    {
+        get => AverageRating;
+        set
+        {
+            if (value.HasValue)
+                AverageRating = value.Value;
+        }
+    }
 
     [BsonElement("reviewCount")]
     public int ReviewCount { get; set; }
@@ -71,6 +94,33 @@ public class Course
 
     [BsonElement("totalLessons")]
     public int TotalLessons { get; set; }
+
+    // Legacy field name: 'totalLessonCount'
+    // Map to the same backing value as TotalLessons for older documents.
+    [BsonElement("totalLessonCount")]
+    [BsonIgnoreIfNull]
+    public int? TotalLessonCount
+    {
+        get => TotalLessons;
+        set
+        {
+            if (value.HasValue)
+                TotalLessons = value.Value;
+        }
+    }
+
+    // Legacy field name: 'totalModuleCount'
+    // Map to the module count for older documents that stored module counts separately.
+    [BsonElement("totalModuleCount")]
+    [BsonIgnoreIfNull]
+    public int? TotalModuleCount
+    {
+        get => Modules?.Count ?? 0;
+        set
+        {
+            // No-op: we don't persist modules from this value, but accept it during deserialization
+        }
+    }
 
     [BsonElement("slug")]
     public string Slug { get; set; } = string.Empty;
@@ -86,6 +136,12 @@ public class Course
 
     [BsonElement("publishedAt")]
     public DateTime? PublishedAt { get; set; }
+
+    // Legacy field support: older documents used a boolean 'isPublished'
+    // while newer documents use 'status' enum. Keep this nullable so the
+    // deserializer won't fail if the field is absent.
+    [BsonElement("isPublished")]
+    public bool? IsPublished { get; set; }
 
     public void RecalculateStats()
     {
@@ -123,6 +179,9 @@ public class Module
     [BsonElement("lessons")]
     public List<Lesson> Lessons { get; set; } = new();
 }
+
+// Back on the Course class, add mapping for legacy module count field
+// (placed after the class definitions for clarity)
 
 public class Lesson
 {

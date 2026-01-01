@@ -24,21 +24,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Job entity - represents project postings by clients
- * Maps to 'jobs' table in PostgreSQL
+ * Project entity - represents freelance/gig project postings by clients
+ * Maps to 'projects' table in PostgreSQL (formerly 'jobs')
+ * This is for short-term, project-based work - NOT traditional employment
  */
 @Entity
-@Table(name = "jobs", indexes = {
-        @Index(name = "idx_jobs_client", columnList = "client_id"),
-        @Index(name = "idx_jobs_status", columnList = "status"),
-        @Index(name = "idx_jobs_category_fk", columnList = "category_id"),
-        @Index(name = "idx_jobs_created", columnList = "created_at")
+@Table(name = "projects", indexes = {
+        @Index(name = "idx_projects_client", columnList = "client_id"),
+        @Index(name = "idx_projects_status", columnList = "status"),
+        @Index(name = "idx_projects_category_fk", columnList = "category_id"),
+        @Index(name = "idx_projects_created", columnList = "created_at")
 })
 @EntityListeners(AuditingEntityListener.class)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Job {
+public class Project {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,10 +55,10 @@ public class Job {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    // Foreign key relationship to JobCategory
+    // Foreign key relationship to ProjectCategory
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
-    private JobCategory jobCategory;
+    private ProjectCategory projectCategory;
 
     @Column(name = "required_skills", columnDefinition = "TEXT[]")
     private String[] requiredSkills;
@@ -84,7 +85,7 @@ public class Job {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private JobStatus status = JobStatus.OPEN;
+    private ProjectStatus status = ProjectStatus.OPEN;
 
     @Column(name = "is_featured")
     private Boolean isFeatured = false;
@@ -118,7 +119,7 @@ public class Job {
         EXPERT
     }
 
-    public enum JobStatus {
+    public enum ProjectStatus {
         DRAFT,
         OPEN,
         IN_PROGRESS,

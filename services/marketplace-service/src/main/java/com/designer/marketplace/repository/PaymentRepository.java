@@ -24,7 +24,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     List<Payment> findByFreelancerId(Long freelancerId);
 
-    List<Payment> findByJobId(Long jobId);
+    List<Payment> findByProjectId(Long projectId);
 
     Page<Payment> findByClientIdOrderByCreatedAtDesc(Long clientId, Pageable pageable);
 

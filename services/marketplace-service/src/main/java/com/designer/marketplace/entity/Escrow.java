@@ -1,12 +1,24 @@
 package com.designer.marketplace.entity;
 
-import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 /**
  * Escrow entity for holding funds until job completion.
@@ -28,8 +40,8 @@ public class Escrow {
     private Payment payment;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "job_id", nullable = false)
-    private Job job;
+    @JoinColumn(name = "project_id", nullable = false)
+    private Project project;
 
     @Column(nullable = false)
     private Long amount;
@@ -46,7 +58,7 @@ public class Escrow {
     @Enumerated(EnumType.STRING)
     @Column(name = "release_condition", length = 100)
     @Builder.Default
-    private ReleaseCondition releaseCondition = ReleaseCondition.JOB_COMPLETED;
+    private ReleaseCondition releaseCondition = ReleaseCondition.PROJECT_COMPLETED;
 
     @Column(name = "auto_release_date")
     private LocalDateTime autoReleaseDate;
@@ -75,7 +87,7 @@ public class Escrow {
     }
 
     public enum ReleaseCondition {
-        JOB_COMPLETED,
+        PROJECT_COMPLETED,
         MILESTONE_COMPLETED,
         MANUAL_RELEASE,
         AUTO_RELEASE,

@@ -32,7 +32,7 @@ import lombok.NoArgsConstructor;
  */
 @Entity
 @Table(name = "contracts", indexes = {
-    @Index(name = "idx_contract_job_id", columnList = "job_id"),
+    @Index(name = "idx_contract_project_id", columnList = "project_id"),
     @Index(name = "idx_contract_client_id", columnList = "client_id"),
     @Index(name = "idx_contract_freelancer_id", columnList = "freelancer_id"),
     @Index(name = "idx_contract_status", columnList = "status")
@@ -49,8 +49,8 @@ public class Contract {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "job_id", nullable = false, foreignKey = @ForeignKey(name = "fk_contract_job"))
-    private Job job;
+    @JoinColumn(name = "project_id", nullable = false, foreignKey = @ForeignKey(name = "fk_contract_project"))
+    private Project project;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", nullable = false, foreignKey = @ForeignKey(name = "fk_contract_client"))

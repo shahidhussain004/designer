@@ -13,7 +13,7 @@ export async function tutorialsRoutes(app: FastifyInstance) {
 
   // Get all tutorials
   app.get(
-    '/api/tutorials',
+    '/',
     {
       schema: {
         description: 'Get all tutorials',
@@ -51,7 +51,7 @@ export async function tutorialsRoutes(app: FastifyInstance) {
 
   // Get tutorial by slug with sections
   app.get(
-    '/api/tutorials/:slug',
+    '/:slug',
     {
       schema: {
         description: 'Get tutorial by slug',
@@ -92,7 +92,7 @@ export async function tutorialsRoutes(app: FastifyInstance) {
 
   // Get section with topics
   app.get(
-    '/api/tutorials/:tutorialSlug/sections/:sectionSlug',
+    '/:tutorialSlug/sections/:sectionSlug',
     {
       schema: {
         description: 'Get section with topics',
@@ -140,7 +140,7 @@ export async function tutorialsRoutes(app: FastifyInstance) {
 
   // Get topic content
   app.get(
-    '/api/tutorials/:tutorialSlug/:sectionSlug/:topicSlug',
+    '/:tutorialSlug/:sectionSlug/:topicSlug',
     {
       schema: {
         description: 'Get topic content',
@@ -204,7 +204,7 @@ export async function tutorialsRoutes(app: FastifyInstance) {
 
   // Create tutorial
   app.post(
-    '/api/admin/tutorials',
+    '/admin/tutorials',
     {
       schema: {
         description: 'Create new tutorial',
@@ -258,7 +258,7 @@ export async function tutorialsRoutes(app: FastifyInstance) {
 
   // Create section
   app.post(
-    '/api/admin/tutorials/:tutorialId/sections',
+    '/admin/tutorials/:tutorialId/sections',
     {
       schema: {
         description: 'Create new section',
@@ -318,7 +318,7 @@ export async function tutorialsRoutes(app: FastifyInstance) {
 
   // Create topic
   app.post(
-    '/api/admin/sections/:sectionId/topics',
+    '/admin/sections/:sectionId/topics',
     {
       schema: {
         description: 'Create new topic',
@@ -380,7 +380,7 @@ export async function tutorialsRoutes(app: FastifyInstance) {
 
   // Update topic
   app.put(
-    '/api/admin/topics/:topicId',
+    '/admin/topics/:topicId',
     {
       schema: {
         description: 'Update topic',
@@ -439,7 +439,7 @@ export async function tutorialsRoutes(app: FastifyInstance) {
 
   // AI content generation (placeholder - will need Anthropic API key)
   app.post(
-    '/api/admin/ai-assist/generate-content',
+    '/admin/ai-assist/generate-content',
     {
       schema: {
         description: 'Generate tutorial content using AI',

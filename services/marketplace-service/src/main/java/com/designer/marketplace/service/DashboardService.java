@@ -13,13 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.designer.marketplace.dto.ClientDashboardResponse;
 import com.designer.marketplace.dto.FreelancerDashboardResponse;
-import com.designer.marketplace.dto.JobResponse;
 import com.designer.marketplace.dto.NotificationResponse;
+import com.designer.marketplace.dto.ProjectResponse;
 import com.designer.marketplace.dto.ProposalResponse;
-import com.designer.marketplace.entity.Job;
+import com.designer.marketplace.entity.Project;
 import com.designer.marketplace.entity.Proposal;
 import com.designer.marketplace.entity.User;
-import com.designer.marketplace.repository.JobRepository;
+import com.designer.marketplace.repository.ProjectRepository;
 import com.designer.marketplace.repository.ProposalRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 public class DashboardService {
 
         private final UserService userService;
-        private final JobRepository jobRepository;
+        private final ProjectRepository projectRepository;
         private final ProposalRepository proposalRepository;
         private final NotificationService notificationService;
 
@@ -52,36 +52,36 @@ public class DashboardService {
                 log.info("Getting client dashboard for user: {}", currentUser.getUsername());
 
                 // Get statistics
-                Long totalJobsPosted = jobRepository.countByClientId(currentUser.getId());
-                Long activeJobs = jobRepository.countByClientIdAndStatus(currentUser.getId(), Job.JobStatus.OPEN) +
-                                jobRepository.countByClientIdAndStatus(currentUser.getId(), Job.JobStatus.IN_PROGRESS);
-                Long completedJobs = jobRepository.countByClientIdAndStatus(currentUser.getId(),
-                                Job.JobStatus.COMPLETED);
-                Long totalProposalsReceived = proposalRepository.countByJobClientId(currentUser.getId());
-                Long pendingProposals = proposalRepository.countByJobClientIdAndStatus(
+                Long totalProjectsPosted = projectRepository.countByClientId(currentUser.getId());
+                Long activeProjects = projectRepository.countByClientIdAndStatus(currentUser.getId(), Project.ProjectStatus.OPEN) +
+                                projectRepository.countByClientIdAndStatus(currentUser.getId(), Project.ProjectStatus.IN_PROGRESS);
+                Long completedProjects = projectRepository.countByClientIdAndStatus(currentUser.getId(),
+                                Project.ProjectStatus.COMPLETED);
+                Long totalProposalsReceived = proposalRepository.countByProjectClientId(currentUser.getId());
+                Long pendingProposals = proposalRepository.countByProjectClientIdAndStatus(
                                 currentUser.getId(), Proposal.ProposalStatus.SUBMITTED);
 
                 ClientDashboardResponse.DashboardStats stats = ClientDashboardResponse.DashboardStats.builder()
-                                .totalJobsPosted(totalJobsPosted)
-                                .activeJobs(activeJobs)
-                                .completedJobs(completedJobs)
+                                .totalProjectsPosted(totalProjectsPosted)
+                                .activeProjects(activeProjects)
+                                .completedProjects(completedProjects)
                                 .totalProposalsReceived(totalProposalsReceived)
                                 .pendingProposals(pendingProposals)
                                 .build();
 
-                // Get active jobs (OPEN and IN_PROGRESS)
-                Pageable jobsPageable = PageRequest.of(0, 5);
-                List<Job> activeJobsList = jobRepository.findTopByClientIdAndStatusIn(
+                // Get active projects (OPEN and IN_PROGRESS)
+                Pageable projectsPageable = PageRequest.of(0, 5);
+                List<Project> activeProjectsList = projectRepository.findTopByClientIdAndStatusIn(
                                 currentUser.getId(),
-                                Arrays.asList(Job.JobStatus.OPEN, Job.JobStatus.IN_PROGRESS),
-                                jobsPageable);
-                List<JobResponse> activeJobsResponse = activeJobsList.stream()
-                                .map(JobResponse::fromEntity)
+                                Arrays.asList(Project.ProjectStatus.OPEN, Project.ProjectStatus.IN_PROGRESS),
+                                projectsPageable);
+                List<ProjectResponse> activeProjectsResponse = activeProjectsList.stream()
+                                .map(ProjectResponse::fromEntity)
                                 .collect(Collectors.toList());
 
-                // Get recent proposals for all client's jobs
+                // Get recent proposals for all client's projects
                 Pageable proposalsPageable = PageRequest.of(0, 10);
-                List<Proposal> recentProposalsList = proposalRepository.findTopByJobClientId(
+                List<Proposal> recentProposalsList = proposalRepository.findTopByProjectClientId(
                                 currentUser.getId(), proposalsPageable);
                 List<ProposalResponse> recentProposalsResponse = recentProposalsList.stream()
                                 .map(ProposalResponse::fromEntity)
@@ -89,7 +89,7 @@ public class DashboardService {
 
                 return ClientDashboardResponse.builder()
                                 .stats(stats)
-                                .activeJobs(activeJobsResponse)
+                                .activeProjects(activeProjectsResponse)
                                 .recentProposals(recentProposalsResponse)
                                 .build();
         }
@@ -135,17 +135,17 @@ public class DashboardService {
                                 .map(ProposalResponse::fromEntity)
                                 .collect(Collectors.toList());
 
-                // Get available jobs (OPEN status, not applied by this user)
-                Pageable jobsPageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
-                Page<Job> availableJobsPage = jobRepository.findByStatus(Job.JobStatus.OPEN, jobsPageable);
-                List<JobResponse> availableJobsResponse = availableJobsPage.getContent().stream()
-                                .map(JobResponse::fromEntity)
+                // Get available projects (OPEN status, not applied by this user)
+                Pageable projectsPageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+                Page<Project> availableProjectsPage = projectRepository.findByStatus(Project.ProjectStatus.OPEN, projectsPageable);
+                List<ProjectResponse> availableProjectsResponse = availableProjectsPage.getContent().stream()
+                                .map(ProjectResponse::fromEntity)
                                 .collect(Collectors.toList());
 
                 return FreelancerDashboardResponse.builder()
                                 .stats(stats)
                                 .myProposals(myProposalsResponse)
-                                .availableJobs(availableJobsResponse)
+                                .availableProjects(availableProjectsResponse)
                                 .build();
         }
 

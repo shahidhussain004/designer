@@ -1,11 +1,11 @@
 package com.designer.marketplace.dto;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 /**
  * DTO for Freelancer Dashboard response
@@ -18,7 +18,7 @@ public class FreelancerDashboardResponse {
 
     private DashboardStats stats;
     private List<ProposalResponse> myProposals;
-    private List<JobResponse> availableJobs;
+    private List<ProjectResponse> availableProjects;
 
     @Data
     @Builder

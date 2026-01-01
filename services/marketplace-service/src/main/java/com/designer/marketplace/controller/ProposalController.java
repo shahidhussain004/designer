@@ -1,12 +1,5 @@
 package com.designer.marketplace.controller;
 
-import com.designer.marketplace.dto.CreateProposalRequest;
-import com.designer.marketplace.dto.ProposalResponse;
-import com.designer.marketplace.dto.UpdateProposalStatusRequest;
-import com.designer.marketplace.service.ProposalService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,14 +7,30 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.designer.marketplace.dto.CreateProposalRequest;
+import com.designer.marketplace.dto.ProposalResponse;
+import com.designer.marketplace.dto.UpdateProposalStatusRequest;
+import com.designer.marketplace.service.ProposalService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Controller for proposal endpoints
  * 
  * Endpoints:
  * - GET /api/proposals - Get user's proposals
- * - GET /api/jobs/{jobId}/proposals - Get proposals for a job
+ * - GET /api/projects/{projectId}/proposals - Get proposals for a project
  * - POST /api/proposals - Submit proposal
  * - PUT /api/proposals/{id}/status - Update proposal status
  */
@@ -50,19 +59,19 @@ public class ProposalController {
     }
 
     /**
-     * Task 3.13: Get proposals for a job
-     * GET /api/jobs/{jobId}/proposals?page=0&size=20
+     * Task 3.13: Get proposals for a project
+     * GET /api/projects/{projectId}/proposals?page=0&size=20
      */
-    @GetMapping("/jobs/{jobId}/proposals")
-    @PreAuthorize("isAuthenticated() and @jobService.isJobOwner(#jobId)")
-    public ResponseEntity<Page<ProposalResponse>> getJobProposals(
-            @PathVariable Long jobId,
+    @GetMapping("/projects/{projectId}/proposals")
+    @PreAuthorize("isAuthenticated() and @projectService.isProjectOwner(#projectId)")
+    public ResponseEntity<Page<ProposalResponse>> getProjectProposals(
+            @PathVariable Long projectId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
 
-        log.info("Getting proposals for job: {}", jobId);
+        log.info("Getting proposals for project: {}", projectId);
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<ProposalResponse> proposals = proposalService.getJobProposals(jobId, pageable);
+        Page<ProposalResponse> proposals = proposalService.getProjectProposals(projectId, pageable);
         return ResponseEntity.ok(proposals);
     }
 
@@ -73,17 +82,17 @@ public class ProposalController {
     @PostMapping("/proposals")
     @PreAuthorize("hasRole('FREELANCER')")
     public ResponseEntity<ProposalResponse> createProposal(@Valid @RequestBody CreateProposalRequest request) {
-        log.info("Creating new proposal for job: {}", request.getJobId());
+        log.info("Creating new proposal for project: {}", request.getProjectId());
         ProposalResponse proposal = proposalService.createProposal(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(proposal);
     }
 
     /**
-     * Task 3.15: Update proposal status (job owner only)
+     * Task 3.15: Update proposal status (project owner only)
      * PUT /api/proposals/{id}/status
      */
     @PutMapping("/proposals/{id}/status")
-    @PreAuthorize("isAuthenticated() and @proposalService.isJobOwnerForProposal(#id)")
+    @PreAuthorize("isAuthenticated() and @proposalService.isProjectOwnerForProposal(#id)")
     public ResponseEntity<ProposalResponse> updateProposalStatus(
             @PathVariable Long id,
             @Valid @RequestBody UpdateProposalStatusRequest request) {
@@ -98,7 +107,7 @@ public class ProposalController {
      * GET /api/proposals/{id}
      */
     @GetMapping("/proposals/{id}")
-    @PreAuthorize("isAuthenticated() and (@proposalService.isProposalOwner(#id) or @proposalService.isJobOwnerForProposal(#id))")
+    @PreAuthorize("isAuthenticated() and (@proposalService.isProposalOwner(#id) or @proposalService.isProjectOwnerForProposal(#id))")
     public ResponseEntity<ProposalResponse> getProposalById(@PathVariable Long id) {
         log.info("Getting proposal by id: {}", id);
         ProposalResponse proposal = proposalService.getProposalById(id);
@@ -126,7 +135,7 @@ public class ProposalController {
      * PUT /api/proposals/{id}/accept
      */
     @PutMapping("/proposals/{id}/accept")
-    @PreAuthorize("isAuthenticated() and @proposalService.isJobOwnerForProposal(#id)")
+    @PreAuthorize("isAuthenticated() and @proposalService.isProjectOwnerForProposal(#id)")
     public ResponseEntity<ProposalResponse> acceptProposal(@PathVariable Long id) {
         log.info("Accepting proposal: {}", id);
         ProposalResponse proposal = proposalService.acceptProposal(id);
@@ -138,7 +147,7 @@ public class ProposalController {
      * PUT /api/proposals/{id}/reject
      */
     @PutMapping("/proposals/{id}/reject")
-    @PreAuthorize("isAuthenticated() and @proposalService.isJobOwnerForProposal(#id)")
+    @PreAuthorize("isAuthenticated() and @proposalService.isProjectOwnerForProposal(#id)")
     public ResponseEntity<ProposalResponse> rejectProposal(@PathVariable Long id) {
         log.info("Rejecting proposal: {}", id);
         ProposalResponse proposal = proposalService.rejectProposal(id);

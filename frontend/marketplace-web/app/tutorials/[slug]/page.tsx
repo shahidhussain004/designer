@@ -1,6 +1,7 @@
 'use client';
 
 import { Breadcrumb, PageLayout } from '@/components/ui';
+import { tutorialsApi } from '@/lib/content-api';
 import { BookOpen, ChevronRight, Clock, Code, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -47,47 +48,42 @@ const TutorialDetailPage = () => {
 
   useEffect(() => {
     if (!slug) return;
-
-    fetch(`http://localhost:8083/api/tutorials/${slug}`)
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch tutorial');
-        return res.json();
-      })
-      .then((data) => {
-        // Backend returns { success: true, data: tutorial }
-        const payload = data?.data ?? data;
+    (async () => {
+      try {
+        const resp = await tutorialsApi.getBySlug(slug);
+        const payload = resp ?? null;
         if (!payload) {
           setError('Invalid tutorial response from server');
           setLoading(false);
           return;
         }
 
-        // Adapt fields to camelCase and safe defaults
+        const p: any = payload;
+
         const adapted: Tutorial = {
-          id: payload.id,
-          slug: payload.slug,
-          title: payload.title,
-          description: payload.description,
-          icon: payload.icon,
-          difficultyLevel: payload.difficulty_level,
-          colorTheme: payload.color_theme,
-          estimatedHours: payload.estimated_hours ?? 0,
-          sections: Array.isArray(payload.sections)
-            ? payload.sections.map((s: any) => ({
+          id: p.id,
+          slug: p.slug,
+          title: p.title,
+          description: p.description ?? p.summary ?? p.excerpt ?? '',
+          icon: p.icon,
+          difficultyLevel: (p.difficulty_level as string) || (p.difficultyLevel as string) || 'beginner',
+          colorTheme: p.color_theme || p.colorTheme,
+          estimatedHours: p.estimated_hours ?? p.estimatedHours ?? 0,
+          sections: Array.isArray(p.sections)
+            ? p.sections.map((s: any) => ({
                 id: s.id,
                 slug: s.slug,
                 title: s.title,
-                description: s.description,
+                description: s.description ?? s.summary ?? '',
                 icon: s.icon,
-                display_order: s.display_order,
+                display_order: s.display_order ?? s.displayOrder ?? 0,
                 topics: Array.isArray(s.topics)
                   ? s.topics.map((t: any) => ({
                       id: t.id,
                       slug: t.slug,
                       title: t.title,
                       estimated_read_time: t.estimated_read_time ?? t.estimatedReadTime ?? 0,
-                      // Backend may not include is_published (topics were already filtered), default to true
-                      is_published: typeof t.is_published === 'boolean' ? t.is_published : true,
+                      is_published: typeof t.is_published === 'boolean' ? t.is_published : (t.isPublished ?? true),
                     }))
                   : [],
               }))
@@ -95,17 +91,16 @@ const TutorialDetailPage = () => {
         };
 
         setTutorial(adapted);
-        // Debug: log adapted structure to help diagnose missing topics in dev
         if (process.env.NODE_ENV !== 'production') {
           // eslint-disable-next-line no-console
           console.debug('adapted tutorial:', adapted);
         }
+      } catch (err: any) {
+        setError(err?.message || 'Failed to load tutorial');
+      } finally {
         setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
+      }
+    })();
   }, [slug]);
 
   if (loading) {

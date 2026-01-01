@@ -17,9 +17,9 @@ import com.designer.marketplace.entity.Contract.ContractStatus;
 public interface ContractRepository extends JpaRepository<Contract, Long> {
 
     /**
-     * Find all contracts for a specific job
+     * Find all contracts for a specific project
      */
-    List<Contract> findByJobId(Long jobId);
+    List<Contract> findByProjectId(Long projectId);
 
     /**
      * Find all contracts where user is the client

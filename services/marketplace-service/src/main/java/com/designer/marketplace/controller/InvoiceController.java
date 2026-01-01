@@ -77,10 +77,10 @@ public class InvoiceController {
         return ResponseEntity.ok(invoiceService.getInvoicesForFreelancer(freelancerId, pageable));
     }
 
-    @GetMapping("/job/{jobId}")
-    @Operation(summary = "Get invoices for a job")
-    public ResponseEntity<List<InvoiceResponse>> getJobInvoices(@PathVariable Long jobId) {
-        return ResponseEntity.ok(invoiceService.getInvoicesForJob(jobId));
+    @GetMapping("/project/{projectId}")
+    @Operation(summary = "Get invoices for a project")
+    public ResponseEntity<List<InvoiceResponse>> getProjectInvoices(@PathVariable Long projectId) {
+        return ResponseEntity.ok(invoiceService.getInvoicesForProject(projectId));
     }
 
     @PatchMapping("/{invoiceId}/status")
