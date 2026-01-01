@@ -1,29 +1,10 @@
 'use client';
 
 import { PageLayout } from '@/components/ui';
-import { contentApi } from '@/lib/content-api';
+import { Tutorial, tutorialsApi } from '@/lib/content-api';
 import { BookOpen, Clock, Headphones, TrendingUp, Video } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-
-// Tutorial type matching our backend schema
-interface Tutorial {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  icon: string;
-  difficultyLevel: 'beginner' | 'intermediate' | 'advanced';
-  colorTheme: string;
-  estimatedHours: number;
-  isPublished: boolean;
-  sectionsCount: number;
-  stats?: {
-    totalTopics?: number;
-    totalReadTime?: number;
-    completionRate?: number;
-  } | null;
-}
 
 // Difficulty filter type
 type DifficultyFilter = 'all' | 'beginner' | 'intermediate' | 'advanced';
@@ -35,33 +16,11 @@ const TutorialsPage = () => {
   const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>('all');
 
   useEffect(() => {
-    // Fetch tutorials from Content Service via contentApi
+    // Fetch tutorials from Tutorials API
     (async () => {
       try {
-        const resp = await contentApi.getPublished({ limit: 100, filters: { contentType: 'tutorial' } });
-        const tutorialsPayload = resp.data ?? [];
-
-        const adapt = (t: any): Tutorial => ({
-          id: t.id,
-          slug: t.slug,
-          title: t.title,
-          description: t.description,
-          icon: t.icon,
-          difficultyLevel: t.difficulty_level || t.difficultyLevel,
-          colorTheme: t.color_theme || t.colorTheme,
-          estimatedHours: t.estimated_hours ?? t.estimatedHours ?? 0,
-          isPublished: t.is_published ?? t.isPublished ?? false,
-          sectionsCount: t.sections_count ?? t.sectionsCount ?? 0,
-          stats: t.stats
-            ? {
-                totalTopics: t.stats.total_topics ?? t.stats.totalTopics,
-                totalReadTime: t.stats.total_read_time ?? t.stats.totalReadTime,
-                completionRate: t.stats.completion_rate ?? t.stats.completionRate,
-              }
-            : null,
-        });
-
-        setTutorials(tutorialsPayload.map(adapt));
+        const tutorialsData = await tutorialsApi.getAll(true);
+        setTutorials(tutorialsData);
       } catch (err: any) {
         setError(err?.message || 'Failed to load tutorials');
       } finally {
@@ -72,7 +31,7 @@ const TutorialsPage = () => {
 
   const filteredTutorials = tutorials.filter((tutorial) => {
     if (difficultyFilter === 'all') return true;
-    return tutorial.difficultyLevel === difficultyFilter;
+    return tutorial.difficulty_level === difficultyFilter;
   });
 
   const getDifficultyBadgeClass = (level: string) => {
@@ -218,8 +177,8 @@ const TutorialsPage = () => {
                       {tutorial.title}
                     </h3>
                   </div>
-                  <span className={getDifficultyBadgeClass(tutorial.difficultyLevel)}>
-                    {tutorial.difficultyLevel}
+                  <span className={getDifficultyBadgeClass(tutorial.difficulty_level)}>
+                    {tutorial.difficulty_level}
                   </span>
                 </div>
 
@@ -232,16 +191,16 @@ const TutorialsPage = () => {
                 <div className="flex items-center gap-4 mb-6 text-sm text-gray-500 dark:text-gray-400">
                   <div className="flex items-center gap-1">
                     <BookOpen className="w-4 h-4" />
-                    <span>{tutorial.sectionsCount} sections</span>
+                    <span>{tutorial.sections_count} sections</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Clock className="w-4 h-4" />
-                    <span>{tutorial.estimatedHours}h</span>
+                    <span>{tutorial.estimated_hours}h</span>
                   </div>
-                  {tutorial.stats && (
+                  {tutorial.stats && tutorial.stats.total_topics && (
                     <div className="flex items-center gap-1">
                       <TrendingUp className="w-4 h-4" />
-                      <span>{tutorial.stats.totalTopics} topics</span>
+                      <span>{tutorial.stats.total_topics} topics</span>
                     </div>
                   )}
                 </div>
