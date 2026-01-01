@@ -1,7 +1,7 @@
 'use client';
 
 import { Breadcrumb, PageLayout } from '@/components/ui';
-import { contentApi } from '@/lib/content-api';
+import { tutorialsApi } from '@/lib/content-api';
 import {
   BookOpen,
   ChevronLeft,
@@ -58,7 +58,7 @@ const TopicReadingPage = () => {
       try {
         // Some content services expose topics as nested slugs; attempt to fetch by composed slug
         const composedSlug = `${tutorialSlug}/${sectionSlug}/${topicSlug}`;
-        const resp = await contentApi.getBySlug(composedSlug);
+        const resp = await tutorialsApi.getBySlug(composedSlug);
         const payload = resp ?? null;
         if (!payload) {
           setError('Invalid topic response from server');

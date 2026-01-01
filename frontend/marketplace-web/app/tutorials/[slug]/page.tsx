@@ -1,7 +1,7 @@
 'use client';
 
 import { Breadcrumb, PageLayout } from '@/components/ui';
-import { contentApi } from '@/lib/content-api';
+import { tutorialsApi } from '@/lib/content-api';
 import { BookOpen, ChevronRight, Clock, Code, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -50,7 +50,7 @@ const TutorialDetailPage = () => {
     if (!slug) return;
     (async () => {
       try {
-        const resp = await contentApi.getBySlug(slug);
+        const resp = await tutorialsApi.getBySlug(slug);
         const payload = resp ?? null;
         if (!payload) {
           setError('Invalid tutorial response from server');

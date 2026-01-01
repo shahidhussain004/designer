@@ -13,7 +13,7 @@ export async function tutorialsRoutes(app: FastifyInstance) {
 
   // Get all tutorials
   app.get(
-    '/tutorials',
+    '/',
     {
       schema: {
         description: 'Get all tutorials',
@@ -51,7 +51,7 @@ export async function tutorialsRoutes(app: FastifyInstance) {
 
   // Get tutorial by slug with sections
   app.get(
-    '/tutorials/:slug',
+    '/:slug',
     {
       schema: {
         description: 'Get tutorial by slug',
@@ -92,7 +92,7 @@ export async function tutorialsRoutes(app: FastifyInstance) {
 
   // Get section with topics
   app.get(
-    '/tutorials/:tutorialSlug/sections/:sectionSlug',
+    '/:tutorialSlug/sections/:sectionSlug',
     {
       schema: {
         description: 'Get section with topics',
@@ -140,7 +140,7 @@ export async function tutorialsRoutes(app: FastifyInstance) {
 
   // Get topic content
   app.get(
-    '/tutorials/:tutorialSlug/:sectionSlug/:topicSlug',
+    '/:tutorialSlug/:sectionSlug/:topicSlug',
     {
       schema: {
         description: 'Get topic content',
