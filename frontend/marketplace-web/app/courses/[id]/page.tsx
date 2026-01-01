@@ -11,6 +11,7 @@ import {
   Spinner,
   Text,
 } from '@/components/green';
+import { PageLayout } from '@/components/ui';
 import { authService } from '@/lib/auth';
 import {
   Course,
@@ -116,70 +117,53 @@ export default function CourseDetailPage() {
   const totalMinutes = course.durationMinutes % 60;
 
   return (
-    <Div>
-      {/* Navigation Header */}
+    <PageLayout>
       <Div>
-        <Flex justify-content="space-between" align-items="center" padding="m" style={{ borderBottom: '1px solid var(--color-border)' }}>
-          <Flex align-items="center" gap="xl">
-            <Link href="/">
-              <Text font-weight="book" font-size="body-m">
-                Designer Marketplace
-              </Text>
-            </Link>
-            <Flex gap="l" className="desktop-nav">
-              <Link href="/jobs"><Text font-size="body-s">Find Work</Text></Link>
-              <Link href="/courses"><Text font-size="body-s">Courses</Text></Link>
-              <Link href="/dashboard"><Text font-size="body-s">Dashboard</Text></Link>
+        {/* Hero Section with Course Header */}
+        <Div style={{ background: 'var(--color-background-secondary)', borderBottom: '1px solid var(--color-border)' }}>
+          <Flex flex-direction="column" gap="m" padding="xl" max-width="1400px" margin="0 auto">
+            {/* Breadcrumb */}
+            <Flex align-items="center" gap="s" color="secondary">
+              <Link href="/courses">
+                <Text font-size="body-xs">Courses</Text>
+              </Link>
+              <Text font-size="body-xs">/</Text>
+              <Text font-size="body-xs" font-weight="book">{course.category}</Text>
             </Flex>
-          </Flex>
-        </Flex>
-      </Div>
 
-      {/* Hero Section with Course Header */}
-      <Div style={{ background: 'var(--color-background-secondary)', borderBottom: '1px solid var(--color-border)' }}>
-        <Flex flex-direction="column" gap="m" padding="xl" max-width="1400px" margin="0 auto">
-          {/* Breadcrumb */}
-          <Flex align-items="center" gap="s" color="secondary">
-            <Link href="/courses">
-              <Text font-size="body-xs">Courses</Text>
-            </Link>
-            <Text font-size="body-xs">/</Text>
-            <Text font-size="body-xs" font-weight="book">{course.category}</Text>
-          </Flex>
+            {/* Title and Description */}
+            <Text tag="h1" font-size="heading-xl">{course.title}</Text>
+            <Text font-size="body-l" color="secondary">{course.description}</Text>
 
-          {/* Title and Description */}
-          <Text tag="h1" font-size="heading-xl">{course.title}</Text>
-          <Text font-size="body-l" color="secondary">{course.description}</Text>
-
-          {/* Key Stats Bar */}
-          <Flex gap="l" align-items="center" flex-wrap="wrap" style={{ marginTop: '12px' }}>
-            <Flex align-items="center" gap="xs">
-              <Text font-size="body-m">★</Text>
-              <Text font-size="body-m" font-weight="book">
-                {typeof course.rating === 'number' && isFinite(course.rating) ? course.rating.toFixed(1) : '—'}
-              </Text>
+            {/* Key Stats Bar */}
+            <Flex gap="l" align-items="center" flex-wrap="wrap" style={{ marginTop: '12px' }}>
+              <Flex align-items="center" gap="xs">
+                <Text font-size="body-m">★</Text>
+                <Text font-size="body-m" font-weight="book">
+                  {typeof course.rating === 'number' && isFinite(course.rating) ? course.rating.toFixed(1) : '—'}
+                </Text>
+                <Text font-size="body-s" color="secondary">
+                  ({typeof course.reviewsCount === 'number' ? course.reviewsCount : 0} reviews)
+                </Text>
+              </Flex>
+              <Text font-size="body-s" color="secondary">•</Text>
               <Text font-size="body-s" color="secondary">
-                ({typeof course.reviewsCount === 'number' ? course.reviewsCount : 0} reviews)
+                {typeof course.enrollmentsCount === 'number' ? course.enrollmentsCount.toLocaleString() : '0'} students enrolled
               </Text>
+              <Text font-size="body-s" color="secondary">•</Text>
+              <Text font-size="body-s" font-weight="book">{course.skillLevel}</Text>
             </Flex>
-            <Text font-size="body-s" color="secondary">•</Text>
-            <Text font-size="body-s" color="secondary">
-              {typeof course.enrollmentsCount === 'number' ? course.enrollmentsCount.toLocaleString() : '0'} students enrolled
-            </Text>
-            <Text font-size="body-s" color="secondary">•</Text>
-            <Text font-size="body-s" font-weight="book">{course.skillLevel}</Text>
-          </Flex>
 
-          {/* Instructor and Date */}
-          <Flex gap="l" flex-wrap="wrap" style={{ marginTop: '8px' }}>
-            <Text font-size="body-s">Taught by <span style={{ fontWeight: '600' }}>{course.instructorName}</span></Text>
-            <Text font-size="body-s" color="secondary">Updated {new Date(course.updatedAt).toLocaleDateString()}</Text>
+            {/* Instructor and Date */}
+            <Flex gap="l" flex-wrap="wrap" style={{ marginTop: '8px' }}>
+              <Text font-size="body-s">Taught by <span style={{ fontWeight: '600' }}>{course.instructorName}</span></Text>
+              <Text font-size="body-s" color="secondary">Updated {new Date(course.updatedAt).toLocaleDateString()}</Text>
+            </Flex>
           </Flex>
-        </Flex>
-      </Div>
+        </Div>
 
-      {/* Main Content Grid - Responsive Layout */}
-      <Flex flex-direction="column; l{row}" gap="xl" padding="xl" max-width="1400px" margin="0 auto">
+        {/* Main Content Grid - Responsive Layout */}
+        <Flex flex-direction="column; l{row}" gap="xl" padding="xl" max-width="1400px" margin="0 auto">
         {/* Left Column - Course Content */}
         <Flex flex-direction="column" gap="xl" flex="1 1 65%">
           {/* What You'll Learn Section */}
@@ -376,5 +360,6 @@ export default function CourseDetailPage() {
         </Div>
       </Flex>
     </Div>
+  </PageLayout>
   );
 }

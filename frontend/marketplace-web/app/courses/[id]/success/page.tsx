@@ -8,6 +8,7 @@ import {
   Spinner,
   Text,
 } from '@/components/green';
+import { PageLayout } from '@/components/ui';
 import { Course, getCourseById } from '@/lib/courses';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -47,22 +48,21 @@ export default function CourseEnrollmentSuccessPage() {
   }
 
   return (
-    <Div>
-      {/* Success Page Hero */}
-      <Div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white', padding: '24px' }}>
+    <PageLayout>
+      <Div style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
         <Flex flex-direction="column" align-items="center" gap="l" max-width="600px" padding="xl">
           {/* Success Icon */}
-          <Div style={{ fontSize: '64px', animation: 'pulse 0.6s ease-in-out' }}>
+          <Div style={{ fontSize: '64px' }}>
             <Text font-size="heading-xl">✓</Text>
           </Div>
 
           {/* Success Title */}
-          <Text tag="h1" font-size="heading-xl" color="white" style={{ textAlign: 'center' }}>
+          <Text tag="h1" font-size="heading-xl" style={{ textAlign: 'center' }}>
             Enrollment Successful!
           </Text>
 
           {/* Success Message */}
-          <Text font-size="body-l" color="white" style={{ textAlign: 'center', opacity: 0.95, lineHeight: '1.6' }}>
+          <Text font-size="body-l" style={{ textAlign: 'center', lineHeight: '1.6' }}>
             {course ? (
               <>You&apos;re now enrolled in <strong style={{ fontWeight: '700' }}>{course.title}</strong>. Welcome to your learning journey!</>
             ) : (
@@ -121,26 +121,12 @@ export default function CourseEnrollmentSuccessPage() {
           </Flex>
 
           {/* Confirmation Message */}
-          <Flex flex-direction="column" align-items="center" gap="s" padding="m" style={{ background: 'rgba(255,255,255,0.1)', borderRadius: '8px', width: '100%', marginTop: '12px' }}>
-            <Text font-size="body-s" color="white" style={{ opacity: 0.9 }}>✓ Receipt sent to your email</Text>
-            <Text font-size="body-xs" color="white" style={{ opacity: 0.8 }}>You can access your course anytime from your dashboard</Text>
+          <Flex flex-direction="column" align-items="center" gap="s" padding="m" style={{ background: 'var(--color-background-secondary)', borderRadius: '8px', width: '100%', marginTop: '12px' }}>
+            <Text font-size="body-s" style={{ opacity: 0.9 }}>✓ Receipt sent to your email</Text>
+            <Text font-size="body-xs" style={{ opacity: 0.8 }}>You can access your course anytime from your dashboard</Text>
           </Flex>
         </Flex>
       </Div>
-
-      {/* Footer Help Section */}
-      <Div style={{ background: 'var(--color-background-secondary)', borderTop: '1px solid var(--color-border)' }}>
-        <Flex justify-content="center" align-items="center" padding="l">
-          <Flex flex-direction="column" align-items="center" gap="s">
-            <Text font-size="body-m" color="secondary">Having trouble?</Text>
-            <Link href="/support">
-              <Text font-size="body-m" font-weight="book" style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}>
-                Contact Support
-              </Text>
-            </Link>
-          </Flex>
-        </Flex>
-      </Div>
-    </Div>
+    </PageLayout>
   );
 }
