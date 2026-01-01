@@ -81,7 +81,7 @@ export async function getCourses(params?: {
   if (params?.minPrice !== undefined) queryParams.append('minPrice', params.minPrice.toString());
   if (params?.maxPrice !== undefined) queryParams.append('maxPrice', params.maxPrice.toString());
   if (params?.search) queryParams.append('search', params.search);
-  if (params?.page !== undefined) queryParams.append('page', (params.page + 1).toString());
+  if (params?.page !== undefined) queryParams.append('page', params.page.toString());
   if (params?.size !== undefined) queryParams.append('pageSize', params.size.toString());
   if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
 

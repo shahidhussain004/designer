@@ -125,16 +125,16 @@ public class CourseService : ICourseService
             levelEnum = null;
         }
 
-        // Ensure page is at least 0, then convert to 0-based skip
-        int skip = Math.Max(0, page) * pageSize;
+        // Convert 1-based page to 0-based skip (page 1 = skip 0, page 2 = skip pageSize)
+        int skip = Math.Max(0, page - 1) * pageSize;
         var courses = await _courseRepository.SearchAsync(searchTerm, categoryEnum, levelEnum, CourseStatus.Published, skip, pageSize);
         var total = await _courseRepository.CountAsync(searchTerm, categoryEnum, levelEnum, CourseStatus.Published);
 
-        // Return 1-based page number in response for compatibility
+        // Return the page number as-is (it's already 1-based from the request)
         return new PagedResult<CourseSummaryResponse>(
             courses.Select(MapToSummary).ToList(),
             total,
-            page + 1,
+            page,
             pageSize
         );
     }
