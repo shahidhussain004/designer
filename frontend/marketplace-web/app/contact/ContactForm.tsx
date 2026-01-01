@@ -33,9 +33,10 @@ export default function ContactForm() {
       setEmail('')
       setSubject('')
       setMessage('')
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err)
-      setError(err?.message || 'Failed to submit form')
+      const message = err instanceof Error ? err.message : String(err ?? 'Failed to submit form')
+      setError(message)
     } finally {
       setSubmitting(false)
     }
