@@ -391,14 +391,81 @@ async function main() {
     // Filter out content with missing author/category
     const validContent = contentData.filter((c) => c.authorId && c.categoryId);
 
-    // Delete existing content to avoid duplicates
+    // Delete existing content and associations to avoid duplicates
+    await prisma.contentTag.deleteMany({});
     await prisma.content.deleteMany({});
 
-    const createdContent = await prisma.content.createMany({
-      data: validContent,
-    });
+    // Create content and attach some tags
+    console.log('Creating content and attaching tags...');
 
-    console.log(`✓ Created ${createdContent.count} content items`);
+    for (const c of validContent) {
+      const created = await prisma.content.create({ data: c });
+
+      // Attach tags based on slug keywords for demo purposes
+      const tagsToAttach: string[] = [];
+      if (c.slug.includes('java') || c.metaKeywords?.includes('java'))
+        tagsToAttach.push('tutorial', 'beginner');
+      if (c.slug.includes('spring') || c.metaKeywords?.some((k) => k?.includes('best')))
+        tagsToAttach.push('best-practices');
+      if (c.slug.includes('docker') || c.metaKeywords?.includes('devops'))
+        tagsToAttach.push('microservices', 'performance');
+      if (c.slug.includes('react') || c.metaKeywords?.includes('react'))
+        tagsToAttach.push('tutorial', 'advanced');
+
+      if (tagsToAttach.length > 0) {
+        const tagRecords = await prisma.tag.findMany({ where: { slug: { in: tagsToAttach } } });
+        if (tagRecords.length > 0) {
+          await prisma.contentTag.createMany({
+            data: tagRecords.map((t) => ({ contentId: created.id, tagId: t.id })),
+            skipDuplicates: true,
+          });
+          // Increment tag usage counts
+          await prisma.tag.updateMany({
+            where: { id: { in: tagRecords.map((t) => t.id) } },
+            data: { usageCount: { increment: 1 } },
+          });
+        }
+      }
+    }
+
+    console.log('✓ Created content and attached tags');
+
+    // Invalidate category cache in Redis so categoryService.findAll() refreshes
+    try {
+      // Load dotenv and ioredis dynamically to avoid failing when dev deps are not installed
+      try {
+        require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+      } catch (e) {
+        // dotenv not available — proceed with process.env as-is
+      }
+
+      let RedisClient: any;
+      try {
+        RedisClient = require('ioredis');
+      } catch (e) {
+        RedisClient = null;
+      }
+
+      if (RedisClient) {
+        const redis = new RedisClient({
+          host: process.env.REDIS_HOST || '127.0.0.1',
+          port: parseInt(process.env.REDIS_PORT || '6379', 10),
+          password: process.env.REDIS_PASSWORD || undefined,
+          db: parseInt(process.env.REDIS_DB || '0', 10),
+        });
+        const cachePrefix = process.env.CACHE_KEY_PREFIX || '';
+        const keys = await redis.keys(`${cachePrefix}category*`);
+        if (keys.length > 0) {
+          await redis.del(...keys);
+          console.log('✓ Cleared category cache keys in Redis');
+        }
+        await redis.disconnect();
+      } else {
+        console.warn('ioredis not installed; skipping cache clear');
+      }
+    } catch (err) {
+      console.warn('Could not clear Redis cache:', err?.message || err);
+    }
 
     console.log('\n✅ Seeding completed successfully!');
   } catch (error) {
