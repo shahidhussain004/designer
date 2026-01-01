@@ -39,32 +39,34 @@ export default function FreelancerPortfolioPage() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    loadPortfolio()
-  }, [freelancerId])
-
-  const loadPortfolio = async () => {
-    try {
-      setLoading(true)
-      // Load both freelancer profile and portfolio
+    const load = async () => {
       try {
-        const { data: profileData } = await apiClient.get(`/users/${freelancerId}/profile`);
-        setFreelancer(profileData);
-      } catch (err) {
-        // ignore profile load failures, show placeholder
-      }
+        setLoading(true)
 
-      try {
-        const { data: portfolioData } = await apiClient.get(`/users/${freelancerId}/portfolio`);
-        setPortfolio(portfolioData || []);
+        // Try to load profile; failures are non-fatal
+        try {
+          const { data: profileData } = await apiClient.get(`/users/${freelancerId}/profile`)
+          setFreelancer(profileData)
+        } catch {
+          // ignore profile load failures, show placeholder
+        }
+
+        // Try to load portfolio; failures are non-fatal
+        try {
+          const { data: portfolioData } = await apiClient.get(`/users/${freelancerId}/portfolio`)
+          setPortfolio(portfolioData || [])
+        } catch {
+          // ignore portfolio failures
+        }
       } catch (err) {
-        // ignore portfolio failures
+        setError(err instanceof Error ? err.message : 'Failed to load portfolio')
+      } finally {
+        setLoading(false)
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load portfolio')
-    } finally {
-      setLoading(false)
     }
-  }
+
+    load()
+  }, [freelancerId])
 
   if (loading) {
     return (

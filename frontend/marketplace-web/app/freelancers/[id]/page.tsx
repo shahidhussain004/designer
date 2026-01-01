@@ -42,20 +42,20 @@ export default function FreelancerProfilePage() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    loadProfile()
-  }, [freelancerId])
-
-  const loadProfile = async () => {
-    try {
-      setLoading(true)
-      const { data } = await apiClient.get(`/users/${freelancerId}/profile`)
-      setProfile(data)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load profile')
-    } finally {
-      setLoading(false)
+    const load = async () => {
+      try {
+        setLoading(true)
+        const { data } = await apiClient.get(`/users/${freelancerId}/profile`)
+        setProfile(data)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load profile')
+      } finally {
+        setLoading(false)
+      }
     }
-  }
+
+    if (freelancerId) load()
+  }, [freelancerId])
 
   if (loading) {
     return (
