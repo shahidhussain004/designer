@@ -9,6 +9,7 @@ import {
     Text,
 } from '@/components/green';
 import { PageLayout } from '@/components/ui';
+import { apiClient } from '@/lib/api-client';
 import { authService } from '@/lib/auth';
 import logger from '@/lib/logger';
 import { User } from '@/types';
@@ -50,11 +51,7 @@ export default function MyApplicationsPage() {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch('http://localhost:8080/api/job-applications/my-applications');
-        if (!response.ok) {
-          throw new Error('Failed to fetch applications');
-        }
-        const data = await response.json();
+        const { data } = await apiClient.get('/job-applications/my-applications');
         setApplications(Array.isArray(data) ? data : data.content || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');

@@ -2,6 +2,7 @@
 
 import { Button, Card, Divider, Flex, Grid, Spinner, Text } from '@/components/green'
 import { PageLayout } from '@/components/ui'
+import { apiClient } from '@/lib/api-client'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
@@ -45,16 +46,18 @@ export default function FreelancerPortfolioPage() {
     try {
       setLoading(true)
       // Load both freelancer profile and portfolio
-      const profileRes = await fetch(`/api/users/${freelancerId}/profile`)
-      if (profileRes.ok) {
-        const profileData = await profileRes.json()
-        setFreelancer(profileData)
+      try {
+        const { data: profileData } = await apiClient.get(`/users/${freelancerId}/profile`);
+        setFreelancer(profileData);
+      } catch (err) {
+        // ignore profile load failures, show placeholder
       }
 
-      const portfolioRes = await fetch(`/api/users/${freelancerId}/portfolio`)
-      if (portfolioRes.ok) {
-        const portfolioData = await portfolioRes.json()
-        setPortfolio(portfolioData || [])
+      try {
+        const { data: portfolioData } = await apiClient.get(`/users/${freelancerId}/portfolio`);
+        setPortfolio(portfolioData || []);
+      } catch (err) {
+        // ignore portfolio failures
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load portfolio')

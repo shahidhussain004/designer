@@ -12,6 +12,7 @@ import {
   Text,
 } from '@/components/green';
 import { PageLayout } from '@/components/ui';
+import apiClient from '@/lib/api-client';
 import { parseCategories, parseExperienceLevels } from '@/lib/apiParsers';
 import type { ExperienceLevel, PostCategory } from '@/lib/apiTypes';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -81,27 +82,21 @@ function ProjectsPageContent() {
   useEffect(() => {
     const fetchFilters = async () => {
       try {
-        const [catsResponse, levelsResponse] = await Promise.all([
-          fetch('/api/project-categories'),
-          fetch('/api/experience-levels')
+        const [catsRes, levelsRes] = await Promise.all([
+          apiClient.get('/project-categories'),
+          apiClient.get('/experience-levels'),
         ]);
-        
-        if (catsResponse.ok) {
-          const catsData = await catsResponse.json();
-          const parsed = parseCategories(catsData);
-          setCategories(parsed);
-        }
-        
-        if (levelsResponse.ok) {
-          const levelsData = await levelsResponse.json();
-          const parsed = parseExperienceLevels(levelsData);
-          setExperienceLevels(parsed);
-        }
+
+        const catsData = catsRes.data;
+        const levelsData = levelsRes.data;
+
+        setCategories(parseCategories(catsData));
+        setExperienceLevels(parseExperienceLevels(levelsData));
       } catch (err) {
         console.error('Failed to fetch filters:', err);
       }
     };
-    
+
     fetchFilters();
   }, []);
 
@@ -110,22 +105,14 @@ function ProjectsPageContent() {
     setError(null);
     
     try {
-      const params = new URLSearchParams();
-      if (categoryId) params.append('categoryId', categoryId);
-      if (experienceLevelId) params.append('experienceLevelId', experienceLevelId);
-      if (minBudget) params.append('minBudget', minBudget);
-      if (maxBudget) params.append('maxBudget', maxBudget);
-      if (searchQuery) params.append('search', searchQuery);
-      
-      const queryString = params.toString();
-      const url = queryString ? `/api/projects?${queryString}` : '/api/projects';
-      const response = await fetch(url);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch projects');
-      }
-      
-      const data = await response.json();
+      const params: Record<string, any> = {};
+      if (categoryId) params.categoryId = categoryId;
+      if (experienceLevelId) params.experienceLevelId = experienceLevelId;
+      if (minBudget) params.minBudget = minBudget;
+      if (maxBudget) params.maxBudget = maxBudget;
+      if (searchQuery) params.search = searchQuery;
+
+      const { data } = await apiClient.get('/projects', { params });
       setProjects(data.content || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');

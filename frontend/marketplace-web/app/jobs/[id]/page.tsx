@@ -85,26 +85,40 @@ export default function JobDetailsPage() {
     const timeoutMs = 10000;
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-    const rawBase = process.env.NEXT_PUBLIC_API_URL || '';
-    const base = rawBase.replace(/\/api\/?$/, '');
-    const jobUrl = `${base}/api/employment-jobs/${jobId}`;
-
     try {
-      const response = await fetch(jobUrl, { signal: controller.signal });
-      if (!response.ok) {
-        throw new Error(`Failed to fetch job details (${response.status})`);
+      // Prefer apiClient with AbortSignal; fall back to fetch if necessary
+      let jobData: any = null;
+      try {
+        const { data } = await apiClient.get(`/employment-jobs/${jobId}`, { signal: controller.signal as any });
+        jobData = data;
+        setJob(jobData);
+      } catch (innerErr) {
+        // fallback to fetch when AbortSignal isn't supported by axios in this environment
+        const base = process.env.NEXT_PUBLIC_API_URL || '';
+        const jobUrl = `${base}/api/employment-jobs/${jobId}`;
+        const response = await fetch(jobUrl, { signal: controller.signal });
+        if (!response.ok) {
+          throw new Error(`Failed to fetch job details (${response.status})`);
+        }
+        jobData = await response.json();
+        setJob(jobData);
       }
-      const data = await response.json();
-      setJob(data);
-      setApplicationData((prev) => ({ ...prev, jobId: data.id }));
 
-      if (data.employerId) {
+      setApplicationData((prev) => ({ ...prev, jobId: jobData.id }));
+
+      if (jobData.employerId) {
         try {
-          const employerUrl = `${base}/api/users/${data.employerId}/profile`;
-          const employerResponse = await fetch(employerUrl, { signal: controller.signal });
-          if (employerResponse.ok) {
-            const employerData = await employerResponse.json();
+          try {
+            const { data: employerData } = await apiClient.get(`/users/${jobData.employerId}/profile`, { signal: controller.signal as any });
             setEmployer(employerData);
+          } catch (inner) {
+            const base = process.env.NEXT_PUBLIC_API_URL || '';
+            const employerUrl = `${base}/api/users/${jobData.employerId}/profile`;
+            const employerResponse = await fetch(employerUrl, { signal: controller.signal });
+            if (employerResponse.ok) {
+              const employerData = await employerResponse.json();
+              setEmployer(employerData);
+            }
           }
         } catch (err) {
           if ((err as any).name !== 'AbortError') {

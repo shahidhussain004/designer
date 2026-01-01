@@ -12,6 +12,7 @@ import {
   Spinner,
   Text,
 } from '@/components/green';
+import apiClient from '@/lib/api-client';
 import { parseCategories, parseExperienceLevels } from '@/lib/apiParsers';
 import type { ExperienceLevel, PostCategory } from '@/lib/apiTypes';
 import { authService } from '@/lib/auth';
@@ -45,33 +46,27 @@ export default function CreateProjectPage() {
     // Fetch categories and experience levels
     const fetchFilters = async () => {
       try {
-        const [catsResponse, levelsResponse] = await Promise.all([
-          fetch('http://localhost:8080/api/project-categories'),
-          fetch('http://localhost:8080/api/experience-levels')
+        const [catsResp, levelsResp] = await Promise.all([
+          apiClient.get('/project-categories'),
+          apiClient.get('/experience-levels'),
         ]);
-        
-        if (catsResponse.ok) {
-          const catsData = await catsResponse.json();
-          const mappedCats = parseCategories(catsData);
-          setCategories(mappedCats);
-          if (mappedCats.length > 0) {
-            setFormData(prev => ({ ...prev, categoryId: mappedCats[0].id }));
-          }
+
+        const mappedCats = parseCategories(catsResp.data);
+        setCategories(mappedCats);
+        if (mappedCats.length > 0) {
+          setFormData(prev => ({ ...prev, categoryId: mappedCats[0].id }));
         }
-        
-        if (levelsResponse.ok) {
-          const levelsData = await levelsResponse.json();
-          const mappedLevels = parseExperienceLevels(levelsData);
-          setExperienceLevels(mappedLevels);
-          if (mappedLevels.length > 0) {
-            setFormData(prev => ({ ...prev, experienceLevelId: mappedLevels[0].id }));
-          }
+
+        const mappedLevels = parseExperienceLevels(levelsResp.data);
+        setExperienceLevels(mappedLevels);
+        if (mappedLevels.length > 0) {
+          setFormData(prev => ({ ...prev, experienceLevelId: mappedLevels[0].id }));
         }
       } catch (err) {
         console.error('Failed to fetch filters:', err);
       }
     };
-    
+
     fetchFilters();
     setLoading(false);
   }, [router]);
@@ -93,28 +88,7 @@ export default function CreateProjectPage() {
     setError(null);
 
     try {
-      const token = localStorage.getItem('access_token');
-      if (!token) {
-        throw new Error('Not authenticated');
-      }
-
-      const response = await fetch('http://localhost:8080/api/projects', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.message || `Failed to create project (${response.status})`
-        );
-      }
-
-      const newProject = await response.json();
+      const { data: newProject } = await apiClient.post('/projects', formData);
       alert('Project created successfully!');
       router.push(`/projects/${newProject.id}`);
     } catch (err) {

@@ -1,6 +1,7 @@
 'use client'
 
 import { IconCalendar, IconSearch, IconStar, VideoBackground } from '@/components/ui';
+import apiClient from '@/lib/api-client';
 import { parseCategories } from '@/lib/apiParsers';
 import type { PostCategory } from '@/lib/apiTypes';
 import Link from 'next/link';
@@ -37,10 +38,9 @@ const LandingPage = () => {
 
     async function load() {
       try {
-        const res = await fetch('/api/project-categories', { signal });
-        if (!res.ok) throw new Error(`Failed to fetch categories: ${res.status}`);
-        const data = await res.json();
-        const categories = parseCategories(data);
+        const res = await apiClient.get('/project-categories', { signal: signal as any });
+        const payload = res.data?.data ?? res.data;
+        const categories = parseCategories(payload);
         setCategories(categories);
       } catch (err: unknown) {
         const maybeErr = err as { name?: string }

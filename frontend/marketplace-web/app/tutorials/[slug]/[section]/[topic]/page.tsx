@@ -1,6 +1,7 @@
 'use client';
 
 import { Breadcrumb, PageLayout } from '@/components/ui';
+import { contentApi } from '@/lib/content-api';
 import {
   BookOpen,
   ChevronLeft,
@@ -53,20 +54,12 @@ const TopicReadingPage = () => {
 
   useEffect(() => {
     if (!tutorialSlug || !sectionSlug || !topicSlug) return;
-
-    fetch(`http://localhost:8083/api/tutorials/${tutorialSlug}/${sectionSlug}/${topicSlug}`)
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch topic');
-        return res.json();
-      })
-      .then((data) => {
-        // Dev-only raw response log
-        if (process.env.NODE_ENV !== 'production') {
-          // eslint-disable-next-line no-console
-          console.debug('raw topic response:', data);
-        }
-
-        const payload = data?.data ?? data;
+    (async () => {
+      try {
+        // Some content services expose topics as nested slugs; attempt to fetch by composed slug
+        const composedSlug = `${tutorialSlug}/${sectionSlug}/${topicSlug}`;
+        const resp = await contentApi.getBySlug(composedSlug);
+        const payload = resp ?? null;
         if (!payload) {
           setError('Invalid topic response from server');
           setLoading(false);
@@ -78,7 +71,7 @@ const TopicReadingPage = () => {
           slug: payload.slug,
           title: payload.title,
           content: payload.content ?? '',
-          code_examples: payload.code_examples ?? null,
+          code_examples: payload.code_examples ?? payload.codeExamples ?? null,
           estimated_read_time: payload.estimated_read_time ?? payload.estimatedReadTime ?? 0,
           views_count: payload.views_count ?? payload.viewsCount ?? 0,
           section: {
@@ -97,19 +90,18 @@ const TopicReadingPage = () => {
           },
         };
 
-        // Dev-only adapted payload log
         if (process.env.NODE_ENV !== 'production') {
           // eslint-disable-next-line no-console
           console.debug('adapted topic payload:', adapted);
         }
 
         setTopic(adapted);
+      } catch (err: any) {
+        setError(err?.message || 'Failed to load topic');
+      } finally {
         setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
+      }
+    })();
   }, [tutorialSlug, sectionSlug, topicSlug]);
 
   if (loading) {

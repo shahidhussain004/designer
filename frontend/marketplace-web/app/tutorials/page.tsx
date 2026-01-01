@@ -1,6 +1,7 @@
 'use client';
 
 import { PageLayout } from '@/components/ui';
+import { contentApi } from '@/lib/content-api';
 import { BookOpen, Clock, Headphones, TrendingUp, Video } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -34,49 +35,39 @@ const TutorialsPage = () => {
   const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>('all');
 
   useEffect(() => {
-    // Fetch tutorials from API
-    fetch('http://localhost:8083/api/tutorials')
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch tutorials');
-        return res.json();
-      })
-      .then((data) => {
-        // API returns an envelope { success: true, data: [...] }
-        const tutorialsPayload = data?.data ?? data;
-        if (!Array.isArray(tutorialsPayload)) {
-          setError('Invalid tutorials response from server');
-          setLoading(false);
-          return;
-        }
+    // Fetch tutorials from Content Service via contentApi
+    (async () => {
+      try {
+        const resp = await contentApi.getPublished({ limit: 100, filters: { contentType: 'tutorial' } });
+        const tutorialsPayload = resp.data ?? [];
 
-        // Convert snake_case backend fields to camelCase for the frontend
         const adapt = (t: any): Tutorial => ({
           id: t.id,
           slug: t.slug,
           title: t.title,
           description: t.description,
           icon: t.icon,
-          difficultyLevel: t.difficulty_level,
-          colorTheme: t.color_theme,
-          estimatedHours: t.estimated_hours,
-          isPublished: t.is_published,
-          sectionsCount: t.sections_count ?? 0,
+          difficultyLevel: t.difficulty_level || t.difficultyLevel,
+          colorTheme: t.color_theme || t.colorTheme,
+          estimatedHours: t.estimated_hours ?? t.estimatedHours ?? 0,
+          isPublished: t.is_published ?? t.isPublished ?? false,
+          sectionsCount: t.sections_count ?? t.sectionsCount ?? 0,
           stats: t.stats
             ? {
-                totalTopics: t.stats.total_topics,
-                totalReadTime: t.stats.total_read_time,
-                completionRate: t.stats.completion_rate,
+                totalTopics: t.stats.total_topics ?? t.stats.totalTopics,
+                totalReadTime: t.stats.total_read_time ?? t.stats.totalReadTime,
+                completionRate: t.stats.completion_rate ?? t.stats.completionRate,
               }
             : null,
         });
 
         setTutorials(tutorialsPayload.map(adapt));
+      } catch (err: any) {
+        setError(err?.message || 'Failed to load tutorials');
+      } finally {
         setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
+      }
+    })();
   }, []);
 
   const filteredTutorials = tutorials.filter((tutorial) => {

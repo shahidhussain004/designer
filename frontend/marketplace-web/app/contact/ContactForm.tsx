@@ -16,11 +16,12 @@ export default function ContactForm() {
     e.preventDefault()
     setSubmitting(true)
     try {
-      const resp = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, subject, message }),
-      })
+          // Keeping the fetch call as is
+          const resp = await fetch('/api/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, subject, message }),
+          });
 
       const data = await resp.json()
       if (!resp.ok) {

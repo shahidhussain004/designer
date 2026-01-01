@@ -2,6 +2,7 @@
 
 import { Badge, Button, Card, Divider, Flex, Grid, Spinner, Text } from '@/components/green'
 import { PageLayout } from '@/components/ui'
+import { apiClient } from '@/lib/api-client'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -47,11 +48,7 @@ export default function FreelancerProfilePage() {
   const loadProfile = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/users/${freelancerId}/profile`)
-      if (!response.ok) {
-        throw new Error('Failed to load profile')
-      }
-      const data = await response.json()
+      const { data } = await apiClient.get(`/users/${freelancerId}/profile`)
       setProfile(data)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load profile')

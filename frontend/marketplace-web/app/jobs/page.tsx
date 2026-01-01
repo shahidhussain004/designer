@@ -12,6 +12,7 @@ import {
     Text
 } from '@/components/green';
 import { PageLayout } from '@/components/ui';
+import { apiClient } from '@/lib/api-client';
 import { authService } from '@/lib/auth';
 import logger from '@/lib/logger';
 import { User } from '@/types';
@@ -65,17 +66,21 @@ export default function JobsListPage() {
     const timeoutMs = 10000;
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-    const rawBase = process.env.NEXT_PUBLIC_API_URL || '';
-    const base = rawBase.replace(/\/api\/?$/, '');
-    const url = `${base}/api/employment-jobs`;
-
     try {
-      const response = await fetch(url, { signal: controller.signal });
-      if (!response.ok) {
-        throw new Error(`Failed to fetch jobs (${response.status})`);
+      // prefer apiClient but maintain abort fallback
+      try {
+        const { data } = await apiClient.get('/employment-jobs', { signal: controller.signal as any });
+        setJobs(Array.isArray(data) ? data : data.content || []);
+      } catch (innerErr) {
+        const base = process.env.NEXT_PUBLIC_API_URL || '';
+        const url = `${base}/api/employment-jobs`;
+        const response = await fetch(url, { signal: controller.signal });
+        if (!response.ok) {
+          throw new Error(`Failed to fetch jobs (${response.status})`);
+        }
+        const data = await response.json();
+        setJobs(Array.isArray(data) ? data : data.content || []);
       }
-      const data = await response.json();
-      setJobs(Array.isArray(data) ? data : data.content || []);
     } catch (err) {
       // Ignore AbortError caused by timeout or component unmount
       if ((err as any)?.name === 'AbortError') {

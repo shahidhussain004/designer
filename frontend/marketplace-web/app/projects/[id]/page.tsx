@@ -95,29 +95,36 @@ export default function ProjectDetailsPage() {
       setLoading(true);
       setError(null);
       try {
-        const rawBase = process.env.NEXT_PUBLIC_API_URL || '';
-        const base = rawBase.replace(/\/api\/?$/, '');
-        const projectUrl = base ? `${base}/api/projects/${projectId}` : `/api/projects/${projectId}`;
-        const response = await fetch(projectUrl, { signal: controller.signal });
-        if (!response.ok) {
-          throw new Error(`Failed to fetch project details (${response.status})`);
+        // Prefer apiClient but keep abort behavior for SSR fallback
+        let projectData: any = null;
+        try {
+          const { data } = await apiClient.get(`/projects/${projectId}`, {
+            signal: controller.signal as any,
+          });
+          projectData = data;
+          setProject(projectData);
+        } catch (err) {
+          // If apiClient fails due to not supporting AbortSignal in this environment, fall back to fetch
+          const base = process.env.NEXT_PUBLIC_API_URL || '';
+          const projectUrl = base ? `${base}/projects/${projectId}` : `/projects/${projectId}`;
+          const response = await fetch(projectUrl, { signal: controller.signal });
+          if (!response.ok) {
+            throw new Error(`Failed to fetch project details (${response.status})`);
+          }
+          projectData = await response.json();
+          setProject(projectData);
         }
-        const data = await response.json();
-        setProject(data);
 
-        setProposalData((prev) => ({ ...prev, projectId: data.id }));
+        setProposalData((prev) => ({ ...prev, projectId: projectData.id }));
 
-        if (data.clientId) {
+        if (projectData.clientId) {
           try {
-            const rawClientBase = process.env.NEXT_PUBLIC_API_URL || '';
-            const clientBase = rawClientBase.replace(/\/api\/?$/, '');
-            const clientUrl = clientBase ? `${clientBase}/api/users/${data.clientId}/profile` : `/api/users/${data.clientId}/profile`;
-            const clientResponse = await fetch(clientUrl, { signal: controller.signal });
-            if (clientResponse.ok) {
-              const clientData = await clientResponse.json();
-              setClient(clientData);
-            }
+            const { data: clientData } = await apiClient.get(`/users/${projectData.clientId}/profile`, {
+              signal: controller.signal as any,
+            });
+            setClient(clientData);
           } catch (err) {
+            // If abort, ignore; otherwise log
             if ((err as any)?.name !== 'AbortError') {
               logger.error('Error fetching client details', err as Error);
             }
@@ -179,54 +186,51 @@ export default function ProjectDetailsPage() {
     setProposalSuccess(false);
     
     try {
-      const { data } = await apiClient.post('/proposals', proposalData)
+      const { data } = await apiClient.post('/proposals', proposalData);
 
-      setProposalSuccess(true)
-      setProposalOpen(false)
-      setProposalData({ projectId: project!.id, coverLetter: '', proposedRate: 0, estimatedDuration: 30 })
+      setProposalSuccess(true);
+      setProposalOpen(false);
+      setProposalData({ projectId: project!.id, coverLetter: '', proposedRate: 0, estimatedDuration: 30 });
 
       // Auto-hide success message after 5 seconds
-      setTimeout(() => setProposalSuccess(false), 5000)
+      setTimeout(() => setProposalSuccess(false), 5000);
     } catch (err: any) {
-      logger.error('Proposal submission failed', err)
+      logger.error('Proposal submission failed', err);
 
       // Try to extract a user-friendly message from axios error structure
-      let message = 'Failed to submit proposal'
+      let message = 'Failed to submit proposal';
       if (err?.response?.data) {
-        const data = err.response.data
+        const data = err.response.data;
 
-        // If backend returned a map of field errors, map them
-        // e.g., { errors: [{ field: 'coverLetter', message: 'required' }, ...] }
         if (data.errors && Array.isArray(data.errors)) {
-          const fe: typeof fieldErrors = {}
+          const fe: typeof fieldErrors = {};
           data.errors.forEach((e: any) => {
             if (e.field && e.message) {
-              const fieldKey = e.field as keyof typeof fieldErrors
-              fe[fieldKey] = e.message
+              const fieldKey = e.field as keyof typeof fieldErrors;
+              fe[fieldKey] = e.message;
             }
-          })
-          setFieldErrors(fe)
-          message = 'Please fix the highlighted fields'
+          });
+          setFieldErrors(fe);
+          message = 'Please fix the highlighted fields';
         } else if (typeof data === 'object') {
-          // Try common patterns
           if (data.field && data.message) {
-            setFieldErrors({ [data.field]: data.message })
-            message = data.message
+            setFieldErrors({ [data.field]: data.message });
+            message = data.message;
           } else if (data.message) {
-            message = data.message
+            message = data.message;
           } else if (data.error) {
-            message = data.error
+            message = data.error;
           }
         } else if (typeof data === 'string') {
-          message = data
+          message = data;
         }
       } else if (err?.message) {
-        message = err.message
+        message = err.message;
       }
 
-      setProposalError(message)
+      setProposalError(message);
     } finally {
-      setSubmittingProposal(false)
+      setSubmittingProposal(false);
     }
   };
 

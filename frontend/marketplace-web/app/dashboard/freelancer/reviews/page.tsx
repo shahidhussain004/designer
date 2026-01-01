@@ -70,26 +70,18 @@ export default function ReviewsPage() {
   const fetchData = async () => {
     try {
       const [givenRes, receivedRes, contractsRes] = await Promise.all([
-        fetch(`/api/reviews/reviewer/${user?.id}`),
-        fetch(`/api/reviews/reviewee/${user?.id}`),
-        fetch('/api/contracts'),
+        apiClient.get(`/reviews/reviewer/${user?.id}`),
+        apiClient.get(`/reviews/reviewee/${user?.id}`),
+        apiClient.get('/contracts'),
       ]);
 
-      if (givenRes.ok) {
-        const givenData = await givenRes.json();
-        setGivenReviews(givenData);
-      }
+      const givenData = givenRes.data;
+      const receivedData = receivedRes.data;
+      const contractsData = contractsRes.data;
 
-      if (receivedRes.ok) {
-        const receivedData = await receivedRes.json();
-        setReceivedReviews(receivedData);
-      }
-
-      if (contractsRes.ok) {
-        const contractsData = await contractsRes.json();
-        // Only show completed contracts
-        setContracts(contractsData.filter((c: Contract) => c.status === 'COMPLETED'));
-      }
+      setGivenReviews(givenData);
+      setReceivedReviews(receivedData);
+      setContracts(contractsData.filter((c: Contract) => c.status === 'COMPLETED'));
     } catch (error) {
       console.error('Failed to fetch data:', error);
     } finally {
@@ -116,13 +108,8 @@ export default function ReviewsPage() {
     };
 
     try {
-      const res = await fetch('/api/reviews', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (res.ok) {
+      const res = await apiClient.post('/reviews', payload);
+      if (res.status >= 200 && res.status < 300) {
         await fetchData();
         resetForm();
       }

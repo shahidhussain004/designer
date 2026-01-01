@@ -36,10 +36,9 @@ export default function ContractsPage() {
 
   const fetchContracts = async () => {
     try {
-      const res = await fetch('/api/contracts');
-      if (res.ok) {
-        const data = await res.json();
-        setContracts(data);
+      const res = await apiClient.get('/contracts');
+      const data = res.data;
+      setContracts(data || []);
       }
     } catch (error) {
       logger.error('Failed to fetch contracts', error as Error);
