@@ -117,219 +117,263 @@ export default function CourseDetailPage() {
 
   return (
     <Div>
-      {/* Navigation */}
+      {/* Navigation Header */}
       <Div>
-        <Flex justify-content="space-between" align-items="center" padding="m">
+        <Flex justify-content="space-between" align-items="center" padding="m" style={{ borderBottom: '1px solid var(--color-border)' }}>
           <Flex align-items="center" gap="xl">
             <Link href="/">
-              <Text>
+              <Text font-weight="book" font-size="body-m">
                 Designer Marketplace
               </Text>
             </Link>
             <Flex gap="l" className="desktop-nav">
-              <Link href="/jobs">Find Work</Link>
-              <Link href="/courses">Courses</Link>
-              <Link href="/dashboard">Dashboard</Link>
+              <Link href="/jobs"><Text font-size="body-s">Find Work</Text></Link>
+              <Link href="/courses"><Text font-size="body-s">Courses</Text></Link>
+              <Link href="/dashboard"><Text font-size="body-s">Dashboard</Text></Link>
             </Flex>
           </Flex>
         </Flex>
       </Div>
 
-      {/* Course Header */}
-      <Div>
-        <Flex flex-direction="column; l{row}" gap="xl">
-          {/* Course Info */}
-          <Flex flex-direction="column" gap="m">
-            {/* Breadcrumb */}
-            <Flex align-items="center" gap="s">
-              <Link href="/courses">
-                Courses
-              </Link>
-              <Text>/</Text>
-              <Text>{course.category}</Text>
-            </Flex>
-
-            <Text tag="h1">{course.title}</Text>
-            <Text>{course.description}</Text>
-
-            {/* Stats */}
-            <Flex gap="m" align-items="center" flex-wrap="wrap">
-              <Flex align-items="center" gap="xs">
-                <Text>★</Text>
-                <Text>{course.rating.toFixed(1)}</Text>
-                <Text>({course.reviewsCount} reviews)</Text>
-              </Flex>
-              <Text>|</Text>
-              <Text>{course.enrollmentsCount.toLocaleString()} students</Text>
-              <Text>|</Text>
-              <Text>{course.skillLevel}</Text>
-            </Flex>
-
-            <Text>
-              Created by <span>{course.instructorName}</span>
-            </Text>
-            <Text>
-              Last updated: {new Date(course.updatedAt).toLocaleDateString()}
-            </Text>
+      {/* Hero Section with Course Header */}
+      <Div style={{ background: 'var(--color-background-secondary)', borderBottom: '1px solid var(--color-border)' }}>
+        <Flex flex-direction="column" gap="m" padding="xl" max-width="1400px" margin="0 auto">
+          {/* Breadcrumb */}
+          <Flex align-items="center" gap="s" color="secondary">
+            <Link href="/courses">
+              <Text font-size="body-xs">Courses</Text>
+            </Link>
+            <Text font-size="body-xs">/</Text>
+            <Text font-size="body-xs" font-weight="book">{course.category}</Text>
           </Flex>
 
-          {/* Enrollment Card */}
-          <Div>
-            <Card>
-              {/* Course Thumbnail */}
-              <Div>
-                {course.thumbnailUrl ? (
-                  <Image
-                    src={course.thumbnailUrl}
-                    alt={course.title}
-                    fill
-                  />
-                ) : (
-                  <Flex justify-content="center" align-items="center">
-                    <Text>🎬</Text>
-                  </Flex>
-                )}
-              </Div>
+          {/* Title and Description */}
+          <Text tag="h1" font-size="heading-xl">{course.title}</Text>
+          <Text font-size="body-l" color="secondary">{course.description}</Text>
 
-              <Flex flex-direction="column" gap="m" padding="l">
-                <Text>
-                  {course.price > 0 ? formatCurrency(course.price, course.currency) : 'Free'}
-                </Text>
+          {/* Key Stats Bar */}
+          <Flex gap="l" align-items="center" flex-wrap="wrap" style={{ marginTop: '12px' }}>
+            <Flex align-items="center" gap="xs">
+              <Text font-size="body-m">★</Text>
+              <Text font-size="body-m" font-weight="book">
+                {typeof course.rating === 'number' && isFinite(course.rating) ? course.rating.toFixed(1) : '—'}
+              </Text>
+              <Text font-size="body-s" color="secondary">
+                ({typeof course.reviewsCount === 'number' ? course.reviewsCount : 0} reviews)
+              </Text>
+            </Flex>
+            <Text font-size="body-s" color="secondary">•</Text>
+            <Text font-size="body-s" color="secondary">
+              {typeof course.enrollmentsCount === 'number' ? course.enrollmentsCount.toLocaleString() : '0'} students enrolled
+            </Text>
+            <Text font-size="body-s" color="secondary">•</Text>
+            <Text font-size="body-s" font-weight="book">{course.skillLevel}</Text>
+          </Flex>
 
+          {/* Instructor and Date */}
+          <Flex gap="l" flex-wrap="wrap" style={{ marginTop: '8px' }}>
+            <Text font-size="body-s">Taught by <span style={{ fontWeight: '600' }}>{course.instructorName}</span></Text>
+            <Text font-size="body-s" color="secondary">Updated {new Date(course.updatedAt).toLocaleDateString()}</Text>
+          </Flex>
+        </Flex>
+      </Div>
+
+      {/* Main Content Grid - Responsive Layout */}
+      <Flex flex-direction="column; l{row}" gap="xl" padding="xl" max-width="1400px" margin="0 auto">
+        {/* Left Column - Course Content */}
+        <Flex flex-direction="column" gap="xl" flex="1 1 65%">
+          {/* What You'll Learn Section */}
+          {Array.isArray(course.learningOutcomes) && course.learningOutcomes.length > 0 && (
+            <Card padding="xl">
+              <Flex flex-direction="column" gap="m">
+                <Text tag="h2" font-size="heading-m">What You will Learn</Text>
+                <Divider style={{ margin: '0' }} />
+                <Grid columns="1; m{2}" gap="l">
+                  {course.learningOutcomes.map((outcome, index) => (
+                    <Flex key={index} align-items="flex-start" gap="m">
+                      <Text font-size="heading-s" color="positive" style={{ marginTop: '2px' }}>✓</Text>
+                      <Text font-size="body-m">{outcome}</Text>
+                    </Flex>
+                  ))}
+                </Grid>
+              </Flex>
+            </Card>
+          )}
+
+          {/* Course Content / Lessons Section */}
+          <Card padding="xl">
+            <Flex flex-direction="column" gap="m">
+              <Text tag="h2" font-size="heading-m">Course Content</Text>
+              <Text font-size="body-s" color="secondary">
+                {Array.isArray(lessons) ? lessons.length : 0} lessons • {totalHours}h {totalMinutes}m total
+              </Text>
+              <Divider style={{ margin: '0' }} />
+
+              <Flex flex-direction="column">
+                {displayedLessons.map((lesson, index) => (
+                  <Div key={lesson.id}>
+                    {index > 0 && <Divider />}
+                    <Flex justify-content="space-between" align-items="center" padding="m">
+                      <Flex align-items="flex-start" gap="m" flex="1">
+                        <Text font-size="body-m" font-weight="book" color="secondary" style={{ minWidth: '32px' }}>
+                          {index + 1}
+                        </Text>
+                        <Div flex="1">
+                          <Text font-size="body-m" font-weight="book">{lesson.title}</Text>
+                          <Flex align-items="center" gap="s" style={{ marginTop: '6px' }}>
+                            <Text font-size="body-s" color="secondary">
+                              {lesson.contentType === 'Video' && '🎬'}
+                              {lesson.contentType === 'Quiz' && '❓'}
+                              {lesson.contentType === 'Text' && '📄'}
+                            </Text>
+                            <Text font-size="body-s" color="secondary">{lesson.durationMinutes} min</Text>
+                            {lesson.isPreview && (
+                              <Badge variant="information">Preview</Badge>
+                            )}
+                          </Flex>
+                        </Div>
+                      </Flex>
+                      {lesson.isPreview && (
+                        <Button size="small" rank="tertiary" style={{ marginLeft: 'auto' }}>Preview</Button>
+                      )}
+                    </Flex>
+                  </Div>
+                ))}
+              </Flex>
+
+              {Array.isArray(lessons) && lessons.length > 5 && !showAllLessons && (
+                <Button
+                  rank="tertiary"
+                  onClick={() => setShowAllLessons(true)}
+                  style={{ marginTop: '12px', alignSelf: 'flex-start' }}
+                >
+                  Show all {lessons.length} lessons
+                </Button>
+              )}
+            </Flex>
+          </Card>
+
+          {/* Requirements Section */}
+          {Array.isArray(course.requirements) && course.requirements.length > 0 && (
+            <Card padding="xl">
+              <Flex flex-direction="column" gap="m">
+                <Text tag="h2" font-size="heading-m">Prerequisites & Requirements</Text>
+                <Divider style={{ margin: '0' }} />
+                <Flex flex-direction="column" gap="s">
+                  {course.requirements.map((req, index) => (
+                    <Flex key={index} align-items="flex-start" gap="m">
+                      <Text font-size="heading-s" color="secondary">•</Text>
+                      <Text font-size="body-m">{req}</Text>
+                    </Flex>
+                  ))}
+                </Flex>
+              </Flex>
+            </Card>
+          )}
+
+          {/* Tags Section */}
+          {Array.isArray(course.tags) && course.tags.length > 0 && (
+            <Card padding="xl">
+              <Flex flex-direction="column" gap="m">
+                <Text tag="h2" font-size="heading-m">Skills You will Master</Text>
+                <Divider style={{ margin: '0' }} />
+                <Flex gap="s" flex-wrap="wrap">
+                  {course.tags.map((tag, index) => (
+                    <Badge key={index} variant="information">{tag}</Badge>
+                  ))}
+                </Flex>
+              </Flex>
+            </Card>
+          )}
+        </Flex>
+
+        {/* Right Column - Sticky Enrollment Card (Desktop) */}
+        <Div flex="1 1 35%" style={{ position: 'relative' }}>
+          <Div style={{ position: 'sticky', top: '24px' }}>
+            <Card padding="xl">
+              <Flex flex-direction="column" gap="m">
+                {/* Course Thumbnail */}
+                <Div style={{ borderRadius: '8px', overflow: 'hidden', aspectRatio: '16/9', background: 'var(--color-background-secondary)' }}>
+                  {course.thumbnailUrl ? (
+                    <Image
+                      src={course.thumbnailUrl}
+                      alt={course.title}
+                      fill
+                      style={{ objectFit: 'cover' }}
+                    />
+                  ) : (
+                    <Flex justify-content="center" align-items="center" height="100%">
+                      <Text font-size="heading-xl" color="secondary">🎬</Text>
+                    </Flex>
+                  )}
+                </Div>
+
+                {/* Price */}
+                <Flex justify-content="space-between" align-items="baseline">
+                  <Text tag="h3" font-size="heading-l" font-weight="book">
+                    {course.price > 0 ? formatCurrency(course.price, course.currency) : 'Free'}
+                  </Text>
+                  {course.price === 0 && <Badge variant="positive">Complimentary</Badge>}
+                </Flex>
+
+                {/* CTA Button */}
                 <Button
                   rank="primary"
                   onClick={handleEnroll}
                   disabled={isEnrolling}
+                  style={{ width: '100%', padding: '12px 16px', fontSize: '16px', fontWeight: '600' }}
                 >
-                  {isEnrolling ? 'Processing...' : course.price > 0 ? 'Buy Now' : 'Enroll for Free'}
+                  {isEnrolling ? 'Processing...' : course.price > 0 ? 'Enroll Now' : 'Enroll for Free'}
                 </Button>
 
-                <Text>
-                  30-Day Money-Back Guarantee
-                </Text>
+                {/* Money Back Guarantee */}
+                {course.price > 0 && (
+                  <Flex align-items="center" gap="s" padding="m" style={{ background: 'var(--color-background-secondary)', borderRadius: '6px' }}>
+                    <Text font-size="heading-m">✓</Text>
+                    <Text font-size="body-xs" color="secondary">30-Day Money-Back Guarantee</Text>
+                  </Flex>
+                )}
 
-                <Flex flex-direction="column" gap="s">
+                <Divider />
+
+                {/* Course Details List */}
+                <Flex flex-direction="column" gap="m">
                   <Flex align-items="center" gap="m">
-                    <Text>⏱️</Text>
-                    <Text>{totalHours}h {totalMinutes}m total length</Text>
+                    <Text font-size="heading-m">⏱️</Text>
+                    <Flex flex-direction="column">
+                      <Text font-size="body-xs" color="secondary">Total Duration</Text>
+                      <Text font-size="body-m" font-weight="book">{totalHours}h {totalMinutes}m</Text>
+                    </Flex>
                   </Flex>
+
                   <Flex align-items="center" gap="m">
-                    <Text>📄</Text>
-                    <Text>{course.lessonsCount} lessons</Text>
+                    <Text font-size="heading-m">📄</Text>
+                    <Flex flex-direction="column">
+                      <Text font-size="body-xs" color="secondary">Lessons</Text>
+                      <Text font-size="body-m" font-weight="book">{course.lessonsCount} lessons</Text>
+                    </Flex>
                   </Flex>
+
                   <Flex align-items="center" gap="m">
-                    <Text>🌟</Text>
-                    <Text>Certificate of completion</Text>
+                    <Text font-size="heading-m">🌟</Text>
+                    <Flex flex-direction="column">
+                      <Text font-size="body-xs" color="secondary">Certificate</Text>
+                      <Text font-size="body-m" font-weight="book">Completion Certificate</Text>
+                    </Flex>
                   </Flex>
+
                   <Flex align-items="center" gap="m">
-                    <Text>🌐</Text>
-                    <Text>Full lifetime access</Text>
+                    <Text font-size="heading-m">🌐</Text>
+                    <Flex flex-direction="column">
+                      <Text font-size="body-xs" color="secondary">Access</Text>
+                      <Text font-size="body-m" font-weight="book">Lifetime Access</Text>
+                    </Flex>
                   </Flex>
                 </Flex>
               </Flex>
             </Card>
           </Div>
-        </Flex>
-      </Div>
-
-      {/* Course Content */}
-      <Flex flex-direction="column" gap="l" padding="xl">
-        {/* What You'll Learn */}
-        {course.learningOutcomes.length > 0 && (
-          <Card>
-            <Flex flex-direction="column" gap="m" padding="l">
-              <Text tag="h2">What You&apos;ll Learn</Text>
-              <Grid columns="1; m{2}" gap="m">
-                {course.learningOutcomes.map((outcome, index) => (
-                  <Flex key={index} align-items="flex-start" gap="s">
-                    <Text>✓</Text>
-                    <Text>{outcome}</Text>
-                  </Flex>
-                ))}
-              </Grid>
-            </Flex>
-          </Card>
-        )}
-
-        {/* Requirements */}
-        {course.requirements.length > 0 && (
-          <Div>
-            <Text tag="h2">Requirements</Text>
-            <Flex flex-direction="column" gap="s">
-              {course.requirements.map((req, index) => (
-                <Flex key={index} align-items="flex-start" gap="s">
-                  <Text>•</Text>
-                  <Text>{req}</Text>
-                </Flex>
-              ))}
-            </Flex>
-          </Div>
-        )}
-
-        {/* Course Content / Lessons */}
-        <Card>
-          <Flex flex-direction="column" padding="l">
-            <Flex justify-content="space-between" align-items="center">
-              <Text tag="h2">Course Content</Text>
-              <Text>
-                {lessons.length} lessons • {totalHours}h {totalMinutes}m
-              </Text>
-            </Flex>
-
-            <Flex flex-direction="column">
-              {displayedLessons.map((lesson, index) => (
-                <Div key={lesson.id}>
-                  {index > 0 && <Divider />}
-                  <Flex justify-content="space-between" align-items="center" padding="m">
-                    <Flex align-items="center" gap="m">
-                      <Div>
-                        {index + 1}
-                      </Div>
-                      <Div>
-                        <Text>{lesson.title}</Text>
-                        <Flex align-items="center" gap="s">
-                          <Text>
-                            {lesson.contentType === 'Video' && '🎬'}
-                            {lesson.contentType === 'Quiz' && '❓'}
-                            {lesson.contentType === 'Text' && '📄'}
-                            {' '}{lesson.durationMinutes} min
-                          </Text>
-                          {lesson.isPreview && (
-                            <Badge variant="information">Preview</Badge>
-                          )}
-                        </Flex>
-                      </Div>
-                    </Flex>
-                    {lesson.isPreview && (
-                      <Button size="small" rank="tertiary">Preview</Button>
-                    )}
-                  </Flex>
-                </Div>
-              ))}
-            </Flex>
-
-            {lessons.length > 5 && !showAllLessons && (
-              <Button
-                rank="tertiary"
-                onClick={() => setShowAllLessons(true)}
-              >
-                Show all {lessons.length} lessons
-              </Button>
-            )}
-          </Flex>
-        </Card>
-
-        {/* Tags */}
-        {course.tags.length > 0 && (
-          <Div>
-            <Text tag="h2">Tags</Text>
-            <Flex gap="s" flex-wrap="wrap">
-              {course.tags.map((tag, index) => (
-                <Badge key={index} variant="information">{tag}</Badge>
-              ))}
-            </Flex>
-          </Div>
-        )}
+        </Div>
       </Flex>
     </Div>
   );
