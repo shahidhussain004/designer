@@ -46,7 +46,7 @@ export default function ClientDashboardPage() {
     </PageLayout>
   )
 
-  const { stats, activeJobs } = data
+  const { stats, activeJobs = [] } = data as any
 
   return (
     <PageLayout>
