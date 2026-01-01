@@ -4,6 +4,7 @@
 import { authenticate, requireAdmin } from '@common/middleware';
 import { createCategorySchema, updateCategorySchema } from '@common/utils/validation';
 import { FastifyInstance } from 'fastify';
+import { categoryRepository } from './category.repository';
 import { categoryService } from './category.service';
 
 interface IdParams {
@@ -17,7 +18,11 @@ interface SlugParams {
 export async function categoryRoutes(fastify: FastifyInstance): Promise<void> {
   // Get all categories
   fastify.get('/', async (_request, reply) => {
-    const categories = await categoryService.findAll();
+    let categories = await categoryService.findAll();
+    // Fallback: if cache returned empty and DB likely has categories, query repository directly
+    if (!categories || categories.length === 0) {
+      categories = await categoryRepository.findAll();
+    }
     return reply.send({
       success: true,
       data: categories,

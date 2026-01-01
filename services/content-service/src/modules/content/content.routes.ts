@@ -8,7 +8,7 @@ import {
   createContentSchema,
   updateContentSchema,
 } from '@common/utils/validation';
-import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import { FastifyInstance } from 'fastify';
 import { contentService } from './content.service';
 
 interface IdParams {
@@ -32,17 +32,26 @@ function normalizeContentQuery(rawQuery: Record<string, unknown>) {
   const normalized = { ...rawQuery };
   const filters: Record<string, unknown> = (rawQuery.filters as Record<string, unknown>) || {};
 
+  // Map of top-level params to filter keys
+  const paramMapping: Record<string, string> = {
+    type: 'contentType',
+    status: 'status',
+    search: 'search',
+    categoryId: 'categoryId',
+  };
+
   // Move top-level filter params into filters object
-  if (rawQuery.type) {
-    filters.contentType = String(rawQuery.type).toLowerCase();
-    delete normalized.type;
+  for (const [param, filterKey] of Object.entries(paramMapping)) {
+    if (rawQuery[param]) {
+      filters[filterKey] =
+        param === 'type' || param === 'status'
+          ? String(rawQuery[param]).toLowerCase()
+          : String(rawQuery[param]);
+      delete normalized[param];
+    }
   }
 
-  if (rawQuery.status) {
-    filters.status = String(rawQuery.status).toLowerCase();
-    delete normalized.status;
-  }
-
+  // Handle tagIds separately (can be array or comma-separated string)
   if (rawQuery.tagIds) {
     const tagVal = rawQuery.tagIds;
     filters.tagIds = Array.isArray(tagVal)
@@ -80,7 +89,7 @@ function transformDates(params: any) {
 
 export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
   // Get all published content (public)
-  fastify.get('/', async (request: FastifyRequest, reply: FastifyReply) => {
+  fastify.get('/', async (request, reply) => {
     const normalizedQuery = normalizeContentQuery(request.query as Record<string, unknown>);
     const parsed = contentListSchema.parse(normalizedQuery);
     const params = transformDates(parsed);
