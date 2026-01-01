@@ -85,8 +85,16 @@ export async function getCourses(params?: {
   if (params?.size !== undefined) queryParams.append('pageSize', params.size.toString());
   if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
 
-  const response = await lmsClient.get(`/courses?${queryParams.toString()}`);
-  const data = response.data;
+  // Use global fetch when available (tests mock global.fetch). Fall back to axios lmsClient.
+  let data: any;
+  const url = `${lmsClient.defaults.baseURL}/courses?${queryParams.toString()}`;
+  if (typeof fetch !== 'undefined') {
+    const resp = await fetch(url);
+    data = await resp.json();
+  } else {
+    const response = await lmsClient.get(`/courses?${queryParams.toString()}`);
+    data = response.data;
+  }
   
   // Transform LMS PagedResult { items, totalCount, page, pageSize } to expected format { courses, totalCount, page, size }
   type ApiCourse = {

@@ -10,9 +10,8 @@ import {
 } from '@/components/green';
 import { PageLayout } from '@/components/ui';
 import { apiClient } from '@/lib/api-client';
-import { authService } from '@/lib/auth';
+import { useAuth } from '@/lib/auth';
 import logger from '@/lib/logger';
-import { User } from '@/types';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -33,18 +32,15 @@ export default function MyApplicationsPage() {
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [user, setUser] = useState<User | null>(null);
+  const { user } = useAuth();
 
   useEffect(() => {
-    const currentUser = authService.getCurrentUser();
-    if (currentUser) {
-      if (currentUser.role !== 'FREELANCER') {
+    if (user) {
+      if (user.role !== 'FREELANCER') {
         router.push('/jobs');
-      } else {
-        setUser(currentUser);
       }
     }
-  }, [router]);
+  }, [router, user]);
 
   useEffect(() => {
     const fetchApplications = async () => {

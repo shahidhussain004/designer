@@ -13,9 +13,8 @@ import {
 } from '@/components/green';
 import { PageLayout } from '@/components/ui';
 import { apiClient } from '@/lib/api-client';
-import { authService } from '@/lib/auth';
+import { useAuth } from '@/lib/auth';
 import logger from '@/lib/logger';
-import { User } from '@/types';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -33,7 +32,7 @@ interface CreateJobRequest {
 
 export default function CreateJobPage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,16 +52,13 @@ export default function CreateJobPage() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    const currentUser = authService.getCurrentUser();
-    if (currentUser) {
-      if (currentUser.role !== 'CLIENT') {
+    if (user) {
+      if (user.role !== 'CLIENT') {
         router.push('/jobs');
-      } else {
-        setUser(currentUser);
       }
     }
     setLoading(false);
-  }, [router]);
+  }, [router, user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

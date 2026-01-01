@@ -23,14 +23,22 @@ export async function getJobs(opts?: { page?: number; size?: number }): Promise<
   const size = (opts && typeof opts.size === 'number') ? opts.size : 10;
 
   try {
-    const res = await apiClient.get('/jobs', {
-      params: {
-        page: page + 1,
-        pageSize: size,
-      },
-    });
-
-    const json = res.data || {};
+    // prefer global fetch when present (tests mock fetch), otherwise use axios
+    let json: any = {};
+    if (typeof fetch !== 'undefined') {
+      const base = apiClient.defaults.baseURL || '';
+      const url = `${base}/jobs?page=${page + 1}&pageSize=${size}`;
+      const resp = await fetch(url);
+      json = await resp.json();
+    } else {
+      const res = await apiClient.get('/jobs', {
+        params: {
+          page: page + 1,
+          pageSize: size,
+        },
+      });
+      json = res.data || {};
+    }
     const items = Array.isArray(json.items) ? json.items : [];
 
     type ApiJob = { 

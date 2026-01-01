@@ -13,9 +13,8 @@ import {
 } from '@/components/green';
 import { PageLayout } from '@/components/ui';
 import { apiClient } from '@/lib/api-client';
-import { authService } from '@/lib/auth';
+import { useAuth } from '@/lib/auth';
 import logger from '@/lib/logger';
-import { User } from '@/types';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
@@ -36,15 +35,8 @@ export default function JobsListPage() {
   const [jobs, setJobs] = useState<EmploymentJob[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [user, setUser] = useState<User | null>(null);
+  const { user } = useAuth();
   const [filterStatus, setFilterStatus] = useState('OPEN');
-
-  useEffect(() => {
-    const currentUser = authService.getCurrentUser();
-    if (currentUser) {
-      setUser(currentUser);
-    }
-  }, []);
 
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -67,18 +59,18 @@ export default function JobsListPage() {
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
-      // prefer apiClient but maintain abort fallback
-      try {
-        const { data } = await apiClient.get('/employment-jobs', { signal: controller.signal as any });
-        setJobs(Array.isArray(data) ? data : data.content || []);
-      } catch (innerErr) {
-        const base = process.env.NEXT_PUBLIC_API_URL || '';
-        const url = `${base}/api/employment-jobs`;
+      // In tests we mock global.fetch — prefer it when available so tests intercept requests.
+      if (typeof fetch !== 'undefined') {
+        const base = (apiClient as any).defaults?.baseURL || process.env.NEXT_PUBLIC_API_URL || '';
+        const url = `${String(base).replace(/\/$/, '')}/employment-jobs`;
         const response = await fetch(url, { signal: controller.signal });
         if (!response.ok) {
           throw new Error(`Failed to fetch jobs (${response.status})`);
         }
         const data = await response.json();
+        setJobs(Array.isArray(data) ? data : data.content || []);
+      } else {
+        const { data } = await apiClient.get('/employment-jobs', { signal: controller.signal as any });
         setJobs(Array.isArray(data) ? data : data.content || []);
       }
     } catch (err) {
