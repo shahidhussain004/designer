@@ -353,7 +353,7 @@ function CourseCard({ course, getSkillLevelVariant }: CourseCardProps) {
               src={course.thumbnailUrl}
               alt={course.title}
               fill
-              style={{ objectFit: 'cover', position: 'absolute', top: 0, left: 0 }}
+              style={{ objectFit: 'cover', position: 'absolute', top: 0, left: 0, pointerEvents: 'none', zIndex: 0 }}
             />
           ) : (
             <Flex justify-content="center" align-items="center" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>

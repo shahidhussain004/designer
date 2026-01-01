@@ -277,13 +277,13 @@ export default function CourseDetailPage() {
             <Card padding="xl">
               <Flex flex-direction="column" gap="m">
                 {/* Course Thumbnail */}
-                <Div style={{ borderRadius: '8px', overflow: 'hidden', aspectRatio: '16/9', background: 'var(--color-background-secondary)' }}>
+                <Div style={{ position: 'relative', borderRadius: '8px', overflow: 'hidden', aspectRatio: '16/9', background: 'var(--color-background-secondary)' }}>
                   {course.thumbnailUrl ? (
                     <Image
                       src={course.thumbnailUrl}
                       alt={course.title}
                       fill
-                      style={{ objectFit: 'cover' }}
+                      style={{ objectFit: 'cover', zIndex: 0, pointerEvents: 'none' }}
                     />
                   ) : (
                     <Flex justify-content="center" align-items="center" height="100%">
