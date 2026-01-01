@@ -186,11 +186,11 @@ public class InvoiceService {
     }
 
     /**
-     * Get invoices for a job.
+     * Get invoices for a project.
      */
     @Transactional(readOnly = true)
-    public List<InvoiceResponse> getInvoicesForJob(Long jobId) {
-        return invoiceRepository.findByJobId(jobId).stream()
+    public List<InvoiceResponse> getInvoicesForProject(Long projectId) {
+        return invoiceRepository.findByProjectId(projectId).stream()
                 .map(InvoiceResponse::fromEntity)
                 .toList();
     }

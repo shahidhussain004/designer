@@ -1,17 +1,8 @@
--- Insert common job categories
-INSERT INTO job_categories (name, slug, description, icon, display_order) VALUES
-('Web Development', 'web-development', 'Websites, web applications, and web services', '🌐', 1),
-('Mobile Development', 'mobile-development', 'iOS, Android, and cross-platform mobile apps', '📱', 2),
-('Design & Creative', 'design-creative', 'UI/UX design, graphic design, branding', '🎨', 3),
-('Writing & Content', 'writing-content', 'Content writing, copywriting, technical writing', '✍️', 4),
-('Marketing & Sales', 'marketing-sales', 'Digital marketing, SEO, social media management', '📈', 5),
-('Data Science & Analytics', 'data-science-analytics', 'Data analysis, machine learning, AI', '📊', 6),
-('DevOps & Cloud', 'devops-cloud', 'Cloud infrastructure, CI/CD, system administration', '☁️', 7),
-('Software Development', 'software-development', 'Desktop applications, backend development', '💻', 8),
-('Video & Animation', 'video-animation', 'Video editing, motion graphics, 3D animation', '🎬', 9),
-('Consulting', 'consulting', 'Business consulting, technical consulting', '💼', 10),
-('Testing & QA', 'testing-qa', 'Software testing, quality assurance', '🔍', 11),
-('Other', 'other', 'Other professional services', '📦', 99);
+-- DEPRECATED: This migration file has been moved to seed_data folder
+-- See: src/main/resources/db/seed_data/V100__seed_job_categories.sql
+--
+-- This migration is kept empty (below) to maintain Flyway's migration history
+-- The seed data is now managed separately in the seed_data folder to keep
+-- schema migrations clean.
 
--- Update timestamp
-UPDATE job_categories SET updated_at = CURRENT_TIMESTAMP;
+-- Job categories data is now seeded in: db/seed_data/V100__seed_job_categories.sql
