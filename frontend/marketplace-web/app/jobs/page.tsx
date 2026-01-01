@@ -16,7 +16,7 @@ import { authService } from '@/lib/auth';
 import logger from '@/lib/logger';
 import { User } from '@/types';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface EmploymentJob {
   id: number;
@@ -45,27 +45,65 @@ export default function JobsListPage() {
     }
   }, []);
 
-  useEffect(() => {
-    const fetchJobs = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await fetch('http://localhost:8080/api/employment-jobs');
-        if (!response.ok) {
-          throw new Error('Failed to fetch jobs');
-        }
-        const data = await response.json();
-        setJobs(Array.isArray(data) ? data : data.content || []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-        logger.error('Error fetching jobs', err as Error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const abortControllerRef = useRef<AbortController | null>(null);
 
+  const fetchJobs = async () => {
+    setLoading(true);
+    setError(null);
+
+    // Abort any previous pending request
+    try {
+      abortControllerRef.current?.abort();
+    } catch (e) {
+      // ignore
+    }
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    // Timeout the request after 10s
+    const timeoutMs = 10000;
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+    const rawBase = process.env.NEXT_PUBLIC_API_URL || '';
+    const base = rawBase.replace(/\/api\/?$/, '');
+    const url = `${base}/api/employment-jobs`;
+
+    try {
+      const response = await fetch(url, { signal: controller.signal });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch jobs (${response.status})`);
+      }
+      const data = await response.json();
+      setJobs(Array.isArray(data) ? data : data.content || []);
+    } catch (err) {
+      // Ignore AbortError caused by timeout or component unmount
+      if ((err as any)?.name === 'AbortError') {
+        // do not set error state or log as an application error
+      } else {
+        const msg = err instanceof Error ? err.message : 'An error occurred';
+        setError(msg);
+        logger.error('Error fetching jobs', err as Error);
+      }
+    } finally {
+      clearTimeout(timeoutId);
+      setLoading(false);
+      abortControllerRef.current = null;
+    }
+  };
+
+  useEffect(() => {
     fetchJobs();
+
+    return () => {
+      // ensure we don't update state after unmount
+      abortControllerRef.current?.abort();
+    };
   }, []);
+
+  const handleRetry = () => {
+    fetchJobs();
+  };
 
   const filteredJobs = jobs.filter(
     (job) => filterStatus === 'ALL' || job.status === filterStatus
@@ -85,7 +123,14 @@ export default function JobsListPage() {
     <PageLayout>
       {error && (
         <div style={{ padding: '1rem' }}>
-          <Alert variant="negative">{error}</Alert>
+          <Alert variant="negative">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+              <div>{error}</div>
+              <div>
+                <Button variant="neutral" onClick={handleRetry}>Retry</Button>
+              </div>
+            </div>
+          </Alert>
         </div>
       )}
 
@@ -143,7 +188,7 @@ export default function JobsListPage() {
           <Grid columns="1" gap="m" style={{ width: '100%' }}>
             {filteredJobs.map((job) => (
               <Link key={job.id} href={`/jobs/${job.id}`}>
-                <Card padding="l" variant="interactive">
+                <Card padding="l" variant="information">
                   <Flex
                     flex-direction="column"
                     gap="m"

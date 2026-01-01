@@ -13,7 +13,7 @@ import {
 } from '@/components/green';
 import { PageLayout } from '@/components/ui';
 import { parseCategories, parseExperienceLevels } from '@/lib/apiParsers';
-import type { ExperienceLevel, JobCategory } from '@/lib/apiTypes';
+import type { ExperienceLevel, PostCategory } from '@/lib/apiTypes';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useCallback, useEffect, useState } from 'react';
 
@@ -60,7 +60,7 @@ function ProjectsPageContent() {
   const searchParams = useSearchParams();
   
   const [projects, setProjects] = useState<Project[]>([]);
-  const [categories, setCategories] = useState<JobCategory[]>([]);
+  const [categories, setCategories] = useState<PostCategory[]>([]);
   const [experienceLevels, setExperienceLevels] = useState<ExperienceLevel[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -82,7 +82,7 @@ function ProjectsPageContent() {
     const fetchFilters = async () => {
       try {
         const [catsResponse, levelsResponse] = await Promise.all([
-          fetch('/api/projects/categories'),
+          fetch('/api/project-categories'),
           fetch('/api/experience-levels')
         ]);
         
@@ -167,7 +167,7 @@ function ProjectsPageContent() {
   };
 
   // Sort projects based on selection
-  const sortedJobs = [...projects].sort((a, b) => {
+  const sortedProjects = [...projects].sort((a, b) => {
     switch (sortBy) {
       case 'budget-high':
         return b.budget - a.budget;
@@ -183,7 +183,7 @@ function ProjectsPageContent() {
   const activeFilterCount = [categoryId, experienceLevelId, minBudget, maxBudget, searchQuery].filter(Boolean).length;
 
   // Render project card based on view mode
-  const renderJobCard = (project: project) => {
+  const renderProjectCard = (project: Project) => {
     switch (viewMode) {
       case 'compact':
         return (

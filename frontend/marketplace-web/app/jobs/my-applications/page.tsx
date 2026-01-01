@@ -117,7 +117,7 @@ export default function MyApplicationsPage() {
                 key={application.id}
                 href={`/jobs/${application.jobId}`}
               >
-                <Card padding="l" variant="interactive">
+                <Card padding="l" variant="information">
                   <Flex
                     flex-direction="column"
                     gap="m"

@@ -13,18 +13,18 @@ import {
   Text,
 } from '@/components/green';
 import { parseCategories, parseExperienceLevels } from '@/lib/apiParsers';
-import type { ExperienceLevel, JobCategory } from '@/lib/apiTypes';
+import type { ExperienceLevel, PostCategory } from '@/lib/apiTypes';
 import { authService } from '@/lib/auth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-export default function CreateJobPage() {
+export default function CreateProjectPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [categories, setCategories] = useState<JobCategory[]>([]);
+  const [categories, setCategories] = useState<PostCategory[]>([]);
   const [experienceLevels, setExperienceLevels] = useState<ExperienceLevel[]>([]);
 
   const [formData, setFormData] = useState({
@@ -46,7 +46,7 @@ export default function CreateJobPage() {
     const fetchFilters = async () => {
       try {
         const [catsResponse, levelsResponse] = await Promise.all([
-          fetch('http://localhost:8080/api/job-categories'),
+          fetch('http://localhost:8080/api/project-categories'),
           fetch('http://localhost:8080/api/experience-levels')
         ]);
         
@@ -137,7 +137,7 @@ export default function CreateJobPage() {
       {/* Header */}
       <Div padding="xl">
         <Flex flex-direction="column" gap="m">
-          <Text tag="h1">Post a New Job</Text>
+          <Text tag="h1">Post a New Project</Text>
           <Text>
             Find the right freelancer for your project
           </Text>
@@ -154,9 +154,9 @@ export default function CreateJobPage() {
         <Card>
           <form onSubmit={handleSubmit}>
             <Flex flex-direction="column" gap="l" padding="l">
-              {/* Job Title */}
+              {/* Project Title */}
               <Div>
-                <Text>Job Title *</Text>
+                <Text>Project Title *</Text>
                 <Input
                   label=""
                   name="title"
@@ -166,9 +166,9 @@ export default function CreateJobPage() {
                 />
               </Div>
 
-              {/* Job Description */}
+              {/* Project Description */}
               <Div>
-                <Text>Job Description *</Text>
+                <Text>Project Description *</Text>
                 <textarea
                   name="description"
                   value={formData.description}
@@ -238,7 +238,7 @@ export default function CreateJobPage() {
                   </Button>
                 </Link>
                 <Button rank="primary" type="submit" disabled={submitting}>
-                  {submitting ? 'Creating Job...' : 'Post Job'}
+                  {submitting ? 'Creating Project...' : 'Post Project'}
                 </Button>
               </Flex>
             </Flex>
@@ -249,7 +249,7 @@ export default function CreateJobPage() {
         <Card>
           <Flex flex-direction="column" gap="l" padding="l">
             <Text tag="h2">
-              Tips for Writing a Great Job Post
+              Tips for Writing a Great Project Post
             </Text>
             <Flex flex-direction="column" gap="m">
               {[

@@ -19,7 +19,7 @@ import logger from '@/lib/logger';
 import { User } from '@/types';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface EmploymentJob {
   id: number;
@@ -70,42 +70,70 @@ export default function JobDetailsPage() {
     }
   }, []);
 
-  useEffect(() => {
-    const fetchJobDetails = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await fetch(`http://localhost:8080/api/employment-jobs/${jobId}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch job details');
-        }
-        const data = await response.json();
-        setJob(data);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-        setApplicationData((prev) => ({ ...prev, jobId: data.id }));
+  const fetchJobDetails = async () => {
+    setLoading(true);
+    setError(null);
 
-        if (data.employerId) {
-          try {
-            const employerResponse = await fetch(
-              `http://localhost:8080/api/users/${data.employerId}/profile`
-            );
-            if (employerResponse.ok) {
-              const employerData = await employerResponse.json();
-              setEmployer(employerData);
-            }
-          } catch (err) {
+    try {
+      abortControllerRef.current?.abort();
+    } catch (e) {}
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    const timeoutMs = 10000;
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+    const rawBase = process.env.NEXT_PUBLIC_API_URL || '';
+    const base = rawBase.replace(/\/api\/?$/, '');
+    const jobUrl = `${base}/api/employment-jobs/${jobId}`;
+
+    try {
+      const response = await fetch(jobUrl, { signal: controller.signal });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch job details (${response.status})`);
+      }
+      const data = await response.json();
+      setJob(data);
+      setApplicationData((prev) => ({ ...prev, jobId: data.id }));
+
+      if (data.employerId) {
+        try {
+          const employerUrl = `${base}/api/users/${data.employerId}/profile`;
+          const employerResponse = await fetch(employerUrl, { signal: controller.signal });
+          if (employerResponse.ok) {
+            const employerData = await employerResponse.json();
+            setEmployer(employerData);
+          }
+        } catch (err) {
+          if ((err as any).name !== 'AbortError') {
             logger.error('Error fetching employer details', err as Error);
           }
         }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (err) {
+      // Ignore AbortError (timeout or unmount)
+      if ((err as any)?.name === 'AbortError') {
+        // no-op
+      } else {
+        const msg = err instanceof Error ? err.message : 'An error occurred';
+        setError(msg);
+      }
+    } finally {
+      clearTimeout(timeoutId);
+      setLoading(false);
+      abortControllerRef.current = null;
+    }
+  };
 
+  useEffect(() => {
     fetchJobDetails();
+
+    return () => abortControllerRef.current?.abort();
   }, [jobId]);
+
+  const handleRetry = () => fetchJobDetails();
 
   const handleApplicationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

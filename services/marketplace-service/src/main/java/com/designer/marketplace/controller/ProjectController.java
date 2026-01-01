@@ -1,7 +1,5 @@
 package com.designer.marketplace.controller;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,10 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.designer.marketplace.dto.CreateProjectRequest;
-import com.designer.marketplace.dto.ProjectCategoryResponse;
 import com.designer.marketplace.dto.ProjectResponse;
 import com.designer.marketplace.dto.UpdateProjectRequest;
-import com.designer.marketplace.service.ProjectCategoryService;
 import com.designer.marketplace.service.ProjectService;
 
 import jakarta.validation.Valid;
@@ -37,7 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ProjectController {
 
     private final ProjectService projectService;
-    private final ProjectCategoryService categoryService;
 
     @GetMapping
     public ResponseEntity<Page<ProjectResponse>> getProjects(
@@ -118,17 +113,5 @@ public class ProjectController {
         return ResponseEntity.ok(projects);
     }
 
-    @GetMapping("/categories")
-    public ResponseEntity<List<ProjectCategoryResponse>> getCategories() {
-        log.info("Getting all project categories");
-        List<ProjectCategoryResponse> categories = categoryService.getAllCategories();
-        return ResponseEntity.ok(categories);
-    }
 
-    @GetMapping("/categories/{slug}")
-    public ResponseEntity<ProjectCategoryResponse> getCategoryBySlug(@PathVariable String slug) {
-        log.info("Getting project category by slug: {}", slug);
-        ProjectCategoryResponse category = categoryService.getCategoryBySlug(slug);
-        return ResponseEntity.ok(category);
-    }
 }

@@ -86,13 +86,21 @@ export default function ProjectDetailsPage() {
   }, []);
 
   useEffect(() => {
+    const abortController = new AbortController();
+    const controller = abortController;
+    const timeoutMs = 10000;
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
     const fetchProjectDetails = async () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(`http://localhost:8080/api/projects/${projectId}`);
+        const rawBase = process.env.NEXT_PUBLIC_API_URL || '';
+        const base = rawBase.replace(/\/api\/?$/, '');
+        const projectUrl = base ? `${base}/api/projects/${projectId}` : `/api/projects/${projectId}`;
+        const response = await fetch(projectUrl, { signal: controller.signal });
         if (!response.ok) {
-          throw new Error('Failed to fetch project details');
+          throw new Error(`Failed to fetch project details (${response.status})`);
         }
         const data = await response.json();
         setProject(data);
@@ -101,25 +109,38 @@ export default function ProjectDetailsPage() {
 
         if (data.clientId) {
           try {
-            const clientResponse = await fetch(
-              `http://localhost:8080/api/users/${data.clientId}/profile`
-            );
+            const rawClientBase = process.env.NEXT_PUBLIC_API_URL || '';
+            const clientBase = rawClientBase.replace(/\/api\/?$/, '');
+            const clientUrl = clientBase ? `${clientBase}/api/users/${data.clientId}/profile` : `/api/users/${data.clientId}/profile`;
+            const clientResponse = await fetch(clientUrl, { signal: controller.signal });
             if (clientResponse.ok) {
               const clientData = await clientResponse.json();
               setClient(clientData);
             }
           } catch (err) {
-                logger.error('Error fetching client details', err as Error);
+            if ((err as any)?.name !== 'AbortError') {
+              logger.error('Error fetching client details', err as Error);
+            }
           }
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        if ((err as any)?.name === 'AbortError') {
+          // ignore aborts (timeout or navigation)
+        } else {
+          setError(err instanceof Error ? err.message : 'An error occurred');
+        }
       } finally {
+        clearTimeout(timeoutId);
         setLoading(false);
       }
     };
 
     fetchProjectDetails();
+
+    return () => {
+      controller.abort();
+      clearTimeout(timeoutId);
+    };
   }, [projectId]);
 
   const handleProposalSubmit = async (e: React.FormEvent) => {
@@ -348,11 +369,11 @@ export default function ProjectDetailsPage() {
                 {user && user.role === 'FREELANCER' && user.id !== project.clientId ? (
                   <Button
                     variant={proposalOpen ? 'neutral' : 'brand'}
-                    onClick={() => {
+                      onClick={() => {
                       if (!proposalOpen) {
-                        // Initialize proposal data with correct jobId when opening form
+                        // Initialize proposal data with correct projectId when opening form
                         setProposalData({
-                          jobId: job.id,
+                          projectId: project!.id,
                           coverLetter: '',
                           proposedRate: 0,
                           estimatedDuration: 30
@@ -363,10 +384,10 @@ export default function ProjectDetailsPage() {
                   >
                     {proposalOpen ? 'Cancel' : 'Send Proposal'}
                   </Button>
-                ) : user && user.id === job.clientId ? (
+                ) : user && user.id === project.clientId ? (
                   <Card padding="m" variant="information">
                     <Text font-size="body-s">
-                      This is your job posting
+                      This is your project posting
                     </Text>
                   </Card>
                 ) : (
@@ -454,18 +475,18 @@ export default function ProjectDetailsPage() {
                 <Flex flex-direction="column" gap="s">
                   <Flex justify-content="space-between">
                     <Text color="secondary">Budget</Text>
-                    <Text font-weight="book">${job.budget}</Text>
+                    <Text font-weight="book">${project.budget}</Text>
                   </Flex>
                   <Flex justify-content="space-between">
                     <Text color="secondary">Status</Text>
-                    <Badge variant={job.status === 'OPEN' ? 'positive' : 'information'}>
-                      {job.status}
+                    <Badge variant={project.status === 'OPEN' ? 'positive' : 'information'}>
+                      {project.status}
                     </Badge>
                   </Flex>
                   <Divider />
                   <Flex justify-content="space-between">
                     <Text font-size="body-s" color="secondary">Posted</Text>
-                    <Text font-size="body-s">{new Date(job.createdAt).toLocaleDateString()}</Text>
+                    <Text font-size="body-s">{new Date(project.createdAt).toLocaleDateString()}</Text>
                   </Flex>
                 </Flex>
               </Flex>
