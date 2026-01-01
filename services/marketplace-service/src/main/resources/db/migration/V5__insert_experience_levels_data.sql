@@ -1,8 +1,8 @@
--- Insert experience levels
-INSERT INTO experience_levels (name, code, description, years_min, years_max, display_order) VALUES
-('Entry Level', 'ENTRY', 'Little to no professional experience required', 0, 2, 1),
-('Intermediate', 'INTERMEDIATE', 'Some professional experience required', 2, 5, 2),
-('Expert', 'EXPERT', 'Extensive professional experience required', 5, NULL, 3);
+-- DEPRECATED: This migration file has been moved to seed_data folder
+-- See: src/main/resources/db/seed_data/V101__seed_experience_levels.sql
+--
+-- This migration is kept empty (below) to maintain Flyway's migration history
+-- The seed data is now managed separately in the seed_data folder to keep
+-- schema migrations clean.
 
--- Update timestamp
-UPDATE experience_levels SET updated_at = CURRENT_TIMESTAMP;
+-- Experience levels data is now seeded in: db/seed_data/V101__seed_experience_levels.sql

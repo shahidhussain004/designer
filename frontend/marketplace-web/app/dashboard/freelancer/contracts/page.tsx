@@ -1,6 +1,7 @@
-'use client';
+"use client";
 
 import { PageLayout } from '@/components/ui';
+import apiClient from '@/lib/api-client';
 import { useAuth } from '@/lib/context/AuthContext';
 import logger from '@/lib/logger';
 import { Calendar, CheckCircle, Clock, DollarSign, FileText, Users, XCircle } from 'lucide-react';
@@ -36,11 +37,9 @@ export default function ContractsPage() {
 
   const fetchContracts = async () => {
     try {
-      const res = await fetch('/api/contracts');
-      if (res.ok) {
-        const data = await res.json();
-        setContracts(data);
-      }
+      const res = await apiClient.get('/contracts');
+      const data = res.data;
+      setContracts(data || []);
     } catch (error) {
       logger.error('Failed to fetch contracts', error as Error);
     } finally {

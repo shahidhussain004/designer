@@ -16,7 +16,7 @@ public interface EscrowRepository extends JpaRepository<Escrow, Long> {
     
     Optional<Escrow> findByPaymentId(Long paymentId);
     
-    List<Escrow> findByJobId(Long jobId);
+    List<Escrow> findByProjectId(Long projectId);
     
     List<Escrow> findByStatus(EscrowHoldStatus status);
     

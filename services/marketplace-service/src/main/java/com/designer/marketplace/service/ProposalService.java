@@ -1,20 +1,22 @@
 package com.designer.marketplace.service;
 
-import com.designer.marketplace.dto.CreateProposalRequest;
-import com.designer.marketplace.dto.ProposalResponse;
-import com.designer.marketplace.dto.UpdateProposalStatusRequest;
-import com.designer.marketplace.entity.Job;
-import com.designer.marketplace.entity.Notification;
-import com.designer.marketplace.entity.Proposal;
-import com.designer.marketplace.entity.User;
-import com.designer.marketplace.repository.JobRepository;
-import com.designer.marketplace.repository.ProposalRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.designer.marketplace.dto.CreateProposalRequest;
+import com.designer.marketplace.dto.ProposalResponse;
+import com.designer.marketplace.dto.UpdateProposalStatusRequest;
+import com.designer.marketplace.entity.Notification;
+import com.designer.marketplace.entity.Project;
+import com.designer.marketplace.entity.Proposal;
+import com.designer.marketplace.entity.User;
+import com.designer.marketplace.repository.ProjectRepository;
+import com.designer.marketplace.repository.ProposalRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Service for proposal management operations
@@ -25,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProposalService {
 
     private final ProposalRepository proposalRepository;
-    private final JobRepository jobRepository;
+    private final ProjectRepository projectRepository;
     private final UserService userService;
     private final NotificationService notificationService;
 
@@ -41,21 +43,21 @@ public class ProposalService {
     }
 
     /**
-     * Task 3.13: Get proposals for a job
+     * Task 3.13: Get proposals for a project
      */
-    public Page<ProposalResponse> getJobProposals(Long jobId, Pageable pageable) {
-        log.info("Getting proposals for job: {}", jobId);
+    public Page<ProposalResponse> getProjectProposals(Long projectId, Pageable pageable) {
+        log.info("Getting proposals for project: {}", projectId);
 
-        Job job = jobRepository.findById(jobId)
-                .orElseThrow(() -> new RuntimeException("Job not found with id: " + jobId));
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found with id: " + projectId));
 
-        // Check if current user is the job owner
+        // Check if current user is the project owner
         User currentUser = userService.getCurrentUser();
-        if (!job.getClient().getId().equals(currentUser.getId())) {
-            throw new RuntimeException("You can only view proposals for your own jobs");
+        if (!project.getClient().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("You can only view proposals for your own projects");
         }
 
-        Page<Proposal> proposals = proposalRepository.findByJobId(jobId, pageable);
+        Page<Proposal> proposals = proposalRepository.findByProjectId(projectId, pageable);
         return proposals.map(ProposalResponse::fromEntity);
     }
 
@@ -71,24 +73,24 @@ public class ProposalService {
             throw new RuntimeException("Only freelancers can submit proposals");
         }
 
-        log.info("Creating proposal for job: {} by user: {}", request.getJobId(), currentUser.getUsername());
+        log.info("Creating proposal for project: {} by user: {}", request.getProjectId(), currentUser.getUsername());
 
-        // Check if job exists
-        Job job = jobRepository.findById(request.getJobId())
-                .orElseThrow(() -> new RuntimeException("Job not found with id: " + request.getJobId()));
+        // Check if project exists
+        Project project = projectRepository.findById(request.getProjectId())
+                .orElseThrow(() -> new RuntimeException("Project not found with id: " + request.getProjectId()));
 
-        // Validate job is open
-        if (job.getStatus() != Job.JobStatus.OPEN) {
-            throw new RuntimeException("Cannot submit proposal to a closed job");
+        // Validate project is open
+        if (project.getStatus() != Project.ProjectStatus.OPEN) {
+            throw new RuntimeException("Cannot submit proposal to a closed project");
         }
 
-        // Task 3.16: Business rule - one proposal per job+freelancer
-        if (proposalRepository.existsByJobIdAndFreelancerId(request.getJobId(), currentUser.getId())) {
-            throw new RuntimeException("You have already submitted a proposal for this job");
+        // Task 3.16: Business rule - one proposal per project+freelancer
+        if (proposalRepository.existsByProjectIdAndFreelancerId(request.getProjectId(), currentUser.getId())) {
+            throw new RuntimeException("You have already submitted a proposal for this project");
         }
 
         Proposal proposal = new Proposal();
-        proposal.setJob(job);
+        proposal.setProject(project);
         proposal.setFreelancer(currentUser);
         proposal.setCoverLetter(request.getCoverLetter());
         proposal.setProposedRate(request.getProposedRate());
@@ -97,17 +99,17 @@ public class ProposalService {
 
         Proposal savedProposal = proposalRepository.save(proposal);
 
-        // Update job proposal count
-        job.setProposalCount(job.getProposalCount() + 1);
-        jobRepository.save(job);
+        // Update project proposal count
+        project.setProposalCount(project.getProposalCount() + 1);
+        projectRepository.save(project);
 
-        // Create notification for job owner
+        // Create notification for project owner
         notificationService.createNotification(
-                job.getClient(),
+                project.getClient(),
                 Notification.NotificationType.PROPOSAL_RECEIVED,
                 "New Proposal Received",
-                String.format("%s submitted a proposal for your job: %s",
-                        currentUser.getFullName(), job.getTitle()),
+                String.format("%s submitted a proposal for your project: %s",
+                        currentUser.getFullName(), project.getTitle()),
                 "PROPOSAL",
                 savedProposal.getId());
 
@@ -126,9 +128,9 @@ public class ProposalService {
 
         User currentUser = userService.getCurrentUser();
 
-        // Check if current user is the job owner
-        if (!proposal.getJob().getClient().getId().equals(currentUser.getId())) {
-            throw new RuntimeException("Only the job owner can update proposal status");
+        // Check if current user is the project owner
+        if (!proposal.getProject().getClient().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Only the project owner can update proposal status");
         }
 
         log.info("Updating proposal status: {} to: {}", proposalId, request.getStatus());
@@ -141,19 +143,19 @@ public class ProposalService {
             proposal.setClientMessage(request.getClientMessage());
         }
 
-        // If accepting a proposal, mark job as in progress
+        // If accepting a proposal, mark project as in progress
         if (newStatus == Proposal.ProposalStatus.ACCEPTED) {
-            Job job = proposal.getJob();
-            job.setStatus(Job.JobStatus.IN_PROGRESS);
-            jobRepository.save(job);
-            log.info("Job {} marked as IN_PROGRESS", job.getId());
+            Project project = proposal.getProject();
+            project.setStatus(Project.ProjectStatus.IN_PROGRESS);
+            projectRepository.save(project);
+            log.info("Project {} marked as IN_PROGRESS", project.getId());
 
             // Notify freelancer
             notificationService.createNotification(
                     proposal.getFreelancer(),
                     Notification.NotificationType.PROPOSAL_ACCEPTED,
                     "Proposal Accepted!",
-                    String.format("Your proposal for '%s' has been accepted!", job.getTitle()),
+                    String.format("Your proposal for '%s' has been accepted!", project.getTitle()),
                     "PROPOSAL",
                     proposalId);
         } else if (newStatus == Proposal.ProposalStatus.REJECTED) {
@@ -162,7 +164,7 @@ public class ProposalService {
                     proposal.getFreelancer(),
                     Notification.NotificationType.PROPOSAL_REJECTED,
                     "Proposal Update",
-                    String.format("Your proposal for '%s' status has been updated", proposal.getJob().getTitle()),
+                    String.format("Your proposal for '%s' status has been updated", proposal.getProject().getTitle()),
                     "PROPOSAL",
                     proposalId);
         }
@@ -194,14 +196,14 @@ public class ProposalService {
     }
 
     /**
-     * Check if user is owner of the job associated with the proposal
+     * Check if user is owner of the project associated with the proposal
      */
     @Transactional(readOnly = true)
-    public boolean isJobOwnerForProposal(Long proposalId) {
+    public boolean isProjectOwnerForProposal(Long proposalId) {
         Proposal proposal = proposalRepository.findById(proposalId)
                 .orElseThrow(() -> new RuntimeException("Proposal not found with id: " + proposalId));
         User currentUser = userService.getCurrentUser();
-        return proposal.getJob().getClient().getId().equals(currentUser.getId());
+        return proposal.getProject().getClient().getId().equals(currentUser.getId());
     }
 
     /**

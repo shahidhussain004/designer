@@ -3,7 +3,7 @@
 import { PageLayout } from '@/components/ui';
 import logger from '@/lib/logger';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface ContractDetail {
   id: number;
@@ -27,12 +27,7 @@ export default function ContractDetailPage() {
   const [contract, setContract] = useState<ContractDetail | null>(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (!id) return
-    fetchContract()
-  }, [id])
-
-  const fetchContract = async () => {
+  const fetchContract = useCallback(async () => {
     try {
       const res = await fetch(`/api/contracts/${id}`)
       if (res.ok) {
@@ -48,7 +43,12 @@ export default function ContractDetailPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [id])
+
+  useEffect(() => {
+    if (!id) return
+    fetchContract()
+  }, [id, fetchContract])
 
   if (loading) {
     return (

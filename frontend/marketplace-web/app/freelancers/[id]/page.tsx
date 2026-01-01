@@ -2,6 +2,7 @@
 
 import { Badge, Button, Card, Divider, Flex, Grid, Spinner, Text } from '@/components/green'
 import { PageLayout } from '@/components/ui'
+import { apiClient } from '@/lib/api-client'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -41,24 +42,20 @@ export default function FreelancerProfilePage() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    loadProfile()
-  }, [freelancerId])
-
-  const loadProfile = async () => {
-    try {
-      setLoading(true)
-      const response = await fetch(`/api/users/${freelancerId}/profile`)
-      if (!response.ok) {
-        throw new Error('Failed to load profile')
+    const load = async () => {
+      try {
+        setLoading(true)
+        const { data } = await apiClient.get(`/users/${freelancerId}/profile`)
+        setProfile(data)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load profile')
+      } finally {
+        setLoading(false)
       }
-      const data = await response.json()
-      setProfile(data)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load profile')
-    } finally {
-      setLoading(false)
     }
-  }
+
+    if (freelancerId) load()
+  }, [freelancerId])
 
   if (loading) {
     return (

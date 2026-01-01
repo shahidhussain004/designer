@@ -1,30 +1,49 @@
 package com.designer.marketplace.service;
 
-import com.designer.marketplace.dto.MilestoneDTOs.*;
-import com.designer.marketplace.entity.*;
-import com.designer.marketplace.entity.Escrow.EscrowHoldStatus;
-import com.designer.marketplace.entity.Escrow.ReleaseCondition;
-import com.designer.marketplace.entity.Milestone.MilestoneStatus;
-import com.designer.marketplace.entity.Payment.EscrowStatus;
-import com.designer.marketplace.entity.Payment.PaymentStatus;
-import com.designer.marketplace.entity.TransactionLedger.TransactionType;
-import com.designer.marketplace.repository.*;
-import com.stripe.exception.StripeException;
-import com.stripe.model.PaymentIntent;
-import com.stripe.param.PaymentIntentCreateParams;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.designer.marketplace.dto.MilestoneDTOs.ApproveMilestoneRequest;
+import com.designer.marketplace.dto.MilestoneDTOs.CreateMilestoneRequest;
+import com.designer.marketplace.dto.MilestoneDTOs.MilestoneResponse;
+import com.designer.marketplace.dto.MilestoneDTOs.MilestoneSummary;
+import com.designer.marketplace.dto.MilestoneDTOs.RequestRevisionRequest;
+import com.designer.marketplace.dto.MilestoneDTOs.SubmitMilestoneRequest;
+import com.designer.marketplace.entity.Escrow;
+import com.designer.marketplace.entity.Escrow.EscrowHoldStatus;
+import com.designer.marketplace.entity.Escrow.ReleaseCondition;
+import com.designer.marketplace.entity.Milestone;
+import com.designer.marketplace.entity.Milestone.MilestoneStatus;
+import com.designer.marketplace.entity.Payment;
+import com.designer.marketplace.entity.Payment.EscrowStatus;
+import com.designer.marketplace.entity.Payment.PaymentStatus;
+import com.designer.marketplace.entity.Project;
+import com.designer.marketplace.entity.Proposal;
+import com.designer.marketplace.entity.TransactionLedger;
+import com.designer.marketplace.entity.TransactionLedger.TransactionType;
+import com.designer.marketplace.entity.User;
+import com.designer.marketplace.repository.EscrowRepository;
+import com.designer.marketplace.repository.MilestoneRepository;
+import com.designer.marketplace.repository.PaymentRepository;
+import com.designer.marketplace.repository.ProjectRepository;
+import com.designer.marketplace.repository.ProposalRepository;
+import com.designer.marketplace.repository.TransactionLedgerRepository;
+import com.designer.marketplace.repository.UserRepository;
+import com.stripe.exception.StripeException;
+import com.stripe.model.PaymentIntent;
+import com.stripe.param.PaymentIntentCreateParams;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Service for managing milestone-based payments.
@@ -35,7 +54,7 @@ import java.util.stream.Collectors;
 public class MilestoneService {
 
     private final MilestoneRepository milestoneRepository;
-    private final JobRepository jobRepository;
+    private final ProjectRepository projectRepository;
     private final ProposalRepository proposalRepository;
     private final PaymentRepository paymentRepository;
     private final EscrowRepository escrowRepository;
@@ -46,7 +65,7 @@ public class MilestoneService {
     private int platformFeePercent;
 
     /**
-     * Create milestones for a job.
+     * Create milestones for a project.
      */
     @Transactional
     public List<MilestoneResponse> createMilestones(Long userId, List<CreateMilestoneRequest> requests) {
@@ -54,18 +73,18 @@ public class MilestoneService {
             throw new IllegalArgumentException("At least one milestone is required");
         }
 
-        Long jobId = requests.get(0).getJobId();
-        Job job = jobRepository.findById(jobId)
-                .orElseThrow(() -> new IllegalArgumentException("Job not found"));
+        Long projectId = requests.get(0).getProjectId();
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
 
         // Verify user is the client
-        if (!job.getClient().getId().equals(userId)) {
-            throw new IllegalArgumentException("Only the job client can create milestones");
+        if (!project.getClient().getId().equals(userId)) {
+            throw new IllegalArgumentException("Only the project client can create milestones");
         }
 
         // Check if milestones already exist
-        if (milestoneRepository.countByJobId(jobId) > 0) {
-            throw new IllegalStateException("Milestones already exist for this job");
+        if (milestoneRepository.countByProjectId(projectId) > 0) {
+            throw new IllegalStateException("Milestones already exist for this project");
         }
 
         List<Milestone> milestones = requests.stream().map(request -> {
@@ -74,7 +93,7 @@ public class MilestoneService {
                     : null;
 
             return Milestone.builder()
-                    .job(job)
+                    .project(project)
                     .proposal(proposal)
                     .title(request.getTitle())
                     .description(request.getDescription())
@@ -88,7 +107,7 @@ public class MilestoneService {
         }).collect(Collectors.toList());
 
         List<Milestone> saved = milestoneRepository.saveAll(milestones);
-        log.info("Created {} milestones for job {}", saved.size(), jobId);
+        log.info("Created {} milestones for project {}", saved.size(), projectId);
 
         return saved.stream()
                 .map(MilestoneResponse::fromEntity)
@@ -105,9 +124,9 @@ public class MilestoneService {
         Milestone milestone = milestoneRepository.findById(milestoneId)
                 .orElseThrow(() -> new IllegalArgumentException("Milestone not found"));
 
-        // Verify client owns the job
-        if (!milestone.getJob().getClient().getId().equals(clientId)) {
-            throw new IllegalArgumentException("Only the job client can fund milestones");
+        // Verify client owns the project
+        if (!milestone.getProject().getClient().getId().equals(clientId)) {
+            throw new IllegalArgumentException("Only the project client can fund milestones");
         }
 
         if (milestone.getStatus() != MilestoneStatus.PENDING) {
@@ -134,7 +153,7 @@ public class MilestoneService {
             // Create Stripe PaymentIntent
             Map<String, String> metadata = new HashMap<>();
             metadata.put("milestone_id", milestone.getId().toString());
-            metadata.put("job_id", milestone.getJob().getId().toString());
+            metadata.put("project_id", milestone.getProject().getId().toString());
             metadata.put("client_id", client.getId().toString());
             metadata.put("freelancer_id", freelancer.getId().toString());
 
@@ -156,7 +175,7 @@ public class MilestoneService {
                     .paymentIntentId(paymentIntent.getId())
                     .client(client)
                     .freelancer(freelancer)
-                    .job(milestone.getJob())
+                    .project(milestone.getProject())
                     .proposal(milestone.getProposal())
                     .amount(amount)
                     .platformFee(platformFee)
@@ -172,7 +191,7 @@ public class MilestoneService {
             // Create escrow record
             Escrow escrow = Escrow.builder()
                     .payment(payment)
-                    .job(milestone.getJob())
+                    .project(milestone.getProject())
                     .amount(freelancerAmount)
                     .currency(milestone.getCurrency())
                     .status(EscrowHoldStatus.HELD)
@@ -266,8 +285,8 @@ public class MilestoneService {
         Milestone milestone = milestoneRepository.findById(milestoneId)
                 .orElseThrow(() -> new IllegalArgumentException("Milestone not found"));
 
-        if (!milestone.getJob().getClient().getId().equals(clientId)) {
-            throw new IllegalArgumentException("Only the job client can approve milestones");
+        if (!milestone.getProject().getClient().getId().equals(clientId)) {
+            throw new IllegalArgumentException("Only the project client can approve milestones");
         }
 
         if (milestone.getStatus() != MilestoneStatus.SUBMITTED) {
@@ -311,8 +330,8 @@ public class MilestoneService {
         Milestone milestone = milestoneRepository.findById(milestoneId)
                 .orElseThrow(() -> new IllegalArgumentException("Milestone not found"));
 
-        if (!milestone.getJob().getClient().getId().equals(clientId)) {
-            throw new IllegalArgumentException("Only the job client can request revisions");
+        if (!milestone.getProject().getClient().getId().equals(clientId)) {
+            throw new IllegalArgumentException("Only the project client can request revisions");
         }
 
         if (milestone.getStatus() != MilestoneStatus.SUBMITTED) {
@@ -328,22 +347,22 @@ public class MilestoneService {
     }
 
     /**
-     * Get milestones for a job.
+     * Get milestones for a project.
      */
     @Transactional(readOnly = true)
-    public List<MilestoneResponse> getMilestonesByJobId(Long jobId) {
-        return milestoneRepository.findByJobIdOrderBySequenceOrderAsc(jobId)
+    public List<MilestoneResponse> getMilestonesByJobId(Long projectId) {
+        return milestoneRepository.findByProjectIdOrderBySequenceOrderAsc(projectId)
                 .stream()
                 .map(MilestoneResponse::fromEntity)
                 .collect(Collectors.toList());
     }
 
     /**
-     * Get milestone summary for a job.
+     * Get milestone summary for a project.
      */
     @Transactional(readOnly = true)
-    public MilestoneSummary getMilestoneSummary(Long jobId) {
-        List<Milestone> milestones = milestoneRepository.findByJobIdOrderBySequenceOrderAsc(jobId);
+    public MilestoneSummary getMilestoneSummary(Long projectId) {
+        List<Milestone> milestones = milestoneRepository.findByProjectIdOrderBySequenceOrderAsc(projectId);
 
         int total = milestones.size();
         int completed = (int) milestones.stream()
@@ -376,7 +395,7 @@ public class MilestoneService {
         double progressPercentage = total > 0 ? (completed * 100.0) / total : 0;
 
         return MilestoneSummary.builder()
-                .jobId(jobId)
+                .projectId(projectId)
                 .totalMilestones(total)
                 .completedMilestones(completed)
                 .pendingMilestones(pending)

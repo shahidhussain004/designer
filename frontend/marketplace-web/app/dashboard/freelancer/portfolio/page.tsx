@@ -5,7 +5,7 @@ import { apiClient } from '@/lib/api-client';
 import { useAuth } from '@/lib/context/AuthContext';
 import { Edit, Eye, EyeOff, Plus, Trash2 } from 'lucide-react';
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface PortfolioItem {
   id: number;
@@ -40,13 +40,7 @@ export default function PortfolioPage() {
   // timer id for clearing undo state
   const undoTimerRef = useRef<number | null>(null)
 
-  useEffect(() => {
-    if (user) {
-      fetchPortfolio();
-    }
-  }, [user]);
-
-  const fetchPortfolio = async () => {
+  const fetchPortfolio = useCallback(async () => {
     try {
       const { data } = await apiClient.get(`/users/${user?.id}/portfolio`);
       setPortfolio(data || []);
@@ -55,7 +49,13 @@ export default function PortfolioPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (user) {
+      fetchPortfolio();
+    }
+  }, [user, fetchPortfolio]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,12 +67,8 @@ export default function PortfolioPage() {
     };
 
     try {
-      const url = editingItem 
-        ? `/api/portfolio/${editingItem.id}?userId=${user?.id}`
-        : `/api/portfolio?userId=${user?.id}`;
-      
       const method = editingItem ? 'PUT' : 'POST';
-      
+
       if (method === 'PUT') {
         await apiClient.put(`/portfolio/${editingItem?.id}?userId=${user?.id}`, payload);
       } else {

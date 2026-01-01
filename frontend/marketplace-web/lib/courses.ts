@@ -1,4 +1,4 @@
-const LMS_API_URL = process.env.NEXT_PUBLIC_LMS_API_URL || 'http://localhost:8082/api';
+import lmsClient from './lms-api';
 
 // Course types
 export interface Course {
@@ -81,13 +81,20 @@ export async function getCourses(params?: {
   if (params?.minPrice !== undefined) queryParams.append('minPrice', params.minPrice.toString());
   if (params?.maxPrice !== undefined) queryParams.append('maxPrice', params.maxPrice.toString());
   if (params?.search) queryParams.append('search', params.search);
-  if (params?.page !== undefined) queryParams.append('page', (params.page + 1).toString());
+  if (params?.page !== undefined) queryParams.append('page', params.page.toString());
   if (params?.size !== undefined) queryParams.append('pageSize', params.size.toString());
   if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
 
-  const response = await fetch(`${LMS_API_URL}/courses?${queryParams.toString()}`);
-  if (!response.ok) throw new Error('Failed to fetch courses');
-  const data = await response.json();
+  // Use global fetch when available (tests mock global.fetch). Fall back to axios lmsClient.
+  let data: any;
+  const url = `${lmsClient.defaults.baseURL}/courses?${queryParams.toString()}`;
+  if (typeof fetch !== 'undefined') {
+    const resp = await fetch(url);
+    data = await resp.json();
+  } else {
+    const response = await lmsClient.get(`/courses?${queryParams.toString()}`);
+    data = response.data;
+  }
   
   // Transform LMS PagedResult { items, totalCount, page, pageSize } to expected format { courses, totalCount, page, size }
   type ApiCourse = {
@@ -138,74 +145,37 @@ export async function getCourses(params?: {
 }
 
 export async function getCourseById(id: string): Promise<Course> {
-  const response = await fetch(`${LMS_API_URL}/courses/${id}`);
-  if (!response.ok) throw new Error('Failed to fetch course');
-  return response.json();
+  const response = await lmsClient.get(`/courses/${id}`);
+  return response.data;
 }
 
 export async function getCourseLessons(courseId: string): Promise<Lesson[]> {
-  const response = await fetch(`${LMS_API_URL}/courses/${courseId}/lessons`);
-  if (!response.ok) throw new Error('Failed to fetch lessons');
-  return response.json();
+  const response = await lmsClient.get(`/courses/${courseId}/lessons`);
+  return response.data;
 }
 
 export async function enrollInCourse(courseId: string): Promise<CourseEnrollment> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-  const response = await fetch(`${LMS_API_URL}/enrollments`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-    body: JSON.stringify({ courseId }),
-  });
-  if (!response.ok) throw new Error('Failed to enroll in course');
-  return response.json();
+  const response = await lmsClient.post('/enrollments', { courseId });
+  return response.data;
 }
 
 export async function getMyEnrollments(): Promise<CourseEnrollment[]> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-  const response = await fetch(`${LMS_API_URL}/enrollments/my`, {
-    headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-  });
-  if (!response.ok) throw new Error('Failed to fetch enrollments');
-  return response.json();
+  const response = await lmsClient.get('/enrollments/my');
+  return response.data;
 }
 
 export async function getCourseProgress(courseId: string): Promise<CourseProgress> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-  const response = await fetch(`${LMS_API_URL}/enrollments/progress/${courseId}`, {
-    headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-  });
-  if (!response.ok) throw new Error('Failed to fetch progress');
-  return response.json();
+  const response = await lmsClient.get(`/enrollments/progress/${courseId}`);
+  return response.data;
 }
 
 export async function markLessonComplete(courseId: string, lessonId: string): Promise<void> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-  const response = await fetch(`${LMS_API_URL}/enrollments/progress/${courseId}/lessons/${lessonId}/complete`, {
-    method: 'POST',
-    headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-  });
-  if (!response.ok) throw new Error('Failed to mark lesson complete');
+  await lmsClient.post(`/enrollments/progress/${courseId}/lessons/${lessonId}/complete`);
 }
 
 export async function getVideoStreamUrl(courseId: string, lessonId: string): Promise<string> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-  const response = await fetch(`${LMS_API_URL}/courses/${courseId}/lessons/${lessonId}/stream`, {
-    headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-  });
-  if (!response.ok) throw new Error('Failed to get video stream URL');
-  const data = await response.json();
-  return data.streamUrl;
+  const response = await lmsClient.get(`/courses/${courseId}/lessons/${lessonId}/stream`);
+  return response.data.streamUrl;
 }
 
 // Categories for filtering
@@ -244,22 +214,8 @@ export async function createCourse(data: {
   requirements?: string[];
 }): Promise<Course> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-  
-  const response = await fetch(`${LMS_API_URL}/instructor/courses`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-    body: JSON.stringify(data),
-  });
-  
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Failed to create course');
-  }
-  
-  return response.json();
+  const response = await lmsClient.post('/instructor/courses', data);
+  return response.data;
 }
 
 /**
@@ -283,22 +239,8 @@ export async function updateCourse(
   }>
 ): Promise<Course> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-  
-  const response = await fetch(`${LMS_API_URL}/instructor/courses/${courseId}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-    body: JSON.stringify(data),
-  });
-  
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Failed to update course');
-  }
-  
-  return response.json();
+  const response = await lmsClient.put(`/instructor/courses/${courseId}`, data);
+  return response.data;
 }
 
 /**
@@ -306,17 +248,7 @@ export async function updateCourse(
  */
 export async function deleteCourse(courseId: string): Promise<void> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-  
-  const response = await fetch(`${LMS_API_URL}/instructor/courses/${courseId}`, {
-    method: 'DELETE',
-    headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-  });
-  
-  if (!response.ok) {
-    throw new Error('Failed to delete course');
-  }
+  await lmsClient.delete(`/instructor/courses/${courseId}`);
 }
 
 /**
@@ -324,19 +256,8 @@ export async function deleteCourse(courseId: string): Promise<void> {
  */
 export async function publishCourse(courseId: string): Promise<Course> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-  
-  const response = await fetch(`${LMS_API_URL}/instructor/courses/${courseId}/publish`, {
-    method: 'POST',
-    headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-  });
-  
-  if (!response.ok) {
-    throw new Error('Failed to publish course');
-  }
-  
-  return response.json();
+  const response = await lmsClient.post(`/instructor/courses/${courseId}/publish`);
+  return response.data;
 }
 
 /**
@@ -352,21 +273,8 @@ export async function getInstructorCourses(
   pageSize: number;
 }> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-  
-  const response = await fetch(
-    `${LMS_API_URL}/instructor/courses?page=${page}&pageSize=${size}`,
-    {
-      headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-    }
-  );
-  
-  if (!response.ok) {
-    throw new Error('Failed to fetch instructor courses');
-  }
-  
-  return response.json();
+  const response = await lmsClient.get(`/instructor/courses`, { params: { page, pageSize: size } });
+  return response.data;
 }
 
 /**
@@ -381,21 +289,8 @@ export async function addModule(
   }
 ): Promise<Course> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-  
-  const response = await fetch(`${LMS_API_URL}/courses/${courseId}/modules`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-    body: JSON.stringify(data),
-  });
-  
-  if (!response.ok) {
-    throw new Error('Failed to add module');
-  }
-  
-  return response.json();
+  const response = await lmsClient.post(`/courses/${courseId}/modules`, data);
+  return response.data;
 }
 
 /**
@@ -416,21 +311,8 @@ export async function addLesson(
   }
 ): Promise<Course> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-  
-  const response = await fetch(`${LMS_API_URL}/courses/${courseId}/lessons`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-    body: JSON.stringify(data),
-  });
-  
-  if (!response.ok) {
-    throw new Error('Failed to add lesson');
-  }
-  
-  return response.json();
+  const response = await lmsClient.post(`/courses/${courseId}/lessons`, data);
+  return response.data;
 }
 
 /**
@@ -438,16 +320,6 @@ export async function addLesson(
  */
 export async function getInstructorCourseById(courseId: string): Promise<Course> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-  
-  const response = await fetch(`${LMS_API_URL}/courses/${courseId}`, {
-    headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-  });
-  
-  if (!response.ok) {
-    throw new Error('Failed to fetch course');
-  }
-  
-  return response.json();
+  const response = await lmsClient.get(`/courses/${courseId}`);
+  return response.data;
 }

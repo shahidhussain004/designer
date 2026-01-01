@@ -1,15 +1,16 @@
 package com.designer.marketplace.dto;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import com.designer.marketplace.entity.Invoice;
 import com.designer.marketplace.entity.Invoice.InvoiceStatus;
 import com.designer.marketplace.entity.Invoice.InvoiceType;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 public class InvoiceDTOs {
 
@@ -81,8 +82,8 @@ public class InvoiceDTOs {
         private Long freelancerId;
         private String freelancerName;
         private String freelancerEmail;
-        private Long jobId;
-        private String jobTitle;
+        private Long projectId;
+        private String projectTitle;
         private InvoiceType invoiceType;
         private Long subtotal;
         private Long platformFee;
@@ -112,8 +113,8 @@ public class InvoiceDTOs {
                     .freelancerId(invoice.getFreelancer().getId())
                     .freelancerName(invoice.getFreelancer().getFullName())
                     .freelancerEmail(invoice.getFreelancer().getEmail())
-                    .jobId(invoice.getJob().getId())
-                    .jobTitle(invoice.getJob().getTitle())
+                    .projectId(invoice.getProject().getId())
+                    .projectTitle(invoice.getProject().getTitle())
                     .invoiceType(invoice.getInvoiceType())
                     .subtotal(invoice.getSubtotal())
                     .platformFee(invoice.getPlatformFee())

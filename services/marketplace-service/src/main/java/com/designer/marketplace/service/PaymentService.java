@@ -1,30 +1,42 @@
 package com.designer.marketplace.service;
 
-import com.designer.marketplace.dto.CreatePaymentRequest;
-import com.designer.marketplace.dto.PaymentResponse;
-import com.designer.marketplace.entity.*;
-import com.designer.marketplace.entity.Payment.EscrowStatus;
-import com.designer.marketplace.entity.Payment.PaymentStatus;
-import com.designer.marketplace.entity.TransactionLedger.TransactionType;
-import com.designer.marketplace.repository.*;
-import com.stripe.Stripe;
-import com.stripe.exception.StripeException;
-import com.stripe.model.PaymentIntent;
-import com.stripe.model.Refund;
-import com.stripe.param.PaymentIntentCreateParams;
-import com.stripe.param.RefundCreateParams;
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import com.designer.marketplace.dto.CreatePaymentRequest;
+import com.designer.marketplace.dto.PaymentResponse;
+import com.designer.marketplace.entity.Escrow;
+import com.designer.marketplace.entity.Payment;
+import com.designer.marketplace.entity.Payment.EscrowStatus;
+import com.designer.marketplace.entity.Payment.PaymentStatus;
+import com.designer.marketplace.entity.Project;
+import com.designer.marketplace.entity.Proposal;
+import com.designer.marketplace.entity.TransactionLedger;
+import com.designer.marketplace.entity.TransactionLedger.TransactionType;
+import com.designer.marketplace.entity.User;
+import com.designer.marketplace.repository.EscrowRepository;
+import com.designer.marketplace.repository.PaymentRepository;
+import com.designer.marketplace.repository.ProjectRepository;
+import com.designer.marketplace.repository.ProposalRepository;
+import com.designer.marketplace.repository.TransactionLedgerRepository;
+import com.designer.marketplace.repository.UserRepository;
+import com.stripe.Stripe;
+import com.stripe.exception.StripeException;
+import com.stripe.model.PaymentIntent;
+import com.stripe.model.Refund;
+import com.stripe.param.PaymentIntentCreateParams;
+import com.stripe.param.RefundCreateParams;
+
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Service for handling payment operations with Stripe integration.
@@ -38,7 +50,7 @@ public class PaymentService {
     private final EscrowRepository escrowRepository;
     private final TransactionLedgerRepository transactionLedgerRepository;
     private final UserRepository userRepository;
-    private final JobRepository jobRepository;
+    private final ProjectRepository projectRepository;
     private final ProposalRepository proposalRepository;
 
     @Value("${stripe.api.key:sk_test_placeholder}")
@@ -58,15 +70,15 @@ public class PaymentService {
      */
     @Transactional
     public PaymentResponse createPaymentIntent(Long clientId, CreatePaymentRequest request) {
-        log.info("Creating payment intent for client {} on job {}", clientId, request.getJobId());
+        log.info("Creating payment intent for client {} on project {}", clientId, request.getProjectId());
 
         // Validate client
         User client = userRepository.findById(clientId)
                 .orElseThrow(() -> new IllegalArgumentException("Client not found"));
 
-        // Validate job
-        Job job = jobRepository.findById(request.getJobId())
-                .orElseThrow(() -> new IllegalArgumentException("Job not found"));
+        // Validate project
+        Project project = projectRepository.findById(request.getProjectId())
+                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
 
         // Validate proposal
         Proposal proposal = proposalRepository.findById(request.getProposalId())
@@ -82,7 +94,7 @@ public class PaymentService {
         try {
             // Create Stripe PaymentIntent
             Map<String, String> metadata = new HashMap<>();
-            metadata.put("job_id", job.getId().toString());
+            metadata.put("project_id", project.getId().toString());
             metadata.put("proposal_id", proposal.getId().toString());
             metadata.put("client_id", client.getId().toString());
             metadata.put("freelancer_id", freelancer.getId().toString());
@@ -90,7 +102,7 @@ public class PaymentService {
             PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
                     .setAmount(amount)
                     .setCurrency(request.getCurrency().toLowerCase())
-                    .setDescription("Payment for job: " + job.getTitle())
+                    .setDescription("Payment for project: " + project.getTitle())
                     .putAllMetadata(metadata)
                     .setAutomaticPaymentMethods(
                             PaymentIntentCreateParams.AutomaticPaymentMethods.builder()
@@ -106,7 +118,7 @@ public class PaymentService {
                     .paymentIntentId(paymentIntent.getId())
                     .client(client)
                     .freelancer(freelancer)
-                    .job(job)
+                    .project(project)
                     .proposal(proposal)
                     .amount(amount)
                     .platformFee(platformFee)
@@ -120,7 +132,7 @@ public class PaymentService {
 
             // Create ledger entry
             createLedgerEntry(payment, null, client, TransactionType.PAYMENT_RECEIVED, amount,
-                    "Payment initiated for job: " + job.getTitle());
+                    "Payment initiated for project: " + project.getTitle());
 
             PaymentResponse response = PaymentResponse.fromEntity(payment);
             response.setClientSecret(paymentIntent.getClientSecret());
@@ -153,11 +165,11 @@ public class PaymentService {
         // Create escrow record
         Escrow escrow = Escrow.builder()
                 .payment(payment)
-                .job(payment.getJob())
+                .project(payment.getProject())
                 .amount(payment.getFreelancerAmount())
                 .currency(payment.getCurrency())
                 .status(Escrow.EscrowHoldStatus.HELD)
-                .releaseCondition(Escrow.ReleaseCondition.JOB_COMPLETED)
+                .releaseCondition(Escrow.ReleaseCondition.PROJECT_COMPLETED)
                 .autoReleaseDate(LocalDateTime.now().plusDays(14)) // Auto-release after 14 days
                 .build();
 

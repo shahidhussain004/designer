@@ -16,8 +16,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CreateProposalRequest {
 
-    @NotNull(message = "Job ID is required")
-    private Long jobId;
+    @NotNull(message = "Project ID is required")
+    private Long projectId;
 
     @NotBlank(message = "Cover letter is required")
     @Size(max = 5000, message = "Cover letter must not exceed 5000 characters")

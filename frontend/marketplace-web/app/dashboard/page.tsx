@@ -3,7 +3,7 @@
 import { PageLayout } from '@/components/ui'
 import Link from 'next/link'
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
   // Render a simple server-side landing with links to role-specific dashboards.
   // The client-side auth flow will redirect users after mount; this ensures
   // the page exists during build-time page data collection.

@@ -77,12 +77,10 @@ export async function buildApp(): Promise<FastifyInstance> {
       await api.register(mediaRoutes, { prefix: '/media' });
       await api.register(searchRoutes, { prefix: '/search' });
       await api.register(analyticsRoutes, { prefix: '/analytics' });
+      await api.register(tutorialsRoutes, { prefix: '/tutorials' });
     },
     { prefix: '/api/v1' }
   );
-
-  // Register tutorials routes (no prefix for clean URLs)
-  await app.register(tutorialsRoutes);
 
   return app;
 }

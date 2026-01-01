@@ -1,10 +1,10 @@
-import { ExperienceLevel, JobCategory } from './apiTypes'
+import { ExperienceLevel, PostCategory } from './apiTypes'
 
 /**
  * Safely parse an unknown value into a JobCategory
  * Returns null if parsing fails
  */
-export function parseCategory(value: unknown): JobCategory | null {
+export function parsePostCategory(value: unknown): PostCategory | null {
   if (typeof value !== 'object' || value === null) return null
   const obj = value as Record<string, unknown>
   const id = obj['id']
@@ -50,12 +50,16 @@ export function parseExperienceLevel(value: unknown): ExperienceLevel | null {
  * Safely parse an array of unknown values into JobCategories
  * Filters out invalid entries
  */
-export function parseCategories(data: unknown): JobCategory[] {
+export function parsePostCategories(data: unknown): PostCategory[] {
   if (!Array.isArray(data)) return []
   return data
-    .map(parseCategory)
-    .filter((cat): cat is JobCategory => cat !== null)
+    .map(parsePostCategory)
+    .filter((cat): cat is PostCategory => cat !== null)
 }
+
+// Backwards compatible aliases
+export { parsePostCategories as parseCategories, parsePostCategory as parseCategory }
+export type JobCategory = PostCategory
 
 /**
  * Safely parse an array of unknown values into ExperienceLevels

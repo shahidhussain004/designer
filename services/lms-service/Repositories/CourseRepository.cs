@@ -77,7 +77,28 @@ public class CourseRepository : ICourseRepository
     {
         // Build filters manually using BsonDocument for more control
         var statusToFilter = status.HasValue ? status.Value : CourseStatus.Published;
-        var filter = new BsonDocument("status", (int)statusToFilter);
+
+        // Build a filter that supports both the newer 'status' enum (stored as int)
+        // and legacy documents that used a boolean 'isPublished' field. We search
+        // for documents that either have the matching status integer OR have
+        // isPublished == true when looking for published content.
+        BsonDocument filter;
+        if (statusToFilter == CourseStatus.Published)
+        {
+            filter = new BsonDocument
+            {
+                { "$or", new BsonArray
+                    {
+                        new BsonDocument("status", (int)CourseStatus.Published),
+                        new BsonDocument("isPublished", true)
+                    }
+                }
+            };
+        }
+        else
+        {
+            filter = new BsonDocument("status", (int)statusToFilter);
+        }
         
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
@@ -106,7 +127,24 @@ public class CourseRepository : ICourseRepository
     {
         // Build filters manually using BsonDocument for more control
         var statusToFilter = status.HasValue ? status.Value : CourseStatus.Published;
-        var filter = new BsonDocument("status", (int)statusToFilter);
+
+        BsonDocument filter;
+        if (statusToFilter == CourseStatus.Published)
+        {
+            filter = new BsonDocument
+            {
+                { "$or", new BsonArray
+                    {
+                        new BsonDocument("status", (int)CourseStatus.Published),
+                        new BsonDocument("isPublished", true)
+                    }
+                }
+            };
+        }
+        else
+        {
+            filter = new BsonDocument("status", (int)statusToFilter);
+        }
         
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {

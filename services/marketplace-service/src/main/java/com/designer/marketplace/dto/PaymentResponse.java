@@ -1,12 +1,13 @@
 package com.designer.marketplace.dto;
 
+import java.time.LocalDateTime;
+
 import com.designer.marketplace.entity.Payment;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 /**
  * Response DTO for payment information.
@@ -28,8 +29,8 @@ public class PaymentResponse {
     private String freelancerName;
     
     // Job info
-    private Long jobId;
-    private String jobTitle;
+    private Long projectId;
+    private String projectTitle;
     private Long proposalId;
     
     // Amount details (in cents)
@@ -65,8 +66,8 @@ public class PaymentResponse {
                 .clientName(payment.getClient().getFullName())
                 .freelancerId(payment.getFreelancer().getId())
                 .freelancerName(payment.getFreelancer().getFullName())
-                .jobId(payment.getJob().getId())
-                .jobTitle(payment.getJob().getTitle())
+                .projectId(payment.getProject().getId())
+                .projectTitle(payment.getProject().getTitle())
                 .proposalId(payment.getProposal() != null ? payment.getProposal().getId() : null)
                 .amount(payment.getAmount())
                 .platformFee(payment.getPlatformFee())

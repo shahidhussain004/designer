@@ -1,6 +1,7 @@
 'use client';
 
 import { Breadcrumb, PageLayout } from '@/components/ui';
+import { tutorialsApi } from '@/lib/content-api';
 import {
   BookOpen,
   ChevronLeft,
@@ -53,63 +54,56 @@ const TopicReadingPage = () => {
 
   useEffect(() => {
     if (!tutorialSlug || !sectionSlug || !topicSlug) return;
-
-    fetch(`http://localhost:8083/api/tutorials/${tutorialSlug}/${sectionSlug}/${topicSlug}`)
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch topic');
-        return res.json();
-      })
-      .then((data) => {
-        // Dev-only raw response log
-        if (process.env.NODE_ENV !== 'production') {
-          // eslint-disable-next-line no-console
-          console.debug('raw topic response:', data);
-        }
-
-        const payload = data?.data ?? data;
+    (async () => {
+      try {
+        // Some content services expose topics as nested slugs; attempt to fetch by composed slug
+        const composedSlug = `${tutorialSlug}/${sectionSlug}/${topicSlug}`;
+        const resp = await tutorialsApi.getBySlug(composedSlug);
+        const payload = resp ?? null;
         if (!payload) {
           setError('Invalid topic response from server');
           setLoading(false);
           return;
         }
 
+        const p: any = payload;
+
         const adapted: TopicContent = {
-          id: payload.id,
-          slug: payload.slug,
-          title: payload.title,
-          content: payload.content ?? '',
-          code_examples: payload.code_examples ?? null,
-          estimated_read_time: payload.estimated_read_time ?? payload.estimatedReadTime ?? 0,
-          views_count: payload.views_count ?? payload.viewsCount ?? 0,
+          id: p.id,
+          slug: p.slug,
+          title: p.title,
+          content: p.content ?? p.body ?? p.html ?? '',
+          code_examples: p.code_examples ?? p.codeExamples ?? null,
+          estimated_read_time: p.estimated_read_time ?? p.estimatedReadTime ?? 0,
+          views_count: p.views_count ?? p.viewsCount ?? 0,
           section: {
-            slug: payload.section_slug ?? payload.section?.slug ?? sectionSlug,
-            title: payload.section_title ?? payload.section?.title ?? '',
+            slug: p.section_slug ?? p.section?.slug ?? sectionSlug,
+            title: p.section_title ?? p.section?.title ?? '',
           },
           tutorial: {
-            slug: payload.tutorial_slug ?? payload.tutorial?.slug ?? tutorialSlug,
-            title: payload.tutorial_title ?? payload.tutorial?.title ?? '',
-            icon: payload.tutorial_icon ?? payload.tutorial?.icon ?? payload.icon ?? '',
-            color_theme: payload.color_theme ?? payload.tutorial?.color_theme ?? payload.tutorial?.colorTheme ?? '#000000',
+            slug: p.tutorial_slug ?? p.tutorial?.slug ?? tutorialSlug,
+            title: p.tutorial_title ?? p.tutorial?.title ?? '',
+            icon: p.tutorial_icon ?? p.tutorial?.icon ?? p.icon ?? '',
+            color_theme: p.color_theme ?? p.tutorial?.color_theme ?? p.tutorial?.colorTheme ?? '#000000',
           },
           navigation: {
-            prev: payload.navigation?.prev ?? null,
-            next: payload.navigation?.next ?? null,
+            prev: p.navigation?.prev ?? null,
+            next: p.navigation?.next ?? null,
           },
         };
 
-        // Dev-only adapted payload log
         if (process.env.NODE_ENV !== 'production') {
           // eslint-disable-next-line no-console
           console.debug('adapted topic payload:', adapted);
         }
 
         setTopic(adapted);
+      } catch (err: any) {
+        setError(err?.message || 'Failed to load topic');
+      } finally {
         setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
+      }
+    })();
   }, [tutorialSlug, sectionSlug, topicSlug]);
 
   if (loading) {
