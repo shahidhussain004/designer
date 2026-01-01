@@ -23,6 +23,6 @@
       "@infrastructure/*": ["src/infrastructure/*"]
     }
   },
-  "include": ["src/**/*", "prisma/seed.ts"],
-  "exclude": ["node_modules", "dist", "tests"]
+  "include": ["src/**/*"],
+  "exclude": ["prisma/seed.ts", "node_modules", "dist", "tests"]
 }
