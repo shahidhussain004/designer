@@ -58,21 +58,23 @@ const TutorialDetailPage = () => {
           return;
         }
 
+        const p: any = payload;
+
         const adapted: Tutorial = {
-          id: payload.id,
-          slug: payload.slug,
-          title: payload.title,
-          description: payload.description,
-          icon: payload.icon,
-          difficultyLevel: (payload.difficulty_level as string) || (payload.difficultyLevel as string) || 'beginner',
-          colorTheme: payload.color_theme || payload.colorTheme,
-          estimatedHours: payload.estimated_hours ?? payload.estimatedHours ?? 0,
-          sections: Array.isArray(payload.sections)
-            ? payload.sections.map((s: any) => ({
+          id: p.id,
+          slug: p.slug,
+          title: p.title,
+          description: p.description ?? p.summary ?? p.excerpt ?? '',
+          icon: p.icon,
+          difficultyLevel: (p.difficulty_level as string) || (p.difficultyLevel as string) || 'beginner',
+          colorTheme: p.color_theme || p.colorTheme,
+          estimatedHours: p.estimated_hours ?? p.estimatedHours ?? 0,
+          sections: Array.isArray(p.sections)
+            ? p.sections.map((s: any) => ({
                 id: s.id,
                 slug: s.slug,
                 title: s.title,
-                description: s.description,
+                description: s.description ?? s.summary ?? '',
                 icon: s.icon,
                 display_order: s.display_order ?? s.displayOrder ?? 0,
                 topics: Array.isArray(s.topics)

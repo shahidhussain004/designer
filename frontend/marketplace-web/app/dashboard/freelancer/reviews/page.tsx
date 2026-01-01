@@ -1,6 +1,7 @@
 "use client";
 
 import { PageLayout } from '@/components/ui';
+import apiClient from '@/lib/api-client';
 import { useAuth } from '@/lib/context/AuthContext';
 import { Flag, MessageSquare, Star, User } from 'lucide-react';
 import { useEffect, useState } from 'react';

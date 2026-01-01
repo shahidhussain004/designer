@@ -14,7 +14,10 @@ export const lmsClient = axios.create({
 lmsClient.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
     const token = localStorage.getItem('access_token');
-    if (token) config.headers = { ...(config.headers || {}), Authorization: `Bearer ${token}` };
+    config.headers = config.headers || {};
+    if (token) {
+      (config.headers as any).Authorization = `Bearer ${token}`;
+    }
   }
   logger.debug(`LMS API: ${config.method?.toUpperCase()} ${config.url}`);
   return config;
