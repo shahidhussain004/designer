@@ -10,11 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.designer.marketplace.dto.CreateJobApplicationRequest;
 import com.designer.marketplace.dto.JobApplicationResponse;
 import com.designer.marketplace.dto.UpdateJobApplicationStatusRequest;
-import com.designer.marketplace.entity.EmploymentJob;
+import com.designer.marketplace.entity.Job;
 import com.designer.marketplace.entity.JobApplication;
 import com.designer.marketplace.entity.Notification;
 import com.designer.marketplace.entity.User;
-import com.designer.marketplace.repository.EmploymentJobRepository;
+import com.designer.marketplace.repository.JobRepository;
 import com.designer.marketplace.repository.JobApplicationRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 public class JobApplicationService {
 
     private final JobApplicationRepository applicationRepository;
-    private final EmploymentJobRepository jobRepository;
+    private final JobRepository jobRepository;
     private final UserService userService;
     private final NotificationService notificationService;
 
@@ -40,7 +40,7 @@ public class JobApplicationService {
     public Page<JobApplicationResponse> getJobApplications(Long jobId, String status, Pageable pageable) {
         log.info("Getting applications for job: {}, status: {}", jobId, status);
 
-        EmploymentJob job = jobRepository.findById(jobId)
+        Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new RuntimeException("Job not found with id: " + jobId));
 
         // Check if current user is the job employer
@@ -81,11 +81,11 @@ public class JobApplicationService {
         log.info("Creating job application for job: {} by user: {}", request.getJobId(), currentUser.getUsername());
 
         // Check if job exists
-        EmploymentJob job = jobRepository.findById(request.getJobId())
+        Job job = jobRepository.findById(request.getJobId())
                 .orElseThrow(() -> new RuntimeException("Job not found with id: " + request.getJobId()));
 
         // Validate job is active
-        if (job.getStatus() != EmploymentJob.JobStatus.ACTIVE) {
+        if (job.getStatus() != Job.JobStatus.ACTIVE) {
             throw new RuntimeException("Cannot apply to an inactive job");
         }
 
@@ -237,7 +237,7 @@ public class JobApplicationService {
         log.info("Withdrawing application: {}", id);
 
         // Update job application count
-        EmploymentJob job = application.getJob();
+        Job job = application.getJob();
         if (job.getApplicationsCount() > 0) {
             job.setApplicationsCount(job.getApplicationsCount() - 1);
             jobRepository.save(job);
@@ -280,3 +280,4 @@ public class JobApplicationService {
         return application.getJob().getEmployer().getId().equals(currentUser.getId());
     }
 }
+

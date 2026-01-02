@@ -69,7 +69,7 @@ public class PortfolioItem {
     @Column(name = "technologies", columnDefinition = "TEXT[]")
     private String[] technologies;
 
-    @Column(name = "completion_date")
+    @Column(name = "end_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate completionDate;
 

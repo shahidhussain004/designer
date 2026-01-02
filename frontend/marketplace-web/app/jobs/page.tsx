@@ -1,22 +1,23 @@
 'use client';
 
 import {
-    Alert,
-    Badge,
-    Button,
-    Card,
-    Flex,
-    Grid,
-    Select,
-    Spinner,
-    Text
+  Alert,
+  Badge,
+  Button,
+  Card,
+  Flex,
+  Grid,
+  Select,
+  Spinner,
+  Text
 } from '@/components/green';
 import { PageLayout } from '@/components/ui';
 import { apiClient } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth';
 import logger from '@/lib/logger';
+import axios from 'axios';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface EmploymentJob {
   id: number;
@@ -38,69 +39,34 @@ export default function JobsListPage() {
   const { user } = useAuth();
   const [filterStatus, setFilterStatus] = useState('OPEN');
 
-  const abortControllerRef = useRef<AbortController | null>(null);
-
-  const fetchJobs = async () => {
-    setLoading(true);
-    setError(null);
-
-    // Abort any previous pending request
-    try {
-      abortControllerRef.current?.abort();
-    } catch (e) {
-      // ignore
-    }
-
+  useEffect(() => {
     const controller = new AbortController();
-    abortControllerRef.current = controller;
 
-    // Timeout the request after 10s
-    const timeoutMs = 10000;
-    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    const fetchJobs = async () => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      // In tests we mock global.fetch — prefer it when available so tests intercept requests.
-      if (typeof fetch !== 'undefined') {
-        const base = (apiClient as any).defaults?.baseURL || process.env.NEXT_PUBLIC_API_URL || '';
-        const url = `${String(base).replace(/\/$/, '')}/employment-jobs`;
-        const response = await fetch(url, { signal: controller.signal });
-        if (!response.ok) {
-          throw new Error(`Failed to fetch jobs (${response.status})`);
-        }
-        const data = await response.json();
+      try {
+        const { data } = await apiClient.get('/jobs', {
+          signal: controller.signal,
+        });
         setJobs(Array.isArray(data) ? data : data.content || []);
-      } else {
-        const { data } = await apiClient.get('/employment-jobs', { signal: controller.signal as any });
-        setJobs(Array.isArray(data) ? data : data.content || []);
-      }
-    } catch (err) {
-      // Ignore AbortError caused by timeout or component unmount
-      if ((err as any)?.name === 'AbortError') {
-        // do not set error state or log as an application error
-      } else {
+      } catch (err) {
+        if (axios.isCancel(err)) return; // Ignore cancellation
         const msg = err instanceof Error ? err.message : 'An error occurred';
         setError(msg);
         logger.error('Error fetching jobs', err as Error);
+      } finally {
+        setLoading(false);
       }
-    } finally {
-      clearTimeout(timeoutId);
-      setLoading(false);
-      abortControllerRef.current = null;
-    }
-  };
+    };
 
-  useEffect(() => {
     fetchJobs();
 
     return () => {
-      // ensure we don't update state after unmount
-      abortControllerRef.current?.abort();
+      controller.abort();
     };
   }, []);
-
-  const handleRetry = () => {
-    fetchJobs();
-  };
 
   const filteredJobs = jobs.filter(
     (job) => filterStatus === 'ALL' || job.status === filterStatus
@@ -123,9 +89,6 @@ export default function JobsListPage() {
           <Alert variant="negative">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
               <div>{error}</div>
-              <div>
-                <Button variant="neutral" onClick={handleRetry}>Retry</Button>
-              </div>
             </div>
           </Alert>
         </div>

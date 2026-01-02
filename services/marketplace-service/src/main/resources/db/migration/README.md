@@ -1,7 +1,14 @@
-# Database Migrations V7-V12: Schema Enhancements
+# Database Migrations - Clean Schema
 
 ## Overview
-These migrations add critical missing features from the original `config/init.sql` to the Flyway-managed schema, enabling portfolio management, contracts, time tracking, and reviews.
+This directory contains all database migrations for the Marketplace application. Migrations are managed by Flyway and follow a clean, organized structure focused on maintainability and best practices.
+
+## Migration Organization
+
+### Naming Convention
+- **VXxx__description.sql** where XXX is the version number
+- **V201+**: New clean schema (primary)
+- **archived/**: Legacy migrations (historical reference)
 
 ---
 
