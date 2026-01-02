@@ -5,8 +5,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 // Re-export types from content-types
 import type {
-    CreateCommentInput,
-    Tag
+  CreateCommentInput,
+  Tag
 } from '@/lib/content-types';
 
 // ============================================================================
@@ -179,6 +179,8 @@ export function useContent(filters?: {
   tags?: string[];
   page?: number;
   limit?: number;
+  sortBy?: string;
+  sortOrder?: string;
 }) {
   return useQuery({
     queryKey: ['content', filters],
@@ -187,7 +189,18 @@ export function useContent(filters?: {
         params: filters,
         signal,
       });
-      return (data as any).data || data;
+      // Return the full response structure with data and meta
+      return {
+        data: (data as any).data || [],
+        meta: (data as any).meta || {
+          total: 0,
+          page: 1,
+          limit: 10,
+          totalPages: 0,
+          hasNextPage: false,
+          hasPrevPage: false,
+        }
+      };
     },
     staleTime: 5 * 60 * 1000,
   });

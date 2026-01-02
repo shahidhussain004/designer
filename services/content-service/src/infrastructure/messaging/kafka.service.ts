@@ -8,6 +8,7 @@ import { Admin, Consumer, Kafka, logLevel, Partitioners, Producer } from 'kafkaj
 
 class KafkaService {
   private static instance: KafkaService;
+  private static _timersPatched = false;
   private kafka: Kafka;
   private producer: Producer | null = null;
   private consumers: Map<string, Consumer> = new Map();
@@ -15,6 +16,30 @@ class KafkaService {
   private isProducerConnected: boolean = false;
 
   private constructor() {
+    // Patch global timers once to prevent negative timeout durations
+    if (!KafkaService._timersPatched) {
+      try {
+        const globalAny = globalThis as any;
+        const origSetTimeout = globalAny.setTimeout;
+        const origSetInterval = globalAny.setInterval;
+
+        globalAny.setTimeout = function (handler: any, timeout?: number, ...args: any[]) {
+          if (typeof timeout === 'number' && timeout < 0) timeout = 0;
+          return origSetTimeout(handler, timeout, ...args);
+        };
+
+        globalAny.setInterval = function (handler: any, timeout?: number, ...args: any[]) {
+          if (typeof timeout === 'number' && timeout < 0) timeout = 0;
+          return origSetInterval(handler, timeout, ...args);
+        };
+
+        KafkaService._timersPatched = true;
+      } catch (e) {
+        // If patching fails for any reason, continue without blocking Kafka initialization
+        logger.warn({ error: e }, 'Failed to patch global timers for negative timeout clamp');
+      }
+    }
+
     this.kafka = new Kafka({
       clientId: kafkaConfig.clientId,
       brokers: kafkaConfig.brokers,

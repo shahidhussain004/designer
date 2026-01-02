@@ -35,7 +35,7 @@ interface Contract {
 
 export default function TimeTrackingPage() {
   const { user } = useAuth();
-  const { data: timeEntries = [], isLoading, isError, error, refetch } = useTimeEntries(user?.id);
+  const { data: timeEntries = [], isLoading, isError, error, refetch } = useTimeEntries(user?.id ?? null);
   const { data: contracts = [] } = useActiveContracts();
   const createTimeEntryMutation = useCreateTimeEntry();
 
@@ -51,13 +51,18 @@ export default function TimeTrackingPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!user?.id) {
+      logger.error('User must be signed in to log time');
+      return;
+    }
+
     const payload = {
-      contract: { id: parseInt(formData.contractId) },
-      freelancer: { id: user?.id },
+      contractId: parseInt(formData.contractId),
+      freelancerId: user.id,
       description: formData.description,
-      hoursWorked: parseFloat(formData.hoursWorked),
+      hoursLogged: parseFloat(formData.hoursWorked),
       ratePerHour: parseFloat(formData.ratePerHour),
-      workDate: formData.workDate,
+      date: formData.workDate,
       status: 'PENDING',
     };
 

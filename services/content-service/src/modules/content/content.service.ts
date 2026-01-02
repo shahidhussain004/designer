@@ -89,39 +89,18 @@ export class ContentService {
   }
 
   async findFeatured(limit = 5): Promise<ContentWithRelations[]> {
-    const cacheKey = `${this.listCachePrefix}featured:${limit}`;
-
-    const cached = await redisService.get<ContentWithRelations[]>(cacheKey);
-    if (cached) return cached;
-
-    const content = await contentRepository.findFeatured(limit);
-    await redisService.set(cacheKey, content, this.cacheTtl);
-
-    return content;
+    // Note: Not cached as Prisma objects with relations don't serialize properly to Redis
+    return contentRepository.findFeatured(limit);
   }
 
   async findTrending(limit = 10): Promise<ContentWithRelations[]> {
-    const cacheKey = `${this.listCachePrefix}trending:${limit}`;
-
-    const cached = await redisService.get<ContentWithRelations[]>(cacheKey);
-    if (cached) return cached;
-
-    const content = await contentRepository.findTrending(limit);
-    await redisService.set(cacheKey, content, this.cacheTtl);
-
-    return content;
+    // Note: Not cached as Prisma objects with relations don't serialize properly to Redis
+    return contentRepository.findTrending(limit);
   }
 
   async findRecent(contentType?: ContentType, limit = 10): Promise<ContentWithRelations[]> {
-    const cacheKey = `${this.listCachePrefix}recent:${contentType || 'all'}:${limit}`;
-
-    const cached = await redisService.get<ContentWithRelations[]>(cacheKey);
-    if (cached) return cached;
-
-    const content = await contentRepository.findRecent(contentType, limit);
-    await redisService.set(cacheKey, content, this.cacheTtl);
-
-    return content;
+    // Note: Not cached as Prisma objects with relations don't serialize properly to Redis
+    return contentRepository.findRecent(contentType, limit);
   }
 
   async findRelated(contentId: string, limit = 5): Promise<ContentWithRelations[]> {

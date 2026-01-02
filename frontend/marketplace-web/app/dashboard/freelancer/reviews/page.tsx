@@ -46,8 +46,8 @@ interface Contract {
 
 export default function ReviewsPage() {
   const { user } = useAuth();
-  const { data: givenReviews = [], isLoading: givenLoading, isError: givenError, error: givenErrorMsg, refetch: refetchGiven } = useGivenReviews(user?.id);
-  const { data: receivedReviews = [], isLoading: receivedLoading, isError: receivedError, error: receivedErrorMsg, refetch: refetchReceived } = useReceivedReviews(user?.id);
+  const { data: givenReviews = [], isLoading: givenLoading, isError: givenError, error: givenErrorMsg, refetch: refetchGiven } = useGivenReviews(user?.id ?? null);
+  const { data: receivedReviews = [], isLoading: receivedLoading, isError: receivedError, error: receivedErrorMsg, refetch: refetchReceived } = useReceivedReviews(user?.id ?? null);
   const { data: contracts = [] } = useCompletedContracts();
   const createReviewMutation = useCreateReview();
 
@@ -69,9 +69,9 @@ export default function ReviewsPage() {
     e.preventDefault();
 
     const payload = {
-      contract: { id: parseInt(formData.contractId) },
-      reviewer: { id: user?.id },
-      reviewee: { id: parseInt(formData.revieweeId) },
+      contractId: parseInt(formData.contractId),
+      reviewerId: user?.id ?? undefined,
+      reviewedUserId: parseInt(formData.revieweeId),
       rating: formData.rating,
       comment: formData.comment,
       isAnonymous: formData.isAnonymous,
@@ -81,7 +81,7 @@ export default function ReviewsPage() {
         timeliness: formData.timeliness,
         professionalism: formData.professionalism,
       },
-    };
+    } as const;
 
     try {
       await createReviewMutation.mutateAsync(payload);

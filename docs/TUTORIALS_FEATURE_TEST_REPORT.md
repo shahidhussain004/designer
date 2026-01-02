@@ -6,7 +6,7 @@ December 30, 2025 - 23:55 UTC
 ## Testing Environment
 - **Backend:** Content Service on port 8083
 - **Frontend:** marketplace-web on port 3002
-- **Database:** PostgreSQL (content_db)
+- **Database:** PostgreSQL (marketplace_db)
 
 ## ✅ Backend API Tests
 

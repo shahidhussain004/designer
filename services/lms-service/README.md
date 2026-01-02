@@ -164,3 +164,23 @@ dotnet test --collect:"XPlat Code Coverage"
 - **Kafka Topics**: 
   - Consumes: `payments.succeeded`, `users.created`
   - Produces: `enrollments.created`, `courses.published`
+
+  ### Kafka Topic Creation Settings
+
+  The service can optionally create missing Kafka topics at startup using the Admin client. Configure defaults in `appsettings.json` under `KafkaSettings`:
+
+  - `DefaultNumPartitions`: default number of partitions for created topics (default: 3)
+  - `DefaultReplicationFactor`: default replication factor for created topics (default: 1)
+  - `TopicPartitions`: optional per-topic partition overrides (map of topic -> partitions)
+
+  Example:
+
+  ```json
+  "KafkaSettings": {
+    "BootstrapServers": "localhost:9092",
+    "GroupId": "lms-service-group",
+    "DefaultNumPartitions": 3,
+    "DefaultReplicationFactor": 1,
+    "TopicPartitions": { "payments.succeeded": 6 }
+  }
+  ```

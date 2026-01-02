@@ -66,6 +66,7 @@ interface Contract {
   totalAmount: number;
   startDate?: string;
   endDate?: string;
+  title?: string; // optional title for display purposes
 }
 
 interface CreatePortfolioInput {
@@ -101,6 +102,14 @@ interface CreateReviewInput {
   contractId?: number;
   rating: number;
   comment: string;
+  reviewerId?: number; // optional - server may derive from auth, but allow passing explicitly
+  isAnonymous?: boolean;
+  categoryRatings?: {
+    communication?: number;
+    quality?: number;
+    timeliness?: number;
+    professionalism?: number;
+  };
 }
 
 interface UsersFilters {
