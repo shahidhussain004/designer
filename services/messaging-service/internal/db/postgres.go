@@ -41,45 +41,28 @@ func NewPostgresConnection(databaseURL string) (*PostgresDB, error) {
 }
 
 // RunMigrations applies database migrations for the messaging service
+// NOTE: Message tables are now managed by marketplace-service Flyway migrations (V12)
+// This function is kept for compatibility but is mostly a no-op
 func RunMigrations(db *PostgresDB) error {
-	migrations := []string{
-		// Message threads table
-		`CREATE TABLE IF NOT EXISTS message_threads (
-			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			participants BIGINT[] NOT NULL,
-			job_id BIGINT REFERENCES jobs(id) ON DELETE SET NULL,
-			title VARCHAR(200),
-			last_message_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-			updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-		)`,
-		`CREATE INDEX IF NOT EXISTS idx_threads_participants ON message_threads USING GIN (participants)`,
-		`CREATE INDEX IF NOT EXISTS idx_threads_last_message ON message_threads(last_message_at DESC)`,
-
-		// Messages table
-		`CREATE TABLE IF NOT EXISTS messages (
-			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			thread_id UUID NOT NULL REFERENCES message_threads(id) ON DELETE CASCADE,
-			sender_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-			receiver_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-			body TEXT NOT NULL,
-			attachments JSONB DEFAULT '[]',
-			read_at TIMESTAMP,
-			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-		)`,
-		`CREATE INDEX IF NOT EXISTS idx_messages_thread ON messages(thread_id)`,
-		`CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(sender_id)`,
-		`CREATE INDEX IF NOT EXISTS idx_messages_receiver ON messages(receiver_id)`,
-		`CREATE INDEX IF NOT EXISTS idx_messages_created ON messages(created_at DESC)`,
-		`CREATE INDEX IF NOT EXISTS idx_messages_unread ON messages(receiver_id, read_at) WHERE read_at IS NULL`,
+	// Check if message_threads table already exists (created by marketplace-service Flyway)
+	var tableExists bool
+	err := db.QueryRow(`
+		SELECT EXISTS(
+			SELECT 1 FROM information_schema.tables 
+			WHERE table_name = 'message_threads'
+		)
+	`).Scan(&tableExists)
+	
+	if err != nil {
+		return fmt.Errorf("failed to check if message_threads table exists: %w", err)
 	}
 
-	for _, migration := range migrations {
-		if _, err := db.Exec(migration); err != nil {
-			return fmt.Errorf("failed to run migration: %w", err)
-		}
+	if !tableExists {
+		// This should not happen in normal operation since marketplace-service Flyway runs first
+		return fmt.Errorf("message_threads table does not exist; ensure marketplace-service migrations have run first")
 	}
 
+	// Table already exists (created by Flyway), no additional migrations needed
 	return nil
 }
 

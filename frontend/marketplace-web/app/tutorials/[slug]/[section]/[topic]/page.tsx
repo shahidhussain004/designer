@@ -1,7 +1,9 @@
 'use client';
 
+import { ErrorMessage } from '@/components/ErrorMessage';
+import { LoadingSpinner } from '@/components/Skeletons';
 import { Breadcrumb, PageLayout } from '@/components/ui';
-import { tutorialsApi } from '@/lib/content-api';
+import { useTutorial } from '@/hooks/useContent';
 import {
   BookOpen,
   ChevronLeft,
@@ -9,7 +11,6 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 // Types matching backend
@@ -48,94 +49,56 @@ const TopicReadingPage = () => {
   const sectionSlug = params.section as string;
   const topicSlug = params.topic as string;
 
-  const [topic, setTopic] = useState<TopicContent | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const composedSlug = `${tutorialSlug}/${sectionSlug}/${topicSlug}`;
+  const { data, isLoading, isError, error, refetch } = useTutorial(composedSlug);
 
-  useEffect(() => {
-    if (!tutorialSlug || !sectionSlug || !topicSlug) return;
-    (async () => {
-      try {
-        // Some content services expose topics as nested slugs; attempt to fetch by composed slug
-        const composedSlug = `${tutorialSlug}/${sectionSlug}/${topicSlug}`;
-        const resp = await tutorialsApi.getBySlug(composedSlug);
-        const payload = resp ?? null;
-        if (!payload) {
-          setError('Invalid topic response from server');
-          setLoading(false);
-          return;
-        }
-
-        const p: any = payload;
-
-        const adapted: TopicContent = {
-          id: p.id,
-          slug: p.slug,
-          title: p.title,
-          content: p.content ?? p.body ?? p.html ?? '',
-          code_examples: p.code_examples ?? p.codeExamples ?? null,
-          estimated_read_time: p.estimated_read_time ?? p.estimatedReadTime ?? 0,
-          views_count: p.views_count ?? p.viewsCount ?? 0,
-          section: {
-            slug: p.section_slug ?? p.section?.slug ?? sectionSlug,
-            title: p.section_title ?? p.section?.title ?? '',
-          },
-          tutorial: {
-            slug: p.tutorial_slug ?? p.tutorial?.slug ?? tutorialSlug,
-            title: p.tutorial_title ?? p.tutorial?.title ?? '',
-            icon: p.tutorial_icon ?? p.tutorial?.icon ?? p.icon ?? '',
-            color_theme: p.color_theme ?? p.tutorial?.color_theme ?? p.tutorial?.colorTheme ?? '#000000',
-          },
-          navigation: {
-            prev: p.navigation?.prev ?? null,
-            next: p.navigation?.next ?? null,
-          },
-        };
-
-        if (process.env.NODE_ENV !== 'production') {
-          // eslint-disable-next-line no-console
-          console.debug('adapted topic payload:', adapted);
-        }
-
-        setTopic(adapted);
-      } catch (err: any) {
-        setError(err?.message || 'Failed to load topic');
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [tutorialSlug, sectionSlug, topicSlug]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <PageLayout>
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-gray-300 border-t-transparent rounded-full animate-spin mx-auto"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-300">Loading content...</p>
-          </div>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+          <LoadingSpinner />
         </div>
       </PageLayout>
     );
   }
 
-  if (error || !topic) {
+  if (isError || !data) {
     return (
       <PageLayout>
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <p className="text-red-500 text-lg">Error: {error || 'Content not found'}</p>
-            <Link
-              href="/tutorials"
-              className="mt-4 inline-block px-6 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
-            >
-              Back to Tutorials
-            </Link>
-          </div>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+          <ErrorMessage 
+            message={error?.message || 'Failed to load topic'} 
+            retry={() => refetch()}
+          />
         </div>
       </PageLayout>
     );
   }
+
+  const p: any = data;
+  const topic: TopicContent = {
+    id: p.id,
+    slug: p.slug,
+    title: p.title,
+    content: p.content ?? p.body ?? p.html ?? '',
+    code_examples: p.code_examples ?? p.codeExamples ?? null,
+    estimated_read_time: p.estimated_read_time ?? p.estimatedReadTime ?? 0,
+    views_count: p.views_count ?? p.viewsCount ?? 0,
+    section: {
+      slug: p.section_slug ?? p.section?.slug ?? sectionSlug,
+      title: p.section_title ?? p.section?.title ?? '',
+    },
+    tutorial: {
+      slug: p.tutorial_slug ?? p.tutorial?.slug ?? tutorialSlug,
+      title: p.tutorial_title ?? p.tutorial?.title ?? '',
+      icon: p.tutorial_icon ?? p.tutorial?.icon ?? p.icon ?? '',
+      color_theme: p.color_theme ?? p.tutorial?.color_theme ?? p.tutorial?.colorTheme ?? '#000000',
+    },
+    navigation: {
+      prev: p.navigation?.prev ?? null,
+      next: p.navigation?.next ?? null,
+    },
+  };
 
   return (
     <PageLayout>

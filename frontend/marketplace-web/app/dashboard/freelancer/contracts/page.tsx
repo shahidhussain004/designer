@@ -1,11 +1,12 @@
 "use client";
 
+import { ErrorMessage } from '@/components/ErrorMessage';
+import { LoadingSpinner } from '@/components/Skeletons';
 import { PageLayout } from '@/components/ui';
-import apiClient from '@/lib/api-client';
+import { useContracts } from '@/hooks/useUsers';
 import { useAuth } from '@/lib/context/AuthContext';
-import logger from '@/lib/logger';
 import { Calendar, CheckCircle, Clock, DollarSign, FileText, Users, XCircle } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 interface Contract {
   id: number;
@@ -25,27 +26,8 @@ interface Contract {
 
 export default function ContractsPage() {
   const { user } = useAuth();
-  const [contracts, setContracts] = useState<Contract[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: contracts = [], isLoading, isError, error, refetch } = useContracts();
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
-
-  useEffect(() => {
-    if (user) {
-      fetchContracts();
-    }
-  }, [user]);
-
-  const fetchContracts = async () => {
-    try {
-      const res = await apiClient.get('/contracts');
-      const data = res.data;
-      setContracts(data || []);
-    } catch (error) {
-      logger.error('Failed to fetch contracts', error as Error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -95,25 +77,36 @@ export default function ContractsPage() {
     }).format(amount);
   };
 
-  const filteredContracts = contracts.filter((contract) => {
+  const filteredContracts = contracts.filter((contract: any) => {
     if (filterStatus === 'ALL') return true;
     return contract.status === filterStatus;
   });
 
   const contractStats = {
-    active: contracts.filter((c) => c.status === 'ACTIVE').length,
-    completed: contracts.filter((c) => c.status === 'COMPLETED').length,
+    active: contracts.filter((c: any) => c.status === 'ACTIVE').length,
+    completed: contracts.filter((c: any) => c.status === 'COMPLETED').length,
     totalEarned: contracts
-      .filter((c) => c.status === 'COMPLETED')
-      .reduce((sum, c) => sum + c.totalAmount, 0),
+      .filter((c: any) => c.status === 'COMPLETED')
+      .reduce((sum: number, c: any) => sum + c.totalAmount, 0),
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <PageLayout>
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <LoadingSpinner />
         </div>
+      </PageLayout>
+    );
+  }
+
+  if (isError) {
+    return (
+      <PageLayout>
+        <ErrorMessage 
+          message={error?.message || 'Failed to load contracts'} 
+          retry={refetch}
+        />
       </PageLayout>
     );
   }
@@ -199,7 +192,7 @@ export default function ContractsPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {filteredContracts.map((contract) => (
+          {filteredContracts.map((contract: any) => (
             <div key={contract.id} className="bg-white rounded-lg shadow hover:shadow-md transition p-6">
               <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                 <div className="flex-1">

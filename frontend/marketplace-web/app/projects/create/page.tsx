@@ -9,24 +9,27 @@ import {
   Flex,
   Grid,
   Input,
-  Spinner,
   Text,
 } from '@/components/green';
-import apiClient from '@/lib/api-client';
+import { LoadingSpinner } from '@/components/Skeletons';
+import { useCreateProject, useExperienceLevels, useProjectCategories } from '@/hooks/useProjects';
 import { parseCategories, parseExperienceLevels } from '@/lib/apiParsers';
-import type { ExperienceLevel, PostCategory } from '@/lib/apiTypes';
 import { authService } from '@/lib/auth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export default function CreateProjectPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+  const createProjectMutation = useCreateProject();
+  const { data: categoriesData, isLoading: categoriesLoading } = useProjectCategories();
+  const { data: experienceLevelsData, isLoading: levelsLoading } = useExperienceLevels();
+  
   const [error, setError] = useState<string | null>(null);
-  const [categories, setCategories] = useState<PostCategory[]>([]);
-  const [experienceLevels, setExperienceLevels] = useState<ExperienceLevel[]>([]);
+
+  const categories = useMemo(() => parseCategories(categoriesData), [categoriesData]);
+  const experienceLevels = useMemo(() => parseExperienceLevels(experienceLevelsData), [experienceLevelsData]);
+  const loading = categoriesLoading || levelsLoading;
 
   const [formData, setFormData] = useState({
     title: '',
@@ -42,34 +45,19 @@ export default function CreateProjectPage() {
       router.push('/auth/login');
       return;
     }
-    
-    // Fetch categories and experience levels
-    const fetchFilters = async () => {
-      try {
-        const [catsResp, levelsResp] = await Promise.all([
-          apiClient.get('/project-categories'),
-          apiClient.get('/experience-levels'),
-        ]);
-
-        const mappedCats = parseCategories(catsResp.data);
-        setCategories(mappedCats);
-        if (mappedCats.length > 0) {
-          setFormData(prev => ({ ...prev, categoryId: mappedCats[0].id }));
-        }
-
-        const mappedLevels = parseExperienceLevels(levelsResp.data);
-        setExperienceLevels(mappedLevels);
-        if (mappedLevels.length > 0) {
-          setFormData(prev => ({ ...prev, experienceLevelId: mappedLevels[0].id }));
-        }
-      } catch (err) {
-        console.error('Failed to fetch filters:', err);
-      }
-    };
-
-    fetchFilters();
-    setLoading(false);
   }, [router]);
+
+  useEffect(() => {
+    if (categories.length > 0 && formData.categoryId === 1) {
+      setFormData(prev => ({ ...prev, categoryId: categories[0].id }));
+    }
+  }, [categories]);
+
+  useEffect(() => {
+    if (experienceLevels.length > 0 && formData.experienceLevelId === 2) {
+      setFormData(prev => ({ ...prev, experienceLevelId: experienceLevels[0].id }));
+    }
+  }, [experienceLevels]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -84,25 +72,20 @@ export default function CreateProjectPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
     setError(null);
 
     try {
-      const { data: newProject } = await apiClient.post('/projects', formData);
+      const newProject = await createProjectMutation.mutateAsync(formData);
       alert('Project created successfully!');
       router.push(`/projects/${newProject.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setSubmitting(false);
     }
   };
 
   if (loading) {
     return (
-      <Flex justify-content="center" align-items="center" padding="xl">
-        <Spinner />
-      </Flex>
+      <LoadingSpinner />
     );
   }
 
@@ -211,8 +194,8 @@ export default function CreateProjectPage() {
                     Cancel
                   </Button>
                 </Link>
-                <Button rank="primary" type="submit" disabled={submitting}>
-                  {submitting ? 'Creating Project...' : 'Post Project'}
+                <Button rank="primary" type="submit" disabled={createProjectMutation.isPending}>
+                  {createProjectMutation.isPending ? 'Creating Project...' : 'Post Project'}
                 </Button>
               </Flex>
             </Flex>

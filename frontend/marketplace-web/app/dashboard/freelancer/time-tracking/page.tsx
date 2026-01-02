@@ -1,11 +1,13 @@
 "use client";
 
+import { ErrorMessage } from '@/components/ErrorMessage';
+import { LoadingSpinner } from '@/components/Skeletons';
 import { PageLayout } from '@/components/ui';
-import { apiClient } from '@/lib/api-client';
+import { useActiveContracts, useCreateTimeEntry, useTimeEntries } from '@/hooks/useUsers';
 import { useAuth } from '@/lib/context/AuthContext';
 import logger from '@/lib/logger';
 import { Calendar, Check, Clock, Plus, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 interface TimeEntry {
   id: number;
@@ -33,9 +35,10 @@ interface Contract {
 
 export default function TimeTrackingPage() {
   const { user } = useAuth();
-  const [timeEntries, setTimeEntries] = useState<TimeEntry[]>([]);
-  const [contracts, setContracts] = useState<Contract[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: timeEntries = [], isLoading, isError, error, refetch } = useTimeEntries(user?.id);
+  const { data: contracts = [] } = useActiveContracts();
+  const createTimeEntryMutation = useCreateTimeEntry();
+
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     contractId: '',
@@ -44,41 +47,6 @@ export default function TimeTrackingPage() {
     ratePerHour: '',
     workDate: new Date().toISOString().split('T')[0],
   });
-
-  useEffect(() => {
-    if (user) {
-      fetchData();
-    }
-
-    // Prefill contractId from query param if present (e.g., ?contractId=123)
-    try {
-      if (typeof window !== 'undefined') {
-        const params = new URLSearchParams(window.location.search)
-        const contractId = params.get('contractId')
-        if (contractId) {
-          setFormData((f) => ({ ...f, contractId }))
-        }
-      }
-    } catch (e) {
-      // ignore
-    }
-  }, [user]);
-
-  const fetchData = async () => {
-    try {
-      const [{ data: entriesData }, { data: contractsData }] = await Promise.all([
-        apiClient.get(`/time-entries/freelancer/${user?.id}`),
-        apiClient.get('/contracts'),
-      ]);
-
-      if (entriesData) setTimeEntries(entriesData);
-      if (contractsData) setContracts((contractsData as Contract[]).filter((c) => c.status === 'ACTIVE'));
-    } catch (error) {
-      logger.error('Failed to fetch data', error as Error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,11 +62,8 @@ export default function TimeTrackingPage() {
     };
 
     try {
-      const res = await apiClient.post('/time-entries', payload);
-      if (res && res.status >= 200 && res.status < 300) {
-        await fetchData();
-        resetForm();
-      }
+      await createTimeEntryMutation.mutateAsync(payload);
+      resetForm();
     } catch (error) {
       logger.error('Failed to create time entry', error as Error);
     }
@@ -157,22 +122,33 @@ export default function TimeTrackingPage() {
     }).format(amount);
   };
 
-  const totalHours = timeEntries.reduce((sum, entry) => sum + entry.hoursWorked, 0);
+  const totalHours = timeEntries.reduce((sum: number, entry: any) => sum + entry.hoursWorked, 0);
   const totalEarnings = timeEntries
-    .filter((e) => e.status === 'PAID')
-    .reduce((sum, entry) => sum + entry.hoursWorked * entry.ratePerHour, 0);
+    .filter((e: any) => e.status === 'PAID')
+    .reduce((sum: number, entry: any) => sum + entry.hoursWorked * entry.ratePerHour, 0);
   const pendingAmount = timeEntries
-    .filter((e) => e.status === 'PENDING' || e.status === 'APPROVED')
-    .reduce((sum, entry) => sum + entry.hoursWorked * entry.ratePerHour, 0);
+    .filter((e: any) => e.status === 'PENDING' || e.status === 'APPROVED')
+    .reduce((sum: number, entry: any) => sum + entry.hoursWorked * entry.ratePerHour, 0);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <PageLayout>
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <LoadingSpinner />
         </div>
       </PageLayout>
-    )
+    );
+  }
+
+  if (isError) {
+    return (
+      <PageLayout>
+        <ErrorMessage 
+          message={error?.message || 'Failed to load time tracking data'} 
+          retry={refetch}
+        />
+      </PageLayout>
+    );
   }
 
   return (
@@ -360,7 +336,7 @@ export default function TimeTrackingPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {timeEntries.map((entry) => (
+          {timeEntries.map((entry: any) => (
             <div key={entry.id} className="bg-white rounded-lg shadow p-6">
               <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                 <div className="flex-1">

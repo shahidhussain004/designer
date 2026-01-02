@@ -1,12 +1,13 @@
 "use client"
 
-import { Button, Card, Divider, Flex, Grid, Spinner, Text } from '@/components/green'
+import { ErrorMessage } from '@/components/ErrorMessage'
+import { Button, Card, Divider, Flex, Grid, Text } from '@/components/green'
+import { LoadingSpinner } from '@/components/Skeletons'
 import { PageLayout } from '@/components/ui'
-import { apiClient } from '@/lib/api-client'
+import { useUserPortfolio, useUserProfile } from '@/hooks/useUsers'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
 
 interface PortfolioItem {
   id: number
@@ -33,46 +34,22 @@ interface Freelancer {
 export default function FreelancerPortfolioPage() {
   const params = useParams()
   const freelancerId = params.id as string
-  const [freelancer, setFreelancer] = useState<Freelancer | null>(null)
-  const [portfolio, setPortfolio] = useState<PortfolioItem[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        setLoading(true)
+  const { data: freelancerData, isLoading: profileLoading, isError: profileError, error: profileErrorMsg, refetch: refetchProfile } = useUserProfile(freelancerId)
+  const { data: portfolioData = [], isLoading: portfolioLoading, isError: portfolioError, error: portfolioErrorMsg, refetch: refetchPortfolio } = useUserPortfolio(parseInt(freelancerId))
 
-        // Try to load profile; failures are non-fatal
-        try {
-          const { data: profileData } = await apiClient.get(`/users/${freelancerId}/profile`)
-          setFreelancer(profileData)
-        } catch {
-          // ignore profile load failures, show placeholder
-        }
+  const freelancer = freelancerData as Freelancer | undefined
+  const portfolio = portfolioData as PortfolioItem[]
 
-        // Try to load portfolio; failures are non-fatal
-        try {
-          const { data: portfolioData } = await apiClient.get(`/users/${freelancerId}/portfolio`)
-          setPortfolio(portfolioData || [])
-        } catch {
-          // ignore portfolio failures
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load portfolio')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    load()
-  }, [freelancerId])
+  const loading = profileLoading || portfolioLoading
+  const error = profileError || portfolioError
+  const errorMessage = profileErrorMsg?.message || portfolioErrorMsg?.message
 
   if (loading) {
     return (
       <PageLayout>
         <Flex justify-content="center" align-items="center" style={{ minHeight: '400px' }}>
-          <Spinner />
+          <LoadingSpinner />
         </Flex>
       </PageLayout>
     )
@@ -82,15 +59,13 @@ export default function FreelancerPortfolioPage() {
     return (
       <PageLayout>
         <Flex justify-content="center" align-items="center" style={{ minHeight: '400px' }}>
-          <Card padding="xl">
-            <Flex flex-direction="column" align-items="center" gap="m">
-              <Text font-size="heading-s">Portfolio Not Found</Text>
-              <Text font-size="body-l" color="neutral-02">{error || 'Unable to load portfolio'}</Text>
-              <Link href="/talents">
-                <Button>Browse Other Talent</Button>
-              </Link>
-            </Flex>
-          </Card>
+          <ErrorMessage 
+            message={errorMessage || 'Failed to load portfolio'} 
+            retry={() => {
+              refetchProfile()
+              refetchPortfolio()
+            }}
+          />
         </Flex>
       </PageLayout>
     )

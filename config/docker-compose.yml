@@ -244,6 +244,8 @@ services:
         condition: service_healthy
       kafka:
         condition: service_healthy
+      marketplace-service:
+        condition: service_healthy
     networks:
       - marketplace-network
     healthcheck:
