@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS jobs (
     visa_sponsorship BOOLEAN DEFAULT FALSE,
     
     -- Engagement & Status
-    status VARCHAR(20) DEFAULT 'ACTIVE' NOT NULL,
+    status VARCHAR(20) DEFAULT 'OPEN' NOT NULL,
     views_count INTEGER DEFAULT 0,
     applications_count INTEGER DEFAULT 0,
     proposal_count INTEGER DEFAULT 0,
@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS jobs (
     CONSTRAINT chk_salary_period CHECK (salary_period IN ('ANNUAL', 'MONTHLY', 'HOURLY')),
     CONSTRAINT chk_salary_range CHECK (salary_max IS NULL OR salary_min IS NULL OR salary_max >= salary_min),
     CONSTRAINT chk_positions_available CHECK (positions_available > 0),
-    CONSTRAINT chk_status CHECK (status IN ('DRAFT', 'ACTIVE', 'PAUSED', 'CLOSED', 'FILLED')),
+    CONSTRAINT chk_status CHECK (status IN ('DRAFT', 'OPEN', 'PAUSED', 'CLOSED', 'FILLED')),
     CONSTRAINT chk_travel_requirement CHECK (travel_requirement IN ('NONE', 'MINIMAL', 'MODERATE', 'EXTENSIVE')),
     CONSTRAINT chk_views_applications CHECK (views_count >= 0 AND applications_count >= 0)
 );
@@ -126,4 +126,4 @@ COMMENT ON TABLE jobs IS 'Traditional employment job postings table';
 COMMENT ON COLUMN jobs.employer_id IS 'User ID of the employer/recruiter posting the job';
 COMMENT ON COLUMN jobs.job_type IS 'Employment type: FULL_TIME, PART_TIME, CONTRACT, TEMPORARY, INTERNSHIP';
 COMMENT ON COLUMN jobs.remote_type IS 'Work location option: FULLY_REMOTE, HYBRID, ON_SITE';
-COMMENT ON COLUMN jobs.status IS 'Job posting status: DRAFT, ACTIVE, PAUSED, CLOSED, FILLED';
+COMMENT ON COLUMN jobs.status IS 'Job posting status: DRAFT, OPEN, PAUSED, CLOSED, FILLED';

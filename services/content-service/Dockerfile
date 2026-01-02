@@ -75,8 +75,11 @@ RUN --mount=type=cache,id=npm,target=/root/.npm \
 # Copy source code and build artifacts
 COPY . .
 
-# Generate Prisma client
-RUN npx prisma generate
+# Ensure Prisma can verify TLS using system/company CAs
+ENV NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/SEB_Root_CA_v2.crt
+
+# Generate Prisma client (uses NODE_EXTRA_CA_CERTS for TLS)
+RUN NODE_EXTRA_CA_CERTS=$NODE_EXTRA_CA_CERTS npx prisma generate || (echo "Prisma generate failed; attempting with NODE_TLS_REJECT_UNAUTHORIZED=0" && NODE_TLS_REJECT_UNAUTHORIZED=0 npx prisma generate)
 
 # Build the application
 RUN npm run build
