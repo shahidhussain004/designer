@@ -1,8 +1,10 @@
 "use client"
 
-import { Alert, Badge, Button, Card, Divider, Flex, Input, Spinner, Text, Textarea } from '@/components/green'
+import { ErrorMessage } from '@/components/ErrorMessage'
+import { Alert, Badge, Button, Card, Divider, Flex, Input, Text, Textarea } from '@/components/green'
+import { LoadingSpinner } from '@/components/Skeletons'
 import { PageLayout } from '@/components/ui'
-import apiClient from '@/lib/api-client'
+import { useUpdateUser, useUserProfile } from '@/hooks/useUsers'
 import { authService } from '@/lib/auth'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -25,10 +27,7 @@ interface UserProfile {
 
 export default function ProfilePage() {
   const router = useRouter()
-  const [profile, setProfile] = useState<UserProfile | null>(null)
-  const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
-  const [saving, setSaving] = useState(false)
   const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null)
   const [formData, setFormData] = useState({
     fullName: '',
@@ -38,41 +37,37 @@ export default function ProfilePage() {
     portfolioUrl: '',
   })
 
+  const currentUser = authService.getCurrentUser()
+  const userId = currentUser?.id
+
+  const { data, isLoading, isError, error, refetch } = useUserProfile(userId)
+  const profile = data as UserProfile | undefined
+  const updateUserMutation = useUpdateUser()
+
   useEffect(() => {
     if (!authService.isAuthenticated()) {
       router.push('/auth/login')
       return
     }
-
-    const loadProfile = async () => {
-      try {
-        const user = authService.getCurrentUser()
-        // In a real app, fetch full profile from API
-        setProfile(user)
-        setFormData({
-          fullName: user?.fullName || '',
-          bio: user?.bio || '',
-          location: user?.location || '',
-          hourlyRate: user?.hourlyRate?.toString() || '',
-          portfolioUrl: user?.portfolioUrl || '',
-        })
-      } catch (err) {
-        console.error('Failed to load profile:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    loadProfile()
   }, [router])
 
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        fullName: profile.fullName || '',
+        bio: profile.bio || '',
+        location: profile.location || '',
+        hourlyRate: profile.hourlyRate?.toString() || '',
+        portfolioUrl: profile.portfolioUrl || '',
+      })
+    }
+  }, [profile])
+
   const handleSave = async () => {
-    setSaving(true)
     setNotification(null)
 
     try {
-      const currentUser = authService.getCurrentUser()
-      if (!currentUser || !currentUser.id) {
+      if (!userId) {
         throw new Error('Not authenticated')
       }
 
@@ -87,16 +82,9 @@ export default function ProfilePage() {
         if (!isNaN(parsed)) payload.hourlyRate = parsed
       }
 
-      const { data } = await apiClient.put(`/users/${currentUser.id}`, payload)
-
-      // Update UI from response
-      setProfile(data)
-      setFormData({
-        fullName: data.fullName || '',
-        bio: data.bio || '',
-        location: data.location || '',
-        hourlyRate: data.hourlyRate ? String(data.hourlyRate) : '',
-        portfolioUrl: data.portfolioUrl || '',
+      await updateUserMutation.mutateAsync({
+        userId,
+        userData: payload
       })
 
       // Update localStorage user object so authService.getCurrentUser() reflects changes
@@ -104,29 +92,40 @@ export default function ProfilePage() {
       if (stored) {
         try {
           const parsed = JSON.parse(stored)
-          const merged = { ...parsed, ...data }
+          const merged = { ...parsed, ...payload }
           localStorage.setItem('user', JSON.stringify(merged))
         } catch {
-          localStorage.setItem('user', JSON.stringify(data))
+          localStorage.setItem('user', JSON.stringify(payload))
         }
       } else {
-        localStorage.setItem('user', JSON.stringify(data))
+        localStorage.setItem('user', JSON.stringify(payload))
       }
 
       setNotification({ type: 'success', message: 'Profile updated successfully!' })
       setEditing(false)
     } catch (err) {
       setNotification({ type: 'error', message: 'Failed to update profile. Please try again.' })
-    } finally {
-      setSaving(false)
     }
   }
 
-  if (loading) {
+  if (isLoading) {
     return (
       <PageLayout>
         <Flex justify-content="center" align-items="center" min-height="50vh">
-          <Spinner />
+          <LoadingSpinner />
+        </Flex>
+      </PageLayout>
+    )
+  }
+
+  if (isError) {
+    return (
+      <PageLayout>
+        <Flex justify-content="center" align-items="center" min-height="50vh">
+          <ErrorMessage 
+            message={error?.message || 'Failed to load profile'} 
+            retry={() => refetch()}
+          />
         </Flex>
       </PageLayout>
     )
@@ -267,15 +266,15 @@ export default function ProfilePage() {
                       setEditing(false)
                       setNotification(null)
                     }}
-                    disabled={saving}
+                    disabled={updateUserMutation.isPending}
                   >
                     Cancel
                   </Button>
                   <Button
                     onClick={handleSave}
-                    disabled={saving}
+                    disabled={updateUserMutation.isPending}
                   >
-                    {saving ? 'Saving...' : 'Save Changes'}
+                    {updateUserMutation.isPending ? 'Saving...' : 'Save Changes'}
                   </Button>
                 </Flex>
               </Flex>

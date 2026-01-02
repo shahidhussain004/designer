@@ -1,10 +1,12 @@
 "use client";
 
+import { ErrorMessage } from '@/components/ErrorMessage';
+import { LoadingSpinner } from '@/components/Skeletons';
 import { PageLayout } from '@/components/ui';
-import apiClient from '@/lib/api-client';
+import { useCompletedContracts, useCreateReview, useGivenReviews, useReceivedReviews } from '@/hooks/useUsers';
 import { useAuth } from '@/lib/context/AuthContext';
 import { Flag, MessageSquare, Star, User } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 interface Review {
   id: number;
@@ -44,12 +46,13 @@ interface Contract {
 
 export default function ReviewsPage() {
   const { user } = useAuth();
-  const [givenReviews, setGivenReviews] = useState<Review[]>([]);
-  const [receivedReviews, setReceivedReviews] = useState<Review[]>([]);
-  const [contracts, setContracts] = useState<Contract[]>([]);
+  const { data: givenReviews = [], isLoading: givenLoading, isError: givenError, error: givenErrorMsg, refetch: refetchGiven } = useGivenReviews(user?.id);
+  const { data: receivedReviews = [], isLoading: receivedLoading, isError: receivedError, error: receivedErrorMsg, refetch: refetchReceived } = useReceivedReviews(user?.id);
+  const { data: contracts = [] } = useCompletedContracts();
+  const createReviewMutation = useCreateReview();
+
   const [activeTab, setActiveTab] = useState<'received' | 'given'>('received');
   const [showForm, setShowForm] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     contractId: '',
     revieweeId: '',
@@ -61,34 +64,6 @@ export default function ReviewsPage() {
     timeliness: 5,
     professionalism: 5,
   });
-
-  useEffect(() => {
-    if (user) {
-      fetchData();
-    }
-  }, [user]);
-
-  const fetchData = async () => {
-    try {
-      const [givenRes, receivedRes, contractsRes] = await Promise.all([
-        apiClient.get(`/reviews/reviewer/${user?.id}`),
-        apiClient.get(`/reviews/reviewee/${user?.id}`),
-        apiClient.get('/contracts'),
-      ]);
-
-      const givenData = givenRes.data;
-      const receivedData = receivedRes.data;
-      const contractsData = contractsRes.data;
-
-      setGivenReviews(givenData);
-      setReceivedReviews(receivedData);
-      setContracts(contractsData.filter((c: Contract) => c.status === 'COMPLETED'));
-    } catch (error) {
-      console.error('Failed to fetch data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,11 +84,8 @@ export default function ReviewsPage() {
     };
 
     try {
-      const res = await apiClient.post('/reviews', payload);
-      if (res.status >= 200 && res.status < 300) {
-        await fetchData();
-        resetForm();
-      }
+      await createReviewMutation.mutateAsync(payload);
+      resetForm();
     } catch (error) {
       console.error('Failed to create review:', error);
     }
@@ -190,19 +162,37 @@ export default function ReviewsPage() {
 
   const avgRating =
     receivedReviews.length > 0
-      ? (receivedReviews.reduce((sum, r) => sum + r.rating, 0) / receivedReviews.length).toFixed(
+      ? (receivedReviews.reduce((sum: number, r: any) => sum + r.rating, 0) / receivedReviews.length).toFixed(
           1
         )
       : '0.0';
 
-  if (loading) {
+  const isLoading = givenLoading || receivedLoading;
+  const isError = givenError || receivedError;
+  const error = givenErrorMsg || receivedErrorMsg;
+
+  if (isLoading) {
     return (
       <PageLayout>
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <LoadingSpinner />
         </div>
       </PageLayout>
-    )
+    );
+  }
+
+  if (isError) {
+    return (
+      <PageLayout>
+        <ErrorMessage 
+          message={error?.message || 'Failed to load reviews'} 
+          retry={() => {
+            refetchGiven();
+            refetchReceived();
+          }}
+        />
+      </PageLayout>
+    );
   }
 
   return (
@@ -391,7 +381,7 @@ export default function ReviewsPage() {
             </div>
           )}
 
-          {(activeTab === 'received' ? receivedReviews : givenReviews).map((review) => (
+          {(activeTab === 'received' ? receivedReviews : givenReviews).map((review: any) => (
             <div key={review.id} className="bg-white rounded-lg shadow p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-start gap-4">

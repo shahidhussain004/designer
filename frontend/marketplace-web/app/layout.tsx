@@ -2,6 +2,7 @@ import { CookiesConsent, SkipLink } from '@/components/ui'
 import { AuthProvider } from '@/lib/context/AuthContext'
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import { Providers } from './providers'
 import PWARegister from './PWARegister'
 
 export const metadata: Metadata = {
@@ -43,11 +44,13 @@ export default function RootLayout({
         <PWARegister />
         
         {/* Main content wrapper with ARIA landmark */}
-        <AuthProvider>
-          <div id="main-content" role="main" tabIndex={-1}>
-            {children}
-          </div>
-        </AuthProvider>
+        <Providers>
+          <AuthProvider>
+            <div id="main-content" role="main" tabIndex={-1}>
+              {children}
+            </div>
+          </AuthProvider>
+        </Providers>
         
         {/* Cookies Consent Component */}
         <CookiesConsent />

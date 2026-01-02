@@ -1,22 +1,23 @@
 'use client';
 
+import { ErrorMessage } from '@/components/ErrorMessage';
 import {
-    Badge,
-    Button,
-    Card,
-    Divider,
-    Flex,
-    Grid,
-    Input,
-    Spinner,
-    Text,
+  Badge,
+  Button,
+  Card,
+  Divider,
+  Flex,
+  Grid,
+  Input,
+  Text,
 } from '@/components/green';
+import { TutorialsSkeleton } from '@/components/Skeletons';
 import { PageLayout } from '@/components/ui';
-import { categoriesApi, contentApi, tagsApi } from '@/lib/content-api';
-import type { Category, ContentType, ContentWithRelations, Tag } from '@/lib/content-types';
+import { useCategories, useContent, useTags } from '@/hooks/useContent';
+import type { ContentType } from '@/lib/content-types';
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 const CONTENT_TYPES: { value: ContentType | ''; label: string }[] = [
   { value: '', label: 'All Types' },
@@ -26,16 +27,6 @@ const CONTENT_TYPES: { value: ContentType | ''; label: string }[] = [
 ];
 
 export default function ResourcesPage() {
-  const [content, setContent] = useState<ContentWithRelations[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [totalCount, setTotalCount] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
-
-  // Categories and tags for filters
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [tags, setTags] = useState<Tag[]>([]);
-
   // Filters
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
@@ -46,59 +37,33 @@ export default function ResourcesPage() {
   const [page, setPage] = useState(1);
   const pageSize = 12;
 
-  // Fetch categories and tags on mount
-  useEffect(() => {
-    const fetchFilters = async () => {
-      try {
-        const [cats, tagsData] = await Promise.all([
-          categoriesApi.getAll(),
-          tagsApi.getAll(),
-        ]);
-        setCategories(cats);
-        setTags(tagsData);
-      } catch (err) {
-        console.error('Error fetching filters:', err);
-      }
-    };
-    fetchFilters();
-  }, []);
+  // Fetch categories and tags
+  const { data: categories = [] } = useCategories();
+  const { data: tags = [] } = useTags();
 
-  const fetchContent = useCallback(async () => {
-    try {
-      setLoading(true);
-      const result = await contentApi.getPublished({
-        page,
-        limit: pageSize,
-        sortBy,
-        sortOrder,
-        filters: {
-          contentType: selectedContentType || undefined,
-          categoryId: selectedCategory || undefined,
-          tagIds: selectedTags.length > 0 ? selectedTags : undefined,
-          search: searchQuery || undefined,
-        },
-      });
+  // Fetch content with filters
+  const filters = useMemo(() => ({
+    page,
+    limit: pageSize,
+    sortBy,
+    sortOrder,
+    filters: {
+      contentType: selectedContentType || undefined,
+      categoryId: selectedCategory || undefined,
+      tagIds: selectedTags.length > 0 ? selectedTags : undefined,
+      search: searchQuery || undefined,
+    },
+  }), [page, sortBy, sortOrder, selectedContentType, selectedCategory, selectedTags, searchQuery]);
 
-      setContent(result.data);
-      setTotalCount(result.meta.total);
-      setTotalPages(result.meta.totalPages);
-      setError(null);
-    } catch (err) {
-      console.error('Error fetching content:', err);
-      setError('Failed to load resources. Please try again later.');
-    } finally {
-      setLoading(false);
-    }
-  }, [page, pageSize, sortBy, sortOrder, selectedContentType, selectedCategory, selectedTags, searchQuery]);
-
-  useEffect(() => {
-    fetchContent();
-  }, [fetchContent]);
+  const { data: contentData, isLoading, error, refetch } = useContent(filters);
+  
+  const content = contentData?.data || [];
+  const totalCount = contentData?.meta?.total || 0;
+  const totalPages = contentData?.meta?.totalPages || 0;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setPage(1);
-    fetchContent();
   };
 
   const handleTagToggle = (tagId: string) => {
@@ -190,7 +155,7 @@ export default function ResourcesPage() {
                   className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
                 >
                   <option value="">All Categories</option>
-                  {categories.map((cat) => (
+                  {categories.map((cat: any) => (
                     <option key={cat.id} value={cat.id}>
                       {cat.name}
                     </option>
@@ -246,27 +211,25 @@ export default function ResourcesPage() {
           {/* Results Summary */}
           <Flex className="justify-between items-center mb-6">
             <Text className="text-gray-600">
-              {loading ? 'Loading...' : `${totalCount} resources found`}
+              {isLoading ? 'Loading...' : `${totalCount} resources found`}
             </Text>
           </Flex>
 
           {/* Error State */}
           {error && (
-            <Card className="p-8 text-center mb-8">
-              <Text className="text-red-600 mb-4">{error}</Text>
-              <Button onClick={fetchContent}>Try Again</Button>
-            </Card>
+            <ErrorMessage 
+              message={error instanceof Error ? error.message : 'Failed to load resources'}
+              retry={refetch}
+            />
           )}
 
           {/* Loading State */}
-          {loading && (
-            <Flex className="justify-center py-12">
-              <Spinner />
-            </Flex>
+          {isLoading && (
+            <TutorialsSkeleton />
           )}
 
           {/* Content Grid */}
-          {!loading && !error && (
+          {!isLoading && !error && (
             <>
               {content.length === 0 ? (
                 <Card className="p-12 text-center">
@@ -279,7 +242,7 @@ export default function ResourcesPage() {
                 </Card>
               ) : (
                 <Grid className="grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {content.map((item) => (
+                  {content.map((item: any) => (
                     <Link key={item.id} href={`/resources/${item.slug}`}>
                       <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer overflow-hidden">
                         {/* Featured Image */}
@@ -387,7 +350,7 @@ export default function ResourcesPage() {
                           {/* Tags */}
                           {item.tags && item.tags.length > 0 && (
                             <Flex className="flex-wrap gap-1 mt-3">
-                              {item.tags.slice(0, 3).map((tag) => (
+                              {item.tags.slice(0, 3).map((tag: any) => (
                                 <Badge
                                   key={tag.id}
                                   className="text-xs bg-gray-100 text-gray-600"

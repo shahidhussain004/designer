@@ -3,7 +3,7 @@
  * API client for the content-service microservice
  */
 
-import axios from 'axios';
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import type {
   ApiResponse,
   Category,
@@ -32,8 +32,18 @@ import logger from './logger';
 
 const CONTENT_API_URL = process.env.NEXT_PUBLIC_CONTENT_API_URL || 'http://localhost:8083/api/v1';
 
+// Extend Axios config for metadata
+declare module 'axios' {
+  export interface InternalAxiosRequestConfig {
+    metadata?: {
+      startTime: number;
+    };
+  }
+}
+
 /**
  * Axios instance for Content Service
+ * Configured with interceptors for auth, logging, and error handling
  */
 export const contentClient = axios.create({
   baseURL: CONTENT_API_URL,
@@ -43,33 +53,94 @@ export const contentClient = axios.create({
   timeout: 10000,
 });
 
-// Request interceptor - add auth token
+// Request interceptor - add auth token and logging
 contentClient.interceptors.request.use(
-  (config) => {
+  (config: InternalAxiosRequestConfig) => {
+    const startTime = Date.now();
+    config.metadata = { startTime };
+
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('access_token');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
-    logger.debug(`Content API: ${config.method?.toUpperCase()} ${config.url}`);
+
+    logger.apiRequest(
+      config.method?.toUpperCase() || 'UNKNOWN',
+      `[Content] ${config.url || 'UNKNOWN'}`,
+      config.data
+    );
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    logger.error('Content API Request Interceptor Error', error);
+    return Promise.reject(error);
+  }
 );
 
-// Response interceptor - log errors
+// Response interceptor - handle errors and log responses
 contentClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    const errorMessage = error.response?.data?.error?.message || error.message;
-    const enhancedError = new Error(errorMessage);
-    enhancedError.name = `ContentAPIError[${error.response?.status || 'Unknown'}]`;
-    
-    logger.error('Content API Error', enhancedError, {
-      url: error.config?.url || 'unknown',
-      status: error.response?.status?.toString() || 'unknown',
-    });
+  (response) => {
+    const duration = response.config.metadata?.startTime 
+      ? Date.now() - response.config.metadata.startTime 
+      : 0;
+
+    logger.apiResponse(
+      response.config.method?.toUpperCase() || 'UNKNOWN',
+      `[Content] ${response.config.url || 'UNKNOWN'}`,
+      response.status,
+      duration
+    );
+
+    if (duration > 1000) {
+      logger.warn(`Slow Content API request: ${duration}ms`, {
+        method: response.config.method,
+        url: response.config.url,
+        duration: `${duration}ms`,
+      });
+    }
+
+    return response;
+  },
+  async (error: AxiosError) => {
+    // Ignore cancellation errors
+    if (axios.isCancel(error)) {
+      return Promise.reject(error);
+    }
+
+    const originalRequest = error.config as InternalAxiosRequestConfig & { 
+      _retry?: boolean; 
+      metadata?: { startTime: number } 
+    };
+
+    const duration = originalRequest?.metadata?.startTime 
+      ? Date.now() - originalRequest.metadata.startTime 
+      : 0;
+
+    if (error.response) {
+      logger.apiError(
+        originalRequest?.method?.toUpperCase() || 'UNKNOWN',
+        `[Content] ${originalRequest?.url || 'UNKNOWN'}`,
+        error,
+        error.response.status
+      );
+
+      logger.error('Content API Error Response', error, {
+        status: error.response.status,
+        statusText: error.response.statusText,
+        data: error.response.data,
+        duration: `${duration}ms`,
+      });
+    } else if (error.request) {
+      logger.error('Content API Request Failed - No Response', error, {
+        url: originalRequest?.url,
+        method: originalRequest?.method,
+      });
+    } else {
+      logger.error('Content API Request Setup Error', error);
+    }
+
     return Promise.reject(error);
   }
 );

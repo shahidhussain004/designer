@@ -1,5 +1,6 @@
 'use client';
 
+import { ErrorMessage } from '@/components/ErrorMessage';
 import {
   Badge,
   Button,
@@ -8,27 +9,43 @@ import {
   Flex,
   Grid,
   Input,
-  Spinner,
   Text,
 } from '@/components/green';
+import { CoursesSkeleton } from '@/components/Skeletons';
 import { PageLayout } from '@/components/ui';
+import { useCourses } from '@/hooks/useCourses';
 import {
-  Course,
   COURSE_CATEGORIES,
-  getCourses,
   SKILL_LEVELS,
 } from '@/lib/courses';
 import { formatCurrency } from '@/lib/payments';
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
+
+// Course type from API
+interface Course {
+  id: number;
+  title: string;
+  description: string;
+  instructorId: number;
+  instructorName?: string;
+  category: string;
+  skillLevel: string;
+  price: number;
+  currency: string;
+  duration: number;
+  language: string;
+  thumbnailUrl?: string;
+  videoPreviewUrl?: string;
+  enrollmentCount: number;
+  rating: number;
+  isPublished: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default function CoursesPage() {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [totalCount, setTotalCount] = useState(0);
-
   // Filters
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
@@ -38,37 +55,25 @@ export default function CoursesPage() {
   const [page, setPage] = useState(0);
   const pageSize = 12;
 
-  const fetchCourses = useCallback(async () => {
-    try {
-      setLoading(true);
-      const result = await getCourses({
-        category: selectedCategory || undefined,
-        skillLevel: selectedSkillLevel || undefined,
-        minPrice: priceRange.min,
-        maxPrice: priceRange.max,
-        search: searchQuery || undefined,
-        page,
-        size: pageSize,
-        sortBy,
-      });
-      setCourses(result.courses);
-      setTotalCount(result.totalCount);
-    } catch (err) {
-      console.error('Error fetching courses:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load courses');
-    } finally {
-      setLoading(false);
-    }
-  }, [selectedCategory, selectedSkillLevel, priceRange, sortBy, page, searchQuery, pageSize]);
+  const filters = useMemo(() => ({
+    category: selectedCategory || undefined,
+    skillLevel: selectedSkillLevel || undefined,
+    minPrice: priceRange.min,
+    maxPrice: priceRange.max,
+    search: searchQuery || undefined,
+    page,
+    size: pageSize,
+    sortBy,
+  }), [selectedCategory, selectedSkillLevel, priceRange, sortBy, page, searchQuery]);
 
-  useEffect(() => {
-    fetchCourses();
-  }, [fetchCourses]);
+  const { data, isLoading, error, refetch } = useCourses(filters);
+  
+  const courses = data?.courses || [];
+  const totalCount = data?.totalCount || 0;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setPage(0);
-    fetchCourses();
   };
 
   const handleClearFilters = () => {
@@ -265,21 +270,13 @@ export default function CoursesPage() {
             </Flex>
 
             {/* Loading State */}
-            {loading && (
-              <Flex justify-content="center" padding="xl">
-                <Spinner />
-              </Flex>
-            )}
+            {isLoading && <CoursesSkeleton />}
 
             {/* Error State */}
-            {error && (
-              <Card padding="l" style={{ borderLeft: '4px solid var(--color-negative)' }}>
-                <Text color="negative" font-size="body-m">{error}</Text>
-              </Card>
-            )}
+            {error && <ErrorMessage message={error instanceof Error ? error.message : 'Failed to load courses'} retry={refetch} />}
 
             {/* Course Grid */}
-            {!loading && !error && (
+            {!isLoading && !error && (
               <>
                 {courses.length > 0 ? (
                   <>
@@ -398,14 +395,9 @@ function CourseCard({ course, getSkillLevelVariant }: CourseCardProps) {
             </Flex>
             <Text font-size="body-xs" color="secondary">•</Text>
             <Text font-size="body-xs" color="secondary">
-              {course.lessonsCount} lessons
+              {course.duration || 0} min duration
             </Text>
           </Flex>
-
-          {/* Duration */}
-          <Text font-size="body-xs" color="secondary">
-            {Math.floor(course.durationMinutes / 60)}h {course.durationMinutes % 60}m
-          </Text>
 
           {/* Divider */}
           <Divider style={{ margin: '8px 0' }} />
@@ -416,7 +408,7 @@ function CourseCard({ course, getSkillLevelVariant }: CourseCardProps) {
               {formatCurrency(course.price, course.currency)}
             </Text>
             <Text font-size="body-xs" color="secondary">
-              {typeof course.enrollmentsCount === 'number' ? course.enrollmentsCount.toLocaleString() : '0'} enrolled
+              {typeof course.enrollmentCount === 'number' ? course.enrollmentCount.toLocaleString() : '0'} enrolled
             </Text>
           </Flex>
         </Flex>

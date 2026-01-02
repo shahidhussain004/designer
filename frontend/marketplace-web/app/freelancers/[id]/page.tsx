@@ -1,11 +1,12 @@
 "use client"
 
-import { Badge, Button, Card, Divider, Flex, Grid, Spinner, Text } from '@/components/green'
+import { ErrorMessage } from '@/components/ErrorMessage'
+import { Badge, Button, Card, Divider, Flex, Grid, Text } from '@/components/green'
+import { LoadingSpinner } from '@/components/Skeletons'
 import { PageLayout } from '@/components/ui'
-import { apiClient } from '@/lib/api-client'
+import { useUserProfile } from '@/hooks/useUsers'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
 
 interface Review {
   id: number
@@ -37,49 +38,28 @@ interface FreelancerProfile {
 export default function FreelancerProfilePage() {
   const params = useParams()
   const freelancerId = params.id as string
-  const [profile, setProfile] = useState<FreelancerProfile | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        setLoading(true)
-        const { data } = await apiClient.get(`/users/${freelancerId}/profile`)
-        setProfile(data)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load profile')
-      } finally {
-        setLoading(false)
-      }
-    }
+  const { data, isLoading, isError, error, refetch } = useUserProfile(freelancerId)
+  const profile = data as FreelancerProfile | undefined
 
-    if (freelancerId) load()
-  }, [freelancerId])
-
-  if (loading) {
+  if (isLoading) {
     return (
       <PageLayout>
         <Flex justify-content="center" align-items="center" style={{ minHeight: '400px' }}>
-          <Spinner />
+          <LoadingSpinner />
         </Flex>
       </PageLayout>
     )
   }
 
-  if (error || !profile) {
+  if (isError || !profile) {
     return (
       <PageLayout>
         <Flex justify-content="center" align-items="center" style={{ minHeight: '400px' }}>
-          <Card padding="xl">
-            <Flex flex-direction="column" align-items="center" gap="m">
-              <Text font-size="heading-s">Profile Not Found</Text>
-              <Text font-size="body-l" color="neutral-02">{error || 'Unable to load profile'}</Text>
-              <Link href="/talents">
-                <Button>Browse Other Talent</Button>
-              </Link>
-            </Flex>
-          </Card>
+          <ErrorMessage 
+            message={error?.message || 'Failed to load profile'} 
+            retry={() => refetch()}
+          />
         </Flex>
       </PageLayout>
     )

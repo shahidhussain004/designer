@@ -7,14 +7,12 @@ import {
   Flex,
   Input,
   Select,
-  Spinner,
   Text,
   Textarea,
 } from '@/components/green';
 import { PageLayout } from '@/components/ui';
-import { apiClient } from '@/lib/api-client';
+import { useCreateJob } from '@/hooks/useJobs';
 import { useAuth } from '@/lib/auth';
-import logger from '@/lib/logger';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -33,10 +31,7 @@ interface CreateJobRequest {
 export default function CreateJobPage() {
   const router = useRouter();
   const { user } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  const createJob = useCreateJob();
 
   const [formData, setFormData] = useState<CreateJobRequest>({
     title: '',
@@ -52,18 +47,14 @@ export default function CreateJobPage() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    if (user) {
-      if (user.role !== 'CLIENT') {
-        router.push('/jobs');
-      }
+    if (user && user.role !== 'CLIENT') {
+      router.push('/jobs');
     }
-    setLoading(false);
   }, [router, user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFieldErrors({});
-    setError(null);
 
     const newErrors: Record<string, string> = {};
 
@@ -91,42 +82,30 @@ export default function CreateJobPage() {
       return;
     }
 
-    setSubmitting(true);
-
     try {
-      const response = await apiClient.post('/jobs', formData);
-      setSuccess(true);
-
+      const result = await createJob.mutateAsync(formData);
       setTimeout(() => {
-        router.push(`/jobs/${response.data.id}`);
+        router.push(`/jobs/${result.id}`);
       }, 1500);
-    } catch (err: any) {
-      logger.error('Job creation failed', err);
-      let message = 'Failed to create job';
-
-      if (err?.response?.data?.message) {
-        message = err.response.data.message;
-      } else if (err?.message) {
-        message = err.message;
-      }
-
-      setError(message);
-    } finally {
-      setSubmitting(false);
+    } catch (err) {
+      // Error handled by mutation
     }
   };
 
-  if (loading) {
+  if (!user) {
     return (
       <PageLayout>
-        <Flex justify-content="center" align-items="center" padding="xl">
-          <Spinner />
+        <Flex flex-direction="column" padding="l" gap="m">
+          <Alert variant="negative">
+            Please log in to post a job
+          </Alert>
+          <Link href="/jobs">← Back to Jobs</Link>
         </Flex>
       </PageLayout>
     );
   }
 
-  if (!user || user.role !== 'CLIENT') {
+  if (user.role !== 'CLIENT') {
     return (
       <PageLayout>
         <Flex flex-direction="column" padding="l" gap="m">
@@ -141,7 +120,7 @@ export default function CreateJobPage() {
 
   return (
     <PageLayout>
-      {success && (
+      {createJob.isSuccess && (
         <div style={{ padding: '1rem' }}>
           <Alert variant="positive">
             Job posted successfully! Redirecting...
@@ -149,9 +128,11 @@ export default function CreateJobPage() {
         </div>
       )}
 
-      {error && (
+      {createJob.error && (
         <div style={{ padding: '1rem' }}>
-          <Alert variant="negative">{error}</Alert>
+          <Alert variant="negative">
+            {createJob.error instanceof Error ? createJob.error.message : 'Failed to create job'}
+          </Alert>
         </div>
       )}
 
@@ -341,9 +322,9 @@ export default function CreateJobPage() {
                 <Button
                   type="submit"
                   variant="brand"
-                  disabled={submitting}
+                  disabled={createJob.isPending}
                 >
-                  {submitting ? 'Posting...' : 'Post Job'}
+                  {createJob.isPending ? 'Posting...' : 'Post Job'}
                 </Button>
               </Flex>
             </Flex>

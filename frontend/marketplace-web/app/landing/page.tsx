@@ -1,8 +1,7 @@
 'use client'
 
 import { IconCalendar, IconSearch, IconStar, VideoBackground } from '@/components/ui';
-import apiClient from '@/lib/api-client';
-import { parseCategories } from '@/lib/apiParsers';
+import { useProjectCategories } from '@/hooks/useProjects';
 import type { PostCategory } from '@/lib/apiTypes';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -30,29 +29,8 @@ const LandingPage = () => {
   const [activeTab, setActiveTab] = useState<'talents' | 'jobs'>('talents');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  const [categories, setCategories] = useState<Category[]>(FALLBACK_CATEGORIES);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    async function load() {
-      try {
-        const res = await apiClient.get('/project-categories', { signal: signal as any });
-        const payload = res.data?.data ?? res.data;
-        const categories = parseCategories(payload);
-        setCategories(categories);
-      } catch (err: unknown) {
-        const maybeErr = err as { name?: string }
-        if (maybeErr.name === 'AbortError') return
-        console.error('Error loading categories:', err)
-        // keep fallback categories
-      }
-    }
-
-    load();
-    return () => controller.abort();
-  }, []);
+  const { data: categoriesData = [] } = useProjectCategories();
+  const categories = categoriesData.length > 0 ? categoriesData : FALLBACK_CATEGORIES;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -242,7 +220,7 @@ const LandingPage = () => {
 
                 <div className="border-t border-white/30 pt-6">
                   <div className="flex flex-wrap gap-3">
-                    {categories.map((cat) => (
+                    {categories.map((cat: any) => (
                       <Link
                         key={cat.id + '-' + cat.name}
                         href={`/jobs?categoryId=${cat.id}`}
@@ -267,7 +245,7 @@ const LandingPage = () => {
 
                 <div className="border-t border-white/30 pt-6">
                   <div className="flex flex-wrap gap-3">
-                    {categories.map((cat) => (
+                    {categories.map((cat: any) => (
                       <Link
                         key={cat.id + '-' + cat.name}
                         href={`/jobs?categoryId=${cat.id}`}

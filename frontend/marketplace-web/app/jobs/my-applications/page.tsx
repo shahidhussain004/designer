@@ -1,20 +1,19 @@
 'use client';
 
+import { ErrorMessage } from '@/components/ErrorMessage';
 import {
-    Alert,
-    Badge,
-    Card,
-    Flex,
-    Spinner,
-    Text,
+  Badge,
+  Card,
+  Flex,
+  Text
 } from '@/components/green';
+import { LoadingSpinner } from '@/components/Skeletons';
 import { PageLayout } from '@/components/ui';
-import { apiClient } from '@/lib/api-client';
+import { useMyApplications } from '@/hooks/useJobs';
 import { useAuth } from '@/lib/auth';
-import logger from '@/lib/logger';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 interface JobApplication {
   id: number;
@@ -29,10 +28,9 @@ interface JobApplication {
 
 export default function MyApplicationsPage() {
   const router = useRouter();
-  const [applications, setApplications] = useState<JobApplication[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
+
+  const { data: applications = [], isLoading, isError, error, refetch } = useMyApplications();
 
   useEffect(() => {
     if (user) {
@@ -42,31 +40,11 @@ export default function MyApplicationsPage() {
     }
   }, [router, user]);
 
-  useEffect(() => {
-    const fetchApplications = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const { data } = await apiClient.get('/job-applications/my-applications');
-        setApplications(Array.isArray(data) ? data : data.content || []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-        logger.error('Error fetching applications', err as Error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (user && user.role === 'FREELANCER') {
-      fetchApplications();
-    }
-  }, [user]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <PageLayout>
         <Flex justify-content="center" align-items="center" padding="xl">
-          <Spinner />
+          <LoadingSpinner />
         </Flex>
       </PageLayout>
     );
@@ -74,9 +52,12 @@ export default function MyApplicationsPage() {
 
   return (
     <PageLayout>
-      {error && (
+      {isError && (
         <div style={{ padding: '1rem' }}>
-          <Alert variant="negative">{error}</Alert>
+          <ErrorMessage 
+            message={error?.message || 'Failed to load applications'} 
+            retry={() => refetch()}
+          />
         </div>
       )}
 
@@ -105,7 +86,7 @@ export default function MyApplicationsPage() {
           </Card>
         ) : (
           <Flex flex-direction="column" gap="m" style={{ width: '100%' }}>
-            {applications.map((application) => (
+            {applications.map((application: any) => (
               <Link
                 key={application.id}
                 href={`/jobs/${application.jobId}`}

@@ -1,5 +1,6 @@
 'use client';
 
+import { ErrorMessage } from '@/components/ErrorMessage';
 import {
   Alert,
   Badge,
@@ -9,12 +10,13 @@ import {
   Flex,
   Grid,
   Input,
-  Spinner,
   Text,
   Textarea,
 } from '@/components/green';
+import { JobDetailsSkeleton } from '@/components/Skeletons';
 import { PageLayout } from '@/components/ui';
-import { apiClient } from '@/lib/api-client';
+import { useProject, useSubmitProposal } from '@/hooks/useProjects';
+import { useUserProfile } from '@/hooks/useUsers';
 import { authService } from '@/lib/auth';
 import logger from '@/lib/logger';
 import { User } from '@/types';
@@ -61,10 +63,10 @@ export default function ProjectDetailsPage() {
   const params = useParams();
   const projectId = params.id as string;
 
-  const [project, setProject] = useState<Project | null>(null);
-  const [client, setClient] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: project, isLoading, error, refetch } = useProject(projectId);
+  const { data: client } = useUserProfile(project?.clientId || null);
+  const submitProposalMutation = useSubmitProposal();
+
   const [user, setUser] = useState<User | null>(null);
   const [proposalOpen, setProposalOpen] = useState(false);
   const [proposalData, setProposalData] = useState<ProposalRequest>({
@@ -73,7 +75,6 @@ export default function ProjectDetailsPage() {
     proposedRate: 0,
     estimatedDuration: 30,
   });
-  const [submittingProposal, setSubmittingProposal] = useState(false);
   const [proposalSuccess, setProposalSuccess] = useState(false);
   const [proposalError, setProposalError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<{ coverLetter?: string; proposedRate?: string; estimatedDuration?: string }>({});
@@ -86,69 +87,10 @@ export default function ProjectDetailsPage() {
   }, []);
 
   useEffect(() => {
-    const abortController = new AbortController();
-    const controller = abortController;
-    const timeoutMs = 10000;
-    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-
-    const fetchProjectDetails = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        // Prefer apiClient but keep abort behavior for SSR fallback
-        let projectData: any = null;
-        try {
-          const { data } = await apiClient.get(`/projects/${projectId}`, {
-            signal: controller.signal as any,
-          });
-          projectData = data;
-          setProject(projectData);
-        } catch (err) {
-          // If apiClient fails due to not supporting AbortSignal in this environment, fall back to fetch
-          const base = process.env.NEXT_PUBLIC_API_URL || '';
-          const projectUrl = base ? `${base}/projects/${projectId}` : `/projects/${projectId}`;
-          const response = await fetch(projectUrl, { signal: controller.signal });
-          if (!response.ok) {
-            throw new Error(`Failed to fetch project details (${response.status})`);
-          }
-          projectData = await response.json();
-          setProject(projectData);
-        }
-
-        setProposalData((prev) => ({ ...prev, projectId: projectData.id }));
-
-        if (projectData.clientId) {
-          try {
-            const { data: clientData } = await apiClient.get(`/users/${projectData.clientId}/profile`, {
-              signal: controller.signal as any,
-            });
-            setClient(clientData);
-          } catch (err) {
-            // If abort, ignore; otherwise log
-            if ((err as any)?.name !== 'AbortError') {
-              logger.error('Error fetching client details', err as Error);
-            }
-          }
-        }
-      } catch (err) {
-        if ((err as any)?.name === 'AbortError') {
-          // ignore aborts (timeout or navigation)
-        } else {
-          setError(err instanceof Error ? err.message : 'An error occurred');
-        }
-      } finally {
-        clearTimeout(timeoutId);
-        setLoading(false);
-      }
-    };
-
-    fetchProjectDetails();
-
-    return () => {
-      controller.abort();
-      clearTimeout(timeoutId);
-    };
-  }, [projectId]);
+    if (project) {
+      setProposalData((prev) => ({ ...prev, projectId: project.id }));
+    }
+  }, [project]);
 
   const handleProposalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -182,11 +124,8 @@ export default function ProjectDetailsPage() {
       return;
     }
 
-    setSubmittingProposal(true);
-    setProposalSuccess(false);
-    
     try {
-      const { data } = await apiClient.post('/proposals', proposalData);
+      await submitProposalMutation.mutateAsync(proposalData);
 
       setProposalSuccess(true);
       setProposalOpen(false);
@@ -229,16 +168,14 @@ export default function ProjectDetailsPage() {
       }
 
       setProposalError(message);
-    } finally {
-      setSubmittingProposal(false);
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <PageLayout>
         <Flex justify-content="center" align-items="center" padding="xl">
-          <Spinner />
+          <JobDetailsSkeleton />
         </Flex>
       </PageLayout>
     );
@@ -248,12 +185,12 @@ export default function ProjectDetailsPage() {
     return (
       <PageLayout>
         <Flex flex-direction="column" padding="l" gap="m">
-          <Alert variant="negative">
-            Error: {error || 'Project not found'}
-          </Alert>
-          <Link href="/projects">
-            ← Back to Browse Projects
-          </Link>
+          {error ? (
+            <ErrorMessage message={(error as Error).message} retry={refetch} />
+          ) : (
+            <Alert variant="negative">Project not found</Alert>
+          )}
+          <Link href="/projects">← Back to Browse Projects</Link>
         </Flex>
       </PageLayout>
     );
@@ -462,8 +399,8 @@ export default function ProjectDetailsPage() {
                       )}
                     </Flex>
 
-                    <Button type="submit" disabled={submittingProposal}>
-                      {submittingProposal ? 'Submitting...' : 'Submit Proposal'}
+                    <Button type="submit" disabled={submitProposalMutation.isPending}>
+                      {submitProposalMutation.isPending ? 'Submitting...' : 'Submit Proposal'}
                     </Button>
                   </Flex>
                 </form>
