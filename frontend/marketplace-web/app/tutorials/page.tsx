@@ -1,38 +1,27 @@
 'use client';
 
+import { ErrorMessage } from '@/components/ErrorMessage';
+import { TutorialsSkeleton } from '@/components/Skeletons';
 import { PageLayout } from '@/components/ui';
-import { Tutorial, tutorialsApi } from '@/lib/content-api';
+import { useTutorials } from '@/hooks/useContent';
 import { BookOpen, Clock, Headphones, TrendingUp, Video } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 // Difficulty filter type
 type DifficultyFilter = 'all' | 'beginner' | 'intermediate' | 'advanced';
 
 const TutorialsPage = () => {
-  const [tutorials, setTutorials] = useState<Tutorial[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>('all');
 
-  useEffect(() => {
-    // Fetch tutorials from Tutorials API
-    (async () => {
-      try {
-        const tutorialsData = await tutorialsApi.getAll(true);
-        setTutorials(tutorialsData);
-      } catch (err: any) {
-        setError(err?.message || 'Failed to load tutorials');
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+  const { data: tutorials = [], isLoading, error, refetch } = useTutorials(true);
 
-  const filteredTutorials = tutorials.filter((tutorial) => {
-    if (difficultyFilter === 'all') return true;
-    return tutorial.difficulty_level === difficultyFilter;
-  });
+  const filteredTutorials = useMemo(() => {
+    return tutorials.filter((tutorial: any) => {
+      if (difficultyFilter === 'all') return true;
+      return tutorial.difficulty_level === difficultyFilter;
+    });
+  }, [tutorials, difficultyFilter]);
 
   const getDifficultyBadgeClass = (level: string) => {
     const baseClasses = 'px-3 py-1 rounded-full text-sm font-medium';
@@ -48,15 +37,10 @@ const TutorialsPage = () => {
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <PageLayout>
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-gray-300 border-t-transparent rounded-full animate-spin mx-auto"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-300">Loading tutorials...</p>
-          </div>
-        </div>
+        <TutorialsSkeleton />
       </PageLayout>
     );
   }
@@ -64,17 +48,10 @@ const TutorialsPage = () => {
   if (error) {
     return (
       <PageLayout>
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <p className="text-red-500 text-lg">Error: {error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="mt-4 px-6 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
-            >
-              Retry
-            </button>
-          </div>
-        </div>
+        <ErrorMessage 
+          message={error instanceof Error ? error.message : 'Failed to load tutorials'} 
+          retry={refetch}
+        />
       </PageLayout>
     );
   }
@@ -163,7 +140,7 @@ const TutorialsPage = () => {
 
         {/* Tutorial Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredTutorials.map((tutorial) => (
+          {filteredTutorials.map((tutorial: any) => (
             <div
               key={tutorial.id}
               className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-shadow overflow-hidden border border-gray-200 dark:border-gray-700"

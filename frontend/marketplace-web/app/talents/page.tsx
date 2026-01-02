@@ -1,11 +1,12 @@
 "use client"
 
-import { Badge, Button, Card, Divider, Flex, Grid, Input, Spinner, Text } from '@/components/green'
+import { ErrorMessage } from '@/components/ErrorMessage'
+import { Badge, Button, Card, Divider, Flex, Grid, Input, Text } from '@/components/green'
+import { LoadingSpinner } from '@/components/Skeletons'
 import { PageLayout } from '@/components/ui'
-import { apiClient } from '@/lib/api-client'
-import logger from '@/lib/logger'
+import { useUsers } from '@/hooks/useUsers'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 interface Freelancer {
   id: number
@@ -27,55 +28,36 @@ interface Freelancer {
 }
 
 export default function TalentsPage() {
-  const [freelancers, setFreelancers] = useState<Freelancer[]>([])
-  const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [skillFilter, setSkillFilter] = useState('')
   const [minRate, setMinRate] = useState('')
   const [maxRate, setMaxRate] = useState('')
 
-  useEffect(() => {
-    loadFreelancers()
-  }, [])
+  const { data: freelancersData = [], isLoading, isError, error, refetch } = useUsers({ role: 'FREELANCER' })
 
-  const loadFreelancers = async () => {
-    try {
-      // Call the new public freelancers endpoint (returns a paged response)
-      const { data } = await apiClient.get('/users/freelancers?page=0&size=50')
+  // Normalize the data
+  const freelancers: Freelancer[] = (freelancersData as any[]).map((u: any) => ({
+    id: u.id,
+    username: u.username,
+    fullName: u.full_name || u.fullName || u.fullName,
+    bio: u.bio,
+    profileImageUrl: u.profile_image_url || u.profileImageUrl,
+    location: u.location,
+    hourlyRate: u.hourly_rate || u.hourlyRate,
+    skills: u.skills || [],
+    ratingAvg: u.rating_avg || u.ratingAvg,
+    ratingCount: u.rating_count || u.ratingCount,
+    completionRate: u.completion_rate || u.completionRate,
+    portfolioItems: u.portfolio_items ? u.portfolio_items.map((p: any) => ({ id: p.id, title: p.title, imageUrl: p.image_url || p.imageUrl })) : [],
+  }))
 
-      // Paged response shape: { content: [...], totalElements, totalPages, number }
-      const items = data?.content || []
-
-      const normalized: Freelancer[] = (items || []).map((u: any) => ({
-        id: u.id,
-        username: u.username,
-        fullName: u.full_name || u.fullName || u.fullName,
-        bio: u.bio,
-        profileImageUrl: u.profile_image_url || u.profileImageUrl,
-        location: u.location,
-        hourlyRate: u.hourly_rate || u.hourlyRate,
-        skills: u.skills || [],
-        ratingAvg: u.rating_avg || u.ratingAvg,
-        ratingCount: u.rating_count || u.ratingCount,
-        completionRate: u.completion_rate || u.completionRate,
-        portfolioItems: u.portfolio_items ? u.portfolio_items.map((p: any) => ({ id: p.id, title: p.title, imageUrl: p.image_url || p.imageUrl })) : [],
-      }))
-
-      setFreelancers(normalized)
-    } catch (err) {
-      logger.error('Failed to load freelancers', err as Error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const filteredFreelancers = freelancers.filter(freelancer => {
+  const filteredFreelancers = freelancers.filter((freelancer: any) => {
     if (searchQuery && !freelancer.fullName.toLowerCase().includes(searchQuery.toLowerCase()) &&
         !freelancer.bio?.toLowerCase().includes(searchQuery.toLowerCase())) {
       return false
     }
 
-    if (skillFilter && !freelancer.skills?.some(skill => 
+    if (skillFilter && !freelancer.skills?.some((skill: any) => 
       skill.toLowerCase().includes(skillFilter.toLowerCase())
     )) {
       return false
@@ -91,6 +73,16 @@ export default function TalentsPage() {
 
     return true
   })
+
+  if (isLoading) {
+    return (
+      <PageLayout>
+        <Flex justify-content="center" align-items="center" padding="xl" min-height="50vh">
+          <LoadingSpinner />
+        </Flex>
+      </PageLayout>
+    )
+  }
 
   return (
     <PageLayout>
@@ -154,12 +146,16 @@ export default function TalentsPage() {
           </Flex>
         </Card>
 
+        {/* Error handling */}
+        {isError && (
+          <ErrorMessage 
+            message={error?.message || 'Failed to load freelancers'} 
+            retry={() => refetch()}
+          />
+        )}
+
         {/* Results */}
-        {loading ? (
-          <Flex justify-content="center" padding="xl">
-            <Spinner />
-          </Flex>
-        ) : filteredFreelancers.length === 0 ? (
+        {!isError && filteredFreelancers.length === 0 ? (
           <Card padding="xl">
             <Flex flex-direction="column" align-items="center" gap="m">
               <Text font-size="heading-s">No freelancers found</Text>

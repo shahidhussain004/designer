@@ -1,15 +1,17 @@
 "use client"
 
-import { Button, Card, Divider, Flex, Grid, Spinner, Text } from '@/components/green'
+import { ErrorMessage } from '@/components/ErrorMessage'
+import { Button, Card, Divider, Flex, Grid, Text } from '@/components/green'
+import { LoadingSpinner } from '@/components/Skeletons'
 import { PageLayout } from '@/components/ui'
-import apiClient from '@/lib/api-client'
+import { useCreatePortfolio, useDeletePortfolio, useUpdatePortfolio, useUserPortfolio, useUserProfile } from '@/hooks/useUsers'
 import { authService } from '@/lib/auth'
 import logger from '@/lib/logger'
 import { Edit, Eye, EyeOff, Plus, Trash2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 
 interface PortfolioItem {
   id: number
@@ -51,10 +53,6 @@ export default function PortfolioPage() {
   const currentUser = authService.getCurrentUser()
   const isOwnPortfolio = currentUser?.id?.toString() === portfolioUserId
 
-  const [freelancer, setFreelancer] = useState<FreelancerProfile | null>(null)
-  const [portfolio, setPortfolio] = useState<PortfolioItem[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [editingItem, setEditingItem] = useState<PortfolioItem | null>(null)
   const [undoItem, setUndoItem] = useState<PortfolioItem | null>(null)
@@ -70,35 +68,29 @@ export default function PortfolioPage() {
     completionDate: '',
   })
 
-  useEffect(() => {
-    loadData()
-  }, [portfolioUserId])
+  // Fetch data using hooks
+  const { data: freelancerData, isLoading: profileLoading, isError: profileError, error: profileErrorMsg, refetch: refetchProfile } = useUserProfile(portfolioUserId)
+  const { data: portfolioData = [], isLoading: portfolioLoading, isError: portfolioError, error: portfolioErrorMsg, refetch: refetchPortfolio } = useUserPortfolio(parseInt(portfolioUserId))
+  
+  const freelancer = freelancerData as FreelancerProfile | undefined
+  
+  // Mutations
+  const createPortfolioMutation = useCreatePortfolio()
+  const updatePortfolioMutation = useUpdatePortfolio()
+  const deletePortfolioMutation = useDeletePortfolio()
 
-  const loadData = async () => {
-    try {
-      setLoading(true)
-      setError(null)
+  // Filter: show only visible items for non-owners
+  const portfolio = isOwnPortfolio 
+    ? portfolioData 
+    : portfolioData.filter((p: any) => p.isVisible)
 
-      // Load freelancer profile
-      const profileRes = await apiClient.get(`/users/${portfolioUserId}/profile`)
-      if (profileRes.data) {
-        setFreelancer(profileRes.data)
-      }
+  const loading = profileLoading || portfolioLoading
+  const error = profileError || portfolioError
+  const errorMessage = profileErrorMsg?.message || portfolioErrorMsg?.message
 
-      // Load portfolio items
-      const portfolioRes = await apiClient.get(`/users/${portfolioUserId}/portfolio`)
-      if (portfolioRes.data) {
-        // Filter: show only visible items for non-owners
-        const items = portfolioRes.data || []
-        const filtered = isOwnPortfolio ? items : items.filter((p: PortfolioItem) => p.isVisible)
-        setPortfolio(filtered)
-      }
-    } catch (err) {
-      logger.error('Failed to load portfolio data', err as Error)
-      setError(err instanceof Error ? err.message : 'Failed to load portfolio')
-    } finally {
-      setLoading(false)
-    }
+  const loadData = () => {
+    refetchProfile()
+    refetchPortfolio()
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -116,17 +108,19 @@ export default function PortfolioPage() {
         displayOrder: editingItem ? editingItem.displayOrder : portfolio.length + 1,
       }
 
-      const endpoint = editingItem
-        ? `/portfolio/${editingItem.id}?userId=${portfolioUserId}`
-        : `/portfolio?userId=${portfolioUserId}`
-
       if (editingItem) {
-        await apiClient.put(endpoint, payload)
+        await updatePortfolioMutation.mutateAsync({
+          userId: parseInt(portfolioUserId),
+          itemId: editingItem.id,
+          input: payload
+        })
       } else {
-        await apiClient.post(endpoint, payload)
+        await createPortfolioMutation.mutateAsync({
+          userId: parseInt(portfolioUserId),
+          input: payload
+        })
       }
 
-      await loadData()
       resetForm()
     } catch (err) {
       logger.error(editingItem ? 'Failed to update portfolio item' : 'Failed to add portfolio item', err as Error)
@@ -137,19 +131,16 @@ export default function PortfolioPage() {
     if (!confirm('Are you sure you want to delete this portfolio item?')) return
 
     try {
-      await apiClient.delete(`/portfolio/${id}?userId=${portfolioUserId}`)
-      await loadData()
+      await deletePortfolioMutation.mutateAsync({
+        userId: parseInt(portfolioUserId),
+        itemId: id
+      })
     } catch (err) {
       logger.error('Failed to delete portfolio item', err as Error)
     }
   }
 
-  const toggleVisibility = async (item: PortfolioItem) => {
-    // Optimistic update
-    setPortfolio((prev) =>
-      prev.map((p) => (p.id === item.id ? { ...p, isVisible: !p.isVisible } : p))
-    )
-
+  const toggleVisibility = async (item: any) => {
     // Show undo banner if hiding
     if (item.isVisible) {
       setUndoItem({ ...item, isVisible: false })
@@ -161,14 +152,16 @@ export default function PortfolioPage() {
     }
 
     try {
-      await apiClient.put(`/portfolio/${item.id}?userId=${portfolioUserId}`, {
-        ...item,
-        isVisible: !item.isVisible,
+      await updatePortfolioMutation.mutateAsync({
+        userId: parseInt(portfolioUserId),
+        itemId: item.id,
+        input: {
+          ...item,
+          isVisible: !item.isVisible,
+        }
       })
     } catch (err) {
       logger.error('Failed to toggle visibility', err as Error)
-      // Revert optimistic change
-      setPortfolio((prev) => prev.map((p) => (p.id === item.id ? item : p)))
       setUndoItem(null)
       if (undoTimerRef.current) {
         window.clearTimeout(undoTimerRef.current)
@@ -177,26 +170,28 @@ export default function PortfolioPage() {
     }
   }
 
-  const restoreVisibility = async (item: PortfolioItem) => {
+  const restoreVisibility = async (item: any) => {
     if (undoTimerRef.current) {
       window.clearTimeout(undoTimerRef.current)
       undoTimerRef.current = null
     }
     setUndoItem(null)
-    setPortfolio((prev) =>
-      prev.map((p) => (p.id === item.id ? { ...p, isVisible: true } : p))
-    )
+    
     try {
-      await apiClient.put(`/portfolio/${item.id}?userId=${portfolioUserId}`, {
-        ...item,
-        isVisible: true,
+      await updatePortfolioMutation.mutateAsync({
+        userId: parseInt(portfolioUserId),
+        itemId: item.id,
+        input: {
+          ...item,
+          isVisible: true,
+        }
       })
     } catch (err) {
       logger.error('Failed to restore visibility', err as Error)
     }
   }
 
-  const editItem = (item: PortfolioItem) => {
+  const editItem = (item: any) => {
     setEditingItem(item)
     setFormData({
       title: item.title,
@@ -229,7 +224,7 @@ export default function PortfolioPage() {
     return (
       <PageLayout>
         <Flex justify-content="center" align-items="center" style={{ minHeight: '400px' }}>
-          <Spinner />
+          <LoadingSpinner />
         </Flex>
       </PageLayout>
     )
@@ -239,24 +234,10 @@ export default function PortfolioPage() {
     return (
       <PageLayout>
         <Flex justify-content="center" align-items="center" style={{ minHeight: '400px' }}>
-          <Card padding="xl">
-            <Flex flex-direction="column" align-items="center" gap="m">
-              <Text font-size="heading-s">Portfolio Not Found</Text>
-              <Text font-size="body-l" color="neutral-02">
-                {error || 'Unable to load portfolio'}
-              </Text>
-              <Flex gap="m">
-                <Link href="/talents">
-                  <Button>Browse Talent</Button>
-                </Link>
-                {isOwnPortfolio && (
-                  <Link href="/dashboard">
-                    <Button rank="secondary">Go to Dashboard</Button>
-                  </Link>
-                )}
-              </Flex>
-            </Flex>
-          </Card>
+          <ErrorMessage 
+            message={errorMessage || 'Failed to load portfolio'} 
+            retry={() => loadData()}
+          />
         </Flex>
       </PageLayout>
     )

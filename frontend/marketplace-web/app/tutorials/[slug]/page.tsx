@@ -1,11 +1,12 @@
 'use client';
 
+import { ErrorMessage } from '@/components/ErrorMessage';
+import { TutorialsSkeleton } from '@/components/Skeletons';
 import { Breadcrumb, PageLayout } from '@/components/ui';
-import { tutorialsApi } from '@/lib/content-api';
+import { useTutorial } from '@/hooks/useContent';
 import { BookOpen, ChevronRight, Clock, Code, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
 
 // Types matching backend
 interface TutorialTopic {
@@ -42,97 +43,71 @@ const TutorialDetailPage = () => {
   const params = useParams();
   const slug = params.slug as string;
 
-  const [tutorial, setTutorial] = useState<Tutorial | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: rawTutorial, isLoading, error, refetch } = useTutorial(slug);
 
-  useEffect(() => {
-    if (!slug) return;
-    (async () => {
-      try {
-        const resp = await tutorialsApi.getBySlug(slug);
-        const payload = resp ?? null;
-        if (!payload) {
-          setError('Invalid tutorial response from server');
-          setLoading(false);
-          return;
-        }
+  if (isLoading) {
+    return (
+      <PageLayout>
+        <TutorialsSkeleton />
+      </PageLayout>
+    );
+  }
 
-        const p: any = payload;
+  if (error || !rawTutorial) {
+    return (
+      <PageLayout>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            {error ? (
+              <ErrorMessage message={error.message} retry={refetch} />
+            ) : (
+              <>
+                <p className="text-red-500 text-lg">Error: Tutorial not found</p>
+                <Link
+                  href="/tutorials"
+                  className="mt-4 inline-block px-6 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
+                >
+                  Back to Tutorials
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      </PageLayout>
+    );
+  }
 
-        const adapted: Tutorial = {
-          id: p.id,
-          slug: p.slug,
-          title: p.title,
-          description: p.description ?? p.summary ?? p.excerpt ?? '',
-          icon: p.icon,
-          difficultyLevel: (p.difficulty_level as string) || (p.difficultyLevel as string) || 'beginner',
-          colorTheme: p.color_theme || p.colorTheme,
-          estimatedHours: p.estimated_hours ?? p.estimatedHours ?? 0,
-          sections: Array.isArray(p.sections)
-            ? p.sections.map((s: any) => ({
-                id: s.id,
-                slug: s.slug,
-                title: s.title,
-                description: s.description ?? s.summary ?? '',
-                icon: s.icon,
-                display_order: s.display_order ?? s.displayOrder ?? 0,
-                topics: Array.isArray(s.topics)
-                  ? s.topics.map((t: any) => ({
-                      id: t.id,
-                      slug: t.slug,
-                      title: t.title,
-                      estimated_read_time: t.estimated_read_time ?? t.estimatedReadTime ?? 0,
-                      is_published: typeof t.is_published === 'boolean' ? t.is_published : (t.isPublished ?? true),
-                    }))
-                  : [],
+  // Adapt API response to component format
+  const p: any = rawTutorial;
+  const tutorial: Tutorial = {
+    id: p.id,
+    slug: p.slug,
+    title: p.title,
+    description: p.description ?? p.summary ?? p.excerpt ?? '',
+    icon: p.icon,
+    difficultyLevel: (p.difficulty_level as string) || (p.difficultyLevel as string) || 'beginner',
+    colorTheme: p.color_theme || p.colorTheme,
+    estimatedHours: p.estimated_hours ?? p.estimatedHours ?? 0,
+    sections: Array.isArray(p.sections)
+      ? p.sections.map((s: any) => ({
+          id: s.id,
+          slug: s.slug,
+          title: s.title,
+          description: s.description ?? s.summary ?? '',
+          icon: s.icon,
+          display_order: s.display_order ?? s.displayOrder ?? 0,
+          topics: Array.isArray(s.topics)
+            ? s.topics.map((t: any) => ({
+                id: t.id,
+                slug: t.slug,
+                title: t.title,
+                estimated_read_time: t.estimated_read_time ?? t.estimatedReadTime ?? 0,
+                is_published: typeof t.is_published === 'boolean' ? t.is_published : (t.isPublished ?? true),
               }))
             : [],
-        };
-
-        setTutorial(adapted);
-        if (process.env.NODE_ENV !== 'production') {
-          // eslint-disable-next-line no-console
-          console.debug('adapted tutorial:', adapted);
-        }
-      } catch (err: any) {
-        setError(err?.message || 'Failed to load tutorial');
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [slug]);
-
-  if (loading) {
-    return (
-      <PageLayout>
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-gray-300 border-t-transparent rounded-full animate-spin mx-auto"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-300">Loading tutorial...</p>
-          </div>
-        </div>
-      </PageLayout>
-    );
-  }
-
-  if (error || !tutorial) {
-    return (
-      <PageLayout>
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <p className="text-red-500 text-lg">Error: {error || 'Tutorial not found'}</p>
-            <Link
-              href="/tutorials"
-              className="mt-4 inline-block px-6 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
-            >
-              Back to Tutorials
-            </Link>
-          </div>
-        </div>
-      </PageLayout>
-    );
-  }
+        }))
+      : [],
+  };
 
   const getDifficultyColor = (level: string) => {
     switch (level) {

@@ -1,5 +1,6 @@
 'use client';
 
+import { ErrorMessage } from '@/components/ErrorMessage';
 import {
   Badge,
   Button,
@@ -8,15 +9,14 @@ import {
   Flex,
   Grid,
   Input,
-  Spinner,
   Text,
 } from '@/components/green';
+import { JobsSkeleton } from '@/components/Skeletons';
 import { PageLayout } from '@/components/ui';
-import apiClient from '@/lib/api-client';
+import { useExperienceLevels, useProjectCategories, useProjects } from '@/hooks/useProjects';
 import { parseCategories, parseExperienceLevels } from '@/lib/apiParsers';
-import type { ExperienceLevel, PostCategory } from '@/lib/apiTypes';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Suspense, useCallback, useEffect, useState } from 'react';
+import { Suspense, useMemo, useState } from 'react';
 
 type ViewMode = 'list' | 'grid' | 'compact';
 type SortBy = 'recent' | 'budget-high' | 'budget-low';
@@ -60,12 +60,6 @@ function ProjectsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [categories, setCategories] = useState<PostCategory[]>([]);
-  const [experienceLevels, setExperienceLevels] = useState<ExperienceLevel[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  
   // View and Sort states
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [sortBy, setSortBy] = useState<SortBy>('recent');
@@ -78,52 +72,28 @@ function ProjectsPageContent() {
   const [maxBudget, setMaxBudget] = useState(searchParams.get('maxBudget') || '');
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
 
-  // Fetch categories and experience levels on mount
-  useEffect(() => {
-    const fetchFilters = async () => {
-      try {
-        const [catsRes, levelsRes] = await Promise.all([
-          apiClient.get('/project-categories'),
-          apiClient.get('/experience-levels'),
-        ]);
+  // Hooks
+  const { data: projects = [], isLoading, error, refetch } = useProjects({ categoryId, experienceLevelId, minBudget, maxBudget, search: searchQuery });
+  const { data: categoriesData } = useProjectCategories();
+  const { data: experienceLevelsData } = useExperienceLevels();
 
-        const catsData = catsRes.data;
-        const levelsData = levelsRes.data;
+  const categories = useMemo(() => parseCategories(categoriesData), [categoriesData]);
+  const experienceLevels = useMemo(() => parseExperienceLevels(experienceLevelsData), [experienceLevelsData]);
 
-        setCategories(parseCategories(catsData));
-        setExperienceLevels(parseExperienceLevels(levelsData));
-      } catch (err) {
-        console.error('Failed to fetch filters:', err);
+  // Sort projects based on selection
+  const sortedProjects = useMemo(() => {
+    return [...projects].sort((a: any, b: any) => {
+      switch (sortBy) {
+        case 'budget-high':
+          return b.budget - a.budget;
+        case 'budget-low':
+          return a.budget - b.budget;
+        case 'recent':
+        default:
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       }
-    };
-
-    fetchFilters();
-  }, []);
-
-  const fetchProjects = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const params: Record<string, any> = {};
-      if (categoryId) params.categoryId = categoryId;
-      if (experienceLevelId) params.experienceLevelId = experienceLevelId;
-      if (minBudget) params.minBudget = minBudget;
-      if (maxBudget) params.maxBudget = maxBudget;
-      if (searchQuery) params.search = searchQuery;
-
-      const { data } = await apiClient.get('/projects', { params });
-      setProjects(data.content || []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
-  }, [categoryId, experienceLevelId, minBudget, maxBudget, searchQuery]);
-
-  useEffect(() => {
-    fetchProjects();
-  }, [fetchProjects]);
+    });
+  }, [projects, sortBy]);
 
   const handleApplyFilters = () => {
     const params = new URLSearchParams();
@@ -152,19 +122,6 @@ function ProjectsPageContent() {
       day: 'numeric',
     });
   };
-
-  // Sort projects based on selection
-  const sortedProjects = [...projects].sort((a, b) => {
-    switch (sortBy) {
-      case 'budget-high':
-        return b.budget - a.budget;
-      case 'budget-low':
-        return a.budget - b.budget;
-      case 'recent':
-      default:
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    }
-  });
 
   // Count active filters
   const activeFilterCount = [categoryId, experienceLevelId, minBudget, maxBudget, searchQuery].filter(Boolean).length;
@@ -513,20 +470,11 @@ function ProjectsPageContent() {
 
           {/* projects List/Grid (right) */}
           <Flex flex-direction="column" gap="m" className="col-span-1 lg:col-span-2">
-            {loading ? (
-              <Flex justify-content="center" padding="xl" className="min-h-96">
-                <Spinner />
-              </Flex>
+            {isLoading ? (
+              <JobsSkeleton />
             ) : error ? (
               <Card padding="l" variant="negative">
-                <Flex flex-direction="column" gap="m" align-items="center">
-                  <Text color="negative" font-weight="book">
-                    ⚠ {error}
-                  </Text>
-                  <Button rank="secondary" onClick={handleClearFilters}>
-                    Clear Filters & Try Again
-                  </Button>
-                </Flex>
+                <ErrorMessage message={(error as Error).message} retry={refetch} />
               </Card>
             ) : sortedProjects.length === 0 ? (
               <Card padding="xl" className="text-center">

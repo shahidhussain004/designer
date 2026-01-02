@@ -1,5 +1,6 @@
 'use client';
 
+import { ErrorMessage } from '@/components/ErrorMessage';
 import {
   Badge,
   Button,
@@ -8,58 +9,32 @@ import {
   Divider,
   Flex,
   Grid,
-  Spinner,
   Text,
 } from '@/components/green';
+import { CoursesSkeleton } from '@/components/Skeletons';
 import { PageLayout } from '@/components/ui';
+import { useCourse, useCourseCurriculum, useEnrollCourse } from '@/hooks/useCourses';
 import { authService } from '@/lib/auth';
-import {
-  Course,
-  enrollInCourse,
-  getCourseById,
-  getCourseLessons,
-  Lesson
-} from '@/lib/courses';
 import { createCourseCheckoutSession, formatCurrency } from '@/lib/payments';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 
 export default function CourseDetailPage() {
   const router = useRouter();
   const params = useParams();
   const courseId = params.id as string;
 
-  const [course, setCourse] = useState<Course | null>(null);
-  const [lessons, setLessons] = useState<Lesson[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isEnrolling, setIsEnrolling] = useState(false);
   const [showAllLessons, setShowAllLessons] = useState(false);
 
-  const fetchCourseData = useCallback(async () => {
-    try {
-      setLoading(true);
-      const [courseData, lessonsData] = await Promise.all([
-        getCourseById(courseId),
-        getCourseLessons(courseId),
-      ]);
-      setCourse(courseData);
-      setLessons(lessonsData);
-    } catch (err) {
-      console.error('Error fetching course:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load course');
-    } finally {
-      setLoading(false);
-    }
-  }, [courseId]);
+  const { data: course, isLoading: courseLoading, error: courseError, refetch } = useCourse(courseId);
+  const { data: lessonsData, isLoading: lessonsLoading } = useCourseCurriculum(courseId);
+  const enrollMutation = useEnrollCourse();
 
-  useEffect(() => {
-    if (courseId) {
-      fetchCourseData();
-    }
-  }, [courseId, fetchCourseData]);
+  const lessons = lessonsData || [];
+  const isLoading = courseLoading || lessonsLoading;
+  const error = courseError;
 
   const handleEnroll = async () => {
     if (!authService.isAuthenticated()) {
@@ -68,8 +43,6 @@ export default function CourseDetailPage() {
     }
 
     try {
-      setIsEnrolling(true);
-      
       if (course && course.price > 0) {
         const session = await createCourseCheckoutSession(
           courseId,
@@ -78,36 +51,31 @@ export default function CourseDetailPage() {
         );
         window.location.href = session.url;
       } else {
-        await enrollInCourse(courseId);
+        await enrollMutation.mutateAsync(Number(courseId));
         router.push(`/courses/${courseId}/learn`);
       }
     } catch (err) {
       console.error('Error enrolling:', err);
-      setError(err instanceof Error ? err.message : 'Failed to enroll');
-    } finally {
-      setIsEnrolling(false);
     }
   };
 
-  if (loading) {
-    return (
-      <Flex justify-content="center" align-items="center">
-        <Spinner />
-      </Flex>
-    );
+  if (isLoading) {
+    return <CoursesSkeleton />;
   }
 
   if (error || !course) {
     return (
-      <Flex justify-content="center" align-items="center" flex-direction="column" gap="l">
-        <Text>😕</Text>
-        <Text tag="h2">Course Not Found</Text>
-        <Text>
-          {error || 'This course does not exist'}
-        </Text>
-        <Link href="/courses">
-          ← Back to Courses
-        </Link>
+      <Flex justify-content="center" align-items="center" flex-direction="column" gap="l" padding="xl">
+        {error ? (
+          <ErrorMessage message={error.message} retry={refetch} />
+        ) : (
+          <>
+            <Text>😕</Text>
+            <Text tag="h2">Course Not Found</Text>
+            <Text>This course does not exist</Text>
+            <Link href="/courses">← Back to Courses</Link>
+          </>
+        )}
       </Flex>
     );
   }
@@ -304,10 +272,10 @@ export default function CourseDetailPage() {
                 <Button
                   rank="primary"
                   onClick={handleEnroll}
-                  disabled={isEnrolling}
+                  disabled={enrollMutation.isPending}
                   style={{ width: '100%', padding: '12px 16px', fontSize: '16px', fontWeight: '600' }}
                 >
-                  {isEnrolling ? 'Processing...' : course.price > 0 ? 'Enroll Now' : 'Enroll for Free'}
+                  {enrollMutation.isPending ? 'Processing...' : course.price > 0 ? 'Enroll Now' : 'Enroll for Free'}
                 </Button>
 
                 {/* Money Back Guarantee */}

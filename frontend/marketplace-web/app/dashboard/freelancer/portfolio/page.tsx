@@ -1,11 +1,13 @@
 "use client";
 
+import { ErrorMessage } from '@/components/ErrorMessage';
+import { LoadingSpinner } from '@/components/Skeletons';
 import { PageLayout } from '@/components/ui';
-import { apiClient } from '@/lib/api-client';
+import { useCreatePortfolio, useDeletePortfolio, useUpdatePortfolio, useUserPortfolio } from '@/hooks/useUsers';
 import { useAuth } from '@/lib/context/AuthContext';
 import { Edit, Eye, EyeOff, Plus, Trash2 } from 'lucide-react';
 import Image from 'next/image';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 interface PortfolioItem {
   id: number;
@@ -22,8 +24,6 @@ interface PortfolioItem {
 
 export default function PortfolioPage() {
   const { user } = useAuth();
-  const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
-  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingItem, setEditingItem] = useState<PortfolioItem | null>(null);
   const [formData, setFormData] = useState({
@@ -40,42 +40,34 @@ export default function PortfolioPage() {
   // timer id for clearing undo state
   const undoTimerRef = useRef<number | null>(null)
 
-  const fetchPortfolio = useCallback(async () => {
-    try {
-      const { data } = await apiClient.get(`/users/${user?.id}/portfolio`);
-      setPortfolio(data || []);
-    } catch (error) {
-      console.error('Failed to fetch portfolio:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [user?.id]);
-
-  useEffect(() => {
-    if (user) {
-      fetchPortfolio();
-    }
-  }, [user, fetchPortfolio]);
+  const { data: portfolio = [], isLoading, isError, error, refetch } = useUserPortfolio(user?.id || 0);
+  const createPortfolioMutation = useCreatePortfolio();
+  const updatePortfolioMutation = useUpdatePortfolio();
+  const deletePortfolioMutation = useDeletePortfolio();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const payload = {
       ...formData,
-      technologies: formData.technologies.split(',').map(t => t.trim()),
+      technologies: formData.technologies.split(',').map((t: any) => t.trim()),
       displayOrder: editingItem ? editingItem.displayOrder : portfolio.length + 1,
     };
 
     try {
-      const method = editingItem ? 'PUT' : 'POST';
-
-      if (method === 'PUT') {
-        await apiClient.put(`/portfolio/${editingItem?.id}?userId=${user?.id}`, payload);
+      if (editingItem) {
+        await updatePortfolioMutation.mutateAsync({
+          userId: user?.id || 0,
+          itemId: editingItem.id,
+          input: payload
+        });
       } else {
-        await apiClient.post(`/portfolio?userId=${user?.id}`, payload);
+        await createPortfolioMutation.mutateAsync({
+          userId: user?.id || 0,
+          input: payload
+        });
       }
 
-      await fetchPortfolio();
       resetForm();
     } catch (error) {
       console.error('Failed to save portfolio item:', error);
@@ -86,17 +78,16 @@ export default function PortfolioPage() {
     if (!confirm('Are you sure you want to delete this portfolio item?')) return;
 
     try {
-      await apiClient.delete(`/portfolio/${id}?userId=${user?.id}`);
-      await fetchPortfolio();
+      await deletePortfolioMutation.mutateAsync({
+        userId: user?.id || 0,
+        itemId: id
+      });
     } catch (error) {
       console.error('Failed to delete portfolio item:', error);
     }
   };
 
-  const toggleVisibility = async (item: PortfolioItem) => {
-    // optimistic update: hide/show locally immediately
-    setPortfolio(prev => prev.map(p => p.id === item.id ? { ...p, isVisible: !p.isVisible } : p))
-
+  const toggleVisibility = async (item: any) => {
     // if hiding, show undo banner
     if (item.isVisible) {
       setUndoItem({ ...item, isVisible: false })
@@ -109,35 +100,39 @@ export default function PortfolioPage() {
     }
 
     try {
-      await apiClient.put(`/portfolio/${item.id}?userId=${user?.id}`, { ...item, isVisible: !item.isVisible });
+      await updatePortfolioMutation.mutateAsync({
+        userId: user?.id || 0,
+        itemId: item.id,
+        input: { ...item, isVisible: !item.isVisible }
+      });
     } catch (error) {
       console.error('Failed to toggle visibility:', error);
-      // revert optimistic change on error
-      setPortfolio(prev => prev.map(p => p.id === item.id ? item : p))
       setUndoItem(null)
       if (undoTimerRef.current) { window.clearTimeout(undoTimerRef.current); undoTimerRef.current = null }
     }
   };
 
-  const restoreVisibility = async (item: PortfolioItem) => {
+  const restoreVisibility = async (item: any) => {
     // cancel pending timer
     if (undoTimerRef.current) { window.clearTimeout(undoTimerRef.current); undoTimerRef.current = null }
     setUndoItem(null)
-    // optimistic restore locally
-    setPortfolio(prev => prev.map(p => p.id === item.id ? { ...p, isVisible: true } : p))
     try {
-      await apiClient.put(`/portfolio/${item.id}?userId=${user?.id}`, { ...item, isVisible: true });
+      await updatePortfolioMutation.mutateAsync({
+        userId: user?.id || 0,
+        itemId: item.id,
+        input: { ...item, isVisible: true }
+      });
     } catch (err) {
       console.error('Failed to restore visibility:', err)
     }
   }
 
-  const editItem = (item: PortfolioItem) => {
+  const editItem = (item: any) => {
     setEditingItem(item);
     setFormData({
       title: item.title,
       description: item.description,
-      imageUrl: item.imageUrl,
+      imageUrl: item.imageUrl || '',
       projectUrl: item.projectUrl,
       technologies: item.technologies.join(', '),
       isVisible: item.isVisible,
@@ -160,12 +155,23 @@ export default function PortfolioPage() {
     });
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <PageLayout>
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <LoadingSpinner />
         </div>
+      </PageLayout>
+    )
+  }
+
+  if (isError) {
+    return (
+      <PageLayout>
+        <ErrorMessage 
+          message={error?.message || 'Failed to load portfolio'} 
+          retry={refetch}
+        />
       </PageLayout>
     )
   }
@@ -343,7 +349,7 @@ export default function PortfolioPage() {
               <div className="md:flex">
                 <div className="md:w-1/3 relative h-64">
                   <Image
-                    src={item.imageUrl}
+                    src={item.imageUrl || '/placeholder.jpg'}
                     alt={item.title}
                     fill
                     className="object-cover"
@@ -395,7 +401,7 @@ export default function PortfolioPage() {
                   <p className="text-gray-600 mb-4">{item.description}</p>
 
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {item.technologies.map((tech) => (
+                    {(item.technologies || []).map((tech) => (
                       <span
                         key={`${item.id}-${tech}`}
                         className="px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full"

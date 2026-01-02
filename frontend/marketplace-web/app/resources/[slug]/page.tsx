@@ -1,17 +1,17 @@
 'use client';
 
+import { ErrorMessage } from '@/components/ErrorMessage';
 import {
-    Badge,
-    Button,
-    Card,
-    Divider,
-    Flex,
-    Spinner,
-    Text,
+  Badge,
+  Button,
+  Card,
+  Divider,
+  Flex,
+  Text,
 } from '@/components/green';
+import { TutorialsSkeleton } from '@/components/Skeletons';
 import { PageLayout } from '@/components/ui';
-import { commentsApi, contentApi } from '@/lib/content-api';
-import type { Comment, ContentWithRelations } from '@/lib/content-types';
+import { useComments, useCreateComment, useIncrementViews, useLikeContent, useResource } from '@/hooks/useContent';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -22,46 +22,27 @@ export default function ResourceDetailPage() {
   const router = useRouter();
   const slug = params?.slug as string;
 
-  const [content, setContent] = useState<ContentWithRelations | null>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [newComment, setNewComment] = useState('');
-  const [submittingComment, setSubmittingComment] = useState(false);
 
+  const { data: content, isLoading, error, refetch } = useResource(slug);
+  const { data: commentsData } = useComments(content?.id || null);
+  const createCommentMutation = useCreateComment();
+  const likeMutation = useLikeContent();
+  const incrementViewsMutation = useIncrementViews();
+
+  const comments = commentsData?.data || [];
+
+  // Track view when content loads
   useEffect(() => {
-    const fetchContent = async () => {
-      if (!slug) return;
-      
-      try {
-        setLoading(true);
-        const data = await contentApi.getBySlug(slug);
-        setContent(data);
-        
-        // Track view
-        contentApi.trackView(data.id).catch(console.error);
-        
-        // Fetch comments
-        const commentsData = await commentsApi.getByContent(data.id);
-        setComments(commentsData.data || []);
-      } catch (err) {
-        console.error('Error fetching content:', err);
-        setError('Resource not found or failed to load.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchContent();
-  }, [slug]);
+    if (content?.id) {
+      incrementViewsMutation.mutate(content.id);
+    }
+  }, [content?.id]);
 
   const handleLike = async () => {
     if (!content) return;
     try {
-      await contentApi.like(content.id);
-      setContent((prev) =>
-        prev ? { ...prev, likeCount: (prev.likeCount || 0) + 1 } : null
-      );
+      await likeMutation.mutateAsync(content.id);
     } catch (err) {
       console.error('Error liking content:', err);
     }
@@ -92,18 +73,17 @@ export default function ResourceDetailPage() {
     if (!content || !newComment.trim()) return;
 
     try {
-      setSubmittingComment(true);
-      const comment = await commentsApi.create({
+      await createCommentMutation.mutateAsync({
         contentId: content.id,
-        body: newComment,
+        input: { 
+          contentId: content.id.toString(),
+          body: newComment 
+        },
       });
-      setComments((prev) => [comment, ...prev]);
       setNewComment('');
     } catch (err) {
       console.error('Error submitting comment:', err);
       alert('Failed to submit comment. Please try again.');
-    } finally {
-      setSubmittingComment(false);
     }
   };
 
@@ -124,12 +104,10 @@ export default function ResourceDetailPage() {
     return styles[type] || { bg: 'bg-gray-100', text: 'text-gray-800' };
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <PageLayout title="Loading... | Designer Marketplace">
-        <Flex className="min-h-screen items-center justify-center">
-          <Spinner />
-        </Flex>
+        <TutorialsSkeleton />
       </PageLayout>
     );
   }
@@ -138,14 +116,16 @@ export default function ResourceDetailPage() {
     return (
       <PageLayout title="Not Found | Designer Marketplace">
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <Card className="p-8 text-center max-w-md">
-            <Text className="text-red-600 text-xl mb-4">
-              {error || 'Resource not found'}
-            </Text>
-            <Button onClick={() => router.push('/resources')}>
-              Back to Resources
-            </Button>
-          </Card>
+          {error ? (
+            <ErrorMessage message={error.message} retry={refetch} />
+          ) : (
+            <Card className="p-8 text-center max-w-md">
+              <Text className="text-red-600 text-xl mb-4">Resource not found</Text>
+              <Button onClick={() => router.push('/resources')}>
+                Back to Resources
+              </Button>
+            </Card>
+          )}
         </div>
       </PageLayout>
     );
@@ -288,7 +268,7 @@ export default function ResourceDetailPage() {
             <div className="mb-8">
               <Text className="font-medium mb-3">Tags:</Text>
               <Flex className="flex-wrap gap-2">
-                {content.tags.map((tag) => (
+                {content.tags.map((tag: any) => (
                   <Link
                     key={tag.id}
                     href={`/resources?tag=${tag.id}`}
@@ -355,9 +335,9 @@ export default function ResourceDetailPage() {
                   <Button
                     type="submit"
                     rank="primary"
-                    disabled={submittingComment || !newComment.trim()}
+                    disabled={createCommentMutation.isPending || !newComment.trim()}
                   >
-                    {submittingComment ? 'Submitting...' : 'Post Comment'}
+                    {createCommentMutation.isPending ? 'Submitting...' : 'Post Comment'}
                   </Button>
                 </Flex>
               </form>
@@ -372,7 +352,7 @@ export default function ResourceDetailPage() {
               </Card>
             ) : (
               <div className="space-y-4">
-                {comments.map((comment) => (
+                {comments.map((comment: any) => (
                   <Card key={comment.id} className="p-5">
                     <Flex className="gap-4">
                       <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
