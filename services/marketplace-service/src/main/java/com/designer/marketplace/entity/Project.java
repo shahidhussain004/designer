@@ -2,6 +2,8 @@ package com.designer.marketplace.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -60,6 +62,7 @@ public class Project {
     @JoinColumn(name = "category_id")
     private ProjectCategory projectCategory;
 
+    @JdbcTypeCode(SqlTypes.ARRAY)
     @Column(name = "required_skills", columnDefinition = "TEXT[]")
     private String[] requiredSkills;
 

@@ -1,24 +1,25 @@
 "use client";
 
 import {
-    Alert,
-    Badge,
-    Button,
-    Card,
-    Flex,
-    Grid,
-    Input,
-    Spinner,
-    Text,
-    Textarea,
+  Alert,
+  Badge,
+  Button,
+  Card,
+  Flex,
+  Grid,
+  Input,
+  Spinner,
+  Text,
+  Textarea,
 } from '@/components/green';
 import { PageLayout } from '@/components/ui';
 import { apiClient } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth';
 import logger from '@/lib/logger';
+import axios from 'axios';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface EmploymentJob {
   id: number;
@@ -60,53 +61,52 @@ export default function JobDetailsPage() {
   const [applicationError, setApplicationError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<{ coverLetter?: string; resumeUrl?: string }>({});
 
-  const abortControllerRef = useRef<AbortController | null>(null);
-
-  const fetchJobDetails = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      abortControllerRef.current?.abort();
-    } catch {}
-
+  useEffect(() => {
     const controller = new AbortController();
-    abortControllerRef.current = controller;
-    const timeoutMs = 10000;
-    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-    try {
-      const { data: jobData } = await apiClient.get(`/employment-jobs/${jobId}`, { signal: controller.signal as any });
-      setJob(jobData);
-      setApplicationData((prev) => ({ ...prev, jobId: jobData?.id || 0 }));
+    const fetchJobDetails = async () => {
+      setLoading(true);
+      setError(null);
 
-      if (jobData?.employerId) {
-        try {
-          const { data: emp } = await apiClient.get(`/users/${jobData.employerId}/profile`, { signal: controller.signal as any });
-          setEmployer(emp);
-        } catch (err) {
-          if ((err as any)?.name !== 'AbortError') {
-            logger.error('Error fetching employer details', err as Error);
+      try {
+        const { data: jobData } = await apiClient.get(`/jobs/${jobId}`, {
+          signal: controller.signal,
+        });
+        
+        setJob(jobData);
+        setApplicationData((prev) => ({ ...prev, jobId: jobData?.id || 0 }));
+
+        if (jobData?.employerId) {
+          try {
+            const { data: emp } = await apiClient.get(
+              `/users/${jobData.employerId}/profile`,
+              { signal: controller.signal }
+            );
+            setEmployer(emp);
+          } catch (err) {
+            if (!axios.isCancel(err)) {
+              logger.error('Error fetching employer details', err as Error);
+            }
           }
         }
+      } catch (err) {
+        if (!axios.isCancel(err)) {
+          const msg = err instanceof Error ? err.message : 'An error occurred';
+          setError(msg);
+          logger.error('Error fetching job details', err as Error);
+        }
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      if ((err as any)?.name === 'AbortError') {
-        // ignore
-      } else {
-        const msg = err instanceof Error ? err.message : 'An error occurred';
-        setError(msg);
-      }
-    } finally {
-      clearTimeout(timeoutId);
-      setLoading(false);
-      abortControllerRef.current = null;
-    }
-  };
+    };
 
-  useEffect(() => {
-    if (jobId) fetchJobDetails();
-    return () => abortControllerRef.current?.abort();
+    if (jobId) {
+      fetchJobDetails();
+    }
+
+    return () => {
+      controller.abort();
+    };
   }, [jobId]);
 
   const handleApplicationSubmit = async (e: React.FormEvent) => {

@@ -50,7 +50,7 @@ public class JobApplication {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "job_id", nullable = false)
-    private EmploymentJob job;
+    private Job job;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "applicant_id", nullable = false)
@@ -124,3 +124,4 @@ public class JobApplication {
         WITHDRAWN
     }
 }
+

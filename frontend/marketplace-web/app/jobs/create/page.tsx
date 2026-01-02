@@ -1,15 +1,15 @@
 'use client';
 
 import {
-    Alert,
-    Button,
-    Card,
-    Flex,
-    Input,
-    Select,
-    Spinner,
-    Text,
-    Textarea,
+  Alert,
+  Button,
+  Card,
+  Flex,
+  Input,
+  Select,
+  Spinner,
+  Text,
+  Textarea,
 } from '@/components/green';
 import { PageLayout } from '@/components/ui';
 import { apiClient } from '@/lib/api-client';
@@ -94,7 +94,7 @@ export default function CreateJobPage() {
     setSubmitting(true);
 
     try {
-      const response = await apiClient.post('/employment-jobs', formData);
+      const response = await apiClient.post('/jobs', formData);
       setSuccess(true);
 
       setTimeout(() => {

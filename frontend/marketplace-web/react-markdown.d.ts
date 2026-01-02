@@ -1,5 +1,5 @@
 declare module 'react-markdown' {
-  import React = require('react');
+  import type React from 'react';
   
   interface ReactMarkdownProps extends React.HTMLAttributes<HTMLDivElement> {
     children: string;
