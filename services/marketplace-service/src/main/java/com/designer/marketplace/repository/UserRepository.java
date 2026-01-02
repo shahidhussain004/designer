@@ -1,6 +1,9 @@
 package com.designer.marketplace.repository;
 
-import com.designer.marketplace.entity.User;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,9 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import com.designer.marketplace.entity.User;
 
 /**
  * Repository for User entity
@@ -31,6 +32,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     
     long countByCreatedAtAfter(LocalDateTime date);
     
+    // Use a derived query to let JPA/Hibernate handle array mapping correctly
     Page<User> findByRole(User.UserRole role, Pageable pageable);
     
     Page<User> findByIsActive(boolean isActive, Pageable pageable);

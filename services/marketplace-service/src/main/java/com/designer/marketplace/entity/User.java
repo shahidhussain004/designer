@@ -3,6 +3,8 @@ package com.designer.marketplace.entity;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -66,6 +68,7 @@ public class User {
     @Column(name = "hourly_rate", columnDefinition = "NUMERIC(10,2)")
     private Double hourlyRate;
 
+    @JdbcTypeCode(SqlTypes.ARRAY)
     @Column(columnDefinition = "TEXT[]")
     private String[] skills;
 
@@ -97,9 +100,11 @@ public class User {
     @Column(name = "linkedin_url", length = 500)
     private String linkedinUrl;
 
+    @JdbcTypeCode(SqlTypes.ARRAY)
     @Column(columnDefinition = "TEXT[]")
     private String[] certifications;
 
+    @JdbcTypeCode(SqlTypes.ARRAY)
     @Column(columnDefinition = "TEXT[]")
     private String[] languages;
 

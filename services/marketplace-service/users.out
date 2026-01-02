@@ -1,0 +1,17 @@
+HTTP/1.1 500 
+X-Frame-Options: DENY
+X-XSS-Protection: 1; mode=block
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api.stripe.com; frame-ancestors 'none'
+Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(self 'https://js.stripe.com')
+Cache-Control: no-store, no-cache, must-revalidate
+Pragma: no-cache
+Expires: 0
+Vary: origin,access-control-request-method,access-control-request-headers,accept-encoding
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Thu, 01 Jan 2026 19:49:09 GMT
+Connection: close
+
+{"timestamp":"2026-01-01T20:49:09.7561473","status":500,"error":"Internal Server Error","message":"JDBC exception executing SQL [/* dynamic native SQL query */ SELECT u.id, u.email, u.username, u.password_hash, u.full_name, u.role, u.bio, u.profile_image_url, u.location, u.phone, u.hourly_rate, CASE WHEN pg_typeof(u.skills) = 'bytea'::regtype THEN convert_from(u.skills::bytea, 'UTF8')::text[] ELSE u.skills END AS skills, u.portfolio_url, u.stripe_customer_id, u.stripe_account_id, u.email_verified, u.is_active, u.rating_avg, u.rating_count, CASE WHEN pg_typeof(u.certifications) = 'bytea'::regtype THEN convert_from(u.certifications::bytea, 'UTF8')::text[] ELSE u.certifications END AS certifications, CASE WHEN pg_typeof(u.languages) = 'bytea'::regtype THEN convert_from(u.languages::bytea, 'UTF8')::text[] ELSE u.languages END AS languages, u.github_url, u.linkedin_url, u.experience_years, u.verification_status, u.identity_verified, u.identity_verified_at, u.completion_rate, u.response_time_hours, u.response_rate, u.created_at, u.updated_at FROM users u WHERE u.role = ? fetch first ? rows only] [ERROR: cannot cast type text[] to bytea\n  Position: 243] [n/a]; SQL [n/a]"}

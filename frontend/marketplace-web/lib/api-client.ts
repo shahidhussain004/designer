@@ -54,6 +54,7 @@ apiClient.interceptors.request.use(
 );
 
 // Response interceptor - handle token refresh and log responses
+// Response interceptor - handle token refresh and log responses
 apiClient.interceptors.response.use(
   (response) => {
     const duration = response.config.metadata?.startTime 
@@ -80,6 +81,11 @@ apiClient.interceptors.response.use(
     return response;
   },
   async (error: AxiosError) => {
+    // Ignore cancellation errors - they're expected behavior
+    if (axios.isCancel(error)) {
+      return Promise.reject(error);
+    }
+
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean; metadata?: { startTime: number } };
     const duration = originalRequest?.metadata?.startTime 
       ? Date.now() - originalRequest.metadata.startTime 

@@ -12,6 +12,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: '**.cloudinary.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'api.example.com',
+      },
     ],
   },
   // Performance optimizations
