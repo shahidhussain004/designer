@@ -1,5 +1,7 @@
 package com.designer.marketplace.dto;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,7 +25,7 @@ public class UserDto {
     private String profileImageUrl;
     private String location;
     private Double hourlyRate;
-    private String[] skills;
+    private List<String> skills;
     private String portfolioUrl;
     private Boolean emailVerified;
     private Boolean isActive;

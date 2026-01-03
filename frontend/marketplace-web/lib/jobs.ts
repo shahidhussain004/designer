@@ -1,12 +1,27 @@
+import apiClient from './api-client';
+
+// ============================================================================
+// Types
+// ============================================================================
+
+export type JobCategory = {
+  id: number;
+  name: string;
+  slug?: string;
+};
+
 export type JobItem = {
   id: string;
   title?: string;
-  category?: {
-    id: number;
-    name: string;
-    slug?: string;
-  } | null;
+  category?: JobCategory | null;
   budget?: number | null;
+  // Extended fields (when API returns full job objects)
+  status?: string;
+  companyName?: string;
+  description?: string;
+  jobType?: string;
+  location?: string;
+  createdAt?: string;
 };
 
 export type JobsResponse = {
@@ -16,54 +31,150 @@ export type JobsResponse = {
   size: number;
 };
 
-import apiClient from './api-client';
+type GetJobsOptions = {
+  page?: number;
+  size?: number;
+};
 
-export async function getJobs(opts?: { page?: number; size?: number }): Promise<JobsResponse> {
-  const page = (opts && typeof opts.page === 'number') ? opts.page : 0;
-  const size = (opts && typeof opts.size === 'number') ? opts.size : 10;
+// API response can be either Spring Data Page format or legacy format
+type ApiResponse = {
+  content?: unknown[];
+  items?: unknown[];
+  totalElements?: number;
+  totalCount?: number;
+};
+
+// ============================================================================
+// Constants
+// ============================================================================
+
+const DEFAULT_PAGE = 0;
+const DEFAULT_SIZE = 10;
+
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+/**
+ * Checks if an item looks like a full job object with extended fields
+ */
+function isFullJobObject(item: any): boolean {
+  return item && (
+    item.status !== undefined || 
+    item.description !== undefined
+  );
+}
+
+/**
+ * Extracts job items from API response, supporting multiple formats
+ */
+function extractJobItems(apiResponse: ApiResponse): unknown[] {
+  if (Array.isArray(apiResponse.content)) {
+    return apiResponse.content;
+  }
+  if (Array.isArray(apiResponse.items)) {
+    return apiResponse.items;
+  }
+  return [];
+}
+
+/**
+ * Extracts total count from API response, supporting multiple formats
+ */
+function extractTotalCount(apiResponse: ApiResponse, fallback: number): number {
+  if (typeof apiResponse.totalElements === 'number') {
+    return apiResponse.totalElements;
+  }
+  if (typeof apiResponse.totalCount === 'number') {
+    return apiResponse.totalCount;
+  }
+  return fallback;
+}
+
+/**
+ * Normalizes job items to ensure consistent structure
+ */
+function normalizeJobItems(items: unknown[]): JobItem[] {
+  if (items.length === 0) {
+    return [];
+  }
+
+  // If items already have extended fields, return as-is
+  if (isFullJobObject(items[0])) {
+    return items as JobItem[];
+  }
+
+  // Otherwise, map to minimal JobItem structure
+  return items.map((item: any) => ({
+    id: item.id,
+    title: item.title,
+    category: item.category || null,
+    budget: item.budget ?? null,
+  }));
+}
+
+/**
+ * Fetches data from API using either fetch or axios
+ */
+async function fetchFromApi(page: number, size: number): Promise<ApiResponse> {
+  // Prefer global fetch (easier to mock in tests)
+  if (typeof fetch !== 'undefined') {
+    const baseUrl = apiClient.defaults.baseURL || '';
+    const url = `${baseUrl}/jobs?page=${page}&pageSize=${size}`;
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    return await response.json();
+  }
+
+  // Fallback to axios
+  const response = await apiClient.get('/jobs', {
+    params: { page, pageSize: size },
+  });
+  
+  return response.data || {};
+}
+
+// ============================================================================
+// Main API Function
+// ============================================================================
+
+/**
+ * Fetches paginated jobs from the API
+ * 
+ * @param options - Pagination options
+ * @returns Promise resolving to jobs response with pagination metadata
+ */
+export async function getJobs(options?: GetJobsOptions): Promise<JobsResponse> {
+  const page = options?.page ?? DEFAULT_PAGE;
+  const size = options?.size ?? DEFAULT_SIZE;
 
   try {
-    // prefer global fetch when present (tests mock fetch), otherwise use axios
-    let json: any = {};
-    if (typeof fetch !== 'undefined') {
-      const base = apiClient.defaults.baseURL || '';
-      const url = `${base}/jobs?page=${page + 1}&pageSize=${size}`;
-      const resp = await fetch(url);
-      json = await resp.json();
-    } else {
-      const res = await apiClient.get('/jobs', {
-        params: {
-          page: page + 1,
-          pageSize: size,
-        },
-      });
-      json = res.data || {};
-    }
-    const items = Array.isArray(json.items) ? json.items : [];
+    const apiResponse = await fetchFromApi(page, size);
+    const items = extractJobItems(apiResponse);
+    const jobs = normalizeJobItems(items);
+    const totalCount = extractTotalCount(apiResponse, jobs.length);
 
-    type ApiJob = { 
-      id: string; 
-      title?: string; 
-      category?: { id: number; name: string; slug?: string } | null; 
-      budget?: number | null 
+    return {
+      jobs,
+      totalCount,
+      page,
+      size,
     };
-
-    const jobs = (items as ApiJob[]).map((i) => ({
-      id: i.id,
-      title: i.title,
-      category: i.category || null,
-      budget: i.budget ?? null,
-    }));
-
-    return { jobs, totalCount: json.totalCount ?? jobs.length, page, size };
-  } catch (err) {
-    // Keep previous behavior: log and return empty result on error
-    // apiClient already logs detailed errors via interceptors
-    // but we keep a console.error for parity with earlier implementation
-    // and to aid local debugging if interceptors are unavailable.
-    // eslint-disable-next-line no-console
-    console.error('getJobs error:', err);
-    return { jobs: [], totalCount: 0, page, size };
+  } catch (error) {
+    // Log error for debugging (apiClient interceptors also log)
+    console.error('Failed to fetch jobs:', error);
+    
+    // Return empty result to prevent UI breakage
+    return {
+      jobs: [],
+      totalCount: 0,
+      page,
+      size,
+    };
   }
 }
 

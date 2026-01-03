@@ -217,7 +217,7 @@ Pipeline Stages:
   - [ ] Typing indicators
   - [ ] File uploads
 - [ ] User dashboard
-  - [ ] Active jobs
+  - [ ] Open jobs
   - [ ] Proposals submitted/received
   - [ ] Earnings & payments
   - [ ] Messages inbox
@@ -476,7 +476,7 @@ Pipeline Stages:
 
 ### **Platform Launch**
 - ✅ 100 beta users onboarded
-- ✅ 10 active jobs posted
+- ✅ 10 open jobs posted
 - ✅ 5 courses published
 - ✅ Payment processing verified
 - ✅ Security audit passed

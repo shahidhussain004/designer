@@ -189,8 +189,8 @@ function ProjectsPageContent() {
               </Text>
 
               <Flex gap="s" align-items="center" className="flex-wrap">
-                <Badge variant="notice">{project.category.name}</Badge>
-                <Badge variant="information">{project.experienceLevel.name}</Badge>
+                <Badge variant="notice">{project.category?.name ?? '—'}</Badge>
+                <Badge variant="information">{project.experienceLevel?.name ?? '—'}</Badge>
                 <Badge variant={project.status === 'OPEN' ? 'positive' : 'information'}>
                   {project.status}
                 </Badge>
@@ -252,7 +252,7 @@ function ProjectsPageContent() {
                   <Text font-size="body-s" color="secondary">
                     Level
                   </Text>
-                  <Text font-size="body-s">{project.experienceLevel.name}</Text>
+                  <Text font-size="body-s">{project.experienceLevel?.name ?? '—'}</Text>
                 </Flex>
               </Flex>
 

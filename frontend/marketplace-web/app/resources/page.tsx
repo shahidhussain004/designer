@@ -42,18 +42,22 @@ export default function ResourcesPage() {
   const { data: tags = [] } = useTags();
 
   // Fetch content with filters
-  const filters = useMemo(() => ({
-    page,
-    limit: pageSize,
-    sortBy,
-    sortOrder,
-    filters: {
-      contentType: selectedContentType || undefined,
-      categoryId: selectedCategory || undefined,
-      tagIds: selectedTags.length > 0 ? selectedTags : undefined,
-      search: searchQuery || undefined,
-    },
-  }), [page, sortBy, sortOrder, selectedContentType, selectedCategory, selectedTags, searchQuery]);
+  const filters = useMemo(() => {
+    const f: any = {
+      page,
+      limit: pageSize,
+      sortBy,
+      sortOrder,
+    };
+    
+    // Add filter params at top level - API normalizes them
+    if (selectedContentType) f.type = selectedContentType;
+    if (selectedCategory) f.categoryId = selectedCategory;
+    if (selectedTags.length > 0) f.tagIds = selectedTags;
+    if (searchQuery) f.search = searchQuery;
+    
+    return f;
+  }, [page, sortBy, sortOrder, selectedContentType, selectedCategory, selectedTags, searchQuery]);
 
   const { data: contentData, isLoading, error, refetch } = useContent(filters);
   

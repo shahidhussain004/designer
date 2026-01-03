@@ -1,6 +1,7 @@
 package com.designer.marketplace.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -62,9 +63,14 @@ public class Project {
     @JoinColumn(name = "category_id")
     private ProjectCategory projectCategory;
 
-    @JdbcTypeCode(SqlTypes.ARRAY)
-    @Column(name = "required_skills", columnDefinition = "TEXT[]")
-    private String[] requiredSkills;
+    // Skills stored as PostgreSQL JSON columns (converted from text[])
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "required_skills", columnDefinition = "json")
+    private List<String> requiredSkills;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "preferred_skills", columnDefinition = "json")
+    private List<String> preferredSkills;
 
     @Column(name = "budget", columnDefinition = "NUMERIC(10,2)")
     private Double budget;
@@ -112,14 +118,16 @@ public class Project {
 
     public enum BudgetType {
         FIXED,
-        HOURLY
+        HOURLY,
+        FIXED_PRICE // Backward compatibility - same as FIXED
     }
 
     // Keep old enum for backward compatibility
     public enum ExperienceLevelEnum {
         ENTRY,
         INTERMEDIATE,
-        EXPERT
+        EXPERT,
+        SENIOR // Backward compatibility - same as EXPERT
     }
 
     public enum ProjectStatus {

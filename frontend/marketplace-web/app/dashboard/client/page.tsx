@@ -46,7 +46,7 @@ export default function ClientDashboardPage() {
     </PageLayout>
   )
 
-  const { stats, activeJobs = [] } = data
+  const { stats, openJobs = [] } = data
 
   return (
     <PageLayout>
@@ -64,8 +64,8 @@ export default function ClientDashboardPage() {
           <Grid columns="1; m{3}" gap="m">
             <Card padding="l" variant="notice">
               <Flex flex-direction="column" gap="s">
-                <Text font="detail-regular-s" color="neutral-02">Active Jobs</Text>
-                <Text font="heading-xl">{stats.activeJobs || 0}</Text>
+                <Text font="detail-regular-s" color="neutral-02">Open Jobs</Text>
+                <Text font="heading-xl">{stats.openJobs || 0}</Text>
               </Flex>
             </Card>
             <Card padding="l" variant="information">
@@ -85,7 +85,7 @@ export default function ClientDashboardPage() {
           <Card padding="l" variant="information">
             <Flex justify-content="space-between" align-items="center" margin-bottom="m">
               <Flex flex-direction="column" gap="xs">
-                <Text font="heading-m">Your Active Jobs</Text>
+                <Text font="heading-m">Your Open Jobs</Text>
                 <Text font="body-regular-s" color="neutral-02">Jobs you have posted</Text>
               </Flex>
               <Link href="/jobs/create">
@@ -93,13 +93,13 @@ export default function ClientDashboardPage() {
               </Link>
             </Flex>
             <Divider opacity="0.2" />
-            {activeJobs.length === 0 ? (
+            {openJobs.length === 0 ? (
               <Div padding="l">
-                <Text font="body-regular-m" color="neutral-02">No active jobs.</Text>
+                <Text font="body-regular-m" color="neutral-02">No open jobs.</Text>
               </Div>
             ) : (
               <Flex flex-direction="column">
-                {activeJobs.map((job) => (
+                {openJobs.map((job) => (
                   <Link key={job.id} href={`/jobs/${job.id}`}>
                     <Div padding="m" border-width="0 0 4xs 0" border-color="subtle-01">
                       <Flex justify-content="space-between" align-items="flex-start">

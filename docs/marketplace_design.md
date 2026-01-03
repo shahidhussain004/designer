@@ -1467,7 +1467,7 @@ This architecture is designed to **scale from free to enterprise without code ch
 
 ## KPIs
 
-- Supply: active job-seekers with portfolios
+- Supply: open job-seekers with portfolios
 - Demand: posted jobs weekly
 - Time-to-hire: median time from post to accepted proposal
 - Conversion: visit → signup → post job

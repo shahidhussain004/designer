@@ -96,7 +96,7 @@ export default function JobsListPage() {
                         </Flex>
                         <Badge variant={job.status === 'OPEN' ? 'positive' : 'information'}>{job.status}</Badge>
                       </Flex>
-                      <Text>{job.description.substring(0, 150)}...</Text>
+                      <Text>{(job.description || '').substring(0, 150)}{(job.description && job.description.length > 150) ? '...' : ''}</Text>
                       <Flex gap="m" flex-wrap="wrap">
                         <Flex flex-direction="column" gap="xs">
                           <Text font-size="body-s" color="secondary">Salary</Text>
@@ -112,7 +112,7 @@ export default function JobsListPage() {
                         </Flex>
                       </Flex>
                     </Flex>
-                    <Text font-size="body-s" color="secondary">Posted {new Date(job.createdAt).toLocaleDateString()}</Text>
+                    <Text font-size="body-s" color="secondary">Posted {job.createdAt ? new Date(job.createdAt).toLocaleDateString() : 'Unknown'}</Text>
                   </Flex>
                 </Card>
               </Link>

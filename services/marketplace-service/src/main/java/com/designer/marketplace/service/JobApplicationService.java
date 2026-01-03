@@ -14,8 +14,8 @@ import com.designer.marketplace.entity.Job;
 import com.designer.marketplace.entity.JobApplication;
 import com.designer.marketplace.entity.Notification;
 import com.designer.marketplace.entity.User;
-import com.designer.marketplace.repository.JobRepository;
 import com.designer.marketplace.repository.JobApplicationRepository;
+import com.designer.marketplace.repository.JobRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -84,9 +84,9 @@ public class JobApplicationService {
         Job job = jobRepository.findById(request.getJobId())
                 .orElseThrow(() -> new RuntimeException("Job not found with id: " + request.getJobId()));
 
-        // Validate job is active
-        if (job.getStatus() != Job.JobStatus.ACTIVE) {
-            throw new RuntimeException("Cannot apply to an inactive job");
+        // Validate job is open for applications
+        if (job.getStatus() != Job.JobStatus.OPEN) {
+            throw new RuntimeException("Cannot apply to a job that is not open for applications");
         }
 
         // Check if user already applied

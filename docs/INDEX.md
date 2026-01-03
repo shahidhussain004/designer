@@ -463,14 +463,14 @@ Cloud Provider (AWS/Azure/GCP)
 - Deliverables: ProposalResponse/CreateProposalRequest DTOs, ProposalService, ProposalController
 
 **Phase 3d: Dashboard Backend APIs (Days 7-8)**
-- [ ] Task 3.17: Implement GET /api/dashboard/client (stats, active jobs, recent proposals)
+- [ ] Task 3.17: Implement GET /api/dashboard/client (stats, open jobs, recent proposals)
 - [ ] Task 3.18: Implement GET /api/dashboard/freelancer (stats, proposals, available jobs)
 - [ ] Task 3.19: Implement GET /api/notifications (user notifications)
 - [ ] Task 3.20: Aggregate queries with JOINs for performance
 - Deliverables: DashboardResponse DTOs with nested data, DashboardService
 
 **Phase 3e: Frontend Dashboard Pages (Days 9-10)**
-- [ ] Task 3.21: Build Client Dashboard UI (active jobs summary, proposal cards)
+- [ ] Task 3.21: Build Client Dashboard UI (open jobs summary, proposal cards)
 - [ ] Task 3.22: Build Freelancer Dashboard UI (available jobs feed, my proposals)
 - [ ] Task 3.23: Build Job Browse Page (grid/list view, filters, search)
 - [ ] Task 3.24: Build Job Details Page (description, apply button, proposal form)

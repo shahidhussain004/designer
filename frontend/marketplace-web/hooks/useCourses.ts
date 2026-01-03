@@ -1,6 +1,7 @@
 'use client';
 
 import { lmsClient } from '@/lib/lms-api';
+import { getCourses } from '@/lib/courses';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
@@ -84,11 +85,8 @@ export function useCourses(filters?: CourseFilters) {
   return useQuery({
     queryKey: ['courses', filters],
     queryFn: async ({ signal }) => {
-      const { data } = await lmsClient.get<PaginatedCourses>('/courses', {
-        params: filters,
-        signal,
-      });
-      return data;
+      const result = await getCourses(filters);
+      return result;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });

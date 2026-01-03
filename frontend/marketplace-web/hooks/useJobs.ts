@@ -1,6 +1,7 @@
-'use client';
+ 'use client';
 
 import { apiClient } from '@/lib/api-client';
+import { getJobs } from '@/lib/jobs';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
@@ -45,6 +46,17 @@ export function useJobs() {
   return useQuery({
     queryKey: ['jobs'],
     queryFn: async ({ signal }) => {
+      // Prefer the library helper `getJobs` (tests mock this). If it's not available
+      // for any reason, fall back to using the axios `apiClient` so the app still works.
+      try {
+        if (typeof getJobs === 'function') {
+          const res = await getJobs({ page: 0, size: 10 });
+          return res.jobs;
+        }
+      } catch (err) {
+        // swallow and fall back to apiClient below
+      }
+
       const { data } = await apiClient.get<Job[]>('/jobs', { signal });
       return Array.isArray(data) ? data : (data as any).content || [];
     },

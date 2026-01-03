@@ -39,6 +39,11 @@ public class KafkaSettings
     public string CoursesCompletedTopic { get; set; } = "courses.completed";
     public string CertificatesIssuedTopic { get; set; } = "certificates.issued";
     public string EnrollmentsCreatedTopic { get; set; } = "enrollments.created";
+    // Topic creation defaults for admin-created topics
+    public int DefaultNumPartitions { get; set; } = 3;
+    public short DefaultReplicationFactor { get; set; } = 1;
+    // Optional per-topic overrides: topic name -> num partitions
+    public Dictionary<string, int> TopicPartitions { get; set; } = new Dictionary<string, int>();
 }
 
 public class RedisSettings

@@ -6,7 +6,7 @@
 ```powershell
 # Terminal 1: Content Service
 cd C:\playground\designer\services\content-service
-$env:DATABASE_URL='postgresql://marketplace_user:marketplace_pass_dev@localhost:5432/content_db'
+$env:DATABASE_URL='postgresql://marketplace_user:marketplace_pass_dev@localhost:5432/marketplace_db'
 npm run dev
 # Runs on: http://localhost:8083
 
@@ -184,7 +184,7 @@ curl -X POST http://localhost:8083/api/admin/sections/{sectionId}/topics \
 Edit `prisma/tutorials-seed.ts` and run:
 ```bash
 cd C:\playground\designer\services\content-service
-$env:DATABASE_URL='postgresql://marketplace_user:marketplace_pass_dev@localhost:5432/content_db'
+$env:DATABASE_URL='postgresql://marketplace_user:marketplace_pass_dev@localhost:5432/marketplace_db'
 npx tsx prisma/tutorials-seed.ts
 ```
 
@@ -230,7 +230,7 @@ rm -rf .next
 $env:DATABASE_URL
 
 # Test PostgreSQL connection
-docker exec -it designer-postgres-1 psql -U marketplace_user -d content_db
+docker exec -it designer-postgres-1 psql -U marketplace_user -d marketplace_db
 
 # Run migrations
 cd services/content-service
@@ -250,7 +250,7 @@ Invoke-RestMethod -Uri "http://localhost:8083/api/tutorials/java"
 Invoke-RestMethod -Uri "http://localhost:8083/api/tutorials/java/java-tutorial/introduction"
 
 # Check database
-docker exec -it designer-postgres-1 psql -U marketplace_user -d content_db -c "SELECT COUNT(*) FROM tutorials;"
+docker exec -it designer-postgres-1 psql -U marketplace_user -d marketplace_db -c "SELECT COUNT(*) FROM tutorials;"
 ```
 
 ## 📚 Dependencies
@@ -304,7 +304,7 @@ docker exec -it designer-postgres-1 psql -U marketplace_user -d content_db -c "S
 ### Need to check database?
 ```sql
 -- Connect to database
-docker exec -it designer-postgres-1 psql -U marketplace_user -d content_db
+docker exec -it designer-postgres-1 psql -U marketplace_user -d marketplace_db
 
 -- View tutorials
 SELECT id, slug, title FROM tutorials;

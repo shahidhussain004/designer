@@ -55,7 +55,7 @@ public interface JobRepository extends JpaRepository<Job, Long> {
 
     // Search query
     @Query("SELECT j FROM Job j WHERE " +
-            "j.status = 'ACTIVE' AND " +
+            "j.status = 'OPEN' AND " +
             "(LOWER(j.title) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
             "LOWER(j.description) LIKE LOWER(CONCAT('%', :query, '%')))")
     Page<Job> searchJobs(@Param("query") String query, Pageable pageable);
@@ -67,10 +67,10 @@ public interface JobRepository extends JpaRepository<Job, Long> {
     @Query("SELECT COUNT(j) FROM Job j WHERE j.employer.id = :employerId AND j.status = :status")
     Long countByEmployerIdAndStatus(@Param("employerId") Long employerId, @Param("status") Job.JobStatus status);
 
-    @Query("SELECT COUNT(j) FROM Job j WHERE j.status = 'ACTIVE'")
-    Long countActiveJobs();
+    @Query("SELECT COUNT(j) FROM Job j WHERE j.status = 'OPEN'")
+    Long countOpenJobs();
 
     // Featured jobs
-    @Query("SELECT j FROM Job j WHERE j.status = 'ACTIVE' AND j.isFeatured = true ORDER BY j.publishedAt DESC")
+    @Query("SELECT j FROM Job j WHERE j.status = 'OPEN' AND j.isFeatured = true ORDER BY j.publishedAt DESC")
     Page<Job> findFeaturedJobs(Pageable pageable);
 }

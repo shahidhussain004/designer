@@ -62,7 +62,7 @@ FREELANCER: freelancer1@example.com / password123
 - Prevent duplicate proposals
 
 #### 5. Dashboard Statistics (2 tests)
-- CLIENT dashboard stats (active jobs, proposals)
+- CLIENT dashboard stats (open jobs, proposals)
 - FREELANCER dashboard stats (available jobs, my proposals)
 
 #### 6. Security & Authorization (4 tests)
