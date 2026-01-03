@@ -184,3 +184,41 @@ dotnet test --collect:"XPlat Code Coverage"
     "TopicPartitions": { "payments.succeeded": 6 }
   }
   ```
+
+## Seeding Test Data (MongoDB)
+
+This repository includes a single idempotent seed script used to populate the `lms_db` test database with sample courses, enrollments, certificates, quizzes, and quiz attempts.
+
+- Seed file: [config/mongodb-seed/lms-seed.js](config/mongodb-seed/lms-seed.js)
+
+Run the seed against a local MongoDB or the Docker container used by the dev environment.
+
+Examples:
+
+Run against a local mongosh install:
+
+- `mongosh "mongodb://localhost:27017/lms_db" --file "config/mongodb-seed/lms-seed.js"`
+
+Run inside the MongoDB Docker container (recommended when using docker-compose):
+
+- Copy the file into the container (optional): `docker cp config/mongodb-seed/lms-seed.js <mongo_container_name>:/tmp/lms-seed.js`
+- Execute inside container: `docker exec -i <mongo_container_name> mongosh "mongodb://<user>:<pass>@localhost:27017/lms_db?authSource=admin" --file /tmp/lms-seed.js`
+
+Verify seeded collections (counts):
+
+- `docker exec -i <mongo_container_name> mongosh "mongodb://<user>:<pass>@localhost:27017/lms_db?authSource=admin" --eval "db = db.getSiblingDB('lms_db'); print('courses', db.courses.countDocuments()); print('enrollments', db.enrollments.countDocuments()); print('certificates', db.certificates.countDocuments()); print('quizzes', db.quizzes.countDocuments()); print('quiz_attempts', db.quiz_attempts.countDocuments());"`
+
+Notes:
+- The seed script is idempotent: it drops the target collections then inserts fresh documents and creates the required indexes (unique slug index for courses, `user_course_idx` for enrollments).
+- Legacy/older seed scripts have been moved to `config/mongodb-seed/archive/legacy-scripts` and should not be used.
+
+Wrapper helper:
+
+You can use the provided PowerShell wrapper to copy and run the seed inside a Docker container and print verification counts. From the repository root run:
+
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File "config/mongodb-seed/seed-mongo.ps1" -ContainerName <mongo_container_name> -MongoUser <user> -MongoPass <pass> -DbName lms_db -SeedFile lms-seed.js
+```
+
+Replace `<mongo_container_name>`, `<user>`, and `<pass>` with your local values.
+

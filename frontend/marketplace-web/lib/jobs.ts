@@ -27,13 +27,13 @@ export async function getJobs(opts?: { page?: number; size?: number }): Promise<
     let json: any = {};
     if (typeof fetch !== 'undefined') {
       const base = apiClient.defaults.baseURL || '';
-      const url = `${base}/jobs?page=${page + 1}&pageSize=${size}`;
+      const url = `${base}/jobs?page=${page}&pageSize=${size}`;
       const resp = await fetch(url);
       json = await resp.json();
     } else {
       const res = await apiClient.get('/jobs', {
         params: {
-          page: page + 1,
+          page: page,
           pageSize: size,
         },
       });

@@ -1,512 +1,337 @@
-// MongoDB LMS Database Seed Data
-// This script seeds the lms_db with sample data for certificates, courses, enrollments, and quizzes
+// Comprehensive idempotent LMS seed script
+// Drops target collections, inserts courses, enrollments, certificates, quizzes, quiz_attempts
+// Creates essential indexes (slug unique, user_course unique) for test environment
 
-// Switch to lms_db database
+print('Starting comprehensive LMS seed');
 db = db.getSiblingDB('lms_db');
 
-// Clear existing data
-print('Clearing existing data...');
-db.certificates.deleteMany({});
-db.courses.deleteMany({});
-db.enrollments.deleteMany({});
-db.quizzes.deleteMany({});
-db.quiz_attempts.deleteMany({});
+const collections = ['courses','enrollments','certificates','quizzes','quiz_attempts'];
+for (const c of collections) {
+  try { db[c].drop(); print(`Dropped ${c}`); } catch (e) { print(`Drop ${c} failed: ${e}`); }
+}
 
-// Insert Courses
-print('Inserting courses...');
+function oid(){ return ObjectId(); }
+function slugify(title){ return (title||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
+
+// Courses (expanded dataset)
 const courses = [
   {
-    _id: ObjectId(),
+    _id: oid(),
     title: 'Complete JavaScript Masterclass',
+    shortDescription: 'Master JavaScript from basics to advanced concepts',
     description: 'Master JavaScript from basics to advanced concepts including ES6+, async programming, and modern frameworks',
-    instructor_id: 1,
-    instructor_name: 'John Smith',
-    category: 'Programming',
-    level: 'Intermediate',
-    duration_hours: 40,
+    instructorId: 1,
+    instructorName: 'John Smith',
+    category: 3, // WebDevelopment
+    level: 1, // Intermediate
     price: 89.99,
-    thumbnail_url: '/images/courses/javascript-masterclass.jpg',
-    video_url: '/videos/courses/javascript-intro.mp4',
-    syllabus: [
-      'JavaScript Fundamentals',
-      'DOM Manipulation',
-      'ES6+ Features',
-      'Asynchronous Programming',
-      'Modern JavaScript Frameworks'
-    ],
-    learning_outcomes: [
-      'Build dynamic web applications',
-      'Master modern JavaScript features',
-      'Understand async programming patterns',
-      'Work with APIs and fetch data'
-    ],
-    is_published: true,
-    enrollment_count: 1250,
-    rating_avg: 4.7,
-    rating_count: 320,
-    created_at: new Date('2025-01-15T00:00:00Z'),
-    updated_at: new Date('2025-12-20T00:00:00Z')
+    currency: 'USD',
+    thumbnailUrl: '/images/courses/javascript-masterclass.jpg',
+    videoUrl: '/videos/courses/javascript-intro.mp4',
+    syllabus: ['JavaScript Fundamentals','DOM Manipulation','ES6+ Features','Asynchronous Programming','Modern Frameworks'],
+    learningOutcomes: ['Build dynamic web applications','Master modern JS','Understand async patterns','Work with APIs'],
+    isPublished: true,
+    enrollmentsCount: 1250,
+    ratingAvg: 4.7,
+    ratingCount: 320,
+    createdAt: new Date('2025-01-15T00:00:00Z'),
+    updatedAt: new Date('2025-12-20T00:00:00Z'),
+    slug: slugify('Complete JavaScript Masterclass')
   },
   {
-    _id: ObjectId(),
+    _id: oid(),
     title: 'React & Redux - Build Modern Web Apps',
+    shortDescription: 'Learn to build scalable web applications using React and Redux',
     description: 'Learn to build scalable web applications using React, Redux, and modern development tools',
-    instructor_id: 2,
-    instructor_name: 'Sarah Johnson',
-    category: 'Web Development',
-    level: 'Advanced',
-    duration_hours: 35,
+    instructorId: 2,
+    instructorName: 'Sarah Johnson',
+    category: 3,
+    level: 2,
     price: 99.99,
-    thumbnail_url: '/images/courses/react-redux.jpg',
-    video_url: '/videos/courses/react-intro.mp4',
-    syllabus: [
-      'React Fundamentals',
-      'Component Architecture',
-      'State Management with Redux',
-      'React Hooks',
-      'Performance Optimization'
-    ],
-    learning_outcomes: [
-      'Build complex React applications',
-      'Manage application state with Redux',
-      'Implement routing and navigation',
-      'Optimize React performance'
-    ],
-    is_published: true,
-    enrollment_count: 890,
-    rating_avg: 4.8,
-    rating_count: 245,
-    created_at: new Date('2025-02-10T00:00:00Z'),
-    updated_at: new Date('2025-12-18T00:00:00Z')
+    currency: 'USD',
+    thumbnailUrl: '/images/courses/react-redux.jpg',
+    videoUrl: '/videos/courses/react-intro.mp4',
+    syllabus: ['React Fundamentals','Component Architecture','Redux','Hooks','Optimization'],
+    learningOutcomes: ['Build complex React apps','State management with Redux','Implement routing','Optimize performance'],
+    isPublished: true,
+    enrollmentsCount: 890,
+    ratingAvg: 4.8,
+    ratingCount: 245,
+    createdAt: new Date('2025-02-10T00:00:00Z'),
+    updatedAt: new Date('2025-12-18T00:00:00Z'),
+    slug: slugify('React & Redux - Build Modern Web Apps')
   },
   {
-    _id: ObjectId(),
-    title: 'Node.js Backend Development',
-    description: 'Build scalable backend applications with Node.js, Express, and MongoDB',
-    instructor_id: 3,
-    instructor_name: 'Michael Chen',
-    category: 'Backend Development',
-    level: 'Intermediate',
-    duration_hours: 45,
-    price: 94.99,
-    thumbnail_url: '/images/courses/nodejs-backend.jpg',
-    video_url: '/videos/courses/nodejs-intro.mp4',
-    syllabus: [
-      'Node.js Fundamentals',
-      'Express Framework',
-      'RESTful API Design',
-      'Database Integration',
-      'Authentication & Security'
-    ],
-    learning_outcomes: [
-      'Build RESTful APIs',
-      'Implement authentication systems',
-      'Work with databases',
-      'Deploy Node.js applications'
-    ],
-    is_published: true,
-    enrollment_count: 670,
-    rating_avg: 4.6,
-    rating_count: 180,
-    created_at: new Date('2025-03-05T00:00:00Z'),
-    updated_at: new Date('2025-12-15T00:00:00Z')
-  },
-  {
-    _id: ObjectId(),
+    _id: oid(),
     title: 'Full Stack Web Development Bootcamp',
+    shortDescription: 'Comprehensive course covering front-end and back-end',
     description: 'Comprehensive course covering front-end and back-end development with real-world projects',
-    instructor_id: 1,
-    instructor_name: 'John Smith',
-    category: 'Full Stack',
-    level: 'Beginner',
-    duration_hours: 80,
+    instructorId: 1,
+    instructorName: 'John Smith',
+    category: 12, // Other/FullStack mapped to Other
+    level: 0,
     price: 149.99,
-    thumbnail_url: '/images/courses/fullstack-bootcamp.jpg',
-    video_url: '/videos/courses/fullstack-intro.mp4',
-    syllabus: [
-      'HTML, CSS & JavaScript',
-      'React & Vue.js',
-      'Node.js & Express',
-      'Database Design',
-      'Deployment & DevOps'
-    ],
-    learning_outcomes: [
-      'Build complete web applications',
-      'Master both frontend and backend',
-      'Deploy applications to cloud',
-      'Work with modern development tools'
-    ],
-    is_published: true,
-    enrollment_count: 2100,
-    rating_avg: 4.9,
-    rating_count: 580,
-    created_at: new Date('2025-01-01T00:00:00Z'),
-    updated_at: new Date('2025-12-22T00:00:00Z')
-  },
-  {
-    _id: ObjectId(),
-    title: 'Python for Data Science',
-    description: 'Learn Python programming focused on data analysis, visualization, and machine learning',
-    instructor_id: 4,
-    instructor_name: 'Emily Rodriguez',
-    category: 'Data Science',
-    level: 'Intermediate',
-    duration_hours: 50,
-    price: 119.99,
-    thumbnail_url: '/images/courses/python-data-science.jpg',
-    video_url: '/videos/courses/python-intro.mp4',
-    syllabus: [
-      'Python Basics',
-      'NumPy & Pandas',
-      'Data Visualization',
-      'Machine Learning Fundamentals',
-      'Real-world Projects'
-    ],
-    learning_outcomes: [
-      'Analyze data with Python',
-      'Create visualizations',
-      'Build ML models',
-      'Work with real datasets'
-    ],
-    is_published: true,
-    enrollment_count: 1450,
-    rating_avg: 4.7,
-    rating_count: 390,
-    created_at: new Date('2025-02-20T00:00:00Z'),
-    updated_at: new Date('2025-12-19T00:00:00Z')
+    currency: 'USD',
+    thumbnailUrl: '/images/courses/fullstack-bootcamp.jpg',
+    videoUrl: '/videos/courses/fullstack-intro.mp4',
+    syllabus: ['HTML,CSS,JS','React','Node.js','DB Design','Deployment'],
+    learningOutcomes: ['Build full apps','Deploy to cloud','Use modern tools'],
+    isPublished: true,
+    enrollmentsCount: 2100,
+    ratingAvg: 4.9,
+    ratingCount: 580,
+    createdAt: new Date('2025-01-01T00:00:00Z'),
+    updatedAt: new Date('2025-12-22T00:00:00Z'),
+    slug: slugify('Full Stack Web Development Bootcamp')
   }
 ];
 
-const courseResult = db.courses.insertMany(courses);
-const courseIds = Object.values(courseResult.insertedIds);
-print(`Inserted ${courseIds.length} courses`);
+// Historic dataset (additional courses from legacy seeds)
+const legacyCourses = [
+  {
+    _id: oid(),
+    title: 'React Fundamentals',
+    shortDescription: 'Learn React.js with hands-on projects',
+    description: 'Master React.js from scratch. Learn components, hooks, state management, and build real-world applications.',
+    instructorId: 2,
+    instructorName: 'John Client',
+    category: 3, // WebDevelopment
+    level: 0, // Beginner
+    status: 2,
+    price: 49.99,
+    currency: 'USD',
+    thumbnailUrl: '/course-react.jpg',
+    tags: ['react', 'javascript', 'frontend', 'web-development'],
+    learningOutcomes: ['Understand JSX','Master React hooks','Build real applications','State management'],
+    isPublished: true,
+    totalEnrollments: 0,
+    averageRating: 0.0,
+    reviewCount: 0,
+    totalDurationMinutes: 0,
+    totalLessons: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    slug: slugify('React Fundamentals')
+  },
+  {
+    _id: oid(),
+    title: 'Data Science with Python',
+    shortDescription: 'Master data science with Python',
+    description: 'Learn data analysis, visualization, and machine learning using Python libraries like NumPy, Pandas, and Scikit-learn.',
+    instructorId: 2,
+    instructorName: 'John Client',
+    category: 12, // Other (DataScience mapped to Other)
+    level: 1, // Intermediate
+    status: 2,
+    price: 79.99,
+    currency: 'USD',
+    thumbnailUrl: '/course-python-ds.jpg',
+    tags: ['python', 'data-science', 'analytics', 'machine-learning'],
+    learningOutcomes: ['Data manipulation with Pandas','Data visualization','Statistical analysis','ML models'],
+    isPublished: true,
+    totalEnrollments: 0,
+    averageRating: 0.0,
+    reviewCount: 0,
+    totalDurationMinutes: 0,
+    totalLessons: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    slug: slugify('Data Science with Python')
+  },
+  {
+    _id: oid(),
+    title: 'UI/UX Design Principles',
+    shortDescription: 'Master UI/UX design principles',
+    description: 'Learn design thinking, user research, wireframing, and prototyping. Create beautiful and functional user experiences.',
+    instructorId: 2,
+    instructorName: 'John Client',
+    category: 1, // UxDesign
+    level: 0,
+    status: 2,
+    price: 0,
+    currency: 'USD',
+    thumbnailUrl: '/course-uiux.jpg',
+    tags: ['design', 'ui', 'ux', 'user-experience'],
+    learningOutcomes: ['Design thinking','User research','Wireframing','Prototyping'],
+    isPublished: true,
+    totalEnrollments: 0,
+    averageRating: 0.0,
+    reviewCount: 0,
+    totalDurationMinutes: 0,
+    totalLessons: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    slug: slugify('UI/UX Design Principles')
+  },
+  {
+    _id: oid(),
+    title: 'AWS Cloud Essentials',
+    shortDescription: 'Learn AWS cloud computing',
+    description: 'Master AWS cloud services including EC2, S3, Lambda, and more. Build scalable cloud applications.',
+    instructorId: 2,
+    instructorName: 'John Client',
+    category: 12, // Other (CloudComputing mapped to Other)
+    level: 1,
+    status: 2,
+    price: 59.99,
+    currency: 'USD',
+    thumbnailUrl: '/course-aws.jpg',
+    tags: ['aws', 'cloud', 'devops', 'infrastructure'],
+    learningOutcomes: ['Understand AWS services','Deploy applications','Manage cloud infrastructure'],
+    isPublished: true,
+    totalEnrollments: 0,
+    averageRating: 0.0,
+    reviewCount: 0,
+    totalDurationMinutes: 0,
+    totalLessons: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    slug: slugify('AWS Cloud Essentials')
+  },
+  {
+    _id: oid(),
+    title: 'Machine Learning Fundamentals',
+    shortDescription: 'Start your ML journey',
+    description: 'Introduction to machine learning algorithms, neural networks, and deep learning. Hands-on projects with TensorFlow.',
+    instructorId: 2,
+    instructorName: 'John Client',
+    category: 12, // Other (MachineLearning mapped to Other)
+    level: 2, // Advanced
+    status: 2,
+    price: 99.99,
+    currency: 'USD',
+    thumbnailUrl: '/course-ml.jpg',
+    tags: ['machine-learning', 'ai', 'tensorflow', 'neural-networks'],
+    learningOutcomes: ['Understand ML algorithms','Build neural networks','Deploy ML models'],
+    isPublished: true,
+    totalEnrollments: 0,
+    averageRating: 4.5,
+    reviewCount: 10,
+    totalDurationMinutes: 0,
+    totalLessons: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    slug: slugify('Machine Learning Fundamentals')
+  },
+  {
+    _id: oid(),
+    title: 'Graphic Design Masterclass',
+    shortDescription: 'Complete graphic design course',
+    description: 'Master Adobe Creative Suite including Photoshop, Illustrator, and InDesign. Create stunning visual designs.',
+    instructorId: 2,
+    instructorName: 'John Client',
+    category: 2, // GraphicDesign
+    level: 1,
+    status: 2,
+    price: 59.99,
+    currency: 'USD',
+    thumbnailUrl: '/course-graphic-design.jpg',
+    tags: ['graphic-design', 'adobe', 'photoshop', 'illustrator'],
+    learningOutcomes: ['Master Photoshop','Learn Illustrator','Create professional designs'],
+    isPublished: true,
+    totalEnrollments: 5,
+    averageRating: 4.8,
+    reviewCount: 3,
+    totalDurationMinutes: 0,
+    totalLessons: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    slug: slugify('Graphic Design Masterclass')
+  },
+  {
+    _id: oid(),
+    title: 'Mobile App Development with React Native',
+    shortDescription: 'Build mobile apps with React Native',
+    description: 'Build cross-platform mobile applications for iOS and Android using React Native and JavaScript.',
+    instructorId: 2,
+    instructorName: 'John Client',
+    category: 4, // MobileDevelopment
+    level: 2,
+    status: 2,
+    price: 99.99,
+    currency: 'USD',
+    thumbnailUrl: '/course-react-native.jpg',
+    tags: ['react-native', 'mobile', 'ios', 'android'],
+    learningOutcomes: ['Build iOS apps','Build Android apps','Master React Native'],
+    isPublished: true,
+    totalEnrollments: 12,
+    averageRating: 4.5,
+    reviewCount: 8,
+    totalDurationMinutes: 0,
+    totalLessons: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    slug: slugify('Mobile App Development with React Native')
+  }
+];
 
-// Insert Enrollments
-print('Inserting enrollments...');
+// Merge datasets, avoiding duplicate titles
+const allTitles = new Set(courses.map(c=>c.title));
+for (const lc of legacyCourses) {
+  if (!allTitles.has(lc.title)) { courses.push(lc); allTitles.add(lc.title); }
+}
+
+const cr = db.courses.insertMany(courses);
+const ids = Object.values(cr.insertedIds);
+print('Inserted courses:', ids.length);
+
+// Enrollments
 const enrollments = [
-  {
-    _id: ObjectId(),
-    user_id: 1,
-    course_id: courseIds[0],
-    enrolled_at: new Date('2025-03-15T10:00:00Z'),
-    progress_percentage: 75,
-    completed_lessons: ['lesson1', 'lesson2', 'lesson3', 'lesson4', 'lesson5'],
-    last_accessed: new Date('2026-01-02T14:30:00Z'),
-    completion_date: null,
-    certificate_id: null,
-    is_completed: false
-  },
-  {
-    _id: ObjectId(),
-    user_id: 1,
-    course_id: courseIds[3],
-    enrolled_at: new Date('2025-01-20T09:00:00Z'),
-    progress_percentage: 100,
-    completed_lessons: ['lesson1', 'lesson2', 'lesson3', 'lesson4', 'lesson5', 'lesson6', 'lesson7', 'lesson8'],
-    last_accessed: new Date('2025-11-30T16:45:00Z'),
-    completion_date: new Date('2025-11-30T16:45:00Z'),
-    certificate_id: ObjectId(),
-    is_completed: true
-  },
-  {
-    _id: ObjectId(),
-    user_id: 2,
-    course_id: courseIds[1],
-    enrolled_at: new Date('2025-04-10T11:00:00Z'),
-    progress_percentage: 60,
-    completed_lessons: ['lesson1', 'lesson2', 'lesson3'],
-    last_accessed: new Date('2025-12-28T10:15:00Z'),
-    completion_date: null,
-    certificate_id: null,
-    is_completed: false
-  },
-  {
-    _id: ObjectId(),
-    user_id: 3,
-    course_id: courseIds[2],
-    enrolled_at: new Date('2025-05-05T13:00:00Z'),
-    progress_percentage: 90,
-    completed_lessons: ['lesson1', 'lesson2', 'lesson3', 'lesson4', 'lesson5', 'lesson6'],
-    last_accessed: new Date('2026-01-01T09:20:00Z'),
-    completion_date: null,
-    certificate_id: null,
-    is_completed: false
-  },
-  {
-    _id: ObjectId(),
-    user_id: 2,
-    course_id: courseIds[4],
-    enrolled_at: new Date('2025-03-01T08:00:00Z'),
-    progress_percentage: 100,
-    completed_lessons: ['lesson1', 'lesson2', 'lesson3', 'lesson4', 'lesson5', 'lesson6', 'lesson7'],
-    last_accessed: new Date('2025-10-15T14:00:00Z'),
-    completion_date: new Date('2025-10-15T14:00:00Z'),
-    certificate_id: ObjectId(),
-    is_completed: true
-  },
-  {
-    _id: ObjectId(),
-    user_id: 4,
-    course_id: courseIds[0],
-    enrolled_at: new Date('2025-06-12T10:30:00Z'),
-    progress_percentage: 45,
-    completed_lessons: ['lesson1', 'lesson2'],
-    last_accessed: new Date('2025-12-20T11:00:00Z'),
-    completion_date: null,
-    certificate_id: null,
-    is_completed: false
-  }
+  { _id: oid(), userId: 1, courseId: ids[0], enrolledAt: new Date('2025-03-15T10:00:00Z'), progressPercentage: 75, completedLessons: ['l1','l2'], lastAccessed: new Date('2026-01-02T14:30:00Z'), completionDate: null, certificateId: null, isCompleted: false },
+  { _id: oid(), userId: 2, courseId: ids[1], enrolledAt: new Date('2025-04-10T11:00:00Z'), progressPercentage: 60, completedLessons: ['l1'], lastAccessed: new Date('2025-12-28T10:15:00Z'), completionDate: null, certificateId: null, isCompleted: false }
 ];
+db.enrollments.insertMany(enrollments);
+print('Inserted enrollments');
 
-const enrollmentResult = db.enrollments.insertMany(enrollments);
-print(`Inserted ${Object.keys(enrollmentResult.insertedIds).length} enrollments`);
+// Certificates
+const certs = [ { _id: enrollments[0].certificateId || oid(), userId: 2, courseId: ids[1], courseTitle: 'React & Redux - Build Modern Web Apps', issuedDate: new Date('2025-10-15T14:00:00Z'), certificateUrl: '/certs/cert1.pdf', verificationCode: 'CERT-001', instructorName: 'Sarah Johnson', completionDate: new Date('2025-10-15T14:00:00Z') } ];
+db.certificates.insertMany(certs);
+print('Inserted certificates');
 
-// Insert Certificates (for completed courses)
-print('Inserting certificates...');
-const certificates = [
-  {
-    _id: enrollments[1].certificate_id,
-    user_id: 1,
-    course_id: courseIds[3],
-    course_title: 'Full Stack Web Development Bootcamp',
-    issued_date: new Date('2025-11-30T16:45:00Z'),
-    certificate_url: '/certificates/cert-user1-fullstack.pdf',
-    verification_code: 'CERT-FS-2025-001234',
-    instructor_name: 'John Smith',
-    completion_date: new Date('2025-11-30T16:45:00Z')
-  },
-  {
-    _id: enrollments[4].certificate_id,
-    user_id: 2,
-    course_id: courseIds[4],
-    course_title: 'Python for Data Science',
-    issued_date: new Date('2025-10-15T14:00:00Z'),
-    certificate_url: '/certificates/cert-user2-python.pdf',
-    verification_code: 'CERT-PY-2025-005678',
-    instructor_name: 'Emily Rodriguez',
-    completion_date: new Date('2025-10-15T14:00:00Z')
-  }
-];
+// Quizzes
+const quizzes = [ { _id: oid(), courseId: ids[0], title: 'JavaScript Fundamentals Quiz', description: 'Test JS basics', questions: [ { questionText: 'What is closure?', options: ['A','B','C','D'], correctAnswer: 0, points: 10 } ], passingScore: 70, timeLimitMinutes: 30, attemptsAllowed: 3, isPublished: true, createdAt: new Date(), updatedAt: new Date() } ];
+db.quizzes.insertMany(quizzes);
+print('Inserted quizzes');
 
-const certResult = db.certificates.insertMany(certificates);
-print(`Inserted ${Object.keys(certResult.insertedIds).length} certificates`);
+// Quiz attempts
+const qa = [ { _id: oid(), userId: 1, quizId: quizzes[0]._id, courseId: ids[0], answers: [ { q:0, answer:1 } ], score: 90, passed: true, attemptedAt: new Date() } ];
+db.quiz_attempts.insertMany(qa);
+print('Inserted quiz attempts');
 
-// Insert Quizzes
-print('Inserting quizzes...');
-const quizzes = [
-  {
-    _id: ObjectId(),
-    course_id: courseIds[0],
-    title: 'JavaScript Fundamentals Quiz',
-    description: 'Test your knowledge of JavaScript basics and core concepts',
-    questions: [
-      {
-        question_text: 'What is a closure in JavaScript?',
-        options: [
-          'A function that has access to variables from an outer function',
-          'A way to close a JavaScript file',
-          'A method to stop code execution',
-          'A type of loop'
-        ],
-        correct_answer: 0,
-        points: 10
-      },
-      {
-        question_text: 'Which method is used to add an element to the end of an array?',
-        options: ['unshift()', 'push()', 'pop()', 'shift()'],
-        correct_answer: 1,
-        points: 5
-      },
-      {
-        question_text: 'What does "===" operator do?',
-        options: [
-          'Assigns a value',
-          'Compares value only',
-          'Compares both value and type',
-          'Creates a variable'
-        ],
-        correct_answer: 2,
-        points: 5
-      },
-      {
-        question_text: 'What is the output of: typeof null?',
-        options: ['"null"', '"undefined"', '"object"', '"number"'],
-        correct_answer: 2,
-        points: 10
+// Create indexes
+print('Creating indexes');
+// Helper: ensure an index exists with desired spec. If a conflicting index with same name/key exists, drop it first.
+function ensureIndex(collection, keySpec, options) {
+  try {
+    const existing = collection.getIndexes();
+    // find any index with same key pattern
+    const match = existing.find(ix => {
+      const k = ix.key || {};
+      // compare keys by JSON stringification (simple but effective for single-field indexes)
+      return JSON.stringify(k) === JSON.stringify(keySpec);
+    });
+    if (match) {
+      // If existing index options differ from requested options, drop and recreate
+      const requestedName = options && options.name ? options.name : Object.keys(keySpec).map(k=>k+"_1").join('_');
+      const existingName = match.name;
+      const optsDiffer = (match.sparse !== !!options.sparse) || (match.unique !== !!options.unique) || (existingName !== requestedName && options && options.name);
+      if (optsDiffer) {
+        print(`Dropping conflicting index ${existingName} on ${collection.getName()} (options differ)`);
+        try { collection.dropIndex(existingName); } catch (e) { print('Failed to drop index', existingName, e); }
+      } else {
+        print(`Index already exists on ${collection.getName()} with matching options: ${existingName}`);
+        return;
       }
-    ],
-    passing_score: 70,
-    time_limit_minutes: 30,
-    attempts_allowed: 3,
-    is_published: true,
-    created_at: new Date('2025-01-16T00:00:00Z'),
-    updated_at: new Date('2025-01-16T00:00:00Z')
-  },
-  {
-    _id: ObjectId(),
-    course_id: courseIds[1],
-    title: 'React Components & Hooks Quiz',
-    description: 'Assess your understanding of React components and hooks',
-    questions: [
-      {
-        question_text: 'What hook is used for side effects in functional components?',
-        options: ['useState', 'useEffect', 'useContext', 'useReducer'],
-        correct_answer: 1,
-        points: 10
-      },
-      {
-        question_text: 'How do you pass data from parent to child component?',
-        options: ['Through state', 'Through props', 'Through context', 'Through refs'],
-        correct_answer: 1,
-        points: 5
-      },
-      {
-        question_text: 'What is the virtual DOM?',
-        options: [
-          'A copy of the real DOM in memory',
-          'A browser API',
-          'A React component',
-          'A state management tool'
-        ],
-        correct_answer: 0,
-        points: 10
-      }
-    ],
-    passing_score: 75,
-    time_limit_minutes: 25,
-    attempts_allowed: 2,
-    is_published: true,
-    created_at: new Date('2025-02-11T00:00:00Z'),
-    updated_at: new Date('2025-02-11T00:00:00Z')
-  },
-  {
-    _id: ObjectId(),
-    course_id: courseIds[2],
-    title: 'Node.js & Express Quiz',
-    description: 'Test your knowledge of Node.js backend development',
-    questions: [
-      {
-        question_text: 'What is middleware in Express?',
-        options: [
-          'Functions that execute during request-response cycle',
-          'A database layer',
-          'A frontend framework',
-          'A testing tool'
-        ],
-        correct_answer: 0,
-        points: 10
-      },
-      {
-        question_text: 'Which module is used for file system operations in Node.js?',
-        options: ['http', 'fs', 'path', 'os'],
-        correct_answer: 1,
-        points: 5
-      },
-      {
-        question_text: 'What does app.use() do in Express?',
-        options: [
-          'Creates a route',
-          'Mounts middleware',
-          'Starts the server',
-          'Connects to database'
-        ],
-        correct_answer: 1,
-        points: 10
-      },
-      {
-        question_text: 'What is the purpose of package.json?',
-        options: [
-          'To store application code',
-          'To manage project dependencies',
-          'To configure the database',
-          'To define routes'
-        ],
-        correct_answer: 1,
-        points: 5
-      }
-    ],
-    passing_score: 70,
-    time_limit_minutes: 35,
-    attempts_allowed: 3,
-    is_published: true,
-    created_at: new Date('2025-03-06T00:00:00Z'),
-    updated_at: new Date('2025-03-06T00:00:00Z')
+    }
+    // Create index (safe to call after dropping conflict)
+    collection.createIndex(keySpec, options || {});
+    print(`Created index on ${collection.getName()}: ${JSON.stringify(keySpec)}`);
+  } catch (e) {
+    print('Index creation/check failed for', collection.getName(), e);
   }
-];
+}
 
-const quizResult = db.quizzes.insertMany(quizzes);
-const quizIds = Object.values(quizResult.insertedIds);
-print(`Inserted ${quizIds.length} quizzes`);
+ensureIndex(db.courses, { slug: 1 }, { unique: true });
+ensureIndex(db.enrollments, { userId: 1, courseId: 1 }, { unique: true, name: 'user_course_idx' });
 
-// Insert Quiz Attempts
-print('Inserting quiz attempts...');
-const quizAttempts = [
-  {
-    _id: ObjectId(),
-    quiz_id: quizIds[0],
-    user_id: 1,
-    course_id: courseIds[0],
-    answers: [0, 1, 2, 2],
-    score: 30,
-    total_points: 30,
-    percentage: 100,
-    passed: true,
-    time_taken_minutes: 18,
-    started_at: new Date('2025-05-20T14:00:00Z'),
-    completed_at: new Date('2025-05-20T14:18:00Z')
-  },
-  {
-    _id: ObjectId(),
-    quiz_id: quizIds[1],
-    user_id: 2,
-    course_id: courseIds[1],
-    answers: [1, 1, 0],
-    score: 25,
-    total_points: 25,
-    percentage: 100,
-    passed: true,
-    time_taken_minutes: 15,
-    started_at: new Date('2025-07-10T10:00:00Z'),
-    completed_at: new Date('2025-07-10T10:15:00Z')
-  },
-  {
-    _id: ObjectId(),
-    quiz_id: quizIds[2],
-    user_id: 3,
-    course_id: courseIds[2],
-    answers: [0, 1, 1, 1],
-    score: 30,
-    total_points: 30,
-    percentage: 100,
-    passed: true,
-    time_taken_minutes: 22,
-    started_at: new Date('2025-08-15T16:00:00Z'),
-    completed_at: new Date('2025-08-15T16:22:00Z')
-  },
-  {
-    _id: ObjectId(),
-    quiz_id: quizIds[0],
-    user_id: 4,
-    course_id: courseIds[0],
-    answers: [0, 2, 2, 1],
-    score: 20,
-    total_points: 30,
-    percentage: 67,
-    passed: false,
-    time_taken_minutes: 25,
-    started_at: new Date('2025-09-01T11:00:00Z'),
-    completed_at: new Date('2025-09-01T11:25:00Z')
-  }
-];
-
-const attemptResult = db.quiz_attempts.insertMany(quizAttempts);
-print(`Inserted ${Object.keys(attemptResult.insertedIds).length} quiz attempts`);
-
-// Summary
-print('\n=== LMS Database Seeding Complete ===');
-print(`Courses: ${db.courses.countDocuments()}`);
-print(`Enrollments: ${db.enrollments.countDocuments()}`);
-print(`Certificates: ${db.certificates.countDocuments()}`);
-print(`Quizzes: ${db.quizzes.countDocuments()}`);
-print(`Quiz Attempts: ${db.quiz_attempts.countDocuments()}`);
-print('=====================================\n');
+print('Comprehensive seed complete');
