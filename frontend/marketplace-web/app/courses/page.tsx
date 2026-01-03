@@ -14,6 +14,7 @@ import {
 import { CoursesSkeleton } from '@/components/Skeletons';
 import { PageLayout } from '@/components/ui';
 import { useCourses } from '@/hooks/useCourses';
+import type { Course as CourseType } from '@/lib/courses';
 import {
   COURSE_CATEGORIES,
   SKILL_LEVELS,
@@ -24,26 +25,7 @@ import Link from 'next/link';
 import React, { useMemo, useState } from 'react';
 
 // Course type from API
-interface Course {
-  id: number;
-  title: string;
-  description: string;
-  instructorId: number;
-  instructorName?: string;
-  category: string;
-  skillLevel: string;
-  price: number;
-  currency: string;
-  duration: number;
-  language: string;
-  thumbnailUrl?: string;
-  videoPreviewUrl?: string;
-  enrollmentCount: number;
-  rating: number;
-  isPublished: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+type Course = CourseType & { duration?: number; enrollmentCount?: number };
 
 export default function CoursesPage() {
   // Filters
@@ -68,7 +50,7 @@ export default function CoursesPage() {
 
   const { data, isLoading, error, refetch } = useCourses(filters);
   
-  const courses = data?.courses || [];
+  const courses = (data?.courses || []) as Course[];
   const totalCount = data?.totalCount || 0;
 
   const handleSearch = (e: React.FormEvent) => {
@@ -394,8 +376,8 @@ function CourseCard({ course, getSkillLevelVariant }: CourseCardProps) {
               </Text>
             </Flex>
             <Text font-size="body-xs" color="secondary">•</Text>
-            <Text font-size="body-xs" color="secondary">
-              {course.duration || 0} min duration
+              <Text font-size="body-xs" color="secondary">
+              {(course.durationMinutes ?? course.duration ?? 0)} min duration
             </Text>
           </Flex>
 

@@ -1,5 +1,5 @@
-import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React from 'react';
 
 // Do not require next/navigation at module load time — that can import the real Next module
 // Tests use jest.setup.js to mock next/navigation. This helper wraps UI in a small
@@ -8,7 +8,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 export function withAppRouter(ui: React.ReactElement, { pathname: _pathname = '/' } = {}) {
   const queryClient = new QueryClient({
     defaultOptions: {
-      queries: { retry: false, cacheTime: 0 },
+      queries: { retry: false, gcTime: 0 },
       mutations: { retry: false },
     },
   });
