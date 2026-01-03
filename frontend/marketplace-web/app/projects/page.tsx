@@ -205,7 +205,7 @@ function ProjectsPageContent() {
               <select
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
+                className="select-with-arrow px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
               >
                 <option value="">All Categories</option>
                 {categories.map((cat) => (
@@ -217,7 +217,7 @@ function ProjectsPageContent() {
               <select
                 value={experienceLevelId}
                 onChange={(e) => setExperienceLevelId(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
+                className="select-with-arrow px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
               >
                 <option value="">All Levels</option>
                 {experienceLevels.map((level) => (
@@ -229,7 +229,7 @@ function ProjectsPageContent() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as SortBy)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
+                className="select-with-arrow px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
               >
                 <option value="recent">Most Recent</option>
                 <option value="budget-high">Highest Budget</option>
