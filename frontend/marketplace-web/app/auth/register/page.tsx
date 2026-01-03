@@ -1,18 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import {
-  Flex,
-  Card,
-  Text,
-  Button,
-  Input,
-  Alert,
-  Divider,
-} from '@/components/green';
+import { PageLayout } from '@/components/ui';
 import { authService } from '@/lib/auth';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -49,150 +41,162 @@ export default function RegisterPage() {
   };
 
   return (
-    <Flex
-      justify-content="center"
-      align-items="center"
-      padding="l"
-    >
-      <Card padding="xl">
-        <Flex flex-direction="column" gap="l">
-          {/* Header */}
-          <Flex flex-direction="column" align-items="center" gap="s">
-            <Text tag="h1" font-size="heading-l">
-              Create your account
-            </Text>
-            <Text color="secondary">
-              Already have an account?{' '}
-              <Link href="/auth/login">
-                Sign in
-              </Link>
-            </Text>
-          </Flex>
+    <PageLayout>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full">
+          {/* Logo/Brand */}
+          <div className="text-center mb-8">
+            <Link href="/" className="text-3xl font-bold text-gray-900">
+              Designer<span className="text-primary-600">Hub</span>
+            </Link>
+          </div>
 
-          <Divider />
+          {/* Register Card */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+            <div className="text-center mb-8">
+              <h1 className="text-2xl font-bold text-gray-900">Create your account</h1>
+              <p className="mt-2 text-gray-600">
+                Already have an account?{' '}
+                <Link href="/auth/login" className="text-primary-600 hover:text-primary-700 font-medium">
+                  Sign in
+                </Link>
+              </p>
+            </div>
 
-          {/* Error Alert */}
-          {error && (
-            <Alert variant="negative">
-              {error}
-            </Alert>
-          )}
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-700 text-sm">{error}</p>
+              </div>
+            )}
 
-          {/* Form */}
-          <form onSubmit={handleSubmit}>
-            <Flex flex-direction="column" gap="m">
-              <Input
-                label="Full Name"
-                value={formData.fullName}
-                onInput={(e: Event) =>
-                  setFormData({ ...formData, fullName: (e.target as HTMLInputElement).value })
-                }
-                required
-              />
-
-              <Input
-                label="Email Address"
-                type="email"
-                value={formData.email}
-                onInput={(e: Event) =>
-                  setFormData({ ...formData, email: (e.target as HTMLInputElement).value })
-                }
-                required
-              />
-
-              <Flex flex-direction="column" gap="xs">
-                <Input
-                  label="Username"
-                  value={formData.username}
-                  onInput={(e: Event) =>
-                    setFormData({ ...formData, username: (e.target as HTMLInputElement).value })
-                  }
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
+                  Full Name
+                </label>
+                <input
+                  id="fullName"
+                  type="text"
+                  value={formData.fullName}
+                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-transparent transition-colors"
+                  placeholder="John Doe"
                 />
-                <Text font-size="body-s" color="secondary">
-                  Letters, numbers, and underscores only (3-50 characters)
-                </Text>
-              </Flex>
+              </div>
 
-              <Flex flex-direction="column" gap="xs">
-                <Input
-                  label="Password"
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-transparent transition-colors"
+                  placeholder="john@example.com"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+                  Username
+                </label>
+                <input
+                  id="username"
+                  type="text"
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-transparent transition-colors"
+                  placeholder="johndoe"
+                />
+                <p className="mt-1 text-xs text-gray-500">Letters, numbers, and underscores only (3-50 characters)</p>
+              </div>
+
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                  Password
+                </label>
+                <input
+                  id="password"
                   type="password"
                   value={formData.password}
-                  onInput={(e: Event) =>
-                    setFormData({ ...formData, password: (e.target as HTMLInputElement).value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-transparent transition-colors"
+                  placeholder="Minimum 8 characters"
                 />
-                <Text font-size="body-s" color="secondary">
-                  Minimum 8 characters
-                </Text>
-              </Flex>
+                <p className="mt-1 text-xs text-gray-500">Minimum 8 characters</p>
+              </div>
 
-              <Divider />
-
-              {/* Role Selection */}
-              <Flex flex-direction="column" gap="s">
-                <Text font-weight="book">I want to:</Text>
-                
-                <Card
-                  padding="m"
-                  variant={formData.role === 'FREELANCER' ? 'positive' : 'secondary'}
-                  onClick={() => setFormData({ ...formData, role: 'FREELANCER' })}
-                >
-                  <Flex align-items="center" gap="m">
+              <div className="border-t border-gray-200 pt-5">
+                <p className="text-sm font-medium text-gray-700 mb-3">I want to:</p>
+                <div className="space-y-3">
+                  <label
+                    className={`flex items-center p-4 border rounded-lg cursor-pointer transition-colors ${
+                      formData.role === 'FREELANCER'
+                        ? 'border-primary-500 bg-primary-50'
+                        : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                  >
                     <input
                       type="radio"
                       name="role"
                       value="FREELANCER"
                       checked={formData.role === 'FREELANCER'}
                       onChange={() => setFormData({ ...formData, role: 'FREELANCER' })}
+                      className="w-4 h-4 text-primary-600 border-gray-300 focus:ring-input-focus"
                     />
-                    <Flex flex-direction="column" gap="2xs">
-                      <Text font-weight="book">Work as a Freelancer</Text>
-                      <Text font-size="body-s" color="secondary">
-                        Find jobs and get hired
-                      </Text>
-                    </Flex>
-                  </Flex>
-                </Card>
+                    <div className="ml-3">
+                      <p className="font-medium text-gray-900">Work as a Freelancer</p>
+                      <p className="text-sm text-gray-500">Find jobs and get hired</p>
+                    </div>
+                  </label>
 
-                <Card
-                  padding="m"
-                  variant={formData.role === 'CLIENT' ? 'positive' : 'secondary'}
-                  onClick={() => setFormData({ ...formData, role: 'CLIENT' })}
-                >
-                  <Flex align-items="center" gap="m">
+                  <label
+                    className={`flex items-center p-4 border rounded-lg cursor-pointer transition-colors ${
+                      formData.role === 'CLIENT'
+                        ? 'border-primary-500 bg-primary-50'
+                        : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                  >
                     <input
                       type="radio"
                       name="role"
                       value="CLIENT"
                       checked={formData.role === 'CLIENT'}
                       onChange={() => setFormData({ ...formData, role: 'CLIENT' })}
+                      className="w-4 h-4 text-primary-600 border-gray-300 focus:ring-input-focus"
                     />
-                    <Flex flex-direction="column" gap="2xs">
-                      <Text font-weight="book">Hire as a Client</Text>
-                      <Text font-size="body-s" color="secondary">
-                        Post jobs and find talent
-                      </Text>
-                    </Flex>
-                  </Flex>
-                </Card>
-              </Flex>
+                    <div className="ml-3">
+                      <p className="font-medium text-gray-900">Hire as a Client</p>
+                      <p className="text-sm text-gray-500">Post jobs and find talent</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
 
-              <Divider />
-
-              <Button type="submit" disabled={loading}>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 px-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 {loading ? 'Creating account...' : 'Create account'}
-              </Button>
+              </button>
 
-              <Text font-size="body-s" color="secondary">
-                By creating an account, you agree to our Terms of Service and Privacy Policy
-              </Text>
-            </Flex>
-          </form>
-        </Flex>
-      </Card>
-    </Flex>
+              <p className="text-xs text-gray-500 text-center">
+                By creating an account, you agree to our{' '}
+                <Link href="/terms" className="text-primary-600 hover:underline">Terms of Service</Link>
+                {' '}and{' '}
+                <Link href="/privacy" className="text-primary-600 hover:underline">Privacy Policy</Link>
+              </p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </PageLayout>
   );
 }

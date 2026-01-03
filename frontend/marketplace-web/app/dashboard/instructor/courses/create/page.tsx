@@ -1,16 +1,9 @@
 'use client'
 
-import {
-  Button,
-  Card,
-  Divider,
-  Flex,
-  Input,
-  Text,
-  Textarea,
-} from '@/components/green'
 import { PageLayout } from '@/components/ui'
 import { COURSE_CATEGORIES, createCourse, SKILL_LEVELS } from '@/lib/courses'
+import { AlertCircle, ArrowLeft, Loader2 } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -68,7 +61,6 @@ export default function CreateCoursePage() {
         requirements: formData.requirements ? formData.requirements.split('\n').filter(r => r.trim()) : [],
       })
 
-      // Redirect to edit page to add modules/lessons
       router.push(`/dashboard/instructor/courses/${newCourse.id}/edit`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create course')
@@ -78,215 +70,239 @@ export default function CreateCoursePage() {
 
   return (
     <PageLayout>
-      <Card padding="xl">
-        <Flex flex-direction="column" gap="l">
-          <Text font-size="heading-l">Create New Course</Text>
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-gray-900 text-white py-12">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <Link href="/dashboard/instructor" className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-4">
+              <ArrowLeft className="w-4 h-4" />
+              Back to My Courses
+            </Link>
+            <h1 className="text-3xl font-bold">Create New Course</h1>
+          </div>
+        </div>
 
-          {error && (
-            <div style={{ padding: '12px', backgroundColor: '#fee', borderRadius: '8px', color: '#c33' }}>
-              {error}
-            </div>
-          )}
+        {/* Content */}
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                <p className="text-red-700">{error}</p>
+              </div>
+            )}
 
-          <form onSubmit={handleSubmit}>
-            <Flex flex-direction="column" gap="m">
+            <form onSubmit={handleSubmit} className="space-y-6">
               {/* Basic Info */}
-              <Flex flex-direction="column" gap="s">
-                <Text font-size="heading-s">Course Details</Text>
-                <Input
-                  placeholder="Course Title (e.g., React Fundamentals)"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  required
-                />
-              </Flex>
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Course Details</h2>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Course Title *</label>
+                    <input
+                      type="text"
+                      name="title"
+                      value={formData.title}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus"
+                      placeholder="e.g., React Fundamentals"
+                    />
+                  </div>
 
-              <Flex flex-direction="column" gap="s">
-                <Text font-size="body-m">Short Description</Text>
-                <Input
-                  placeholder="One-line summary (e.g., Learn React in 30 days)"
-                  name="shortDescription"
-                  value={formData.shortDescription}
-                  onChange={handleChange}
-                />
-              </Flex>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Short Description</label>
+                    <input
+                      type="text"
+                      name="shortDescription"
+                      value={formData.shortDescription}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus"
+                      placeholder="One-line summary (e.g., Learn React in 30 days)"
+                    />
+                  </div>
 
-              <Flex flex-direction="column" gap="s">
-                <Text font-size="body-m">Full Description</Text>
-                <Textarea
-                  placeholder="Detailed course description, what students will learn, prerequisites..."
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  rows={6}
-                  required
-                />
-              </Flex>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Full Description *</label>
+                    <textarea
+                      name="description"
+                      value={formData.description}
+                      onChange={handleChange}
+                      rows={6}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus"
+                      placeholder="Detailed course description, what students will learn, prerequisites..."
+                    />
+                  </div>
+                </div>
+              </div>
 
-              <Divider />
+              <hr className="border-gray-200" />
 
               {/* Category & Level */}
-              <Flex flex-direction="column" gap="s">
-                <Text font-size="heading-s">Course Information</Text>
-              </Flex>
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Course Information</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                    <select
+                      name="category"
+                      value={formData.category}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus"
+                    >
+                      {COURSE_CATEGORIES.map(cat => (
+                        <option key={cat} value={cat.replace(/\s+/g, '')}>
+                          {cat}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-              <Flex gap="m">
-                <Flex flex-direction="column" gap="s" style={{ flex: 1 }}>
-                  <Text font-size="body-m">Category</Text>
-                  <select
-                    name="category"
-                    value={formData.category}
-                    onChange={handleChange}
-                    style={{
-                      padding: '10px',
-                      border: '1px solid #ddd',
-                      borderRadius: '6px',
-                      fontFamily: 'inherit',
-                    }}
-                  >
-                    {COURSE_CATEGORIES.map(cat => (
-                      <option key={cat} value={cat.replace(/\s+/g, '')}>
-                        {cat}
-                      </option>
-                    ))}
-                  </select>
-                </Flex>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Skill Level</label>
+                    <select
+                      name="level"
+                      value={formData.level}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus"
+                    >
+                      {SKILL_LEVELS.map(level => (
+                        <option key={level} value={level}>
+                          {level}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
 
-                <Flex flex-direction="column" gap="s" style={{ flex: 1 }}>
-                  <Text font-size="body-m">Skill Level</Text>
-                  <select
-                    name="level"
-                    value={formData.level}
-                    onChange={handleChange}
-                    style={{
-                      padding: '10px',
-                      border: '1px solid #ddd',
-                      borderRadius: '6px',
-                      fontFamily: 'inherit',
-                    }}
-                  >
-                    {SKILL_LEVELS.map(level => (
-                      <option key={level} value={level}>
-                        {level}
-                      </option>
-                    ))}
-                  </select>
-                </Flex>
-              </Flex>
-
-              <Divider />
+              <hr className="border-gray-200" />
 
               {/* Pricing & Media */}
-              <Flex flex-direction="column" gap="s">
-                <Text font-size="heading-s">Pricing & Media</Text>
-              </Flex>
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Pricing & Media</h2>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Price (USD)</label>
+                      <input
+                        type="number"
+                        name="price"
+                        value={formData.price}
+                        onChange={handleChange}
+                        min="0"
+                        step="0.01"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus"
+                        placeholder="0 for free"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Currency</label>
+                      <input
+                        type="text"
+                        value={formData.currency}
+                        disabled
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-500"
+                      />
+                    </div>
+                  </div>
 
-              <Flex gap="m">
-                <Flex flex-direction="column" gap="s" style={{ flex: 1 }}>
-                  <Text font-size="body-m">Price (USD)</Text>
-                  <Input
-                    type="number"
-                    placeholder="0 for free"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleChange}
-                    min="0"
-                    step="0.01"
-                  />
-                </Flex>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Thumbnail URL</label>
+                    <input
+                      type="url"
+                      name="thumbnailUrl"
+                      value={formData.thumbnailUrl}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus"
+                      placeholder="https://example.com/thumbnail.jpg"
+                    />
+                  </div>
 
-                <Flex flex-direction="column" gap="s" style={{ flex: 1 }}>
-                  <Text font-size="body-m">Currency</Text>
-                  <Input
-                    disabled
-                    value={formData.currency}
-                  />
-                </Flex>
-              </Flex>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Preview Video URL (optional)</label>
+                    <input
+                      type="url"
+                      name="previewVideoUrl"
+                      value={formData.previewVideoUrl}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus"
+                      placeholder="https://example.com/preview.mp4"
+                    />
+                  </div>
+                </div>
+              </div>
 
-              <Flex flex-direction="column" gap="s">
-                <Text font-size="body-m">Thumbnail URL</Text>
-                <Input
-                  placeholder="https://example.com/thumbnail.jpg"
-                  name="thumbnailUrl"
-                  value={formData.thumbnailUrl}
-                  onChange={handleChange}
-                />
-              </Flex>
-
-              <Flex flex-direction="column" gap="s">
-                <Text font-size="body-m">Preview Video URL (optional)</Text>
-                <Input
-                  placeholder="https://example.com/preview.mp4"
-                  name="previewVideoUrl"
-                  value={formData.previewVideoUrl}
-                  onChange={handleChange}
-                />
-              </Flex>
-
-              <Divider />
+              <hr className="border-gray-200" />
 
               {/* Metadata */}
-              <Flex flex-direction="column" gap="s">
-                <Text font-size="heading-s">Course Metadata</Text>
-              </Flex>
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Course Metadata</h2>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Tags (comma-separated)</label>
+                    <textarea
+                      name="tags"
+                      value={formData.tags}
+                      onChange={handleChange}
+                      rows={2}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus"
+                      placeholder="e.g., react, javascript, frontend, web development"
+                    />
+                  </div>
 
-              <Flex flex-direction="column" gap="s">
-                <Text font-size="body-m">Tags (comma-separated)</Text>
-                <Textarea
-                  placeholder="e.g., react, javascript, frontend, web development"
-                  name="tags"
-                  value={formData.tags}
-                  onChange={handleChange}
-                  rows={2}
-                />
-              </Flex>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Learning Objectives (one per line)</label>
+                    <textarea
+                      name="objectives"
+                      value={formData.objectives}
+                      onChange={handleChange}
+                      rows={3}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus"
+                      placeholder="What students will learn..."
+                    />
+                  </div>
 
-              <Flex flex-direction="column" gap="s">
-                <Text font-size="body-m">Learning Objectives (one per line)</Text>
-                <Textarea
-                  placeholder="What students will learn..."
-                  name="objectives"
-                  value={formData.objectives}
-                  onChange={handleChange}
-                  rows={3}
-                />
-              </Flex>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Requirements (one per line)</label>
+                    <textarea
+                      name="requirements"
+                      value={formData.requirements}
+                      onChange={handleChange}
+                      rows={3}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus"
+                      placeholder="What students need to know before taking this course..."
+                    />
+                  </div>
+                </div>
+              </div>
 
-              <Flex flex-direction="column" gap="s">
-                <Text font-size="body-m">Requirements (one per line)</Text>
-                <Textarea
-                  placeholder="What students need to know before taking this course..."
-                  name="requirements"
-                  value={formData.requirements}
-                  onChange={handleChange}
-                  rows={3}
-                />
-              </Flex>
-
-              <Divider />
+              <hr className="border-gray-200" />
 
               {/* Actions */}
-              <Flex gap="m" style={{ justifyContent: 'flex-end' }}>
-                <Button
-                  variant="neutral"
+              <div className="flex justify-end gap-4">
+                <button
+                  type="button"
                   onClick={() => router.back()}
                   disabled={loading}
+                  className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium disabled:opacity-50"
                 >
                   Cancel
-                </Button>
-                <Button
+                </button>
+                <button
                   type="submit"
                   disabled={loading}
+                  className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium disabled:opacity-50 flex items-center gap-2"
                 >
+                  {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                   {loading ? 'Creating...' : 'Create & Continue to Modules'}
-                </Button>
-              </Flex>
-            </Flex>
-          </form>
-        </Flex>
-      </Card>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     </PageLayout>
   )
 }

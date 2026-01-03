@@ -6,9 +6,9 @@
 
 'use client';
 
-import React, { forwardRef, useState, createContext, useContext, useCallback } from 'react';
-import { createPortal } from 'react-dom';
 import { cn } from '@/lib/design-system/utils';
+import React, { createContext, forwardRef, useCallback, useContext, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 // =============================================================================
 // ALERT COMPONENT
@@ -79,7 +79,7 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(
         ref={ref}
         role="alert"
         className={cn(
-          'flex gap-3 p-4 rounded-lg border',
+          'flex gap-3 p-4 rounded-lg border focus:outline-none focus:ring-2 focus:ring-input-focus',
           styles.container,
           className
         )}
@@ -220,7 +220,7 @@ const Toast: React.FC<ToastProps> = ({
         className={cn(
           'shrink-0 p-1 rounded',
           'text-secondary-400 hover:text-secondary-600',
-          'focus:outline-none focus:ring-2 focus:ring-primary-500',
+          'focus:outline-none focus:ring-2 focus:ring-input-focus',
           'transition-colors'
         )}
         aria-label="Dismiss"

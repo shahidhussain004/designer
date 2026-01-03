@@ -76,7 +76,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           className={cn(
             'w-full px-4 py-3 rounded-lg border transition-all duration-200',
             'text-secondary-900 placeholder:text-secondary-400',
-            'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500',
+                'focus:outline-none focus:ring-2 focus:ring-input-focus',
             'min-h-[120px] resize-y',
             error
               ? 'border-error-300 focus:ring-error-500 focus:border-error-500'
@@ -151,7 +151,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
               'peer w-5 h-5 rounded border-2 border-secondary-300',
               'appearance-none cursor-pointer transition-all duration-200',
               'checked:bg-primary-500 checked:border-primary-500',
-              'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
+              'focus:outline-none',
               'hover:border-primary-400',
               'disabled:cursor-not-allowed disabled:bg-secondary-100'
             )}
@@ -229,7 +229,7 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(
               'peer w-5 h-5 rounded-full border-2 border-secondary-300',
               'appearance-none cursor-pointer transition-all duration-200',
               'checked:border-primary-500',
-              'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
+              'focus:outline-none',
               'hover:border-primary-400',
               'disabled:cursor-not-allowed disabled:bg-secondary-100'
             )}
@@ -390,7 +390,7 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
             className={cn(
               'rounded-full transition-colors duration-200',
               'bg-secondary-300 peer-checked:bg-primary-500',
-              'peer-focus:ring-2 peer-focus:ring-primary-500 peer-focus:ring-offset-2',
+              'peer-focus:ring-2 peer-focus:ring-input-focus peer-focus:ring-offset-2',
               sizes.track
             )}
           />

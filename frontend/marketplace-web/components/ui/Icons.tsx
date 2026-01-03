@@ -4,8 +4,8 @@
  * Professional SVG-based logos and brand assets
  */
 
-import React, { forwardRef } from 'react';
 import { cn } from '@/lib/design-system/utils';
+import React, { forwardRef } from 'react';
 
 // =============================================================================
 // LOGO COMPONENT
@@ -18,6 +18,8 @@ export interface LogoProps extends React.SVGAttributes<SVGElement> {
   variant?: 'full' | 'icon' | 'wordmark';
   /** Color theme */
   theme?: 'default' | 'white' | 'dark';
+  /** Scale multiplier applied only to full/wordmark variants */
+  fullScale?: number;
 }
 
 const logoSizes = {
@@ -29,7 +31,7 @@ const logoSizes = {
 };
 
 export const Logo = forwardRef<SVGSVGElement, LogoProps>(
-  ({ className, size = 'md', variant = 'full', theme = 'default', ...props }, ref) => {
+  ({ className, size = 'md', variant = 'full', theme = 'default', fullScale = 1, ...props }, ref) => {
     const dimensions = logoSizes[size];
     
     const colors = {
@@ -52,14 +54,20 @@ export const Logo = forwardRef<SVGSVGElement, LogoProps>(
 
     const color = colors[theme];
 
-    // Icon-only variant
+    // Resolve file names for SVGs based on theme (use reverse variants for white theme)
+    const logoFiles = {
+      icon: theme === 'white' ? '/logo-icon-reverse.svg' : '/logo-icon.svg',
+      full: theme === 'white' ? '/logo-designer-reverse.svg' : '/logo-designer.svg',
+    };
+
+    // Icon-only variant: embed the brand SVG from the public folder
     if (variant === 'icon') {
       return (
         <svg
           ref={ref}
           width={dimensions.iconSize}
           height={dimensions.iconSize}
-          viewBox="0 0 48 48"
+          viewBox={`0 0 ${dimensions.iconSize} ${dimensions.iconSize}`}
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           className={cn('flex-shrink-0', className)}
@@ -67,34 +75,27 @@ export const Logo = forwardRef<SVGSVGElement, LogoProps>(
           role="img"
           {...props}
         >
-          {/* Stylized "D" with gradient */}
-          <defs>
-            <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor={color.primary} />
-              <stop offset="100%" stopColor={color.secondary} />
-            </linearGradient>
-          </defs>
-          <rect x="4" y="4" width="40" height="40" rx="12" fill="url(#logo-gradient)" />
-          <path
-            d="M16 14H24C30.627 14 36 19.373 36 26C36 32.627 30.627 38 24 38H16V14Z"
-            fill="none"
-            stroke="white"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+          <image
+            href={logoFiles.icon}
+            x="0"
+            y="0"
+            width={dimensions.iconSize}
+            height={dimensions.iconSize}
+            preserveAspectRatio="xMidYMid meet"
           />
-          <circle cx="24" cy="26" r="4" fill="white" />
         </svg>
       );
     }
 
     // Wordmark-only variant
     if (variant === 'wordmark') {
+      const w = Math.round(dimensions.width * fullScale);
+      const h = Math.round(dimensions.height * fullScale);
       return (
         <svg
           ref={ref}
-          width={dimensions.width}
-          height={dimensions.height}
+          width={w}
+          height={h}
           viewBox="0 0 200 48"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -103,36 +104,30 @@ export const Logo = forwardRef<SVGSVGElement, LogoProps>(
           role="img"
           {...props}
         >
-          <text
-            x="0"
-            y="32"
-            fontFamily="Inter, system-ui, sans-serif"
-            fontSize="24"
-            fontWeight="700"
-            fill={color.text}
-          >
-            Designer
-          </text>
-          <text
-            x="105"
-            y="32"
-            fontFamily="Inter, system-ui, sans-serif"
-            fontSize="24"
-            fontWeight="400"
-            fill={color.primary}
-          >
-            MP
-          </text>
+          <g transform={`scale(${fullScale})`}>
+            <text
+              x="0"
+              y="32"
+              fontFamily="Inter, system-ui, sans-serif"
+              fontSize="24"
+              fontWeight="700"
+              fill={color.text}
+            >
+              Designer
+            </text>
+          </g>
         </svg>
       );
     }
 
-    // Full logo (icon + wordmark)
+    // Full logo (icon + wordmark) — allow scaling via fullScale without changing icon behavior
+    const fullW = Math.round(dimensions.width * fullScale);
+    const fullH = Math.round(dimensions.height * fullScale);
     return (
       <svg
         ref={ref}
-        width={dimensions.width}
-        height={dimensions.height}
+        width={fullW}
+        height={fullH}
         viewBox="0 0 200 48"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -141,48 +136,14 @@ export const Logo = forwardRef<SVGSVGElement, LogoProps>(
         role="img"
         {...props}
       >
-        <defs>
-          <linearGradient id="logo-gradient-full" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor={color.primary} />
-            <stop offset="100%" stopColor={color.secondary} />
-          </linearGradient>
-        </defs>
-        
-        {/* Icon */}
-        <rect x="0" y="4" width="40" height="40" rx="10" fill="url(#logo-gradient-full)" />
-        <path
-          d="M12 12H18C23.523 12 28 16.477 28 22C28 27.523 23.523 32 18 32H12V12Z"
-          fill="none"
-          stroke="white"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+        <image
+          href={logoFiles.full}
+          x="0"
+          y="0"
+          width={200}
+          height={48}
+          preserveAspectRatio="xMidYMid meet"
         />
-        <circle cx="18" cy="22" r="3" fill="white" />
-        
-        {/* Text */}
-        <text
-          x="52"
-          y="31"
-          fontFamily="Inter, system-ui, sans-serif"
-          fontSize="20"
-          fontWeight="700"
-          fill={color.text}
-          letterSpacing="-0.02em"
-        >
-          Designer
-        </text>
-        <text
-          x="143"
-          y="31"
-          fontFamily="Inter, system-ui, sans-serif"
-          fontSize="20"
-          fontWeight="600"
-          fill={color.primary}
-          letterSpacing="-0.02em"
-        >
-          MP
-        </text>
       </svg>
     );
   }

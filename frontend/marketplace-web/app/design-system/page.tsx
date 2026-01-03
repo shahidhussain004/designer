@@ -6,48 +6,48 @@
 
 'use client';
 
-import React, { useState } from 'react';
 import {
-  Button,
-  Input,
-  Textarea,
-  Checkbox,
-  RadioGroup,
-  Switch,
-  Select,
-  Badge,
+  Alert,
   Avatar,
   AvatarGroup,
+  Badge,
+  Button,
   Card,
-  CardHeader,
   CardBody,
   CardFooter,
-  Alert,
+  CardHeader,
+  Checkbox,
+  Container,
+  Divider,
+  Grid,
+  Heading,
+  IconAlertCircle,
+  IconCheck,
+  IconHeart,
+  IconHome,
+  IconSearch,
+  IconSettings,
+  IconStar,
+  IconUser,
+  Input,
+  Logo,
+  RadioGroup,
+  Section,
+  Select,
   Skeleton,
   SkeletonCard,
   SkeletonText,
   Spinner,
-  Tabs,
-  TabList,
-  Tab,
-  TabPanel,
-  Logo,
-  IconHome,
-  IconSearch,
-  IconUser,
-  IconSettings,
-  IconHeart,
-  IconStar,
-  IconCheck,
-  IconAlertCircle,
-  Container,
-  Grid,
   Stack,
-  Section,
-  Divider,
-  Heading,
+  Switch,
+  Tab,
+  TabList,
+  TabPanel,
+  Tabs,
+  Textarea,
   VisuallyHidden,
 } from '@/components/ui';
+import { useState } from 'react';
 
 export default function DesignSystemPage() {
   const [selectValue, setSelectValue] = useState('');
@@ -425,6 +425,18 @@ export default function DesignSystemPage() {
                         <Logo variant="icon" size="md" />
                         <Logo variant="icon" size="lg" />
                         <Logo variant="icon" size="xl" />
+                      </div>
+                    </div>
+
+                  <Divider />
+                    
+                    <div>
+                      <p className="text-sm font-medium text-secondary-700 mb-4">Wordmark Only</p>
+                      <div className="flex flex-wrap items-center gap-4">
+                        <Logo variant="wordmark" size="sm" />
+                        <Logo variant="wordmark" size="md" />
+                        <Logo variant="wordmark" size="lg" />
+                        <Logo variant="wordmark" size="xl" />
                       </div>
                     </div>
                     

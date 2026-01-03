@@ -18,19 +18,19 @@
 @layer base {
   :root {
     /* --------------------------------------------------------------------------
-       COLOR PALETTE - Primary (Brand)
+       COLOR PALETTE - Primary (Brand Red/Coral - Fastly/RedHat inspired)
        -------------------------------------------------------------------------- */
-    --color-primary-50: 239 246 255;
-    --color-primary-100: 219 234 254;
-    --color-primary-200: 191 219 254;
-    --color-primary-300: 147 197 253;
-    --color-primary-400: 96 165 250;
-    --color-primary-500: 59 130 246;
-    --color-primary-600: 37 99 235;
-    --color-primary-700: 29 78 216;
-    --color-primary-800: 30 64 175;
-    --color-primary-900: 30 58 138;
-    --color-primary-950: 23 37 84;
+    --color-primary-50: 254 242 242;
+    --color-primary-100: 254 226 226;
+    --color-primary-200: 254 202 202;
+    --color-primary-300: 252 165 165;
+    --color-primary-400: 248 113 113;
+    --color-primary-500: 239 68 68;
+    --color-primary-600: 220 38 38;
+    --color-primary-700: 185 28 28;
+    --color-primary-800: 153 27 27;
+    --color-primary-900: 127 29 29;
+    --color-primary-950: 69 10 10;
 
     /* --------------------------------------------------------------------------
        COLOR PALETTE - Secondary (Neutral)
@@ -236,7 +236,7 @@
 
   /* Focus styles for accessibility */
   :focus-visible {
-    outline: 2px solid rgb(var(--color-primary-500));
+    outline: 2px solid #102a3f;
     outline-offset: 2px;
   }
 
@@ -284,7 +284,13 @@
     @apply w-full px-4 py-3 rounded-lg border border-secondary-300;
     @apply bg-white text-secondary-900 placeholder:text-secondary-400;
     @apply transition-all duration-200;
-    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
+    outline: none;
+    box-shadow: 0 0 0 0 rgba(16,42,63,0);
+    transition: box-shadow 0.15s ease-in-out, border-color 0.15s ease-in-out;
+    &:focus {
+      box-shadow: 0 0 0 4px rgba(16,42,63,0.12);
+      border-color: #102a3f;
+    }
     @apply hover:border-secondary-400;
     @apply disabled:bg-secondary-50 disabled:text-secondary-500 disabled:cursor-not-allowed;
   }
@@ -294,10 +300,28 @@
     @apply w-full px-4 py-3 rounded-lg border border-secondary-300;
     @apply bg-white text-secondary-900 placeholder:text-secondary-400;
     @apply transition-all duration-200;
-    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
     @apply hover:border-secondary-400;
     @apply disabled:bg-secondary-50 disabled:text-secondary-500 disabled:cursor-not-allowed;
     @apply min-h-[120px] resize-y;
+  }
+
+  /* Global override: Use semantic input-focus color for all form control focus states
+     This will prevent the primary/error color from being used as a focus ring for
+     non-error states and avoid the 'error-like' red appearance on focus. */
+  /* Only apply to controls that are not marked as invalid (keep error focus styles intact) */
+  input:not([aria-invalid="true"]):focus,
+  textarea:not([aria-invalid="true"]):focus,
+  select:not([aria-invalid="true"]):focus,
+  .input:not([aria-invalid="true"]):focus,
+  .focus-input:not([aria-invalid="true"]):focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(16,42,63,0.12) !important;
+    border-color: #102a3f !important;
+  }
+
+  /* Utility helper class for input focus using brand neutral color */
+  .focus-input {
+    --input-focus-color: #102a3f;
   }
 
   /* Card base styles */

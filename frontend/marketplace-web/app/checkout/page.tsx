@@ -1,39 +1,22 @@
 'use client';
 
-import React, { Suspense, useEffect, useState, useCallback } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
-import {
-  Grid,
-  Flex,
-  Card,
-  Text,
-  Button,
-  Input,
-  Alert,
-  Spinner,
-  Divider,
-} from '@/components/green';
+import { authService } from '@/lib/auth';
 import {
   createPaymentIntent,
+  formatCurrency,
   getPaymentMethods,
   PaymentIntent,
   PaymentMethod,
-  formatCurrency,
 } from '@/lib/payments';
-import { authService } from '@/lib/auth';
-
-declare global {
-  interface Window {
-    Stripe?: (key: string) => unknown;
-  }
-}
+import { AlertCircle, ArrowLeft, CreditCard, Loader2, Lock, Plus, Shield } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import React, { Suspense, useCallback, useEffect, useState } from 'react';
 
 function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Query params for checkout context
   const type = searchParams.get('type') || 'milestone';
   const itemId = searchParams.get('id');
   const amount = parseInt(searchParams.get('amount') || '0', 10);
@@ -48,7 +31,6 @@ function CheckoutContent() {
   const [showAddCard, setShowAddCard] = useState(false);
   const [paymentIntent, setPaymentIntent] = useState<PaymentIntent | null>(null);
 
-  // Card form state
   const [cardNumber, setCardNumber] = useState('');
   const [cardExpiry, setCardExpiry] = useState('');
   const [cardCvc, setCardCvc] = useState('');
@@ -111,7 +93,6 @@ function CheckoutContent() {
       setProcessing(true);
       setError(null);
 
-      // Simulate payment processing
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       router.push(`/checkout/success?type=${type}&id=${itemId}&amount=${amount}`);
@@ -144,241 +125,241 @@ function CheckoutContent() {
 
   if (loading) {
     return (
-      <Flex
-        justify-content="center"
-        align-items="center"
-        flex-direction="column"
-        gap="m"
-      >
-        <Spinner />
-        <Text color="secondary">Setting up checkout...</Text>
-      </Flex>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 text-primary-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-500">Setting up checkout...</p>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Flex
-      flex-direction="column"
-      padding="l"
-    >
-      <Flex flex-direction="column">
-        {/* Header */}
-        <Flex flex-direction="column" gap="s" padding="m">
-          <Link href={returnUrl}>
-            ← Back
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-gray-900 text-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Link href={returnUrl} className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-4">
+            <ArrowLeft className="w-4 h-4" />
+            Back
           </Link>
-          <Text tag="h1" font-size="heading-l">
-            Checkout
-          </Text>
-        </Flex>
+          <h1 className="text-2xl font-bold">Checkout</h1>
+        </div>
+      </div>
 
-        <Grid columns="1; m{3}" gap="l">
+      {/* Content */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Payment Form */}
-          <Flex flex-direction="column" gap="m">
-            <form onSubmit={handleSubmit}>
-              <Flex flex-direction="column" gap="m">
-                {/* Error Message */}
-                {error && (
-                  <Alert variant="negative">{error}</Alert>
-                )}
+          <div className="lg:col-span-2">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {error && (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
+                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                  <p className="text-red-700">{error}</p>
+                </div>
+              )}
 
-                {/* Saved Payment Methods */}
-                {paymentMethods.length > 0 && !showAddCard && (
-                  <Card padding="l">
-                    <Flex flex-direction="column" gap="m">
-                      <Text tag="h2" font-size="heading-s">
-                        Payment Method
-                      </Text>
-
-                      <Flex flex-direction="column" gap="s">
-                        {paymentMethods.map((method) => (
-                          <Card
-                            key={method.id}
-                            padding="m"
-                            variant={selectedPaymentMethod === method.id ? 'positive' : 'secondary'}
-                            onClick={() => setSelectedPaymentMethod(method.id)}
-                          >
-                            <Flex align-items="center" gap="m">
-                              <input
-                                type="radio"
-                                name="paymentMethod"
-                                value={method.id}
-                                checked={selectedPaymentMethod === method.id}
-                                onChange={(e) => setSelectedPaymentMethod(e.target.value)}
-                              />
-                              <Flex flex-direction="column" gap="2xs" flex="1">
-                                <Text font-weight="book">
-                                  •••• {method.card?.last4}
-                                </Text>
-                                <Text font-size="body-s" color="secondary">
-                                  Expires {method.card?.expMonth}/{method.card?.expYear}
-                                </Text>
-                              </Flex>
-                              {method.isDefault && (
-                                <Text font-size="body-s" color="secondary">
-                                  Default
-                                </Text>
-                              )}
-                            </Flex>
-                          </Card>
-                        ))}
-                      </Flex>
-
-                      <Button rank="tertiary" onClick={() => setShowAddCard(true)}>
-                        + Add new card
-                      </Button>
-                    </Flex>
-                  </Card>
-                )}
-
-                {/* New Card Form */}
-                {showAddCard && (
-                  <Card padding="l">
-                    <Flex flex-direction="column" gap="m">
-                      <Flex justify-content="space-between" align-items="center">
-                        <Text tag="h2" font-size="heading-s">
-                          Card Details
-                        </Text>
-                        {paymentMethods.length > 0 && (
-                          <Button rank="tertiary" onClick={() => setShowAddCard(false)}>
-                            Cancel
-                          </Button>
+              {/* Saved Payment Methods */}
+              {paymentMethods.length > 0 && !showAddCard && (
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                  <h2 className="font-semibold text-gray-900 mb-4">Payment Method</h2>
+                  <div className="space-y-3">
+                    {paymentMethods.map((method) => (
+                      <label
+                        key={method.id}
+                        className={`flex items-center gap-4 p-4 rounded-lg border cursor-pointer transition-colors ${
+                          selectedPaymentMethod === method.id
+                            ? 'border-primary-500 bg-primary-50'
+                            : 'border-gray-200 hover:bg-gray-50'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value={method.id}
+                          checked={selectedPaymentMethod === method.id}
+                          onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+                          className="text-primary-600"
+                        />
+                        <CreditCard className="w-5 h-5 text-gray-400" />
+                        <div className="flex-1">
+                          <p className="font-medium text-gray-900">•••• {method.card?.last4}</p>
+                          <p className="text-sm text-gray-500">
+                            Expires {method.card?.expMonth}/{method.card?.expYear}
+                          </p>
+                        </div>
+                        {method.isDefault && (
+                          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">Default</span>
                         )}
-                      </Flex>
+                      </label>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddCard(true)}
+                    className="mt-4 flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium text-sm"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add new card
+                  </button>
+                </div>
+              )}
 
-                      <Input
-                        label="Cardholder Name"
+              {/* New Card Form */}
+              {showAddCard && (
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="font-semibold text-gray-900">Card Details</h2>
+                    {paymentMethods.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setShowAddCard(false)}
+                        className="text-sm text-gray-500 hover:text-gray-700"
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Cardholder Name</label>
+                      <input
+                        type="text"
                         value={cardName}
-                        onInput={(e: Event) => setCardName((e.target as HTMLInputElement).value)}
+                        onChange={(e) => setCardName(e.target.value)}
                         required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus"
+                        placeholder="John Doe"
                       />
+                    </div>
 
-                      <Input
-                        label="Card Number"
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
+                      <input
+                        type="text"
                         value={cardNumber}
-                        onInput={(e: Event) =>
-                          setCardNumber(formatCardNumber((e.target as HTMLInputElement).value))
-                        }
+                        onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
                         maxLength={19}
                         required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus"
+                        placeholder="4242 4242 4242 4242"
                       />
+                    </div>
 
-                      <Grid columns="2" gap="m">
-                        <Input
-                          label="Expiry Date"
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
+                        <input
+                          type="text"
                           value={cardExpiry}
-                          onInput={(e: Event) =>
-                            setCardExpiry(formatExpiry((e.target as HTMLInputElement).value))
-                          }
+                          onChange={(e) => setCardExpiry(formatExpiry(e.target.value))}
                           maxLength={5}
                           required
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus"
+                          placeholder="MM/YY"
                         />
-                        <Input
-                          label="CVC"
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">CVC</label>
+                        <input
+                          type="text"
                           value={cardCvc}
-                          onInput={(e: Event) =>
-                            setCardCvc((e.target as HTMLInputElement).value.replace(/\D/g, '').slice(0, 4))
-                          }
+                          onChange={(e) => setCardCvc(e.target.value.replace(/\D/g, '').slice(0, 4))}
                           maxLength={4}
                           required
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus"
+                          placeholder="123"
                         />
-                      </Grid>
+                      </div>
+                    </div>
 
-                      <label>
-                        <input
-                          type="checkbox"
-                          checked={saveCard}
-                          onChange={(e) => setSaveCard(e.target.checked)}
-                        />
-                        <Text font-size="body-s">Save card for future payments</Text>
-                      </label>
-                    </Flex>
-                  </Card>
-                )}
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={saveCard}
+                        onChange={(e) => setSaveCard(e.target.checked)}
+                        className="rounded text-primary-600"
+                      />
+                      <span className="text-sm text-gray-700">Save card for future payments</span>
+                    </label>
+                  </div>
+                </div>
+              )}
 
-                {/* Submit Button */}
-                <Button type="submit" disabled={processing}>
-                  {processing ? 'Processing...' : `Pay ${formatCurrency(amount)}`}
-                </Button>
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={processing}
+                className="w-full py-4 px-6 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {processing ? 'Processing...' : `Pay ${formatCurrency(amount)}`}
+              </button>
 
-                {/* Security Note */}
-                <Flex justify-content="center" align-items="center" gap="xs">
-                  <Text font-size="body-s" color="secondary">
-                    🔒 Secured by Stripe. Your payment information is encrypted.
-                  </Text>
-                </Flex>
-              </Flex>
+              {/* Security Note */}
+              <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+                <Lock className="w-4 h-4" />
+                Secured by Stripe. Your payment information is encrypted.
+              </div>
             </form>
-          </Flex>
+          </div>
 
           {/* Order Summary */}
-          <Card padding="l">
-            <Flex flex-direction="column" gap="m">
-              <Text tag="h2" font-size="heading-s">
-                Order Summary
-              </Text>
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-6">
+              <h2 className="font-semibold text-gray-900 mb-4">Order Summary</h2>
 
-              <Flex flex-direction="column" gap="s">
-                <Flex justify-content="space-between">
-                  <Text color="secondary">{title}</Text>
-                  <Text font-weight="book">{formatCurrency(amount)}</Text>
-                </Flex>
-                <Flex justify-content="space-between">
-                  <Text font-size="body-s" color="secondary">
-                    Processing fee
-                  </Text>
-                  <Text font-size="body-s" color="secondary">
-                    {formatCurrency(0)}
-                  </Text>
-                </Flex>
-              </Flex>
+              <div className="space-y-3 mb-4">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">{title}</span>
+                  <span className="font-medium text-gray-900">{formatCurrency(amount)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Processing fee</span>
+                  <span className="text-gray-500">{formatCurrency(0)}</span>
+                </div>
+              </div>
 
-              <Divider />
+              <hr className="border-gray-200 mb-4" />
 
-              <Flex justify-content="space-between">
-                <Text font-size="heading-s" font-weight="book">
-                  Total
-                </Text>
-                <Text font-size="heading-s" font-weight="book">
-                  {formatCurrency(amount)}
-                </Text>
-              </Flex>
+              <div className="flex justify-between mb-6">
+                <span className="text-lg font-semibold text-gray-900">Total</span>
+                <span className="text-lg font-semibold text-gray-900">{formatCurrency(amount)}</span>
+              </div>
 
-              {/* Payment Type Info */}
-              <Card padding="m" variant="secondary">
-                <Flex gap="s">
-                  <Text>🛡️</Text>
-                  <Flex flex-direction="column" gap="xs">
-                    <Text font-weight="book">
+              {/* Payment Protection */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <div className="flex gap-3">
+                  <Shield className="w-5 h-5 text-green-600 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium text-gray-900 text-sm">
                       {type === 'milestone' ? 'Escrow Protection' : 'Secure Payment'}
-                    </Text>
-                    <Text font-size="body-s" color="secondary">
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
                       {type === 'milestone'
                         ? 'Funds are held securely until the milestone is completed and approved.'
                         : 'Your payment is protected by our secure checkout system.'}
-                    </Text>
-                  </Flex>
-                </Flex>
-              </Card>
-            </Flex>
-          </Card>
-        </Grid>
-      </Flex>
-    </Flex>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
 function CheckoutLoading() {
   return (
-    <Flex
-      justify-content="center"
-      align-items="center"
-      flex-direction="column"
-      gap="m"
-    >
-      <Spinner />
-      <Text color="secondary">Loading checkout...</Text>
-    </Flex>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <Loader2 className="w-8 h-8 text-primary-600 animate-spin mx-auto mb-4" />
+        <p className="text-gray-500">Loading checkout...</p>
+      </div>
+    </div>
   );
 }
 

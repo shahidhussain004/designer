@@ -1,13 +1,13 @@
 'use client'
 
 import {
-    Milestone,
-    approveMilestone,
-    formatCurrency,
-    getMilestoneStatusColor,
-    requestMilestoneRevision,
-    startMilestone,
-    submitMilestone
+  Milestone,
+  approveMilestone,
+  formatCurrency,
+  getMilestoneStatusColor,
+  requestMilestoneRevision,
+  startMilestone,
+  submitMilestone
 } from '@/lib/payments'
 import { useState } from 'react'
 
@@ -351,7 +351,7 @@ export default function MilestoneList({
             <textarea
               value={deliverables}
               onChange={(e) => setDeliverables(e.target.value)}
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 min-h-32"
+              className="w-full p-3 border rounded-lg min-h-32"
             />
             <div className="flex justify-end gap-3 mt-4">
               <button
@@ -385,7 +385,7 @@ export default function MilestoneList({
             <textarea
               value={revisionReason}
               onChange={(e) => setRevisionReason(e.target.value)}
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 min-h-32"
+              className="w-full p-3 border rounded-lg min-h-32"
             />
             <div className="flex justify-end gap-3 mt-4">
               <button
