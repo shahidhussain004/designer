@@ -1,21 +1,11 @@
 'use client';
 
 import { ErrorMessage } from '@/components/ErrorMessage';
-import {
-  Badge,
-  Button,
-  Card,
-  Div,
-  Divider,
-  Flex,
-  Grid,
-  Text,
-} from '@/components/green';
 import { CoursesSkeleton } from '@/components/Skeletons';
-import { PageLayout } from '@/components/ui';
 import { useCourse, useCourseCurriculum, useEnrollCourse } from '@/hooks/useCourses';
 import { authService } from '@/lib/auth';
 import { createCourseCheckoutSession, formatCurrency } from '@/lib/payments';
+import { ArrowLeft, Award, BookOpen, CheckCircle, Clock, Eye, Globe, PlayCircle, Star, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -65,18 +55,22 @@ export default function CourseDetailPage() {
 
   if (error || !course) {
     return (
-      <Flex justify-content="center" align-items="center" flex-direction="column" gap="l" padding="xl">
-        {error ? (
-          <ErrorMessage message={error.message} retry={refetch} />
-        ) : (
-          <>
-            <Text>😕</Text>
-            <Text tag="h2">Course Not Found</Text>
-            <Text>This course does not exist</Text>
-            <Link href="/courses">← Back to Courses</Link>
-          </>
-        )}
-      </Flex>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          {error ? (
+            <ErrorMessage message={error.message} retry={refetch} />
+          ) : (
+            <>
+              <p className="text-6xl mb-4">😕</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Course Not Found</h2>
+              <p className="text-gray-600 mb-4">This course does not exist</p>
+              <Link href="/courses" className="text-primary-600 hover:text-primary-700 font-medium">
+                ← Back to Courses
+              </Link>
+            </>
+          )}
+        </div>
+      </div>
     );
   }
 
@@ -85,249 +79,237 @@ export default function CourseDetailPage() {
   const totalMinutes = course.durationMinutes % 60;
 
   return (
-    <PageLayout>
-      <Div>
-        {/* Hero Section with Course Header */}
-        <Div style={{ background: 'var(--color-background-secondary)', borderBottom: '1px solid var(--color-border)' }}>
-          <Flex flex-direction="column" gap="m" padding="xl" max-width="1400px" margin="0 auto">
-            {/* Breadcrumb */}
-            <Flex align-items="center" gap="s" color="secondary">
-              <Link href="/courses">
-                <Text font-size="body-xs">Courses</Text>
-              </Link>
-              <Text font-size="body-xs">/</Text>
-              <Text font-size="body-xs" font-weight="book">{course.category}</Text>
-            </Flex>
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section */}
+      <div className="bg-gray-900 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-2 text-sm text-gray-400 mb-6">
+            <Link href="/courses" className="hover:text-white flex items-center gap-1">
+              <ArrowLeft className="w-4 h-4" />
+              Courses
+            </Link>
+            <span>/</span>
+            <span className="text-gray-300">{course.category}</span>
+          </nav>
 
-            {/* Title and Description */}
-            <Text tag="h1" font-size="heading-xl">{course.title}</Text>
-            <Text font-size="body-l" color="secondary">{course.description}</Text>
+          {/* Title and Description */}
+          <h1 className="text-3xl lg:text-4xl font-bold mb-4">{course.title}</h1>
+          <p className="text-lg text-gray-300 mb-6 max-w-3xl">{course.description}</p>
 
-            {/* Key Stats Bar */}
-            <Flex gap="l" align-items="center" flex-wrap="wrap" style={{ marginTop: '12px' }}>
-              <Flex align-items="center" gap="xs">
-                <Text font-size="body-m">★</Text>
-                <Text font-size="body-m" font-weight="book">
-                  {typeof course.rating === 'number' && isFinite(course.rating) ? course.rating.toFixed(1) : '—'}
-                </Text>
-                <Text font-size="body-s" color="secondary">
-                  ({typeof course.reviewsCount === 'number' ? course.reviewsCount : 0} reviews)
-                </Text>
-              </Flex>
-              <Text font-size="body-s" color="secondary">•</Text>
-              <Text font-size="body-s" color="secondary">
-                {typeof course.enrollmentsCount === 'number' ? course.enrollmentsCount.toLocaleString() : '0'} students enrolled
-              </Text>
-              <Text font-size="body-s" color="secondary">•</Text>
-              <Text font-size="body-s" font-weight="book">{course.skillLevel}</Text>
-            </Flex>
+          {/* Stats Bar */}
+          <div className="flex flex-wrap items-center gap-4 text-sm">
+            <div className="flex items-center gap-1">
+              <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+              <span className="font-semibold">
+                {typeof course.rating === 'number' && isFinite(course.rating) ? course.rating.toFixed(1) : '—'}
+              </span>
+              <span className="text-gray-400">
+                ({typeof course.reviewsCount === 'number' ? course.reviewsCount : 0} reviews)
+              </span>
+            </div>
+            <span className="text-gray-500">•</span>
+            <div className="flex items-center gap-1 text-gray-400">
+              <Users className="w-4 h-4" />
+              {typeof course.enrollmentsCount === 'number' ? course.enrollmentsCount.toLocaleString() : '0'} students
+            </div>
+            <span className="text-gray-500">•</span>
+            <span className="px-2 py-1 bg-gray-800 rounded text-xs font-medium">{course.skillLevel}</span>
+          </div>
 
-            {/* Instructor and Date */}
-            <Flex gap="l" flex-wrap="wrap" style={{ marginTop: '8px' }}>
-              <Text font-size="body-s">Taught by <span style={{ fontWeight: '600' }}>{course.instructorName}</span></Text>
-              <Text font-size="body-s" color="secondary">Updated {new Date(course.updatedAt).toLocaleDateString()}</Text>
-            </Flex>
-          </Flex>
-        </Div>
+          {/* Instructor */}
+          <div className="mt-4 text-sm text-gray-400">
+            Taught by <span className="text-white font-medium">{course.instructorName}</span>
+            <span className="mx-2">•</span>
+            Updated {new Date(course.updatedAt).toLocaleDateString()}
+          </div>
+        </div>
+      </div>
 
-        {/* Main Content Grid - Responsive Layout */}
-        <Flex flex-direction="column; l{row}" gap="xl" padding="xl" max-width="1400px" margin="0 auto">
-        {/* Left Column - Course Content */}
-        <Flex flex-direction="column" gap="xl" flex="1 1 65%">
-          {/* What You'll Learn Section */}
-          {Array.isArray(course.learningOutcomes) && course.learningOutcomes.length > 0 && (
-            <Card padding="xl">
-              <Flex flex-direction="column" gap="m">
-                <Text tag="h2" font-size="heading-m">What You will Learn</Text>
-                <Divider style={{ margin: '0' }} />
-                <Grid columns="1; m{2}" gap="l">
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* What You'll Learn */}
+            {Array.isArray(course.learningOutcomes) && course.learningOutcomes.length > 0 && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">What You&apos;ll Learn</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {course.learningOutcomes.map((outcome, index) => (
-                    <Flex key={index} align-items="flex-start" gap="m">
-                      <Text font-size="heading-s" color="positive" style={{ marginTop: '2px' }}>✓</Text>
-                      <Text font-size="body-m">{outcome}</Text>
-                    </Flex>
+                    <div key={index} className="flex items-start gap-3">
+                      <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      <span className="text-gray-700">{outcome}</span>
+                    </div>
                   ))}
-                </Grid>
-              </Flex>
-            </Card>
-          )}
+                </div>
+              </div>
+            )}
 
-          {/* Course Content / Lessons Section */}
-          <Card padding="xl">
-            <Flex flex-direction="column" gap="m">
-              <Text tag="h2" font-size="heading-m">Course Content</Text>
-              <Text font-size="body-s" color="secondary">
-                {Array.isArray(lessons) ? lessons.length : 0} lessons • {totalHours}h {totalMinutes}m total
-              </Text>
-              <Divider style={{ margin: '0' }} />
-
-              <Flex flex-direction="column">
+            {/* Course Content */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-900">Course Content</h2>
+                <span className="text-sm text-gray-500">
+                  {Array.isArray(lessons) ? lessons.length : 0} lessons • {totalHours}h {totalMinutes}m
+                </span>
+              </div>
+              <div className="divide-y divide-gray-100">
                 {displayedLessons.map((lesson, index) => (
-                  <Div key={lesson.id}>
-                    {index > 0 && <Divider />}
-                    <Flex justify-content="space-between" align-items="center" padding="m">
-                      <Flex align-items="flex-start" gap="m" flex="1">
-                        <Text font-size="body-m" font-weight="book" color="secondary" style={{ minWidth: '32px' }}>
-                          {index + 1}
-                        </Text>
-                        <Div flex="1">
-                          <Text font-size="body-m" font-weight="book">{lesson.title}</Text>
-                          <Flex align-items="center" gap="s" style={{ marginTop: '6px' }}>
-                            <Text font-size="body-s" color="secondary">
-                              {lesson.contentType === 'Video' && '🎬'}
-                              {lesson.contentType === 'Quiz' && '❓'}
-                              {lesson.contentType === 'Text' && '📄'}
-                            </Text>
-                            <Text font-size="body-s" color="secondary">{lesson.durationMinutes} min</Text>
-                            {lesson.isPreview && (
-                              <Badge variant="information">Preview</Badge>
-                            )}
-                          </Flex>
-                        </Div>
-                      </Flex>
-                      {lesson.isPreview && (
-                        <Button size="small" rank="tertiary" style={{ marginLeft: 'auto' }}>Preview</Button>
-                      )}
-                    </Flex>
-                  </Div>
+                  <div key={lesson.id} className="py-4 flex items-center justify-between">
+                    <div className="flex items-start gap-4 flex-1">
+                      <span className="text-sm font-medium text-gray-400 w-8">{index + 1}</span>
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900">{lesson.title}</p>
+                        <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
+                          {lesson.contentType === 'Video' && <PlayCircle className="w-4 h-4" />}
+                          {lesson.contentType === 'Quiz' && <span>❓</span>}
+                          {lesson.contentType === 'Text' && <BookOpen className="w-4 h-4" />}
+                          <span>{lesson.durationMinutes} min</span>
+                          {lesson.isPreview && (
+                            <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-medium">Preview</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    {lesson.isPreview && (
+                      <button className="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1">
+                        <Eye className="w-4 h-4" />
+                        Preview
+                      </button>
+                    )}
+                  </div>
                 ))}
-              </Flex>
-
+              </div>
               {Array.isArray(lessons) && lessons.length > 5 && !showAllLessons && (
-                <Button
-                  rank="tertiary"
+                <button
                   onClick={() => setShowAllLessons(true)}
-                  style={{ marginTop: '12px', alignSelf: 'flex-start' }}
+                  className="mt-4 text-primary-600 hover:text-primary-700 font-medium text-sm"
                 >
                   Show all {lessons.length} lessons
-                </Button>
+                </button>
               )}
-            </Flex>
-          </Card>
+            </div>
 
-          {/* Requirements Section */}
-          {Array.isArray(course.requirements) && course.requirements.length > 0 && (
-            <Card padding="xl">
-              <Flex flex-direction="column" gap="m">
-                <Text tag="h2" font-size="heading-m">Prerequisites & Requirements</Text>
-                <Divider style={{ margin: '0' }} />
-                <Flex flex-direction="column" gap="s">
+            {/* Requirements */}
+            {Array.isArray(course.requirements) && course.requirements.length > 0 && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Prerequisites & Requirements</h2>
+                <ul className="space-y-2">
                   {course.requirements.map((req, index) => (
-                    <Flex key={index} align-items="flex-start" gap="m">
-                      <Text font-size="heading-s" color="secondary">•</Text>
-                      <Text font-size="body-m">{req}</Text>
-                    </Flex>
+                    <li key={index} className="flex items-start gap-3 text-gray-700">
+                      <span className="text-gray-400">•</span>
+                      {req}
+                    </li>
                   ))}
-                </Flex>
-              </Flex>
-            </Card>
-          )}
+                </ul>
+              </div>
+            )}
 
-          {/* Tags Section */}
-          {Array.isArray(course.tags) && course.tags.length > 0 && (
-            <Card padding="xl">
-              <Flex flex-direction="column" gap="m">
-                <Text tag="h2" font-size="heading-m">Skills You will Master</Text>
-                <Divider style={{ margin: '0' }} />
-                <Flex gap="s" flex-wrap="wrap">
+            {/* Tags */}
+            {Array.isArray(course.tags) && course.tags.length > 0 && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Skills You&apos;ll Master</h2>
+                <div className="flex flex-wrap gap-2">
                   {course.tags.map((tag, index) => (
-                    <Badge key={index} variant="information">{tag}</Badge>
+                    <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                      {tag}
+                    </span>
                   ))}
-                </Flex>
-              </Flex>
-            </Card>
-          )}
-        </Flex>
+                </div>
+              </div>
+            )}
+          </div>
 
-        {/* Right Column - Sticky Enrollment Card (Desktop) */}
-        <Div flex="1 1 35%" style={{ position: 'relative' }}>
-          <Div style={{ position: 'sticky', top: '24px' }}>
-            <Card padding="xl">
-              <Flex flex-direction="column" gap="m">
-                {/* Course Thumbnail */}
-                <Div style={{ position: 'relative', borderRadius: '8px', overflow: 'hidden', aspectRatio: '16/9', background: 'var(--color-background-secondary)' }}>
+          {/* Right Column - Enrollment Card */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-6">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                {/* Thumbnail */}
+                <div className="relative aspect-video bg-gray-100">
                   {course.thumbnailUrl ? (
                     <Image
                       src={course.thumbnailUrl}
                       alt={course.title}
                       fill
-                      style={{ objectFit: 'cover', zIndex: 0, pointerEvents: 'none' }}
+                      className="object-cover"
                     />
                   ) : (
-                    <Flex justify-content="center" align-items="center" height="100%">
-                      <Text font-size="heading-xl" color="secondary">🎬</Text>
-                    </Flex>
+                    <div className="flex items-center justify-center h-full">
+                      <PlayCircle className="w-16 h-16 text-gray-300" />
+                    </div>
                   )}
-                </Div>
+                </div>
 
-                {/* Price */}
-                <Flex justify-content="space-between" align-items="baseline">
-                  <Text tag="h3" font-size="heading-l" font-weight="book">
-                    {course.price > 0 ? formatCurrency(course.price, course.currency) : 'Free'}
-                  </Text>
-                  {course.price === 0 && <Badge variant="positive">Complimentary</Badge>}
-                </Flex>
+                <div className="p-6 space-y-4">
+                  {/* Price */}
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-3xl font-bold text-gray-900">
+                      {course.price > 0 ? formatCurrency(course.price, course.currency) : 'Free'}
+                    </span>
+                    {course.price === 0 && (
+                      <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-medium">
+                        Complimentary
+                      </span>
+                    )}
+                  </div>
 
-                {/* CTA Button */}
-                <Button
-                  rank="primary"
-                  onClick={handleEnroll}
-                  disabled={enrollMutation.isPending}
-                  style={{ width: '100%', padding: '12px 16px', fontSize: '16px', fontWeight: '600' }}
-                >
-                  {enrollMutation.isPending ? 'Processing...' : course.price > 0 ? 'Enroll Now' : 'Enroll for Free'}
-                </Button>
+                  {/* CTA Button */}
+                  <button
+                    onClick={handleEnroll}
+                    disabled={enrollMutation.isPending}
+                    className="w-full py-3 px-4 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {enrollMutation.isPending ? 'Processing...' : course.price > 0 ? 'Enroll Now' : 'Enroll for Free'}
+                  </button>
 
-                {/* Money Back Guarantee */}
-                {course.price > 0 && (
-                  <Flex align-items="center" gap="s" padding="m" style={{ background: 'var(--color-background-secondary)', borderRadius: '6px' }}>
-                    <Text font-size="heading-m">✓</Text>
-                    <Text font-size="body-xs" color="secondary">30-Day Money-Back Guarantee</Text>
-                  </Flex>
-                )}
+                  {/* Guarantee */}
+                  {course.price > 0 && (
+                    <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm text-gray-600">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      30-Day Money-Back Guarantee
+                    </div>
+                  )}
 
-                <Divider />
+                  <hr className="border-gray-200" />
 
-                {/* Course Details List */}
-                <Flex flex-direction="column" gap="m">
-                  <Flex align-items="center" gap="m">
-                    <Text font-size="heading-m">⏱️</Text>
-                    <Flex flex-direction="column">
-                      <Text font-size="body-xs" color="secondary">Total Duration</Text>
-                      <Text font-size="body-m" font-weight="book">{totalHours}h {totalMinutes}m</Text>
-                    </Flex>
-                  </Flex>
-
-                  <Flex align-items="center" gap="m">
-                    <Text font-size="heading-m">📄</Text>
-                    <Flex flex-direction="column">
-                      <Text font-size="body-xs" color="secondary">Lessons</Text>
-                      <Text font-size="body-m" font-weight="book">{course.lessonsCount} lessons</Text>
-                    </Flex>
-                  </Flex>
-
-                  <Flex align-items="center" gap="m">
-                    <Text font-size="heading-m">🌟</Text>
-                    <Flex flex-direction="column">
-                      <Text font-size="body-xs" color="secondary">Certificate</Text>
-                      <Text font-size="body-m" font-weight="book">Completion Certificate</Text>
-                    </Flex>
-                  </Flex>
-
-                  <Flex align-items="center" gap="m">
-                    <Text font-size="heading-m">🌐</Text>
-                    <Flex flex-direction="column">
-                      <Text font-size="body-xs" color="secondary">Access</Text>
-                      <Text font-size="body-m" font-weight="book">Lifetime Access</Text>
-                    </Flex>
-                  </Flex>
-                </Flex>
-              </Flex>
-            </Card>
-          </Div>
-        </Div>
-      </Flex>
-    </Div>
-  </PageLayout>
+                  {/* Course Details */}
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 text-sm">
+                      <Clock className="w-5 h-5 text-gray-400" />
+                      <div>
+                        <p className="text-gray-500">Total Duration</p>
+                        <p className="font-medium text-gray-900">{totalHours}h {totalMinutes}m</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm">
+                      <BookOpen className="w-5 h-5 text-gray-400" />
+                      <div>
+                        <p className="text-gray-500">Lessons</p>
+                        <p className="font-medium text-gray-900">{course.lessonsCount} lessons</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm">
+                      <Award className="w-5 h-5 text-gray-400" />
+                      <div>
+                        <p className="text-gray-500">Certificate</p>
+                        <p className="font-medium text-gray-900">Completion Certificate</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm">
+                      <Globe className="w-5 h-5 text-gray-400" />
+                      <div>
+                        <p className="text-gray-500">Access</p>
+                        <p className="font-medium text-gray-900">Lifetime Access</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -41,7 +41,7 @@ export type { ConfirmDialogProps, ModalBodyProps, ModalFooterProps, ModalHeaderP
 export { default as Breadcrumb, type BreadcrumbItem, type BreadcrumbProps } from './Breadcrumb';
 export { FluidAccountDropdown } from './FluidAccountDropdown';
 export { FluidNotificationsDropdown } from './FluidNotificationsDropdown';
-export { Footer, type FooterLink, type FooterProps, type FooterSection } from './Footer';
+export { Footer } from './Footer';
 export { default as Navbar } from './Navbar';
 export { default as PageLayout, type PageLayoutProps } from './PageLayout';
 export { Tab, TabList, TabPanel, Tabs } from './Tabs';
@@ -85,6 +85,15 @@ export { default as MilestoneList, type MilestoneListProps } from './MilestoneLi
 export * from '@/lib/design-system/tokens';
 export { announceToScreenReader, cn, debounce, getContrastRatio, lockBodyScroll, throttle, trapFocus } from '@/lib/design-system/utils';
 
-
 export { VideoBackground } from './VideoBackground';
+
+// Shared Section Components
+export {
+  CTASection, FeatureGrid, HeroSection, PageHeader,
+  SectionContainer, StatsSection, TrustedBySection
+} from './Sections';
+export type {
+  CTASectionProps, FeatureGridProps, HeroSectionProps, PageHeaderProps,
+  SectionContainerProps, StatsSectionProps, TrustedBySectionProps
+} from './Sections';
 

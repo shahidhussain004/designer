@@ -1,17 +1,10 @@
 'use client';
 
-import React, { Suspense, useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import Link from 'next/link';
-import {
-  Flex,
-  Card,
-  Text,
-  Button,
-  Spinner,
-  Divider,
-} from '@/components/green';
 import { formatCurrency } from '@/lib/payments';
+import { BookOpen, CheckCircle, Loader2, Lock, Target } from 'lucide-react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
 
 function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
@@ -31,7 +24,7 @@ function CheckoutSuccessContent() {
     switch (type) {
       case 'milestone':
         return {
-          icon: '🎯',
+          icon: Target,
           title: 'Milestone Funded!',
           description:
             'The funds have been securely deposited into escrow. The freelancer has been notified and can begin work.',
@@ -40,7 +33,7 @@ function CheckoutSuccessContent() {
         };
       case 'course':
         return {
-          icon: '📚',
+          icon: BookOpen,
           title: 'Course Purchased!',
           description: 'You now have full access to the course. Start learning right away!',
           primaryAction: { label: 'Start Learning', href: `/courses/${itemId}/learn` },
@@ -48,7 +41,7 @@ function CheckoutSuccessContent() {
         };
       case 'escrow':
         return {
-          icon: '🔒',
+          icon: Lock,
           title: 'Escrow Funded!',
           description: 'The funds are now held securely in escrow until the project is completed.',
           primaryAction: { label: 'View Project', href: `/jobs/${itemId}` },
@@ -56,7 +49,7 @@ function CheckoutSuccessContent() {
         };
       default:
         return {
-          icon: '✅',
+          icon: CheckCircle,
           title: 'Payment Successful!',
           description: 'Your payment has been processed successfully.',
           primaryAction: { label: 'Go to Dashboard', href: '/dashboard' },
@@ -66,126 +59,92 @@ function CheckoutSuccessContent() {
   };
 
   const details = getTypeDetails();
+  const IconComponent = details.icon;
 
   return (
-    <Flex
-      justify-content="center"
-      align-items="center"
-      padding="l"
-    >
-      {/* Confetti Effect - simple version */}
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      {/* Confetti Effect */}
       {showConfetti && (
-        <div>
-          <Text font-size="heading-xl">🎉 🎊 ✨ 🎉 🎊 ✨ 🎉</Text>
+        <div className="fixed top-0 left-0 right-0 flex justify-center text-4xl animate-bounce">
+          🎉 🎊 ✨ 🎉 🎊 ✨ 🎉
         </div>
       )}
 
-      <Card padding="xl">
-        <Flex flex-direction="column" gap="l" align-items="center">
-          {/* Success Icon */}
-          <Flex
-            justify-content="center"
-            align-items="center"
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 max-w-md w-full text-center">
+        {/* Success Icon */}
+        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <IconComponent className="w-8 h-8 text-green-600" />
+        </div>
+
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">{details.title}</h1>
+        <p className="text-gray-600 mb-6">{details.description}</p>
+
+        {/* Amount */}
+        {amount > 0 && (
+          <div className="bg-gray-50 rounded-lg p-4 mb-6">
+            <p className="text-sm text-gray-500 mb-1">Amount Paid</p>
+            <p className="text-3xl font-bold text-gray-900">{formatCurrency(amount)}</p>
+          </div>
+        )}
+
+        {/* Transaction Details */}
+        <div className="bg-gray-50 rounded-lg p-4 mb-6">
+          <p className="font-medium text-gray-900 mb-3">Transaction Details</p>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-gray-500">Transaction ID</span>
+              <span className="text-gray-900 font-mono">TXN-{Date.now().toString(36).toUpperCase()}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-500">Date</span>
+              <span className="text-gray-900">{new Date().toLocaleDateString()}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-500">Payment Method</span>
+              <span className="text-gray-900">•••• 4242</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-500">Status</span>
+              <span className="text-green-600 font-medium">Completed</span>
+            </div>
+          </div>
+        </div>
+
+        <hr className="border-gray-200 mb-6" />
+
+        {/* Actions */}
+        <div className="space-y-3">
+          <Link
+            href={details.primaryAction.href}
+            className="block w-full py-3 px-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
           >
-            <Text font-size="heading-xl">{details.icon}</Text>
-          </Flex>
+            {details.primaryAction.label}
+          </Link>
+          <Link
+            href={details.secondaryAction.href}
+            className="block w-full py-3 px-4 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+          >
+            {details.secondaryAction.label}
+          </Link>
+        </div>
 
-          <Text tag="h1" font-size="heading-l">
-            {details.title}
-          </Text>
-
-          <Text color="secondary">
-            {details.description}
-          </Text>
-
-          {/* Amount Confirmation */}
-          {amount > 0 && (
-            <Card padding="m" variant="secondary">
-              <Flex flex-direction="column" gap="xs" align-items="center">
-                <Text font-size="body-s" color="secondary">
-                  Amount Paid
-                </Text>
-                <Text font-size="heading-xl">{formatCurrency(amount)}</Text>
-              </Flex>
-            </Card>
-          )}
-
-          {/* Transaction Details */}
-          <Card padding="m">
-            <Flex flex-direction="column" gap="m">
-              <Text font-weight="book">Transaction Details</Text>
-              <Flex flex-direction="column" gap="s">
-                <Flex justify-content="space-between">
-                  <Text font-size="body-s" color="secondary">
-                    Transaction ID
-                  </Text>
-                  <Text font-size="body-s">
-                    TXN-{Date.now().toString(36).toUpperCase()}
-                  </Text>
-                </Flex>
-                <Flex justify-content="space-between">
-                  <Text font-size="body-s" color="secondary">
-                    Date
-                  </Text>
-                  <Text font-size="body-s">{new Date().toLocaleDateString()}</Text>
-                </Flex>
-                <Flex justify-content="space-between">
-                  <Text font-size="body-s" color="secondary">
-                    Payment Method
-                  </Text>
-                  <Text font-size="body-s">•••• 4242</Text>
-                </Flex>
-                <Flex justify-content="space-between">
-                  <Text font-size="body-s" color="secondary">
-                    Status
-                  </Text>
-                  <Text font-size="body-s" color="positive">
-                    Completed
-                  </Text>
-                </Flex>
-              </Flex>
-            </Flex>
-          </Card>
-
-          <Divider />
-
-          {/* Actions */}
-          <Flex flex-direction="column" gap="s">
-            <Link href={details.primaryAction.href}>
-              <Button>{details.primaryAction.label}</Button>
-            </Link>
-            <Link href={details.secondaryAction.href}>
-              <Button rank="secondary">
-                {details.secondaryAction.label}
-              </Button>
-            </Link>
-          </Flex>
-
-          {/* Receipt Link */}
-          <Flex flex-direction="column" gap="xs" align-items="center">
-            <Text font-size="body-s" color="secondary">
-              A receipt has been sent to your email address.
-            </Text>
-            <Link
-              href="/dashboard/invoices"
-            >
-              <Text font-size="body-s">View all invoices →</Text>
-            </Link>
-          </Flex>
-        </Flex>
-      </Card>
-    </Flex>
+        {/* Receipt Link */}
+        <p className="text-sm text-gray-500 mt-6">
+          A receipt has been sent to your email address.
+          <Link href="/dashboard/invoices" className="text-primary-600 hover:text-primary-700 ml-1">
+            View all invoices →
+          </Link>
+        </p>
+      </div>
+    </div>
   );
 }
 
 function SuccessLoading() {
   return (
-    <Flex
-      justify-content="center"
-      align-items="center"
-    >
-      <Spinner />
-    </Flex>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
+    </div>
   );
 }
 

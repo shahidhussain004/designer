@@ -1,11 +1,11 @@
 "use client"
 
 import { ErrorMessage } from '@/components/ErrorMessage'
-import { Alert, Badge, Button, Card, Divider, Flex, Input, Text, Textarea } from '@/components/green'
 import { LoadingSpinner } from '@/components/Skeletons'
 import { PageLayout } from '@/components/ui'
 import { useUpdateUser, useUserProfile } from '@/hooks/useUsers'
 import { authService } from '@/lib/auth'
+import { CheckCircle, Edit2, ExternalLink, MapPin, Star, XCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -111,9 +111,9 @@ export default function ProfilePage() {
   if (isLoading) {
     return (
       <PageLayout>
-        <Flex justify-content="center" align-items="center" min-height="50vh">
+        <div className="min-h-[50vh] flex items-center justify-center">
           <LoadingSpinner />
-        </Flex>
+        </div>
       </PageLayout>
     )
   }
@@ -121,12 +121,12 @@ export default function ProfilePage() {
   if (isError) {
     return (
       <PageLayout>
-        <Flex justify-content="center" align-items="center" min-height="50vh">
+        <div className="min-h-[50vh] flex items-center justify-center">
           <ErrorMessage 
             message={error?.message || 'Failed to load profile'} 
             retry={() => refetch()}
           />
-        </Flex>
+        </div>
       </PageLayout>
     )
   }
@@ -134,198 +134,220 @@ export default function ProfilePage() {
   if (!profile) {
     return (
       <PageLayout>
-        <Flex justify-content="center" align-items="center" min-height="50vh">
-          <Text color="negative-01">Profile not found</Text>
-        </Flex>
+        <div className="min-h-[50vh] flex items-center justify-center">
+          <p className="text-red-600">Profile not found</p>
+        </div>
       </PageLayout>
     )
   }
 
   return (
     <PageLayout>
-      <Flex flex-direction="column" gap="l" padding="l" max-width="800px" margin="0 auto">
-        {/* Header */}
-        <Flex justify-content="space-between" align-items="center">
-          <div>
-            <Text font-size="heading-l">My Profile</Text>
-            <Text font-size="body-s" color="neutral-02">
-              Manage your account information
-            </Text>
+      {/* Header */}
+      <div className="bg-gray-900 text-white py-12 lg:py-16">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold">My Profile</h1>
+              <p className="text-gray-300 mt-1">Manage your account information</p>
+            </div>
+            {!editing && (
+              <button 
+                onClick={() => setEditing(true)}
+                className="flex items-center gap-2 bg-white text-gray-900 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+              >
+                <Edit2 className="w-4 h-4" />
+                Edit Profile
+              </button>
+            )}
           </div>
-          {!editing && (
-            <Button onClick={() => setEditing(true)}>
-              Edit Profile
-            </Button>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="bg-gray-50 py-8">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          {/* Notification */}
+          {notification && (
+            <div className={`mb-6 px-4 py-3 rounded-lg flex items-center gap-2 ${
+              notification.type === 'success' 
+                ? 'bg-green-50 text-green-700 border border-green-200' 
+                : 'bg-red-50 text-red-700 border border-red-200'
+            }`}>
+              {notification.type === 'success' ? (
+                <CheckCircle className="w-5 h-5" />
+              ) : (
+                <XCircle className="w-5 h-5" />
+              )}
+              {notification.message}
+            </div>
           )}
-        </Flex>
 
-        {/* Notification */}
-        {notification && (
-          <Alert variant={notification.type === 'success' ? 'positive' : 'negative'}>
-            {notification.message}
-          </Alert>
-        )}
-
-        {/* Profile Card */}
-        <Card padding="l">
-          <Flex flex-direction="column" gap="m">
+          {/* Profile Card */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             {/* Avatar and Basic Info */}
-            <Flex gap="m" align-items="center">
-              <div style={{ 
-                width: '80px', 
-                height: '80px', 
-                borderRadius: '50%', 
-                backgroundColor: '#e0e0e0',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '32px',
-                fontWeight: 'bold',
-                color: '#666'
-              }}>
+            <div className="flex items-center gap-4 mb-6 pb-6 border-b border-gray-200">
+              <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center text-3xl font-bold text-gray-500">
                 {profile.fullName?.charAt(0).toUpperCase() || 'U'}
               </div>
-              <Flex flex-direction="column" gap="xs">
-                <Text font-size="heading-s">{profile.fullName}</Text>
-                <Text font-size="body-s" color="neutral-02">@{profile.username}</Text>
-                <Badge variant="information">{profile.role}</Badge>
-              </Flex>
-            </Flex>
-
-            <Divider />
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">{profile.fullName}</h2>
+                <p className="text-gray-500">@{profile.username}</p>
+                <span className={`inline-block mt-2 px-3 py-1 rounded-full text-sm font-medium ${
+                  profile.role === 'FREELANCER' 
+                    ? 'bg-blue-100 text-blue-700' 
+                    : 'bg-purple-100 text-purple-700'
+                }`}>
+                  {profile.role}
+                </span>
+              </div>
+            </div>
 
             {/* Form Fields */}
             {editing ? (
-              <Flex flex-direction="column" gap="m">
+              <div className="space-y-4">
                 <div>
-                  <Text font-size="body-s" style={{ marginBottom: '0.5rem' }}>Full Name</Text>
-                  <Input
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                  <input
                     value={formData.fullName}
                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                     placeholder="Your full name"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <Text font-size="body-s" style={{ marginBottom: '0.5rem' }}>Email</Text>
-                  <Input
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <input
                     value={profile.email}
                     disabled
-                    style={{ opacity: 0.6 }}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
                   />
-                  <Text font-size="detail-regular-s" color="neutral-02">Email cannot be changed</Text>
+                  <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
                 </div>
 
                 <div>
-                  <Text font-size="body-s" style={{ marginBottom: '0.5rem' }}>Bio</Text>
-                  <Textarea
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                  <textarea
                     value={formData.bio}
                     onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                     placeholder="Tell us about yourself"
                     rows={4}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <Text font-size="body-s" style={{ marginBottom: '0.5rem' }}>Location</Text>
-                  <Input
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                  <input
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                     placeholder="City, Country"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none"
                   />
                 </div>
 
                 {profile.role === 'FREELANCER' && (
                   <>
                     <div>
-                      <Text font-size="body-s" style={{ marginBottom: '0.5rem' }}>Hourly Rate (USD)</Text>
-                      <Input
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Hourly Rate (USD)</label>
+                      <input
                         type="number"
                         value={formData.hourlyRate}
                         onChange={(e) => setFormData({ ...formData, hourlyRate: e.target.value })}
                         placeholder="50"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none"
                       />
                     </div>
 
                     <div>
-                      <Text font-size="body-s" style={{ marginBottom: '0.5rem' }}>Portfolio URL</Text>
-                      <Input
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Portfolio URL</label>
+                      <input
                         value={formData.portfolioUrl}
                         onChange={(e) => setFormData({ ...formData, portfolioUrl: e.target.value })}
                         placeholder="https://yourportfolio.com"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none"
                       />
                     </div>
                   </>
                 )}
 
                 {/* Action Buttons */}
-                <Flex gap="m" justify-content="flex-end">
-                  <Button
-                      rank="tertiary"
-                      onClick={() => {
+                <div className="flex justify-end gap-3 pt-4">
+                  <button
+                    onClick={() => {
                       setEditing(false)
                       setNotification(null)
                     }}
                     disabled={updateUserMutation.isPending}
+                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
                   >
                     Cancel
-                  </Button>
-                  <Button
+                  </button>
+                  <button
                     onClick={handleSave}
                     disabled={updateUserMutation.isPending}
+                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 transition-colors"
                   >
                     {updateUserMutation.isPending ? 'Saving...' : 'Save Changes'}
-                  </Button>
-                </Flex>
-              </Flex>
+                  </button>
+                </div>
+              </div>
             ) : (
-              <Flex flex-direction="column" gap="m">
+              <div className="space-y-4">
                 <div>
-                  <Text font-size="body-s" color="neutral-02">Email</Text>
-                  <Text>{profile.email}</Text>
+                  <p className="text-sm text-gray-500">Email</p>
+                  <p className="text-gray-900">{profile.email}</p>
                 </div>
 
                 {profile.bio && (
                   <div>
-                    <Text font-size="body-s" color="neutral-02">Bio</Text>
-                    <Text>{profile.bio}</Text>
+                    <p className="text-sm text-gray-500">Bio</p>
+                    <p className="text-gray-900">{profile.bio}</p>
                   </div>
                 )}
 
                 {profile.location && (
-                  <div>
-                    <Text font-size="body-s" color="neutral-02">Location</Text>
-                    <Text>{profile.location}</Text>
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-gray-400" />
+                    <span className="text-gray-900">{profile.location}</span>
                   </div>
                 )}
 
                 {profile.role === 'FREELANCER' && profile.hourlyRate && (
                   <div>
-                    <Text font-size="body-s" color="neutral-02">Hourly Rate</Text>
-                    <Text>${profile.hourlyRate}/hour</Text>
+                    <p className="text-sm text-gray-500">Hourly Rate</p>
+                    <p className="text-gray-900 font-semibold">${profile.hourlyRate}/hour</p>
                   </div>
                 )}
 
                 {profile.role === 'FREELANCER' && profile.portfolioUrl && (
                   <div>
-                    <Text font-size="body-s" color="neutral-02">Portfolio</Text>
-                    <a href={profile.portfolioUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#1a73e8' }}>
+                    <p className="text-sm text-gray-500">Portfolio</p>
+                    <a 
+                      href={profile.portfolioUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="text-primary-600 hover:text-primary-700 flex items-center gap-1"
+                    >
                       {profile.portfolioUrl}
+                      <ExternalLink className="w-4 h-4" />
                     </a>
                   </div>
                 )}
 
                 {profile.role === 'FREELANCER' && typeof profile.ratingAvg !== 'undefined' && (
-                  <div>
-                    <Text font-size="body-s" color="neutral-02">Rating</Text>
-                    <Text>⭐ {profile.ratingAvg.toFixed(1)} ({profile.ratingCount} reviews)</Text>
+                  <div className="flex items-center gap-2">
+                    <Star className="w-5 h-5 text-yellow-400 fill-current" />
+                    <span className="font-semibold text-gray-900">{profile.ratingAvg.toFixed(1)}</span>
+                    <span className="text-gray-500">({profile.ratingCount} reviews)</span>
                   </div>
                 )}
-              </Flex>
+              </div>
             )}
-          </Flex>
-        </Card>
-      </Flex>
+          </div>
+        </div>
+      </div>
     </PageLayout>
   )
 }

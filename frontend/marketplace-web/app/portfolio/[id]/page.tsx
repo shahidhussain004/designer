@@ -1,13 +1,12 @@
 "use client"
 
 import { ErrorMessage } from '@/components/ErrorMessage'
-import { Button, Card, Divider, Flex, Grid, Text } from '@/components/green'
 import { LoadingSpinner } from '@/components/Skeletons'
 import { PageLayout } from '@/components/ui'
 import { useCreatePortfolio, useDeletePortfolio, useUpdatePortfolio, useUserPortfolio, useUserProfile } from '@/hooks/useUsers'
 import { authService } from '@/lib/auth'
 import logger from '@/lib/logger'
-import { Edit, Eye, EyeOff, Plus, Trash2 } from 'lucide-react'
+import { ArrowLeft, Edit, ExternalLink, Eye, EyeOff, Plus, Trash2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
@@ -223,9 +222,9 @@ export default function PortfolioPage() {
   if (loading) {
     return (
       <PageLayout>
-        <Flex justify-content="center" align-items="center" style={{ minHeight: '400px' }}>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <LoadingSpinner />
-        </Flex>
+        </div>
       </PageLayout>
     )
   }
@@ -233,116 +232,94 @@ export default function PortfolioPage() {
   if (error || !freelancer) {
     return (
       <PageLayout>
-        <Flex justify-content="center" align-items="center" style={{ minHeight: '400px' }}>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <ErrorMessage 
             message={errorMessage || 'Failed to load portfolio'} 
             retry={() => loadData()}
           />
-        </Flex>
+        </div>
       </PageLayout>
     )
   }
 
   return (
     <PageLayout>
-      <Flex flex-direction="column" gap="l" padding="l">
-        {/* Header & Navigation */}
-        <div>
-          {/* Breadcrumb Navigation */}
-          {!isOwnPortfolio && (
-            <Flex gap="m" align-items="center" style={{ marginBottom: '1.5rem' }}>
-              <Link href="/talents">
-                <Button rank="tertiary" size="small">
-                  ← Back to Talent
-                </Button>
-              </Link>
-              <Text font-size="body-s" color="neutral-02">/</Text>
-              <Link href={`/freelancers/${freelancer.id}`}>
-                <Button rank="tertiary" size="small">
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-gray-900 text-white py-12">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Breadcrumb Navigation */}
+            {!isOwnPortfolio && (
+              <div className="flex items-center gap-3 mb-6">
+                <Link href="/talents" className="inline-flex items-center gap-2 text-gray-400 hover:text-white">
+                  <ArrowLeft className="w-4 h-4" />
+                  Back to Talent
+                </Link>
+                <span className="text-gray-600">/</span>
+                <Link href={`/freelancers/${freelancer.id}`} className="text-gray-400 hover:text-white">
                   View Profile
-                </Button>
-              </Link>
-            </Flex>
-          )}
-
-          {/* Page Header */}
-          <Flex justify-content="space-between" align-items="start" gap="l">
-            <Flex gap="m" align-items="start" style={{ flex: 1 }}>
-              {/* Avatar */}
-              <div
-                style={{
-                  width: '100px',
-                  height: '100px',
-                  borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '40px',
-                  fontWeight: 'bold',
-                  color: 'white',
-                  flexShrink: 0,
-                }}
-              >
-                {freelancer.fullName?.charAt(0).toUpperCase()}
+                </Link>
               </div>
+            )}
 
-              {/* Profile Info */}
-              <Flex flex-direction="column" gap="s" style={{ flex: 1 }}>
-                <div>
-                  <Text font-size="heading-l">
-                    {isOwnPortfolio ? 'My Portfolio' : `${freelancer.fullName}'s Portfolio`}
-                  </Text>
-                  <Text font-size="body-l" color="neutral-02">
-                    @{freelancer.username}
-                  </Text>
+            {/* Page Header */}
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
+              <div className="flex gap-4 items-start">
+                {/* Avatar */}
+                <div className="w-24 h-24 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-4xl font-bold text-white flex-shrink-0">
+                  {freelancer.fullName?.charAt(0).toUpperCase()}
                 </div>
 
-                {freelancer.bio && (
-                  <Text font-size="body-l" color="neutral-02">
-                    {freelancer.bio}
-                  </Text>
-                )}
+                {/* Profile Info */}
+                <div className="flex-1">
+                  <h1 className="text-2xl font-bold mb-1">
+                    {isOwnPortfolio ? 'My Portfolio' : `${freelancer.fullName}'s Portfolio`}
+                  </h1>
+                  <p className="text-gray-400">@{freelancer.username}</p>
 
-                {(freelancer.hourlyRate || freelancer.ratingAvg) && (
-                  <Flex gap="l" align-items="center">
-                    {freelancer.hourlyRate && (
-                      <Text font-size="body-l" font-weight="bold">
-                        💰 ${freelancer.hourlyRate}/hr
-                      </Text>
-                    )}
-                    {typeof freelancer.ratingAvg !== 'undefined' && (
-                      <Text font-size="body-l">
-                        ⭐ {freelancer.ratingAvg.toFixed(1)} ({freelancer.ratingCount} reviews)
-                      </Text>
-                    )}
-                  </Flex>
-                )}
-              </Flex>
-            </Flex>
+                  {freelancer.bio && (
+                    <p className="text-gray-300 mt-2">{freelancer.bio}</p>
+                  )}
 
-            {/* Owner Actions */}
-            {isOwnPortfolio && (
-              <Button onClick={() => setShowForm(!showForm)} style={{ whiteSpace: 'nowrap' }}>
-                <Plus size={16} style={{ marginRight: '0.5rem' }} />
-                Add Project
-              </Button>
-            )}
-          </Flex>
+                  {(freelancer.hourlyRate || freelancer.ratingAvg) && (
+                    <div className="flex gap-4 mt-3">
+                      {freelancer.hourlyRate && (
+                        <span className="text-white font-medium">💰 ${freelancer.hourlyRate}/hr</span>
+                      )}
+                      {typeof freelancer.ratingAvg !== 'undefined' && (
+                        <span className="text-gray-300">⭐ {freelancer.ratingAvg.toFixed(1)} ({freelancer.ratingCount} reviews)</span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Owner Actions */}
+              {isOwnPortfolio && (
+                <button
+                  onClick={() => setShowForm(!showForm)}
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium flex items-center gap-2 whitespace-nowrap"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Project
+                </button>
+              )}
+            </div>
+          </div>
         </div>
 
-        <Divider />
-
-        {/* Add/Edit Form (Owner Only) */}
-        {isOwnPortfolio && showForm && (
-          <Card padding="l" style={{ backgroundColor: '#f8f9fa' }}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1.5rem' }}>
-              {editingItem ? 'Edit Project' : 'Add New Project'}
-            </h2>
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        {/* Content */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Add/Edit Form (Owner Only) */}
+          {isOwnPortfolio && showForm && (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+              <h2 className="text-xl font-bold text-gray-900 mb-6">
+                {editingItem ? 'Edit Project' : 'Add New Project'}
+              </h2>
+              <form onSubmit={handleSubmit} className="space-y-6">
               {/* Title */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.5rem' }}>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Project Title *
                 </label>
                 <input
@@ -350,20 +327,14 @@ export default function PortfolioPage() {
                   required
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    border: '1px solid #ddd',
-                    borderRadius: '6px',
-                    fontSize: '1rem',
-                  }}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none"
                   placeholder="E.g., E-commerce Website Redesign"
                 />
               </div>
 
               {/* Description */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.5rem' }}>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Description *
                 </label>
                 <textarea
@@ -371,22 +342,15 @@ export default function PortfolioPage() {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={4}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    border: '1px solid #ddd',
-                    borderRadius: '6px',
-                    fontSize: '1rem',
-                    fontFamily: 'inherit',
-                  }}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none resize-none"
                   placeholder="Describe the project, your role, and key achievements..."
                 />
               </div>
 
               {/* URLs Grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.5rem' }}>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     Image URL *
                   </label>
                   <input
@@ -394,31 +358,19 @@ export default function PortfolioPage() {
                     required
                     value={formData.imageUrl}
                     onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem',
-                      border: '1px solid #ddd',
-                      borderRadius: '6px',
-                      fontSize: '1rem',
-                    }}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none"
                     placeholder="https://example.com/project.jpg"
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.5rem' }}>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     Project URL (Optional)
                   </label>
                   <input
                     type="url"
                     value={formData.projectUrl}
                     onChange={(e) => setFormData({ ...formData, projectUrl: e.target.value })}
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem',
-                      border: '1px solid #ddd',
-                      borderRadius: '6px',
-                      fontSize: '1rem',
-                    }}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus outline-none"
                     placeholder="https://example.com"
                   />
                 </div>
@@ -426,7 +378,7 @@ export default function PortfolioPage() {
 
               {/* Technologies */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.5rem' }}>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Technologies (comma-separated) *
                 </label>
                 <input
@@ -434,323 +386,240 @@ export default function PortfolioPage() {
                   required
                   value={formData.technologies}
                   onChange={(e) => setFormData({ ...formData, technologies: e.target.value })}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    border: '1px solid #ddd',
-                    borderRadius: '6px',
-                    fontSize: '1rem',
-                  }}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus outline-none"
                   placeholder="React, Node.js, PostgreSQL, AWS"
                 />
               </div>
 
               {/* Completion Date & Visibility Grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', alignItems: 'end' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.5rem' }}>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     Completion Date
                   </label>
                   <input
                     type="date"
                     value={formData.completionDate}
                     onChange={(e) => setFormData({ ...formData, completionDate: e.target.value })}
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem',
-                      border: '1px solid #ddd',
-                      borderRadius: '6px',
-                      fontSize: '1rem',
-                    }}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus outline-none"
                   />
                 </div>
 
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                <label className="flex items-center gap-2 cursor-pointer py-3">
                   <input
                     type="checkbox"
                     checked={formData.isVisible}
                     onChange={(e) => setFormData({ ...formData, isVisible: e.target.checked })}
-                    style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                    className="w-5 h-5 rounded border-gray-300 text-primary-600"
                   />
-                  <span style={{ fontSize: '0.875rem' }}>Visible to public</span>
+                  <span className="text-sm text-gray-700">Visible to public</span>
                 </label>
               </div>
 
               {/* Action Buttons */}
-              <Flex gap="m" justify-content="flex-end">
-                <Button
-                  rank="tertiary"
+              <div className="flex gap-3 justify-end">
+                <button
+                  type="button"
                   onClick={resetForm}
-                  style={{ cursor: 'pointer' }}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium"
                 >
                   Cancel
-                </Button>
-                <Button
+                </button>
+                <button
                   type="submit"
-                  style={{ cursor: 'pointer' }}
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
                 >
                   {editingItem ? 'Update Project' : 'Add Project'}
-                </Button>
-              </Flex>
+                </button>
+              </div>
             </form>
-          </Card>
-        )}
-
-        {/* Undo Banner */}
-        {undoItem && isOwnPortfolio && (
-          <div
-            style={{
-              position: 'fixed',
-              bottom: '24px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              backgroundColor: '#1a1a1a',
-              color: 'white',
-              padding: '12px 16px',
-              borderRadius: '6px',
-              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-              zIndex: 50,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '16px',
-            }}
-          >
-            <span>Project hidden</span>
-            <button
-              onClick={() => restoreVisibility(undoItem)}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#60a5fa',
-                cursor: 'pointer',
-                textDecoration: 'underline',
-              }}
-            >
-              Undo
-            </button>
           </div>
         )}
 
-        {/* Portfolio Content */}
-        {portfolio.length === 0 ? (
-          <Card padding="xl">
-            <Flex flex-direction="column" align-items="center" gap="m">
-              <Text font-size="heading-s">
+          {/* Undo Banner */}
+          {undoItem && isOwnPortfolio && (
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-4">
+              <span>Project hidden</span>
+              <button
+                onClick={() => restoreVisibility(undoItem)}
+                className="text-primary-400 hover:text-primary-300 underline"
+              >
+                Undo
+              </button>
+            </div>
+          )}
+
+          {/* Portfolio Content */}
+          {portfolio.length === 0 ? (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 {isOwnPortfolio ? 'No Projects Yet' : 'No Public Portfolio Items'}
-              </Text>
-              <Text font-size="body-l" color="neutral-02">
+              </h3>
+              <p className="text-gray-500 mb-6">
                 {isOwnPortfolio
                   ? 'Add your best work to showcase your skills'
                   : 'This freelancer hasnt added any public portfolio items yet'}
-              </Text>
+              </p>
               {isOwnPortfolio && (
-                <Button onClick={() => setShowForm(true)}>
-                  <Plus size={16} style={{ marginRight: '0.5rem' }} />
-                  Add Your First Project
-                </Button>
-              )}
-            </Flex>
-          </Card>
-        ) : (
-          <Grid columns="2" gap="l">
-            {portfolio.map((item) => (
-              <Card key={item.id} padding="0" style={{ overflow: 'hidden' }}>
-                {/* Image Section */}
-                <div
-                  style={{
-                    width: '100%',
-                    height: '250px',
-                    backgroundColor: '#f0f0f0',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    overflow: 'hidden',
-                    background: 'linear-gradient(135deg, #667eea15 0%, #764ba215 100%)',
-                    position: 'relative',
-                  }}
+                <button
+                  onClick={() => setShowForm(true)}
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium inline-flex items-center gap-2"
                 >
-                  {item.imageUrl && (
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.title}
-                      fill
-                      className="object-cover"
-                      onError={() => {}}
-                    />
-                  )}
+                  <Plus className="w-4 h-4" />
+                  Add Your First Project
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {portfolio.map((item) => (
+                <div key={item.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                  {/* Image Section */}
+                  <div className="relative h-64 bg-gradient-to-br from-primary-50 to-gray-100">
+                    {item.imageUrl && (
+                      <Image
+                        src={item.imageUrl}
+                        alt={item.title}
+                        fill
+                        className="object-cover"
+                        onError={() => {}}
+                      />
+                    )}
 
-                  {/* Hidden Badge (Owner Only) */}
-                  {isOwnPortfolio && !item.isVisible && (
-                    <div
-                      style={{
-                        position: 'absolute',
-                        top: '12px',
-                        right: '12px',
-                        backgroundColor: 'rgba(255, 193, 7, 0.9)',
-                        color: '#333',
-                        padding: '4px 12px',
-                        borderRadius: '4px',
-                        fontSize: '0.75rem',
-                        fontWeight: '600',
-                      }}
-                    >
-                      Hidden
-                    </div>
-                  )}
-                </div>
+                    {/* Hidden Badge (Owner Only) */}
+                    {isOwnPortfolio && !item.isVisible && (
+                      <div className="absolute top-3 right-3 bg-amber-500 text-amber-900 px-3 py-1 rounded text-xs font-semibold">
+                        Hidden
+                      </div>
+                    )}
+                  </div>
 
-                {/* Content Section */}
-                <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                  <Flex flex-direction="column" gap="m">
+                  {/* Content Section */}
+                  <div className="p-6">
                     {/* Title */}
-                    <Text font-size="heading-s">{item.title}</Text>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.title}</h3>
 
                     {/* Description */}
-                    <Text font-size="body-l" color="neutral-02" style={{ lineHeight: '1.6' }}>
-                      {item.description}
-                    </Text>
+                    <p className="text-gray-600 mb-4 line-clamp-3">{item.description}</p>
 
                     {/* Technologies */}
                     {item.technologies && item.technologies.length > 0 && (
-                      <Flex gap="s" style={{ flexWrap: 'wrap' }}>
+                      <div className="flex flex-wrap gap-2 mb-4">
                         {item.technologies.map((tech, idx) => (
-                          <div
+                          <span
                             key={idx}
-                            style={{
-                              padding: '0.35rem 0.75rem',
-                              backgroundColor: '#667eea20',
-                              borderRadius: '20px',
-                              fontSize: '0.875rem',
-                              color: '#667eea',
-                              fontWeight: 500,
-                            }}
+                            className="px-3 py-1 bg-primary-50 text-primary-700 rounded-full text-sm font-medium"
                           >
                             {tech}
-                          </div>
+                          </span>
                         ))}
-                      </Flex>
+                      </div>
                     )}
 
                     {/* Metadata */}
                     {item.completionDate && (
-                      <Text font-size="body-s" color="neutral-02">
+                      <p className="text-sm text-gray-500 mb-4">
                         📅 Completed: {new Date(item.completionDate).toLocaleDateString()}
-                      </Text>
+                      </p>
                     )}
-                  </Flex>
 
-                  <Divider />
+                    <hr className="border-gray-200 my-4" />
 
-                  {/* Actions */}
-                  {isOwnPortfolio ? (
-                    <Flex gap="m" justify-content="space-between" align-items="center">
-                      <Flex gap="m">
+                    {/* Actions */}
+                    {isOwnPortfolio ? (
+                      <div className="flex items-center justify-between">
                         <button
                           onClick={() => toggleVisibility(item)}
-                          style={{
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.5rem',
-                            color: '#666',
-                            fontSize: '0.875rem',
-                          }}
+                          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
                           title={item.isVisible ? 'Hide from public' : 'Make visible'}
                         >
-                          {item.isVisible ? <Eye size={18} /> : <EyeOff size={18} />}
+                          {item.isVisible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                           <span>{item.isVisible ? 'Visible' : 'Hidden'}</span>
                         </button>
-                      </Flex>
 
-                      <Flex gap="m">
-                        <button
-                          onClick={() => editItem(item)}
-                          style={{
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            color: '#667eea',
-                            padding: '0.5rem',
-                          }}
-                          title="Edit"
-                        >
-                          <Edit size={20} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(item.id)}
-                          style={{
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            color: '#e53e3e',
-                            padding: '0.5rem',
-                          }}
-                          title="Delete"
-                        >
-                          <Trash2 size={20} />
-                        </button>
-                      </Flex>
-                    </Flex>
-                  ) : (
-                    <>
-                      {item.projectUrl && (
-                        <a href={item.projectUrl} target="_blank" rel="noopener noreferrer">
-                          <Button rank="secondary" style={{ width: '100%' }}>
-                            View Live Project →
-                          </Button>
-                        </a>
-                      )}
-                    </>
-                  )}
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => editItem(item)}
+                            className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+                            title="Edit"
+                          >
+                            <Edit className="w-5 h-5" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(item.id)}
+                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        {item.projectUrl && (
+                          <a
+                            href={item.projectUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                            View Live Project
+                          </a>
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
-              </Card>
-            ))}
-          </Grid>
-        )}
-
-        {/* CTA Section (Public View Only) */}
-        {!isOwnPortfolio && portfolio.length > 0 && (
-          <Card
-            padding="l"
-            style={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              color: 'white',
-            }}
-          >
-            <Flex justify-content="space-between" align-items="center">
-              <Flex flex-direction="column" gap="s">
-                <Text font-size="heading-s" style={{ color: 'white' }}>
-                  Impressed by this work?
-                </Text>
-                <Text font-size="body-l" style={{ color: 'rgba(255,255,255,0.9)' }}>
-                  Hire {freelancer.fullName} for your next project
-                </Text>
-              </Flex>
-              <Flex gap="m">
-                <Link href={`/freelancers/${freelancer.id}`}>
-                  <Button rank="secondary">View Profile</Button>
-                </Link>
-                <Button style={{ whiteSpace: 'nowrap' }}>Contact Freelancer</Button>
-              </Flex>
-            </Flex>
-          </Card>
-        )}
-
-        {/* Navigation Footer */}
-        <Flex gap="m" justify-content="center" padding="l">
-          {isOwnPortfolio ? (
-            <Link href="/dashboard">
-              <Button rank="tertiary">← Back to Dashboard</Button>
-            </Link>
-          ) : (
-            <Link href="/talents">
-              <Button rank="tertiary">← Browse More Talent</Button>
-            </Link>
+              ))}
+            </div>
           )}
-        </Flex>
-      </Flex>
+
+          {/* CTA Section (Public View Only) */}
+          {!isOwnPortfolio && portfolio.length > 0 && (
+            <div className="mt-8 bg-gradient-to-r from-primary-600 to-primary-700 rounded-lg p-6 text-white">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <h3 className="text-xl font-semibold mb-1">Impressed by this work?</h3>
+                  <p className="text-primary-100">Hire {freelancer.fullName} for your next project</p>
+                </div>
+                <div className="flex gap-3">
+                  <Link
+                    href={`/freelancers/${freelancer.id}`}
+                    className="px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors font-medium"
+                  >
+                    View Profile
+                  </Link>
+                  <button className="px-4 py-2 bg-white text-primary-700 rounded-lg hover:bg-primary-50 transition-colors font-medium whitespace-nowrap">
+                    Contact Freelancer
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Navigation Footer */}
+          <div className="flex justify-center mt-8">
+            {isOwnPortfolio ? (
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to Dashboard
+              </Link>
+            ) : (
+              <Link
+                href="/talents"
+                className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Browse More Talent
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
     </PageLayout>
   )
 }

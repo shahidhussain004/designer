@@ -6,9 +6,9 @@
 
 'use client';
 
-import React, { forwardRef, useEffect, useRef, useCallback } from 'react';
+import { announceToScreenReader, cn, lockBodyScroll, trapFocus } from '@/lib/design-system/utils';
+import React, { forwardRef, useCallback, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { cn, trapFocus, lockBodyScroll, announceToScreenReader } from '@/lib/design-system/utils';
 
 export interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Whether the modal is open */
@@ -178,7 +178,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
                   'p-2 rounded-full',
                   'text-secondary-400 hover:text-secondary-600',
                   'hover:bg-secondary-100',
-                  'focus:outline-none focus:ring-2 focus:ring-primary-500',
+                  'focus:outline-none focus:ring-2 focus:ring-input-focus',
                   'transition-colors duration-200'
                 )}
                 aria-label="Close dialog"
@@ -367,7 +367,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
               'flex-1 px-4 py-2.5 rounded-lg font-medium',
               'border border-secondary-300 text-secondary-700',
               'hover:bg-secondary-50 transition-colors',
-              'focus:outline-none focus:ring-2 focus:ring-primary-500',
+              'focus:outline-none focus:ring-2 focus:ring-input-focus',
               loading && 'opacity-50 cursor-not-allowed'
             )}
           >
@@ -383,7 +383,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
               'focus:outline-none focus:ring-2 focus:ring-offset-2',
               variant === 'danger'
                 ? 'bg-error-500 hover:bg-error-600 focus:ring-error-500'
-                : 'bg-primary-500 hover:bg-primary-600 focus:ring-primary-500',
+                : 'bg-primary-500 hover:bg-primary-600 focus:ring-input-focus',
               loading && 'opacity-50 cursor-not-allowed'
             )}
           >

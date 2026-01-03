@@ -1,6 +1,5 @@
 'use client'
 
-import { Div, Flex } from '@/components/green';
 import { Footer, Navbar } from '@/components/ui';
 import React from 'react';
 
@@ -9,25 +8,24 @@ interface PageLayoutProps {
   showNavbar?: boolean
   showFooter?: boolean
   title?: string
+  /** Use white background instead of gray */
+  whiteBg?: boolean
 }
 
 export default function PageLayout({ 
   children, 
   showNavbar = true, 
-  showFooter = true 
+  showFooter = true,
+  whiteBg = false,
 }: PageLayoutProps) {
   return (
-      <Flex 
-        flex-direction="column" 
-        min-height="100vh"
-        background="neutral-01"
-      >
-        {showNavbar && <Navbar />}
-        <Div flex="1" width="100%">
-          {children}
-        </Div>
-        {showFooter && <Footer />}
-      </Flex>
+    <div className={`flex flex-col min-h-screen ${whiteBg ? 'bg-white' : 'bg-gray-50'}`}>
+      {showNavbar && <Navbar />}
+      <main className="flex-1 w-full">
+        {children}
+      </main>
+      {showFooter && <Footer />}
+    </div>
   )
 }
 

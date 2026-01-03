@@ -1,10 +1,10 @@
 "use client"
 
 import { ErrorMessage } from '@/components/ErrorMessage'
-import { Badge, Button, Card, Divider, Flex, Grid, Text } from '@/components/green'
 import { LoadingSpinner } from '@/components/Skeletons'
 import { PageLayout } from '@/components/ui'
 import { useUserProfile } from '@/hooks/useUsers'
+import { ArrowLeft, Bookmark, Calendar, CheckCircle, ExternalLink, Mail, MapPin, MessageSquare, Phone, Star } from 'lucide-react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 
@@ -45,9 +45,9 @@ export default function FreelancerProfilePage() {
   if (isLoading) {
     return (
       <PageLayout>
-        <Flex justify-content="center" align-items="center" style={{ minHeight: '400px' }}>
+        <div className="min-h-[400px] flex items-center justify-center">
           <LoadingSpinner />
-        </Flex>
+        </div>
       </PageLayout>
     )
   }
@@ -55,263 +55,228 @@ export default function FreelancerProfilePage() {
   if (isError || !profile) {
     return (
       <PageLayout>
-        <Flex justify-content="center" align-items="center" style={{ minHeight: '400px' }}>
+        <div className="min-h-[400px] flex items-center justify-center">
           <ErrorMessage 
             message={error?.message || 'Failed to load profile'} 
             retry={() => refetch()}
           />
-        </Flex>
+        </div>
       </PageLayout>
     )
   }
 
   return (
     <PageLayout>
-      <Flex flex-direction="column" gap="l" padding="l">
-        {/* Hero Section with Profile Header */}
-        <div style={{
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          borderRadius: '12px',
-          padding: '2rem',
-          color: 'white',
-          position: 'relative',
-          overflow: 'hidden'
-        }}>
-          <Flex gap="l" align-items="start">
+      {/* Hero Section */}
+      <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-primary-900 text-white py-12 lg:py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
             {/* Avatar */}
-            <div style={{
-              width: '120px',
-              height: '120px',
-              borderRadius: '12px',
-              backgroundColor: 'rgba(255,255,255,0.2)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '48px',
-              fontWeight: 'bold',
-              color: 'white',
-              flexShrink: 0,
-              border: '3px solid rgba(255,255,255,0.3)'
-            }}>
+            <div className="w-24 h-24 lg:w-32 lg:h-32 rounded-xl bg-white/20 flex items-center justify-center text-4xl lg:text-5xl font-bold flex-shrink-0 border-2 border-white/30">
               {profile.fullName?.charAt(0).toUpperCase()}
             </div>
 
             {/* Profile Info */}
-            <Flex flex-direction="column" gap="m" style={{ flex: 1 }}>
-              <div>
-                <Text font-size="heading-l" style={{ color: 'white', marginBottom: '0.5rem' }}>
-                  {profile.fullName}
-                </Text>
-                <Text font-size="body-l" style={{ color: 'rgba(255,255,255,0.9)' }}>
-                  @{profile.username}
-                </Text>
-              </div>
+            <div className="flex-1">
+              <h1 className="text-2xl lg:text-3xl font-bold">{profile.fullName}</h1>
+              <p className="text-gray-300 text-lg">@{profile.username}</p>
 
-              <Flex gap="m" align-items="center">
+              <div className="flex flex-wrap items-center gap-4 mt-4">
                 {profile.location && (
-                  <Text font-size="body-l" style={{ color: 'rgba(255,255,255,0.9)' }}>
-                    📍 {profile.location}
-                  </Text>
+                  <span className="flex items-center gap-1 text-gray-300">
+                    <MapPin className="w-4 h-4" /> {profile.location}
+                  </span>
                 )}
                 {typeof profile.ratingAvg !== 'undefined' && (
-                  <Flex align-items="center" gap="s">
-                    <Text font-size="heading-xs" style={{ color: 'white' }}>
-                      ⭐ {profile.ratingAvg.toFixed(1)}
-                    </Text>
-                    <Text font-size="body-s" style={{ color: 'rgba(255,255,255,0.8)' }}>
-                      ({profile.ratingCount} reviews)
-                    </Text>
-                  </Flex>
+                  <span className="flex items-center gap-1">
+                    <Star className="w-5 h-5 text-yellow-400 fill-current" />
+                    <span className="font-semibold">{profile.ratingAvg.toFixed(1)}</span>
+                    <span className="text-gray-400">({profile.ratingCount} reviews)</span>
+                  </span>
                 )}
-              </Flex>
+              </div>
 
-              <Flex gap="l" align-items="center">
+              <div className="flex gap-6 mt-4">
                 {profile.hourlyRate && (
                   <div>
-                    <Text font-size="body-s" style={{ color: 'rgba(255,255,255,0.7)' }}>Hourly Rate</Text>
-                    <Text font-size="heading-s" style={{ color: 'white' }}>
-                      ${profile.hourlyRate}/hr
-                    </Text>
+                    <p className="text-xs text-gray-400">Hourly Rate</p>
+                    <p className="text-xl font-bold">${profile.hourlyRate}/hr</p>
                   </div>
                 )}
                 {typeof profile.completionRate !== 'undefined' && (
                   <div>
-                    <Text font-size="body-s" style={{ color: 'rgba(255,255,255,0.7)' }}>Job Success</Text>
-                    <Text font-size="heading-s" style={{ color: 'white' }}>
-                      {profile.completionRate}%
-                    </Text>
+                    <p className="text-xs text-gray-400">Job Success</p>
+                    <p className="text-xl font-bold">{profile.completionRate}%</p>
                   </div>
                 )}
-              </Flex>
-            </Flex>
+              </div>
+            </div>
 
-            {/* Action Button */}
-            <Flex flex-direction="column" gap="m" style={{ justifyContent: 'flex-start' }}>
-              <Button style={{ whiteSpace: 'nowrap' }}>
-                Contact Freelancer
-              </Button>
-              <Link href={`/portfolio/${profile.id}`}>
-                <Button rank="secondary" style={{ whiteSpace: 'nowrap' }}>
-                  View Portfolio
-                </Button>
+            {/* Action Buttons */}
+            <div className="flex flex-col gap-3 w-full lg:w-auto">
+              <button className="bg-primary-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors flex items-center justify-center gap-2">
+                <MessageSquare className="w-4 h-4" /> Contact Freelancer
+              </button>
+              <Link 
+                href={`/portfolio/${profile.id}`}
+                className="border border-white/30 text-white px-6 py-3 rounded-lg font-medium hover:bg-white/10 transition-colors text-center"
+              >
+                View Portfolio
               </Link>
-            </Flex>
-          </Flex>
+            </div>
+          </div>
         </div>
+      </div>
 
-        {/* Main Content Grid */}
-        <Grid columns="3" gap="l">
-          {/* Left Column - Bio & Skills */}
-          <Flex flex-direction="column" gap="l" style={{ gridColumn: '1 / 3' }}>
-            {/* Bio Section */}
-            {profile.bio && (
-              <Card padding="l">
-                <Flex flex-direction="column" gap="m">
-                  <Text font-size="heading-s">About</Text>
-                  <Text font-size="body-l" color="neutral-02">
-                    {profile.bio}
-                  </Text>
-                </Flex>
-              </Card>
-            )}
+      {/* Content */}
+      <div className="bg-gray-50 py-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Column - Main Content */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Bio Section */}
+              {profile.bio && (
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-3">About</h2>
+                  <p className="text-gray-600">{profile.bio}</p>
+                </div>
+              )}
 
-            {/* Skills Section */}
-            {profile.skills && profile.skills.length > 0 && (
-              <Card padding="l">
-                <Flex flex-direction="column" gap="m">
-                  <Text font-size="heading-s">Skills & Expertise</Text>
-                  <Flex gap="m" style={{ flexWrap: 'wrap' }}>
+              {/* Skills Section */}
+              {profile.skills && profile.skills.length > 0 && (
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-3">Skills & Expertise</h2>
+                  <div className="flex flex-wrap gap-2">
                     {profile.skills.map((skill, idx) => (
-                      <Badge key={idx} variant="information">
+                      <span 
+                        key={idx} 
+                        className="px-3 py-1 bg-primary-50 text-primary-700 rounded-full text-sm font-medium"
+                      >
                         {skill}
-                      </Badge>
+                      </span>
                     ))}
-                  </Flex>
-                </Flex>
-              </Card>
-            )}
+                  </div>
+                </div>
+              )}
 
-            {/* Contact Info */}
-            <Card padding="l">
-              <Flex flex-direction="column" gap="m">
-                <Text font-size="heading-s">Contact Information</Text>
-                <Flex flex-direction="column" gap="s">
+              {/* Contact Info */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Contact Information</h2>
+                <div className="space-y-3">
                   {profile.email && (
-                    <Flex gap="m">
-                      <Text font-size="body-s" color="neutral-02" style={{ minWidth: '80px' }}>
-                        Email:
-                      </Text>
-                      <Text font-size="body-l">{profile.email}</Text>
-                    </Flex>
+                    <div className="flex items-center gap-3">
+                      <Mail className="w-5 h-5 text-gray-400" />
+                      <span className="text-gray-700">{profile.email}</span>
+                    </div>
                   )}
                   {profile.phone && (
-                    <Flex gap="m">
-                      <Text font-size="body-s" color="neutral-02" style={{ minWidth: '80px' }}>
-                        Phone:
-                      </Text>
-                      <Text font-size="body-l">{profile.phone}</Text>
-                    </Flex>
+                    <div className="flex items-center gap-3">
+                      <Phone className="w-5 h-5 text-gray-400" />
+                      <span className="text-gray-700">{profile.phone}</span>
+                    </div>
                   )}
                   {profile.portfolioUrl && (
-                    <Flex gap="m">
-                      <Text font-size="body-s" color="neutral-02" style={{ minWidth: '80px' }}>
-                        Website:
-                      </Text>
-                      <a href={profile.portfolioUrl} target="_blank" rel="noopener noreferrer">
-                        <Text font-size="body-l" style={{ color: '#667eea' }}>
-                          {profile.portfolioUrl}
-                        </Text>
+                    <div className="flex items-center gap-3">
+                      <ExternalLink className="w-5 h-5 text-gray-400" />
+                      <a 
+                        href={profile.portfolioUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-primary-600 hover:text-primary-700"
+                      >
+                        {profile.portfolioUrl}
                       </a>
-                    </Flex>
+                    </div>
                   )}
-                </Flex>
-              </Flex>
-            </Card>
-          </Flex>
+                </div>
+              </div>
 
-          {/* Right Column - Stats */}
-          <Flex flex-direction="column" gap="l">
-            <Card padding="l">
-              <Flex flex-direction="column" gap="m">
-                <Text font-size="heading-s">Statistics</Text>
-                <Divider />
-                <Flex flex-direction="column" gap="m">
-                  <Flex justify-content="space-between" align-items="center">
-                    <Text font-size="body-l" color="neutral-02">Member Since</Text>
-                    <Text font-size="body-l" font-weight="bold">
+              {/* Reviews Section */}
+              {profile.reviews && profile.reviews.length > 0 && (
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                    Reviews ({profile.reviews.length})
+                  </h2>
+                  <div className="divide-y divide-gray-200">
+                    {profile.reviews.map(review => (
+                      <div key={review.id} className="py-4 first:pt-0 last:pb-0">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <p className="font-medium text-gray-900">{review.authorName}</p>
+                            <div className="flex items-center gap-1 text-yellow-400">
+                              {[...Array(5)].map((_, i) => (
+                                <Star 
+                                  key={i} 
+                                  className={`w-4 h-4 ${i < review.rating ? 'fill-current' : 'fill-none stroke-current'}`} 
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          <span className="text-sm text-gray-500">
+                            {new Date(review.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <p className="text-gray-600">{review.comment}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Right Column - Stats */}
+            <div className="space-y-6">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Statistics</h2>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span className="text-gray-500 flex items-center gap-2">
+                      <Calendar className="w-4 h-4" /> Member Since
+                    </span>
+                    <span className="font-semibold text-gray-900">
                       {profile.createdAt ? new Date(profile.createdAt).getFullYear() : 'N/A'}
-                    </Text>
-                  </Flex>
-                  <Divider />
-                  <Flex justify-content="space-between" align-items="center">
-                    <Text font-size="body-l" color="neutral-02">Job Success</Text>
-                    <Text font-size="body-l" font-weight="bold">
-                      {profile.completionRate || 0}%
-                    </Text>
-                  </Flex>
-                  <Divider />
-                  <Flex justify-content="space-between" align-items="center">
-                    <Text font-size="body-l" color="neutral-02">Rating</Text>
-                    <Text font-size="body-l" font-weight="bold">
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span className="text-gray-500 flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4" /> Job Success
+                    </span>
+                    <span className="font-semibold text-gray-900">{profile.completionRate || 0}%</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-gray-500 flex items-center gap-2">
+                      <Star className="w-4 h-4" /> Rating
+                    </span>
+                    <span className="font-semibold text-gray-900">
                       {profile.ratingAvg ? profile.ratingAvg.toFixed(1) : 'No ratings'}/5
-                    </Text>
-                  </Flex>
-                </Flex>
-              </Flex>
-            </Card>
+                    </span>
+                  </div>
+                </div>
+              </div>
 
-            {/* Quick Actions */}
-            <Card padding="l">
-              <Flex flex-direction="column" gap="m">
-                <Button style={{ width: '100%' }}>
-                  Send Message
-                </Button>
-                <Button rank="secondary" style={{ width: '100%' }}>
-                  Save Profile
-                </Button>
-              </Flex>
-            </Card>
-          </Flex>
-        </Grid>
+              {/* Quick Actions */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-3">
+                <button className="w-full bg-primary-600 text-white py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors flex items-center justify-center gap-2">
+                  <MessageSquare className="w-4 h-4" /> Send Message
+                </button>
+                <button className="w-full border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
+                  <Bookmark className="w-4 h-4" /> Save Profile
+                </button>
+              </div>
+            </div>
+          </div>
 
-        {/* Reviews Section */}
-        {profile.reviews && profile.reviews.length > 0 && (
-          <Card padding="l">
-            <Flex flex-direction="column" gap="m">
-              <Text font-size="heading-s">Reviews ({profile.reviews.length})</Text>
-              <Divider />
-              <Flex flex-direction="column" gap="m">
-                {profile.reviews.map(review => (
-                  <Flex key={review.id} flex-direction="column" gap="s">
-                    <Flex justify-content="space-between" align-items="start">
-                      <Flex flex-direction="column" gap="s">
-                        <Text font-size="body-l" font-weight="bold">
-                          {review.authorName}
-                        </Text>
-                        <Text font-size="body-s" color="neutral-02">
-                          ⭐ {review.rating}/5
-                        </Text>
-                      </Flex>
-                      <Text font-size="body-s" color="neutral-02">
-                        {new Date(review.createdAt).toLocaleDateString()}
-                      </Text>
-                    </Flex>
-                    <Text font-size="body-l">{review.comment}</Text>
-                    <Divider />
-                  </Flex>
-                ))}
-              </Flex>
-            </Flex>
-          </Card>
-        )}
-
-        {/* Navigation */}
-        <Flex gap="m" justify-content="center" padding="l">
-          <Link href="/talents">
-            <Button rank="tertiary">← Back to Talent List</Button>
-          </Link>
-        </Flex>
-      </Flex>
+          {/* Navigation */}
+          <div className="flex justify-center mt-8">
+            <Link 
+              href="/talents"
+              className="text-primary-600 hover:text-primary-700 flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" /> Back to Talent List
+            </Link>
+          </div>
+        </div>
+      </div>
     </PageLayout>
   )
 }

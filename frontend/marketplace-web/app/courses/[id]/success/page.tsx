@@ -1,15 +1,8 @@
 'use client';
 
-import {
-  Button,
-  Card,
-  Div,
-  Flex,
-  Spinner,
-  Text,
-} from '@/components/green';
 import { PageLayout } from '@/components/ui';
 import { Course, getCourseById } from '@/lib/courses';
+import { ArrowRight, BookOpen, CheckCircle, Clock, Loader2, PlayCircle } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -41,92 +34,106 @@ export default function CourseEnrollmentSuccessPage() {
 
   if (loading) {
     return (
-      <Flex justify-content="center" align-items="center">
-        <Spinner />
-      </Flex>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 text-primary-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-500">Loading...</p>
+        </div>
+      </div>
     );
   }
 
   return (
     <PageLayout>
-      <Div style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
-        <Flex flex-direction="column" align-items="center" gap="l" max-width="600px" padding="xl">
-          {/* Success Icon */}
-          <Div style={{ fontSize: '64px' }}>
-            <Text font-size="heading-xl">✓</Text>
-          </Div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
+        <div className="max-w-lg w-full">
+          {/* Success Card */}
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 text-center">
+            {/* Success Icon */}
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="w-10 h-10 text-green-600" />
+            </div>
 
-          {/* Success Title */}
-          <Text tag="h1" font-size="heading-xl" style={{ textAlign: 'center' }}>
-            Enrollment Successful!
-          </Text>
+            {/* Success Title */}
+            <h1 className="text-3xl font-bold text-gray-900 mb-3">
+              Enrollment Successful!
+            </h1>
 
-          {/* Success Message */}
-          <Text font-size="body-l" style={{ textAlign: 'center', lineHeight: '1.6' }}>
-            {course ? (
-              <>You&apos;re now enrolled in <strong style={{ fontWeight: '700' }}>{course.title}</strong>. Welcome to your learning journey!</>
-            ) : (
-              <>Your enrollment has been confirmed. Start learning right away!</>
+            {/* Success Message */}
+            <p className="text-gray-600 text-lg mb-6">
+              {course ? (
+                <>You&apos;re now enrolled in <span className="font-semibold text-gray-900">{course.title}</span>. Welcome to your learning journey!</>
+              ) : (
+                <>Your enrollment has been confirmed. Start learning right away!</>
+              )}
+            </p>
+
+            {/* Course Preview Card */}
+            {course && (
+              <div className="bg-gray-50 rounded-xl p-4 mb-6">
+                <div className="flex items-start gap-4">
+                  <div className="relative w-24 h-20 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
+                    {course.thumbnailUrl ? (
+                      <Image
+                        src={course.thumbnailUrl}
+                        alt={course.title}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <PlayCircle className="w-8 h-8 text-gray-400" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 text-left">
+                    <h3 className="font-semibold text-gray-900 text-sm mb-2">{course.title}</h3>
+                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                      <span className="flex items-center gap-1">
+                        <BookOpen className="w-3 h-3" />
+                        {course.lessonsCount} lessons
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {Math.floor(course.durationMinutes / 60)}h
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             )}
-          </Text>
 
-          {/* Course Preview Card */}
-          {course && (
-            <Card padding="l" style={{ width: '100%', marginTop: '12px' }}>
-              <Flex align-items="flex-start" gap="m">
-                <Div style={{ borderRadius: '8px', overflow: 'hidden', width: '120px', height: '100px', background: 'var(--color-background-secondary)', flexShrink: 0 }}>
-                  {course.thumbnailUrl ? (
-                    <Image
-                      src={course.thumbnailUrl}
-                      alt={course.title}
-                      fill
-                      style={{ objectFit: 'cover' }}
-                    />
-                  ) : (
-                    <Flex justify-content="center" align-items="center" height="100%">
-                      <Text font-size="heading-m">🎬</Text>
-                    </Flex>
-                  )}
-                </Div>
-                <Flex flex-direction="column" gap="s" flex="1">
-                  <Text font-weight="book" font-size="body-m">{course.title}</Text>
-                  <Flex gap="s" flex-wrap="wrap">
-                    <Flex align-items="center" gap="xs">
-                      <Text font-size="body-xs">📄</Text>
-                      <Text font-size="body-xs">{course.lessonsCount} lessons</Text>
-                    </Flex>
-                    <Flex align-items="center" gap="xs">
-                      <Text font-size="body-xs">⏱️</Text>
-                      <Text font-size="body-xs">{Math.floor(course.durationMinutes / 60)}h</Text>
-                    </Flex>
-                  </Flex>
-                </Flex>
-              </Flex>
-            </Card>
-          )}
-
-          {/* CTA Buttons */}
-          <Flex flex-direction="column" gap="m" style={{ width: '100%', marginTop: '12px' }}>
-            <Link href={`/courses/${courseId}/learn`} style={{ width: '100%' }}>
-              <Button rank="primary" style={{ width: '100%', padding: '12px 16px', fontSize: '16px', fontWeight: '600' }}>
+            {/* CTA Buttons */}
+            <div className="space-y-3">
+              <Link 
+                href={`/courses/${courseId}/learn`}
+                className="flex items-center justify-center gap-2 w-full py-3 px-6 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-semibold"
+              >
                 Start Learning
-              </Button>
-            </Link>
-            
-            <Link href="/dashboard" style={{ width: '100%' }}>
-              <Button rank="secondary" style={{ width: '100%', padding: '12px 16px', fontSize: '16px' }}>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              
+              <Link 
+                href="/dashboard"
+                className="flex items-center justify-center w-full py-3 px-6 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              >
                 Go to Dashboard
-              </Button>
-            </Link>
-          </Flex>
+              </Link>
+            </div>
 
-          {/* Confirmation Message */}
-          <Flex flex-direction="column" align-items="center" gap="s" padding="m" style={{ background: 'var(--color-background-secondary)', borderRadius: '8px', width: '100%', marginTop: '12px' }}>
-            <Text font-size="body-s" style={{ opacity: 0.9 }}>✓ Receipt sent to your email</Text>
-            <Text font-size="body-xs" style={{ opacity: 0.8 }}>You can access your course anytime from your dashboard</Text>
-          </Flex>
-        </Flex>
-      </Div>
+            {/* Confirmation Message */}
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+                <CheckCircle className="w-4 h-4 text-green-500" />
+                Receipt sent to your email
+              </div>
+              <p className="text-xs text-gray-400 mt-2">
+                You can access your course anytime from your dashboard
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </PageLayout>
   );
 }

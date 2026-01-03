@@ -1,8 +1,7 @@
 "use client"
 
-import { Card, Div, Flex } from '@/components/green'
-import { PageLayout } from '@/components/ui'
 import { dashboardService, Notification } from '@/lib/dashboard'
+import { Bell, Loader2, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 function formatTime(dateStr: string) {
@@ -21,32 +20,24 @@ function formatTime(dateStr: string) {
 
 function NotificationItem({ n, onDelete }: { n: Notification; onDelete: (id: number) => void }) {
   return (
-    <Card
-      variant={n.isRead ? 'primary' : 'information'}
-      style={{ marginBottom: 12, padding: '12px 16px' }}
-    >
-      <Flex justify-content="space-between" align-items="center">
-        <Div>
-          <div style={{ fontSize: 15, fontWeight: n.isRead ? 500 : 700, color: '#111827' }}>{n.title}</div>
-          <div style={{ fontSize: 13, color: '#6b7280', marginTop: 6 }}>{n.message}</div>
-          <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 8 }}>{formatTime(n.createdAt)}</div>
-        </Div>
-        <div style={{ marginLeft: 12 }}>
-          <button
-            onClick={() => onDelete(n.id)}
-            style={{
-              border: 'none',
-              background: 'transparent',
-              color: '#6b7280',
-              cursor: 'pointer'
-            }}
-            aria-label="Delete notification"
-          >
-            ✕
-          </button>
+    <div className={`bg-white rounded-lg shadow-sm border p-4 mb-3 ${n.isRead ? 'border-gray-200' : 'border-primary-300 bg-primary-50'}`}>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <h3 className={`text-sm ${n.isRead ? 'font-medium text-gray-900' : 'font-bold text-gray-900'}`}>
+            {n.title}
+          </h3>
+          <p className="text-sm text-gray-600 mt-1">{n.message}</p>
+          <p className="text-xs text-gray-400 mt-2">{formatTime(n.createdAt)}</p>
         </div>
-      </Flex>
-    </Card>
+        <button
+          onClick={() => onDelete(n.id)}
+          className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+          aria-label="Delete notification"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
   )
 }
 
@@ -75,23 +66,40 @@ export default function NotificationsPage() {
   }
 
   return (
-    <PageLayout>
-      <Div style={{ maxWidth: 980, margin: '32px auto', padding: '0 16px' }}>
-        <h1 style={{ fontSize: 24, margin: '0 0 12px' }}>Notifications</h1>
-        <p style={{ color: '#6b7280', marginTop: 0 }}>All your recent activity and important updates in one place.</p>
-
-        <div style={{ marginTop: 20 }}>
-          {loading ? (
-            <div style={{ padding: 24, textAlign: 'center', color: '#6b7280' }}>Loading…</div>
-          ) : notifications.length === 0 ? (
-            <div style={{ padding: 24, textAlign: 'center', color: '#6b7280' }}>No notifications</div>
-          ) : (
-            notifications.map(n => (
-              <NotificationItem key={n.id} n={n} onDelete={handleDelete} />
-            ))
-          )}
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-gray-900 text-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="flex items-center gap-3">
+            <Bell className="w-8 h-8" />
+            <div>
+              <h1 className="text-3xl font-bold">Notifications</h1>
+              <p className="text-gray-400 mt-1">All your recent activity and important updates in one place.</p>
+            </div>
+          </div>
         </div>
-      </Div>
-    </PageLayout>
+      </div>
+
+      {/* Content */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
+          </div>
+        ) : notifications.length === 0 ? (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+            <Bell className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900">No notifications</h3>
+            <p className="text-gray-500 mt-1">You&apos;re all caught up!</p>
+          </div>
+        ) : (
+          <div>
+            {notifications.map(n => (
+              <NotificationItem key={n.id} n={n} onDelete={handleDelete} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   )
 }
