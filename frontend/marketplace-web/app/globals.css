@@ -319,6 +319,32 @@
     border-color: #102a3f !important;
   }
 
+  /* Custom select styling: hide native arrow and use an inline SVG positioned
+     away from the right border so it aligns visually with left text padding. */
+  select:not([multiple]) {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    /* Match common left padding used across the app (px-4 -> 1rem) */
+    padding-right: 1rem;
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1rem;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2020%2020'%20fill='none'%20stroke='currentColor'%3E%3Cpath%20stroke-linecap='round'%20stroke-linejoin='round'%20stroke-width='1.5'%20d='M6%208l4%204%204-4'/%3E%3C/svg%3E");
+  }
+
+  /* Custom select with consistent chevron alignment */
+  .select-with-arrow {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1rem;
+    padding-right: 1rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M6 8l4 4 4-4' stroke='%23102a3f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  }
+
   /* Utility helper class for input focus using brand neutral color */
   .focus-input {
     --input-focus-color: #102a3f;
