@@ -131,7 +131,7 @@ export default function CoursesPage() {
               <select
                 value={selectedCategory}
                 onChange={(e) => { setSelectedCategory(e.target.value); setPage(0); }}
-                className="hidden lg:block px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-input-focus bg-white"
+                className="select-with-arrow hidden lg:block px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-input-focus bg-white"
               >
                 <option value="">All Categories</option>
                 {COURSE_CATEGORIES.map((cat) => (
@@ -143,7 +143,7 @@ export default function CoursesPage() {
               <select
                 value={selectedSkillLevel}
                 onChange={(e) => { setSelectedSkillLevel(e.target.value); setPage(0); }}
-                className="hidden lg:block px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-input-focus bg-white"
+                className="select-with-arrow hidden lg:block px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-input-focus bg-white"
               >
                 <option value="">All Levels</option>
                 {SKILL_LEVELS.map((level) => (
@@ -168,7 +168,7 @@ export default function CoursesPage() {
               <select
                 value={sortBy}
                 onChange={(e) => { setSortBy(e.target.value); setPage(0); }}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-input-focus bg-white"
+                className="select-with-arrow px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-input-focus bg-white"
               >
                 <option value="popular">Most Popular</option>
                 <option value="newest">Newest</option>
