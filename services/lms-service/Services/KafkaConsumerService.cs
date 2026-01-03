@@ -1,7 +1,10 @@
 using Confluent.Kafka;
+using Confluent.Kafka.Admin;
 using LmsService.Configuration;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace LmsService.Services;
 
@@ -41,6 +44,48 @@ public class KafkaConsumerService : BackgroundService
             "payments.succeeded",
             "users.created"
         };
+
+        // Ensure topics exist before subscribing. This uses the Admin client to create any missing topics
+        try
+        {
+            var adminConfig = new AdminClientConfig { BootstrapServers = _settings.BootstrapServers };
+            using var admin = new AdminClientBuilder(adminConfig).Build();
+            var meta = admin.GetMetadata(TimeSpan.FromSeconds(10));
+            var existing = new HashSet<string>(meta.Topics.Select(t => t.Topic));
+            var missing = topics.Where(t => !existing.Contains(t)).ToList();
+
+            if (missing.Any())
+            {
+                var specs = missing.Select(t =>
+                {
+                    var partitions = _settings.TopicPartitions != null && _settings.TopicPartitions.TryGetValue(t, out var p)
+                        ? p
+                        : _settings.DefaultNumPartitions;
+
+                    return new TopicSpecification
+                    {
+                        Name = t,
+                        NumPartitions = partitions,
+                        ReplicationFactor = _settings.DefaultReplicationFactor
+                    };
+                }).ToList();
+
+                try
+                {
+                    await admin.CreateTopicsAsync(specs);
+                    _logger.LogInformation("Created missing Kafka topics: {Topics}", string.Join(", ", missing));
+                }
+                catch (CreateTopicsException cex)
+                {
+                    // If topics already exist due to race or another broker, log and continue
+                    _logger.LogWarning(cex, "CreateTopicsAsync reported error (topics may already exist)");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to verify/create Kafka topics; consumer will still attempt to subscribe");
+        }
 
         _consumer.Subscribe(topics);
         _logger.LogInformation("Kafka consumer started, subscribed to topics: {Topics}", string.Join(", ", topics));

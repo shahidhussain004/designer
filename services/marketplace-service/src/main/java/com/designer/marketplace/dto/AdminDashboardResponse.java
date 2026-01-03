@@ -1,14 +1,14 @@
 package com.designer.marketplace.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
@@ -28,7 +28,7 @@ public class AdminDashboardResponse {
     private Long totalJobs;
     private Long openJobs;
     private Long completedJobs;
-    private Long activeJobs;
+    private Long closedJobs;
     
     // Proposal statistics
     private Long totalProposals;

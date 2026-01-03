@@ -4,7 +4,7 @@ import { authService } from './auth';
 
 export interface DashboardStats {
   totalJobsPosted?: number;
-  activeJobs?: number;
+  openJobs?: number;
   completedJobs?: number;
   totalProposalsReceived?: number;
   pendingProposals?: number;
@@ -41,7 +41,7 @@ export interface ProposalSummary {
 
 export interface ClientDashboard {
   stats: DashboardStats;
-  activeJobs: JobSummary[];
+  openJobs: JobSummary[];
   recentProposals: ProposalSummary[];
 }
 

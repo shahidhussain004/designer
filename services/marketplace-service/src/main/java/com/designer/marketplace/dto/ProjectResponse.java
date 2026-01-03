@@ -1,6 +1,7 @@
 package com.designer.marketplace.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.designer.marketplace.entity.Project;
 
@@ -20,7 +21,7 @@ public class ProjectResponse {
     private String title;
     private String description;
     private ProjectCategoryResponse category;
-    private String[] requiredSkills;
+    private List<String> requiredSkills;
     private Double budget;
     private String budgetType;
     private Integer duration;

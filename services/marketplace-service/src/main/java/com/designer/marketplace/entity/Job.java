@@ -11,9 +11,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -207,7 +204,7 @@ public class Job {
     // Status and tracking
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private JobStatus status = JobStatus.ACTIVE;
+    private JobStatus status = JobStatus.OPEN;
 
     @Column(name = "views_count")
     private Integer viewsCount = 0;
@@ -300,7 +297,7 @@ public class Job {
 
     public enum JobStatus {
         DRAFT,
-        ACTIVE,
+        OPEN,
         PAUSED,
         CLOSED,
         FILLED

@@ -36,7 +36,7 @@ public class JobService {
     private final UserRepository userRepository;
 
     /**
-     * Get all active jobs with filters
+     * Get all open jobs with filters
      */
     @Transactional(readOnly = true)
     public Page<JobResponse> getAllJobs(
@@ -53,7 +53,7 @@ public class JobService {
         PageRequest safePageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.unsorted());
 
         Page<Job> jobs = jobRepository.findByFilters(
-            Job.JobStatus.ACTIVE.name(),
+            "OPEN",
             categoryId,
             jobTypeStr,
             expLevelStr,
@@ -182,7 +182,7 @@ public class JobService {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found with id: " + jobId));
 
-        job.setStatus(Job.JobStatus.ACTIVE);
+        job.setStatus(Job.JobStatus.OPEN);
         job.setPublishedAt(LocalDateTime.now());
 
         Job saved = jobRepository.save(job);

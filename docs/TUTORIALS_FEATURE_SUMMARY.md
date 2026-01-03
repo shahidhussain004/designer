@@ -201,7 +201,7 @@ Created tables:
 
 ### Content Service .env
 ```env
-DATABASE_URL=postgresql://marketplace_user:marketplace_pass_dev@localhost:5432/content_db
+DATABASE_URL=postgresql://marketplace_user:marketplace_pass_dev@localhost:5432/marketplace_db
 NODE_ENV=development
 PORT=8083
 ```
@@ -226,7 +226,7 @@ PORT=8083
 ### 1. Start Content Service (Backend)
 ```powershell
 cd C:\playground\designer\services\content-service
-$env:DATABASE_URL='postgresql://marketplace_user:marketplace_pass_dev@localhost:5432/content_db'
+$env:DATABASE_URL='postgresql://marketplace_user:marketplace_pass_dev@localhost:5432/marketplace_db'
 npm run dev
 ```
 Running on: http://localhost:8083

@@ -1,6 +1,13 @@
 package com.designer.marketplace.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import com.designer.marketplace.dto.InvoiceDTOs.BillingInfo;
+import com.designer.marketplace.dto.InvoiceDTOs.InvoiceLineItem;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -100,20 +107,23 @@ public class Invoice {
     /**
      * Client's billing information (stored as JSON)
      */
-    @Column(name = "client_billing_info", columnDefinition = "TEXT")
-    private String clientBillingInfo;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "client_billing_info", columnDefinition = "json")
+    private BillingInfo clientBillingInfo;
 
     /**
      * Freelancer's billing information (stored as JSON)
      */
-    @Column(name = "freelancer_billing_info", columnDefinition = "TEXT")
-    private String freelancerBillingInfo;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "freelancer_billing_info", columnDefinition = "json")
+    private BillingInfo freelancerBillingInfo;
 
     /**
      * Line items for the invoice (stored as JSON array)
      */
-    @Column(name = "line_items", columnDefinition = "TEXT")
-    private String lineItems;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "line_items", columnDefinition = "json")
+    private List<InvoiceLineItem> lineItems;
 
     /**
      * Additional notes on the invoice

@@ -1,21 +1,21 @@
 // Types handled by 'any' casts
+import {
+  BriefcaseIcon,
+  ClockIcon,
+  CurrencyDollarIcon,
+  UsersIcon,
+} from '@heroicons/react/24/outline'
 import { useQuery } from '@tanstack/react-query'
-import { adminApi } from '../lib/api'
 import { Link } from 'react-router-dom'
 import {
-  Grid,
-  Flex,
-  Card,
-  Text,
   Badge,
+  Card,
+  Flex,
+  Grid,
   Spinner,
+  Text,
 } from '../components/green'
-import {
-  UsersIcon,
-  BriefcaseIcon,
-  CurrencyDollarIcon,
-  ClockIcon,
-} from '@heroicons/react/24/outline'
+import { adminApi } from '../lib/api'
 
 interface StatCard {
   name: string
@@ -45,8 +45,8 @@ export default function Dashboard() {
       changeType: 'positive',
     },
     {
-      name: 'Active Jobs',
-      value: stats?.activeJobs || 0,
+      name: 'Open Jobs',
+      value: stats?.openJobs || 0,
       icon: BriefcaseIcon,
       change: `${stats?.pendingJobs || 0} pending review`,
       changeType: 'neutral',

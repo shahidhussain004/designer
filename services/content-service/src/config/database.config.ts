@@ -2,7 +2,7 @@
 export const databaseConfig = {
   url:
     process.env.DATABASE_URL ||
-    'postgresql://postgres:password@localhost:5432/content_db?schema=public',
+    'postgresql://marketplace_user:marketplace_pass_dev@localhost:5432/marketplace_db?schema=content',
   logging: process.env.NODE_ENV === 'development',
 };
 

@@ -103,22 +103,44 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
 
   // Get featured content
   fastify.get<{ Querystring: LimitQuerystring }>('/featured', async (request, reply) => {
-    const limit = request.query.limit || 5;
-    const content = await contentService.findFeatured(limit);
-    return reply.send({
-      success: true,
-      data: content,
-    });
+    try {
+      const limit = parseInt(String(request.query.limit || 5), 10);
+      const content = await contentService.findFeatured(limit);
+      return reply.send({
+        success: true,
+        data: content,
+      });
+    } catch (error) {
+      fastify.log.error({ error }, 'Error fetching featured content');
+      return reply.status(500).send({
+        success: false,
+        error: {
+          code: 'FEATURED_FETCH_ERROR',
+          message: error instanceof Error ? error.message : 'Failed to fetch featured content',
+        },
+      });
+    }
   });
 
   // Get trending content
   fastify.get<{ Querystring: LimitQuerystring }>('/trending', async (request, reply) => {
-    const limit = request.query.limit || 10;
-    const content = await contentService.findTrending(limit);
-    return reply.send({
-      success: true,
-      data: content,
-    });
+    try {
+      const limit = parseInt(String(request.query.limit || 10), 10);
+      const content = await contentService.findTrending(limit);
+      return reply.send({
+        success: true,
+        data: content,
+      });
+    } catch (error) {
+      fastify.log.error({ error }, 'Error fetching trending content');
+      return reply.status(500).send({
+        success: false,
+        error: {
+          code: 'TRENDING_FETCH_ERROR',
+          message: error instanceof Error ? error.message : 'Failed to fetch trending content',
+        },
+      });
+    }
   });
 
   // Get recent content by type

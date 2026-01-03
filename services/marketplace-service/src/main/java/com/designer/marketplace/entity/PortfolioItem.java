@@ -2,6 +2,8 @@ package com.designer.marketplace.entity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -65,9 +67,20 @@ public class PortfolioItem {
     @Column(name = "project_url", length = 500)
     private String projectUrl;
 
-    @JdbcTypeCode(SqlTypes.ARRAY)
-    @Column(name = "technologies", columnDefinition = "TEXT[]")
-    private String[] technologies;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "technologies", columnDefinition = "json")
+    @Builder.Default
+    private List<String> technologies = new ArrayList<>();
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "images", columnDefinition = "json")
+    @Builder.Default
+    private List<String> images = new ArrayList<>();
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "tools_used", columnDefinition = "json")
+    @Builder.Default
+    private List<String> toolsUsed = new ArrayList<>();
 
     @Column(name = "end_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")

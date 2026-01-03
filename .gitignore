@@ -276,5 +276,11 @@ secrets/
 private/
 .git-credentials
 
+# ============================================================================
+# MongoDB Seed
+# ============================================================================
+config/mongodb-seed/archive/
+
 # Ignore repository backup folder
 backup/
+scripts_tests/
