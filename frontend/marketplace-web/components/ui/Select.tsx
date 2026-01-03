@@ -6,8 +6,8 @@
 
 'use client';
 
-import React, { forwardRef, useState, useRef, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/design-system/utils';
+import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 
 export interface SelectOption {
   value: string;
@@ -236,7 +236,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
             className={cn(
               'w-full flex items-center justify-between',
               'bg-white border rounded-lg transition-all duration-200',
-              'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500',
+              'focus:outline-none',
               sizes[size],
               error
                 ? 'border-error-300 focus:ring-error-500 focus:border-error-500'
@@ -303,7 +303,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
                     className={cn(
                       'w-full px-3 py-2 text-sm',
                       'border border-secondary-300 rounded-md',
-                      'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500'
+                      'focus:outline-none'
                     )}
                   />
                 </div>

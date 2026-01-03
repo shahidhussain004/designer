@@ -1,18 +1,9 @@
 'use client';
 
-import {
-  Alert,
-  Button,
-  Card,
-  Flex,
-  Input,
-  Select,
-  Text,
-  Textarea,
-} from '@/components/green';
 import { PageLayout } from '@/components/ui';
 import { useCreateJob } from '@/hooks/useJobs';
 import { useAuth } from '@/lib/auth';
+import { ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -95,12 +86,17 @@ export default function CreateJobPage() {
   if (!user) {
     return (
       <PageLayout>
-        <Flex flex-direction="column" padding="l" gap="m">
-          <Alert variant="negative">
-            Please log in to post a job
-          </Alert>
-          <Link href="/jobs">← Back to Jobs</Link>
-        </Flex>
+        <div className="bg-gray-50 min-h-screen py-12">
+          <div className="mx-auto max-w-4xl px-4">
+            <div className="bg-red-50 text-red-700 border border-red-200 rounded-lg px-4 py-3 flex items-center gap-2 mb-4">
+              <XCircle className="w-5 h-5" />
+              Please log in to post a job
+            </div>
+            <Link href="/jobs" className="text-primary-600 hover:text-primary-700 flex items-center gap-2">
+              <ArrowLeft className="w-4 h-4" /> Back to Jobs
+            </Link>
+          </div>
+        </div>
       </PageLayout>
     );
   }
@@ -108,229 +104,212 @@ export default function CreateJobPage() {
   if (user.role !== 'CLIENT') {
     return (
       <PageLayout>
-        <Flex flex-direction="column" padding="l" gap="m">
-          <Alert variant="negative">
-            Only clients can post jobs
-          </Alert>
-          <Link href="/jobs">← Back to Jobs</Link>
-        </Flex>
+        <div className="bg-gray-50 min-h-screen py-12">
+          <div className="mx-auto max-w-4xl px-4">
+            <div className="bg-red-50 text-red-700 border border-red-200 rounded-lg px-4 py-3 flex items-center gap-2 mb-4">
+              <XCircle className="w-5 h-5" />
+              Only clients can post jobs
+            </div>
+            <Link href="/jobs" className="text-primary-600 hover:text-primary-700 flex items-center gap-2">
+              <ArrowLeft className="w-4 h-4" /> Back to Jobs
+            </Link>
+          </div>
+        </div>
       </PageLayout>
     );
   }
 
   return (
     <PageLayout>
-      {createJob.isSuccess && (
-        <div style={{ padding: '1rem' }}>
-          <Alert variant="positive">
-            Job posted successfully! Redirecting...
-          </Alert>
+      {/* Header */}
+      <div className="bg-gray-900 text-white py-12 lg:py-16">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <Link href="/jobs" className="text-gray-300 hover:text-white flex items-center gap-2 mb-4">
+            <ArrowLeft className="w-4 h-4" /> Back to Jobs
+          </Link>
+          <h1 className="text-3xl lg:text-4xl font-bold">Post a New Job</h1>
+          <p className="text-gray-300 mt-2">Find the perfect candidate for your position</p>
         </div>
-      )}
+      </div>
 
-      {createJob.error && (
-        <div style={{ padding: '1rem' }}>
-          <Alert variant="negative">
-            {createJob.error instanceof Error ? createJob.error.message : 'Failed to create job'}
-          </Alert>
-        </div>
-      )}
+      {/* Content */}
+      <div className="bg-gray-50 py-8">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          {/* Alerts */}
+          {createJob.isSuccess && (
+            <div className="bg-green-50 text-green-700 border border-green-200 rounded-lg px-4 py-3 flex items-center gap-2 mb-6">
+              <CheckCircle className="w-5 h-5" />
+              Job posted successfully! Redirecting...
+            </div>
+          )}
 
-      <Flex flex-direction="column" gap="s" padding="l">
-        <Link href="/jobs">← Back to Jobs</Link>
-        <Text tag="h1" font-size="heading-xl">
-          Post a New Job
-        </Text>
-      </Flex>
+          {createJob.error && (
+            <div className="bg-red-50 text-red-700 border border-red-200 rounded-lg px-4 py-3 flex items-center gap-2 mb-6">
+              <XCircle className="w-5 h-5" />
+              {createJob.error instanceof Error ? createJob.error.message : 'Failed to create job'}
+            </div>
+          )}
 
-      <Flex padding="l">
-        <Card padding="l" style={{ maxWidth: '800px', width: '100%' }}>
-          <form onSubmit={handleSubmit}>
-            <Flex flex-direction="column" gap="l">
+          {/* Form */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <form onSubmit={handleSubmit} className="space-y-8">
               {/* Basic Information */}
-              <Flex flex-direction="column" gap="m">
-                <Text tag="h2" font-size="heading-m">
-                  Basic Information
-                </Text>
-
-                <Flex flex-direction="column" gap="xs">
-                  <Text tag="label" font-size="body-s">
-                    Job Title *
-                  </Text>
-                  <Input
-                    type="text"
-                    placeholder="e.g., Senior Full Stack Developer"
-                    value={formData.title}
-                    onChange={(e) =>
-                      setFormData({ ...formData, title: e.target.value })
-                    }
-                  />
-                  {fieldErrors.title && (
-                    <Text font-size="body-s" color="negative">
-                      {fieldErrors.title}
-                    </Text>
-                  )}
-                </Flex>
-
-                <Flex flex-direction="column" gap="xs">
-                  <Text tag="label" font-size="body-s">
-                    Company Name *
-                  </Text>
-                  <Input
-                    type="text"
-                    placeholder="Your company name"
-                    value={formData.companyName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, companyName: e.target.value })
-                    }
-                  />
-                  {fieldErrors.companyName && (
-                    <Text font-size="body-s" color="negative">
-                      {fieldErrors.companyName}
-                    </Text>
-                  )}
-                </Flex>
-
-                <Flex gap="m">
-                  <Flex flex-direction="column" gap="xs" flex="1">
-                    <Text tag="label" font-size="body-s">
-                      Job Type *
-                    </Text>
-                    <Select
-                      value={formData.jobType}
-                      onChange={(e) =>
-                        setFormData({ ...formData, jobType: e.target.value })
-                      }
-                    >
-                      <option value="FULL_TIME">Full Time</option>
-                      <option value="PART_TIME">Part Time</option>
-                      <option value="CONTRACT">Contract</option>
-                      <option value="TEMPORARY">Temporary</option>
-                    </Select>
-                  </Flex>
-
-                  <Flex flex-direction="column" gap="xs" flex="1">
-                    <Text tag="label" font-size="body-s">
-                      Location *
-                    </Text>
-                    <Input
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Basic Information</h2>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Job Title <span className="text-red-500">*</span>
+                    </label>
+                    <input
                       type="text"
-                      placeholder="e.g., Remote, New York, NY"
-                      value={formData.location}
-                      onChange={(e) =>
-                        setFormData({ ...formData, location: e.target.value })
-                      }
+                      placeholder="e.g., Senior Full Stack Developer"
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-transparent"
                     />
-                    {fieldErrors.location && (
-                      <Text font-size="body-s" color="negative">
-                        {fieldErrors.location}
-                      </Text>
+                    {fieldErrors.title && (
+                      <p className="text-sm text-red-600 mt-1">{fieldErrors.title}</p>
                     )}
-                  </Flex>
-                </Flex>
+                  </div>
 
-                <Flex flex-direction="column" gap="xs">
-                  <Text tag="label" font-size="body-s">
-                    Salary (Annual) *
-                  </Text>
-                  <Input
-                    type="number"
-                    placeholder="e.g., 100000"
-                    value={formData.salary || ''}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        salary: parseInt(e.target.value) || 0,
-                      })
-                    }
-                  />
-                  {fieldErrors.salary && (
-                    <Text font-size="body-s" color="negative">
-                      {fieldErrors.salary}
-                    </Text>
-                  )}
-                </Flex>
-              </Flex>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Company Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Your company name"
+                      value={formData.companyName}
+                      onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-transparent"
+                    />
+                    {fieldErrors.companyName && (
+                      <p className="text-sm text-red-600 mt-1">{fieldErrors.companyName}</p>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Job Type <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={formData.jobType}
+                        onChange={(e) => setFormData({ ...formData, jobType: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-transparent bg-white"
+                      >
+                        <option value="FULL_TIME">Full Time</option>
+                        <option value="PART_TIME">Part Time</option>
+                        <option value="CONTRACT">Contract</option>
+                        <option value="TEMPORARY">Temporary</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Location <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g., Remote, New York, NY"
+                        value={formData.location}
+                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-transparent"
+                      />
+                      {fieldErrors.location && (
+                        <p className="text-sm text-red-600 mt-1">{fieldErrors.location}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Salary (Annual) <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="e.g., 100000"
+                      value={formData.salary || ''}
+                      onChange={(e) => setFormData({ ...formData, salary: parseInt(e.target.value) || 0 })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-transparent"
+                    />
+                    {fieldErrors.salary && (
+                      <p className="text-sm text-red-600 mt-1">{fieldErrors.salary}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
 
               {/* Job Details */}
-              <Flex flex-direction="column" gap="m">
-                <Text tag="h2" font-size="heading-m">
-                  Job Details
-                </Text>
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Job Details</h2>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Description <span className="text-red-500">*</span>
+                    </label>
+                    <textarea
+                      placeholder="Describe the job role, responsibilities, and what you're looking for"
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      rows={6}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-transparent"
+                    />
+                    {fieldErrors.description && (
+                      <p className="text-sm text-red-600 mt-1">{fieldErrors.description}</p>
+                    )}
+                  </div>
 
-                <Flex flex-direction="column" gap="xs">
-                  <Text tag="label" font-size="body-s">
-                    Description *
-                  </Text>
-                  <Textarea
-                    placeholder="Describe the job role, responsibilities, and what you're looking for"
-                    value={formData.description}
-                    onChange={(e) =>
-                      setFormData({ ...formData, description: e.target.value })
-                    }
-                    style={{ minHeight: '200px' }}
-                  />
-                  {fieldErrors.description && (
-                    <Text font-size="body-s" color="negative">
-                      {fieldErrors.description}
-                    </Text>
-                  )}
-                </Flex>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Requirements <span className="text-red-500">*</span>
+                    </label>
+                    <textarea
+                      placeholder="List the key skills and experience required"
+                      value={formData.requirements}
+                      onChange={(e) => setFormData({ ...formData, requirements: e.target.value })}
+                      rows={4}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-transparent"
+                    />
+                    {fieldErrors.requirements && (
+                      <p className="text-sm text-red-600 mt-1">{fieldErrors.requirements}</p>
+                    )}
+                  </div>
 
-                <Flex flex-direction="column" gap="xs">
-                  <Text tag="label" font-size="body-s">
-                    Requirements *
-                  </Text>
-                  <Textarea
-                    placeholder="List the key skills and experience required"
-                    value={formData.requirements}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        requirements: e.target.value,
-                      })
-                    }
-                    style={{ minHeight: '150px' }}
-                  />
-                  {fieldErrors.requirements && (
-                    <Text font-size="body-s" color="negative">
-                      {fieldErrors.requirements}
-                    </Text>
-                  )}
-                </Flex>
-
-                <Flex flex-direction="column" gap="xs">
-                  <Text tag="label" font-size="body-s">
-                    Benefits
-                  </Text>
-                  <Textarea
-                    placeholder="Describe benefits, perks, and what makes your company great"
-                    value={formData.benefits}
-                    onChange={(e) =>
-                      setFormData({ ...formData, benefits: e.target.value })
-                    }
-                    style={{ minHeight: '150px' }}
-                  />
-                </Flex>
-              </Flex>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Benefits</label>
+                    <textarea
+                      placeholder="Describe benefits, perks, and what makes your company great"
+                      value={formData.benefits}
+                      onChange={(e) => setFormData({ ...formData, benefits: e.target.value })}
+                      rows={4}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-transparent"
+                    />
+                  </div>
+                </div>
+              </div>
 
               {/* Actions */}
-              <Flex gap="m" justify-content="flex-end">
-                <Link href="/jobs">
-                  <Button variant="neutral">Cancel</Button>
+              <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                <Link 
+                  href="/jobs"
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
                 </Link>
-                <Button
+                <button
                   type="submit"
-                  variant="brand"
                   disabled={createJob.isPending}
+                  className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 transition-colors"
                 >
                   {createJob.isPending ? 'Posting...' : 'Post Job'}
-                </Button>
-              </Flex>
-            </Flex>
-          </form>
-        </Card>
-      </Flex>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     </PageLayout>
   );
 }

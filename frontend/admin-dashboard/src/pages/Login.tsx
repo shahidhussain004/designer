@@ -1,16 +1,16 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useAuthStore } from '../store/authStore'
-import { authApi } from '../lib/api'
 import toast from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom'
 import {
-  Flex,
-  Card,
-  Text,
   Button,
-  Input,
+  Card,
   Divider,
+  Flex,
+  Input,
+  Text,
 } from '../components/green'
+import { authApi } from '../lib/api'
+import { useAuthStore } from '../store/authStore'
 
 export default function Login() {
   const [email, setEmail] = useState('')

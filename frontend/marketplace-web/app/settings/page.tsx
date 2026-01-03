@@ -1,8 +1,8 @@
 "use client"
 
-import { Alert, Button, Card, Divider, Flex, Input, Spinner, Text } from '@/components/green'
 import { PageLayout } from '@/components/ui'
 import { authService } from '@/lib/auth'
+import { Bell, CheckCircle, Key, LogOut, User, XCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -67,163 +67,166 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <PageLayout>
-        <Flex justify-content="center" align-items="center" min-height="50vh">
-          <Spinner />
-        </Flex>
+        <div className="min-h-[50vh] flex items-center justify-center">
+          <div className="w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full animate-spin" />
+        </div>
       </PageLayout>
     )
   }
 
   return (
     <PageLayout>
-      <Flex flex-direction="column" gap="l" padding="l" max-width="800px" margin="0 auto">
-        {/* Header */}
-        <div>
-          <Text font-size="heading-l">Settings</Text>
-          <Text font-size="body-s" color="neutral-02">
-            Manage your account settings and preferences
-          </Text>
+      {/* Header */}
+      <div className="bg-gray-900 text-white py-12 lg:py-16">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <h1 className="text-3xl font-bold">Settings</h1>
+          <p className="text-gray-300 mt-1">Manage your account settings and preferences</p>
         </div>
+      </div>
 
-        {/* Notification */}
-        {notification && (
-          <Alert variant={notification.type === 'success' ? 'positive' : 'negative'}>
-            {notification.message}
-          </Alert>
-        )}
+      {/* Content */}
+      <div className="bg-gray-50 py-8">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 space-y-6">
+          {/* Notification */}
+          {notification && (
+            <div className={`px-4 py-3 rounded-lg flex items-center gap-2 ${
+              notification.type === 'success' 
+                ? 'bg-green-50 text-green-700 border border-green-200' 
+                : 'bg-red-50 text-red-700 border border-red-200'
+            }`}>
+              {notification.type === 'success' ? (
+                <CheckCircle className="w-5 h-5" />
+              ) : (
+                <XCircle className="w-5 h-5" />
+              )}
+              {notification.message}
+            </div>
+          )}
 
-        {/* Password Change Card */}
-        <Card padding="l">
-          <Flex flex-direction="column" gap="m">
-            <Text font-size="heading-s">Change Password</Text>
-            <Divider />
-
-            <div>
-              <Text font-size="body-s" style={{ marginBottom: '0.5rem' }}>Current Password</Text>
-              <Input
-                type="password"
-                value={passwordData.currentPassword}
-                onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                placeholder="Enter current password"
-              />
+          {/* Password Change Card */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center gap-2 mb-4 pb-4 border-b border-gray-200">
+              <Key className="w-5 h-5 text-gray-500" />
+              <h2 className="text-lg font-semibold text-gray-900">Change Password</h2>
             </div>
 
-            <div>
-              <Text font-size="body-s" style={{ marginBottom: '0.5rem' }}>New Password</Text>
-              <Input
-                type="password"
-                value={passwordData.newPassword}
-                onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                placeholder="Enter new password"
-              />
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+                <input
+                  type="password"
+                  value={passwordData.currentPassword}
+                  onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                  placeholder="Enter current password"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                <input
+                  type="password"
+                  value={passwordData.newPassword}
+                  onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                  placeholder="Enter new password"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+                <input
+                  type="password"
+                  value={passwordData.confirmPassword}
+                  onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                  placeholder="Confirm new password"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none"
+                />
+              </div>
+
+              <div className="flex justify-end">
+                <button 
+                  onClick={handlePasswordChange}
+                  className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+                >
+                  Update Password
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Email Notifications Card */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center gap-2 mb-4 pb-4 border-b border-gray-200">
+              <Bell className="w-5 h-5 text-gray-500" />
+              <h2 className="text-lg font-semibold text-gray-900">Email Notifications</h2>
             </div>
 
-            <div>
-              <Text font-size="body-s" style={{ marginBottom: '0.5rem' }}>Confirm New Password</Text>
-              <Input
-                type="password"
-                value={passwordData.confirmPassword}
-                onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                placeholder="Confirm new password"
-              />
+            <div className="space-y-4">
+              {[
+                { key: 'jobAlerts', title: 'Job Alerts', desc: 'Receive notifications for new jobs matching your skills' },
+                { key: 'proposalUpdates', title: 'Proposal Updates', desc: 'Get notified when your proposals are reviewed' },
+                { key: 'messages', title: 'Messages', desc: 'Receive email notifications for new messages' },
+                { key: 'newsletter', title: 'Newsletter', desc: 'Stay updated with tips, news, and platform updates' },
+              ].map((item) => (
+                <div key={item.key} className="flex items-center justify-between py-2">
+                  <div>
+                    <p className="font-medium text-gray-900">{item.title}</p>
+                    <p className="text-sm text-gray-500">{item.desc}</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={emailNotifications[item.key as keyof typeof emailNotifications]}
+                      onChange={(e) => setEmailNotifications({ ...emailNotifications, [item.key]: e.target.checked })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                  </label>
+                </div>
+              ))}
+
+              <div className="flex justify-end pt-4">
+                <button 
+                  onClick={handleNotificationSave}
+                  className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+                >
+                  Save Preferences
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Account Actions */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center gap-2 mb-4 pb-4 border-b border-gray-200">
+              <User className="w-5 h-5 text-gray-500" />
+              <h2 className="text-lg font-semibold text-gray-900">Account Actions</h2>
             </div>
 
-            <Flex justify-content="flex-end">
-              <Button onClick={handlePasswordChange}>
-                Update Password
-              </Button>
-            </Flex>
-          </Flex>
-        </Card>
-
-        {/* Email Notifications Card */}
-        <Card padding="l">
-          <Flex flex-direction="column" gap="m">
-            <Text font-size="heading-s">Email Notifications</Text>
-            <Divider />
-
-            <Flex justify-content="space-between" align-items="center">
-              <div>
-                <Text font-size="body-regular-m">Job Alerts</Text>
-                <Text font-size="body-s" color="neutral-02">Receive notifications for new jobs matching your skills</Text>
-              </div>
-              <input
-                type="checkbox"
-                checked={emailNotifications.jobAlerts}
-                onChange={(e) => setEmailNotifications({ ...emailNotifications, jobAlerts: e.target.checked })}
-                style={{ width: '20px', height: '20px', cursor: 'pointer' }}
-              />
-            </Flex>
-
-            <Flex justify-content="space-between" align-items="center">
-              <div>
-                <Text font-size="body-regular-m">Proposal Updates</Text>
-                <Text font-size="body-s" color="neutral-02">Get notified when your proposals are reviewed</Text>
-              </div>
-              <input
-                type="checkbox"
-                checked={emailNotifications.proposalUpdates}
-                onChange={(e) => setEmailNotifications({ ...emailNotifications, proposalUpdates: e.target.checked })}
-                style={{ width: '20px', height: '20px', cursor: 'pointer' }}
-              />
-            </Flex>
-
-            <Flex justify-content="space-between" align-items="center">
-              <div>
-                <Text font-size="body-regular-m">Messages</Text>
-                <Text font-size="body-s" color="neutral-02">Receive email notifications for new messages</Text>
-              </div>
-              <input
-                type="checkbox"
-                checked={emailNotifications.messages}
-                onChange={(e) => setEmailNotifications({ ...emailNotifications, messages: e.target.checked })}
-                style={{ width: '20px', height: '20px', cursor: 'pointer' }}
-              />
-            </Flex>
-
-            <Flex justify-content="space-between" align-items="center">
-              <div>
-                <Text font-size="body-regular-m">Newsletter</Text>
-                <Text font-size="body-s" color="neutral-02">Stay updated with tips, news, and platform updates</Text>
-              </div>
-              <input
-                type="checkbox"
-                checked={emailNotifications.newsletter}
-                onChange={(e) => setEmailNotifications({ ...emailNotifications, newsletter: e.target.checked })}
-                style={{ width: '20px', height: '20px', cursor: 'pointer' }}
-              />
-            </Flex>
-
-            <Flex justify-content="flex-end">
-              <Button onClick={handleNotificationSave}>
-                Save Preferences
-              </Button>
-            </Flex>
-          </Flex>
-        </Card>
-
-        {/* Account Actions */}
-        <Card padding="l">
-          <Flex flex-direction="column" gap="m">
-            <Text font-size="heading-s">Account Actions</Text>
-            <Divider />
-
-            <Flex gap="m">
-              <Button variant="neutral" onClick={() => router.push('/profile')}>
+            <div className="flex gap-3">
+              <button 
+                onClick={() => router.push('/profile')}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              >
                 View Profile
-              </Button>
-              <Button variant="negative" onClick={() => {
-                if (confirm('Are you sure you want to log out?')) {
-                  authService.logout()
-                  router.push('/')
-                }
-              }}>
+              </button>
+              <button 
+                onClick={() => {
+                  if (confirm('Are you sure you want to log out?')) {
+                    authService.logout()
+                    router.push('/')
+                  }
+                }}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
+              >
+                <LogOut className="w-4 h-4" />
                 Log Out
-              </Button>
-            </Flex>
-          </Flex>
-        </Card>
-      </Flex>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </PageLayout>
   )
 }

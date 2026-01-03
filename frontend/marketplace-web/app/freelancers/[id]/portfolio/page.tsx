@@ -1,10 +1,10 @@
 "use client"
 
 import { ErrorMessage } from '@/components/ErrorMessage'
-import { Button, Card, Divider, Flex, Grid, Text } from '@/components/green'
 import { LoadingSpinner } from '@/components/Skeletons'
 import { PageLayout } from '@/components/ui'
 import { useUserPortfolio, useUserProfile } from '@/hooks/useUsers'
+import { ArrowLeft, ExternalLink } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
@@ -48,9 +48,9 @@ export default function FreelancerPortfolioPage() {
   if (loading) {
     return (
       <PageLayout>
-        <Flex justify-content="center" align-items="center" style={{ minHeight: '400px' }}>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <LoadingSpinner />
-        </Flex>
+        </div>
       </PageLayout>
     )
   }
@@ -58,7 +58,7 @@ export default function FreelancerPortfolioPage() {
   if (error || !freelancer) {
     return (
       <PageLayout>
-        <Flex justify-content="center" align-items="center" style={{ minHeight: '400px' }}>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <ErrorMessage 
             message={errorMessage || 'Failed to load portfolio'} 
             retry={() => {
@@ -66,98 +66,70 @@ export default function FreelancerPortfolioPage() {
               refetchPortfolio()
             }}
           />
-        </Flex>
+        </div>
       </PageLayout>
     )
   }
 
   return (
     <PageLayout>
-      <Flex flex-direction="column" gap="l" padding="l">
-        {/* Header Section */}
-        <div>
-          {/* Breadcrumb & Navigation */}
-          <Flex gap="m" align-items="center" style={{ marginBottom: '1.5rem' }}>
-            <Link href="/talents">
-              <Button rank="tertiary" size="small">← Back to Talent</Button>
-            </Link>
-            <Text font-size="body-s" color="neutral-02">/</Text>
-            <Link href={`/freelancers/${freelancer.id}`}>
-              <Button rank="tertiary" size="small">View Profile</Button>
-            </Link>
-          </Flex>
-
-          {/* Page Title */}
-          <Flex gap="m" align-items="start">
-            <div style={{
-              width: '80px',
-              height: '80px',
-              borderRadius: '12px',
-              backgroundColor: '#667eea',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '36px',
-              fontWeight: 'bold',
-              color: 'white',
-              flexShrink: 0
-            }}>
-              {freelancer.fullName?.charAt(0).toUpperCase()}
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-gray-900 text-white py-12">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Breadcrumb & Navigation */}
+            <div className="flex items-center gap-3 mb-6">
+              <Link href="/talents" className="inline-flex items-center gap-2 text-gray-400 hover:text-white">
+                <ArrowLeft className="w-4 h-4" />
+                Back to Talent
+              </Link>
+              <span className="text-gray-600">/</span>
+              <Link href={`/freelancers/${freelancer.id}`} className="text-gray-400 hover:text-white">
+                View Profile
+              </Link>
             </div>
-            <Flex flex-direction="column" gap="s" style={{ flex: 1 }}>
-              <Text font-size="heading-l">{freelancer.fullName}&rsquo;s Portfolio</Text>
-              <Text font-size="body-l" color="neutral-02">
-                @{freelancer.username}
-              </Text>
-              {(freelancer.hourlyRate || freelancer.ratingAvg) && (
-                <Flex gap="l" align-items="center">
-                  {freelancer.hourlyRate && (
-                    <Text font-size="body-l">💰 ${freelancer.hourlyRate}/hr</Text>
-                  )}
-                  {typeof freelancer.ratingAvg !== 'undefined' && (
-                    <Text font-size="body-l">
-                      ⭐ {freelancer.ratingAvg.toFixed(1)} ({freelancer.ratingCount} reviews)
-                    </Text>
-                  )}
-                </Flex>
-              )}
-            </Flex>
-          </Flex>
+
+            {/* Page Title */}
+            <div className="flex gap-4 items-start">
+              <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-3xl font-bold text-white flex-shrink-0">
+                {freelancer.fullName?.charAt(0).toUpperCase()}
+              </div>
+              <div className="flex-1">
+                <h1 className="text-2xl font-bold mb-1">{freelancer.fullName}&rsquo;s Portfolio</h1>
+                <p className="text-gray-400">@{freelancer.username}</p>
+                {(freelancer.hourlyRate || freelancer.ratingAvg) && (
+                  <div className="flex gap-4 mt-3">
+                    {freelancer.hourlyRate && (
+                      <span className="text-white">💰 ${freelancer.hourlyRate}/hr</span>
+                    )}
+                    {typeof freelancer.ratingAvg !== 'undefined' && (
+                      <span className="text-gray-300">
+                        ⭐ {freelancer.ratingAvg.toFixed(1)} ({freelancer.ratingCount} reviews)
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
-        <Divider />
-
-        {/* Portfolio Content */}
-        {portfolio.length === 0 ? (
-          <Card padding="xl">
-            <Flex flex-direction="column" align-items="center" gap="m">
-              <Text font-size="heading-s">No Portfolio Items</Text>
-              <Text font-size="body-l" color="neutral-02">
+        {/* Content */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Portfolio Content */}
+          {portfolio.length === 0 ? (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No Portfolio Items</h3>
+              <p className="text-gray-500">
                 This freelancer has not added any portfolio items yet
-              </Text>
-            </Flex>
-          </Card>
-        ) : (
-          <Flex flex-direction="column" gap="l">
-            {/* Portfolio Grid */}
-            <Grid columns="2" gap="l">
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               {portfolio.map(item => (
-                <Card key={item.id} padding="0" style={{ overflow: 'hidden' }}>
+                <div key={item.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                   {/* Image Section */}
-                  <div style={{
-                    width: '100%',
-                    height: '250px',
-                    backgroundColor: '#f0f0f0',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    overflow: 'hidden',
-                    background: 'linear-gradient(135deg, #667eea15 0%, #764ba215 100%)',
-                    fontSize: '14px',
-                    color: '#999',
-                    textAlign: 'center',
-                    padding: '1rem'
-                  }}>
+                  <div className="relative h-64 bg-gradient-to-br from-primary-50 to-gray-100">
                     {item.imageUrl && (
                       <Image
                         src={item.imageUrl}
@@ -170,94 +142,89 @@ export default function FreelancerPortfolioPage() {
                   </div>
 
                   {/* Content Section */}
-                  <div style={{ padding: '1.5rem' }}>
-                    <Flex flex-direction="column" gap="m">
-                      {/* Title */}
-                      <Text font-size="heading-s">{item.title}</Text>
+                  <div className="p-6">
+                    {/* Title */}
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.title}</h3>
 
-                      {/* Description */}
-                      <Text font-size="body-l" color="neutral-02" style={{ lineHeight: '1.6' }}>
-                        {item.description}
-                      </Text>
+                    {/* Description */}
+                    <p className="text-gray-600 mb-4 line-clamp-3">{item.description}</p>
 
-                      {/* Technologies */}
-                      {item.technologies && item.technologies.length > 0 && (
-                        <Flex gap="s" style={{ flexWrap: 'wrap' }}>
-                          {item.technologies.map((tech, idx) => (
-                            <div
-                              key={idx}
-                              style={{
-                                padding: '0.35rem 0.75rem',
-                                backgroundColor: '#667eea20',
-                                borderRadius: '20px',
-                                fontSize: '0.875rem',
-                                color: '#667eea',
-                                fontWeight: 500
-                              }}
-                            >
-                              {tech}
-                            </div>
-                          ))}
-                        </Flex>
-                      )}
+                    {/* Technologies */}
+                    {item.technologies && item.technologies.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {item.technologies.map((tech, idx) => (
+                          <span
+                            key={idx}
+                            className="px-3 py-1 bg-primary-50 text-primary-700 rounded-full text-sm font-medium"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    )}
 
-                      {/* Metadata */}
-                      {item.completionDate && (
-                        <Text font-size="body-s" color="neutral-02">
-                          📅 Completed: {new Date(item.completionDate).toLocaleDateString()}
-                        </Text>
-                      )}
+                    {/* Metadata */}
+                    {item.completionDate && (
+                      <p className="text-sm text-gray-500 mb-4">
+                        📅 Completed: {new Date(item.completionDate).toLocaleDateString()}
+                      </p>
+                    )}
 
-                      <Divider />
+                    <hr className="border-gray-200 my-4" />
 
-                      {/* Actions */}
-                      {item.projectUrl && (
-                        <a href={item.projectUrl} target="_blank" rel="noopener noreferrer">
-                          <Button rank="secondary" style={{ width: '100%' }}>
-                            View Live Project →
-                          </Button>
-                        </a>
-                      )}
-                    </Flex>
+                    {/* Actions */}
+                    {item.projectUrl && (
+                      <a
+                        href={item.projectUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        View Live Project
+                      </a>
+                    )}
                   </div>
-                </Card>
+                </div>
               ))}
-            </Grid>
-          </Flex>
-        )}
+            </div>
+          )}
 
-        {/* Bottom CTA */}
-        <Card padding="l" style={{
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          color: 'white'
-        }}>
-          <Flex justify-content="space-between" align-items="center">
-            <Flex flex-direction="column" gap="s">
-              <Text font-size="heading-s" style={{ color: 'white' }}>
-                Impressed by this work?
-              </Text>
-              <Text font-size="body-l" style={{ color: 'rgba(255,255,255,0.9)' }}>
-                Hire {freelancer.fullName} for your next project
-              </Text>
-            </Flex>
-            <Flex gap="m">
-              <Link href={`/freelancers/${freelancer.id}`}>
-                <Button rank="secondary">View Profile</Button>
-              </Link>
-              <Button style={{ whiteSpace: 'nowrap' }}>
-                Contact Freelancer
-              </Button>
-            </Flex>
-          </Flex>
-        </Card>
+          {/* Bottom CTA */}
+          {portfolio.length > 0 && (
+            <div className="bg-gradient-to-r from-primary-600 to-primary-700 rounded-lg p-6 text-white mb-8">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <h3 className="text-xl font-semibold mb-1">Impressed by this work?</h3>
+                  <p className="text-primary-100">Hire {freelancer.fullName} for your next project</p>
+                </div>
+                <div className="flex gap-3">
+                  <Link
+                    href={`/freelancers/${freelancer.id}`}
+                    className="px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors font-medium"
+                  >
+                    View Profile
+                  </Link>
+                  <button className="px-4 py-2 bg-white text-primary-700 rounded-lg hover:bg-primary-50 transition-colors font-medium whitespace-nowrap">
+                    Contact Freelancer
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
-        {/* Footer Navigation */}
-        <Flex gap="m" justify-content="center" padding="l">
-          <Link href="/talents">
-            <Button rank="tertiary">← Browse More Talent</Button>
-          </Link>
-        </Flex>
-      </Flex>
+          {/* Footer Navigation */}
+          <div className="flex justify-center">
+            <Link
+              href="/talents"
+              className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Browse More Talent
+            </Link>
+          </div>
+        </div>
+      </div>
     </PageLayout>
   )
 }

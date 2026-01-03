@@ -1,37 +1,41 @@
-import { Card, Flex, Text } from '@/components/green';
 import { PageLayout } from '@/components/ui';
 import ContactForm from './ContactForm';
 
 export default function ContactPage() {
   return (
     <PageLayout>
-      <Flex flex-direction="column" gap="l" padding="l" style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <div>
-          <Text font-size="heading-l">Contact Us</Text>
-          <Text font-size="body-l" color="neutral-02">
+      {/* Page Header */}
+      <div className="bg-gray-900 text-white py-16 lg:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
+          <p className="text-gray-300 text-lg max-w-2xl">
             Get in touch with us! We would love to hear from you.
-          </Text>
+          </p>
         </div>
+      </div>
 
-        <Card padding="l">
-          <ContactForm />
-        </Card>
+      <div className="bg-gray-50 py-16 lg:py-20">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 space-y-8">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+            <ContactForm />
+          </div>
 
-        <Card padding="m">
-          <Flex flex-direction="column" gap="m">
-            <Text font-size="heading-5">Other Ways to Reach Us</Text>
-            <Text font-size="body-m">
-              📧 Email: support@designer-marketplace.com
-            </Text>
-            <Text font-size="body-m">
-              📞 Phone: +1 (555) 123-4567
-            </Text>
-            <Text font-size="body-m">
-              🏢 Address: 123 Design Street, Creative City, CA 94000
-            </Text>
-          </Flex>
-        </Card>
-      </Flex>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+            <h2 className="text-2xl font-bold mb-6">Other Ways to Reach Us</h2>
+            <div className="space-y-4">
+              <p className="text-gray-700 text-lg">
+                📧 Email: support@designer-marketplace.com
+              </p>
+              <p className="text-gray-700 text-lg">
+                📞 Phone: +1 (555) 123-4567
+              </p>
+              <p className="text-gray-700 text-lg">
+                🏢 Address: 123 Design Street, Creative City, CA 94000
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </PageLayout>
   )
 }

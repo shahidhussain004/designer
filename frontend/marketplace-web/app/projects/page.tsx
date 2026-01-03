@@ -1,16 +1,6 @@
 'use client';
 
 import { ErrorMessage } from '@/components/ErrorMessage';
-import {
-  Badge,
-  Button,
-  Card,
-  Divider,
-  Flex,
-  Grid,
-  Input,
-  Text,
-} from '@/components/green';
 import { JobsSkeleton } from '@/components/Skeletons';
 import { PageLayout } from '@/components/ui';
 import { useExperienceLevels, useProjectCategories, useProjects } from '@/hooks/useProjects';
@@ -128,392 +118,167 @@ function ProjectsPageContent() {
 
   // Render project card based on view mode
   const renderProjectCard = (project: Project) => {
-    switch (viewMode) {
-      case 'compact':
-        return (
-          <Card
-            key={project.id}
-            padding="m"
-            className="hover:shadow-md transition-shadow cursor-pointer"
-            role="button"
-            tabIndex={0}
-            onClick={() => router.push(`/projects/${project.id}`)}
-            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && router.push(`/projects/${project.id}`)}
+    return (
+      <div
+        key={project.id}
+        className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-lg hover:border-primary-300 transition-all cursor-pointer group"
+        onClick={() => router.push(`/projects/${project.id}`)}
+        onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && router.push(`/projects/${project.id}`)}
+        role="button"
+        tabIndex={0}
+      >
+        <div className="flex flex-col h-full">
+          <div className="flex justify-between items-start mb-3">
+            <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-primary-100 text-primary-700">
+              {project.category?.name ?? 'Uncategorized'}
+            </span>
+            <span className={`inline-block px-3 py-1 text-xs font-medium rounded-full ${
+              project.status === 'OPEN' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+            }`}>
+              {project.status}
+            </span>
+          </div>
+          
+          <h4 className="text-lg font-semibold mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">
+            {project.title}
+          </h4>
+          
+          <p className="text-sm text-gray-500 mb-3">
+            Posted by {project.client?.fullName || 'Unknown'} • {formatDate(project.createdAt)}
+          </p>
+          
+          <p className="text-gray-600 text-sm line-clamp-3 mb-4 flex-grow">
+            {project.description}
+          </p>
+          
+          <div className="border-t border-gray-200 pt-4 mt-auto">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm text-gray-500">Budget</span>
+              <span className="text-lg font-bold text-green-600">${project.budget?.toLocaleString() || '0'}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-500">Level</span>
+              <span className="text-sm text-gray-700">{project.experienceLevel?.name ?? 'Any'}</span>
+            </div>
+          </div>
+          
+          <button
+            onClick={(e) => { e.stopPropagation(); router.push(`/projects/${project.id}`); }}
+            className="mt-4 w-full py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors group-hover:border-primary-300 group-hover:text-primary-600"
           >
-            <Flex justify-content="space-between" align-items="flex-start" gap="m">
-              <Flex flex-direction="column" gap="xs" flex="1">
-                <Text tag="h4" font-size="body-l" font-weight="book">
-                  {project.title}
-                </Text>
-                <Text font-size="body-s" color="secondary">
-                  {project.client.fullName} • {project.category.name}
-                </Text>
-              </Flex>
-              <Flex flex-direction="column" gap="xs" align-items="flex-end">
-                <Text font-size="body-l" font-weight="book" color="positive">
-                  ${project.budget.toLocaleString()}
-                </Text>
-                <Badge variant={project.status === 'OPEN' ? 'positive' : 'information'} className="text-xs">
-                  {project.status}
-                </Badge>
-                <Button rank="secondary" onClick={(e) => { e.stopPropagation(); router.push(`/projects/${project.id}`); }} className="mt-2">
-                  View Details →
-                </Button>
-              </Flex>
-            </Flex>
-          </Card>
-        );
-
-      case 'list':
-        return (
-          <Card key={project.id} padding="l" className="hover:shadow-md transition-shadow">
-            <Flex flex-direction="column" gap="m">
-              <Flex justify-content="space-between" align-items="flex-start">
-                <Flex flex-direction="column" gap="xs" flex="1">
-                  <Text tag="h3" font-size="heading-s" className="cursor-pointer hover:text-primary-600 transition-colors" onClick={() => router.push(`/projects/${project.id}`)}>
-                    {project.title}
-                  </Text>
-                  <Text font-size="body-s" color="secondary">
-                    Posted by {project.client.fullName} • {formatDate(project.createdAt)}
-                  </Text>
-                </Flex>
-                <Text font-size="heading-s" color="positive" className="whitespace-nowrap ml-4">
-                  ${project.budget.toLocaleString()}
-                </Text>
-              </Flex>
-
-              <Text className="line-clamp-2 text-secondary-700">
-                {project.description.length > 250
-                  ? `${project.description.substring(0, 250)}...`
-                  : project.description}
-              </Text>
-
-              <Flex gap="s" align-items="center" className="flex-wrap">
-                <Badge variant="notice">{project.category?.name ?? '—'}</Badge>
-                <Badge variant="information">{project.experienceLevel?.name ?? '—'}</Badge>
-                <Badge variant={project.status === 'OPEN' ? 'positive' : 'information'}>
-                  {project.status}
-                </Badge>
-              </Flex>
-
-              <Divider />
-
-              <Flex justify-content="flex-end">
-                <Button
-                  rank="secondary"
-                  onClick={() => router.push(`/projects/${project.id}`)}
-                >
-                  View Details →
-                </Button>
-              </Flex>
-            </Flex>
-          </Card>
-        );
-
-      case 'grid':
-      default:
-        return (
-          <Card
-            key={project.id}
-            padding="l"
-            className="h-full flex flex-col hover:shadow-lg transition-shadow cursor-pointer hover:scale-105 transform"
-            role="button"
-            tabIndex={0}
-            onClick={() => router.push(`/projects/${project.id}`)}
-            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && router.push(`/projects/${project.id}`)}
-          >
-            <Flex flex-direction="column" gap="m" flex="1">
-              <Flex flex-direction="column" gap="xs" flex="1">
-                <Badge variant="notice" className="w-fit">{project.category.name}</Badge>
-                <Text tag="h4" font-size="heading-s" className="line-clamp-2">
-                  {project.title}
-                </Text>
-                <Text font-size="body-s" color="secondary">
-                  {project.client.fullName}
-                </Text>
-              </Flex>
-
-              <Text className="line-clamp-3 text-sm text-secondary-600">
-                {project.description}
-              </Text>
-
-              <Divider />
-
-              <Flex flex-direction="column" gap="s">
-                <Flex justify-content="space-between" align-items="center">
-                  <Text font-size="body-s" color="secondary">
-                    Budget
-                  </Text>
-                  <Text font-size="body-l" font-weight="book" color="positive">
-                    ${project.budget.toLocaleString()}
-                  </Text>
-                </Flex>
-                <Flex justify-content="space-between" align-items="center">
-                  <Text font-size="body-s" color="secondary">
-                    Level
-                  </Text>
-                  <Text font-size="body-s">{project.experienceLevel?.name ?? '—'}</Text>
-                </Flex>
-              </Flex>
-
-              <Flex gap="s" align-items="center" className="mt-auto pt-2">
-                <Badge variant={project.status === 'OPEN' ? 'positive' : 'information'} className="flex-1 text-center">
-                  {project.status}
-                </Badge>
-                <Text font-size="body-xs" color="secondary" className="whitespace-nowrap">
-                  {formatDate(project.createdAt)}
-                </Text>
-                <div className="ml-3">
-                  <Button rank="secondary" onClick={(e) => { e.stopPropagation(); router.push(`/projects/${project.id}`); }}>
-                    View Details →
-                  </Button>
-                </div>
-              </Flex>
-            </Flex>
-          </Card>
-        );
-    }
+            View Details →
+          </button>
+        </div>
+      </div>
+    );
   };
 
   return (
     <PageLayout>
-      <Flex flex-direction="column" gap="l" padding="l" className="max-w-7xl mx-auto w-full">
+      <div className="min-h-screen bg-gray-50">
         {/* Page Header */}
-        <Flex flex-direction="column" gap="s">
-          <Text tag="h1" font-size="heading-l">
-            ✨ Find Your Next Work
-          </Text>
-          <Text color="secondary" font-size="body-l">
-            Discover curated opportunities matched to your expertise
-          </Text>
-        </Flex>
+        <div className="bg-gray-900 text-white py-16 lg:py-20">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <h1 className="text-4xl font-bold mb-4">Find Your Next Project</h1>
+            <p className="text-gray-300 text-lg max-w-2xl">
+              Discover curated opportunities matched to your expertise
+            </p>
+            <p className="text-gray-400 mt-2">
+              {projects.length} project{projects.length !== 1 ? 's' : ''} available
+            </p>
+          </div>
+        </div>
 
-        {/* Search Bar */}
-        <Card padding="m" variant="information" className="shadow-sm">
-          <Flex gap="m" align-items="flex-end">
-            <Flex flex="1">
-              <Input
-                label="Search by project title, skills, or keywords"
-                value={searchQuery}
-                onInput={(e: Event) => setSearchQuery((e.target as HTMLInputElement).value)}
-                placeholder="e.g., Logo Design, Web Development..."
-              />
-            </Flex>
-            <Button onClick={handleApplyFilters} className="whitespace-nowrap">
-              🔍 Search
-            </Button>
-          </Flex>
-        </Card>
-
-        {/* View Controls Bar */}
-        <Card padding="m" className="border-secondary-200">
-          <Flex justify-content="space-between" align-items="center" className="flex-wrap gap-4">
-            {/* Left: Filter Toggle and Count */}
-            <Flex align-items="center" gap="m">
-              <Button
-                rank="secondary"
-                onClick={() => setFiltersOpen(!filtersOpen)}
-                className="lg:hidden"
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+          {/* Search and Filter Bar */}
+          <div className="sticky top-0 z-10 bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-8">
+            <div className="flex flex-col lg:flex-row gap-4">
+              <div className="flex-1">
+                <input
+                  type="text"
+                  placeholder="Search by project title, skills, or keywords..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
+                />
+              </div>
+              <select
+                value={categoryId}
+                onChange={(e) => setCategoryId(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
               >
-                {filtersOpen ? '✕ Hide' : '⊞ Show'} Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
-              </Button>
-              <Text font-size="body-s" color="secondary" className="hidden lg:block">
-                Showing {projects.length} project{projects.length !== 1 ? 's' : ''}
-                {activeFilterCount > 0 && ` • ${activeFilterCount} filter${activeFilterCount !== 1 ? 's' : ''} applied`}
-              </Text>
-            </Flex>
-
-            {/* Center: Sort Dropdown */}
-            <Flex gap="s" align-items="center">
-              <Text font-size="body-s" color="secondary" className="hidden sm:block">
-                Sort by:
-              </Text>
+                <option value="">All Categories</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id.toString()}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={experienceLevelId}
+                onChange={(e) => setExperienceLevelId(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
+              >
+                <option value="">All Levels</option>
+                {experienceLevels.map((level) => (
+                  <option key={level.id} value={level.id.toString()}>
+                    {level.name}
+                  </option>
+                ))}
+              </select>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as SortBy)}
-                className="px-3 py-2 border border-secondary-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
               >
-                <option value="recent">📅 Most Recent</option>
-                <option value="budget-high">💰 Highest Budget</option>
-                <option value="budget-low">💵 Lowest Budget</option>
+                <option value="recent">Most Recent</option>
+                <option value="budget-high">Highest Budget</option>
+                <option value="budget-low">Lowest Budget</option>
               </select>
-            </Flex>
-
-            {/* Right: View Mode Toggle */}
-            <Flex gap="xs" className="border border-secondary-200 rounded-lg p-1">
               <button
-                onClick={() => setViewMode('list')}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  viewMode === 'list'
-                    ? 'bg-primary-500 text-white'
-                    : 'text-secondary-600 hover:bg-secondary-100'
-                }`}
-                title="List View"
+                onClick={handleApplyFilters}
+                className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
               >
-                ≡ List
+                Search
               </button>
+              {activeFilterCount > 0 && (
+                <button
+                  onClick={handleClearFilters}
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Results */}
+          {isLoading ? (
+            <JobsSkeleton />
+          ) : error ? (
+            <div className="bg-white rounded-lg shadow-sm border border-red-200 p-8">
+              <ErrorMessage message={(error as Error).message} retry={refetch} />
+            </div>
+          ) : sortedProjects.length === 0 ? (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+              <p className="text-xl text-gray-500 mb-4">No projects found</p>
+              <p className="text-gray-400 mb-6 max-w-sm mx-auto">
+                Try adjusting your search filters or check back later for new opportunities
+              </p>
               <button
-                onClick={() => setViewMode('grid')}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  viewMode === 'grid'
-                    ? 'bg-primary-500 text-white'
-                    : 'text-secondary-600 hover:bg-secondary-100'
-                }`}
-                title="Grid View"
+                onClick={handleClearFilters}
+                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                ⊞ Grid
+                Clear All Filters
               </button>
-              <button
-                onClick={() => setViewMode('compact')}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  viewMode === 'compact'
-                    ? 'bg-primary-500 text-white'
-                    : 'text-secondary-600 hover:bg-secondary-100'
-                }`}
-                title="Compact View"
-              >
-                ≣ Compact
-              </button>
-            </Flex>
-          </Flex>
-        </Card>
-
-        {/* Outer grid: sidebar (1) + content (2) on large screens */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Filters Sidebar (left) */}
-          {filtersOpen && (
-            <Card padding="l" className="col-span-1 lg:col-span-1 h-fit sticky top-20 max-h-[calc(100vh-120px)] overflow-y-auto">
-              <Flex flex-direction="column" gap="m">
-                <Text tag="h3" font-size="heading-s">
-                  🎯 Filters
-                </Text>
-
-                <Divider />
-
-                {/* Category Filter */}
-                <Flex flex-direction="column" gap="xs">
-                  <Text font-size="body-s" font-weight="book">
-                    Category
-                  </Text>
-                  <select
-                    value={categoryId}
-                    onChange={(e) => setCategoryId(e.target.value)}
-                    className="w-full px-3 py-2 border border-secondary-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
-                  >
-                    <option value="">All Categories</option>
-                    {categories.map((cat) => (
-                      <option key={cat.id} value={cat.id.toString()}>
-                        {cat.name}
-                      </option>
-                    ))}
-                  </select>
-                </Flex>
-
-                {/* Experience Level Filter */}
-                <Flex flex-direction="column" gap="xs">
-                  <Text font-size="body-s" font-weight="book">
-                    Experience Level
-                  </Text>
-                  <select
-                    value={experienceLevelId}
-                    onChange={(e) => setExperienceLevelId(e.target.value)}
-                    className="w-full px-3 py-2 border border-secondary-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
-                  >
-                    <option value="">All Levels</option>
-                    {experienceLevels.map((level) => (
-                      <option key={level.id} value={level.id.toString()}>
-                        {level.name}
-                      </option>
-                    ))}
-                  </select>
-                </Flex>
-
-                {/* Budget Range */}
-                <Flex flex-direction="column" gap="xs">
-                  <Text font-size="body-s" font-weight="book">
-                    Budget Range
-                  </Text>
-                  <Flex gap="s" flex-direction="column">
-                    <Input
-                      label="Min Budget"
-                      type="number"
-                      value={minBudget}
-                      onInput={(e: Event) => setMinBudget((e.target as HTMLInputElement).value)}
-                      placeholder="Min"
-                    />
-                    <Input
-                      label="Max Budget"
-                      type="number"
-                      value={maxBudget}
-                      onInput={(e: Event) => setMaxBudget((e.target as HTMLInputElement).value)}
-                      placeholder="Max"
-                    />
-                  </Flex>
-                </Flex>
-
-                <Divider />
-
-                {/* Filter Actions */}
-                <Flex flex-direction="column" gap="s">
-                  <Button onClick={handleApplyFilters} className="w-full">
-                    ✓ Apply Filters
-                  </Button>
-                  {activeFilterCount > 0 && (
-                    <Button rank="secondary" onClick={handleClearFilters} className="w-full">
-                      ✕ Clear All
-                    </Button>
-                  )}
-                </Flex>
-              </Flex>
-            </Card>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {sortedProjects.map((project) => renderProjectCard(project))}
+            </div>
           )}
-
-          {/* projects List/Grid (right) */}
-          <Flex flex-direction="column" gap="m" className="col-span-1 lg:col-span-2">
-            {isLoading ? (
-              <JobsSkeleton />
-            ) : error ? (
-              <Card padding="l" variant="negative">
-                <ErrorMessage message={(error as Error).message} retry={refetch} />
-              </Card>
-            ) : sortedProjects.length === 0 ? (
-              <Card padding="xl" className="text-center">
-                <Flex flex-direction="column" align-items="center" gap="m">
-                  <Text font-size="heading-s" color="secondary">
-                    🔍 No projects found
-                  </Text>
-                  <Text color="secondary" className="max-w-sm">
-                    Try adjusting your search filters or check back later for new opportunities
-                  </Text>
-                  <Button rank="secondary" onClick={handleClearFilters}>
-                    Clear All Filters
-                  </Button>
-                </Flex>
-              </Card>
-            ) : (
-              <>
-                {/* projects Count Summary on Mobile */}
-                <Text font-size="body-s" color="secondary" className="lg:hidden px-2">
-                  Found {projects.length} project{projects.length !== 1 ? 's' : ''}
-                  {activeFilterCount > 0 && ` • ${activeFilterCount} filter${activeFilterCount !== 1 ? 's' : ''} active`}
-                </Text>
-
-                {/* Grid layout for grid view mode */}
-                {viewMode === 'grid' && (
-                  <Grid columns="1; m{2} l{3}" gap="m">
-                    {sortedProjects.map((project) => renderProjectCard(project))}
-                  </Grid>
-                )}
-
-                {/* Stack layout for list/compact view modes */}
-                {(viewMode === 'list' || viewMode === 'compact') && (
-                  sortedProjects.map((project) => renderProjectCard(project))
-                )}
-              </>
-            )}
-          </Flex>
         </div>
-      </Flex>
+      </div>
     </PageLayout>
   );
 }

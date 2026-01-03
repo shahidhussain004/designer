@@ -4,8 +4,8 @@
  * Accessible form input with label, helper text, and error states
  */
 
-import React, { forwardRef, useId } from 'react';
 import { cn } from '@/lib/design-system/utils';
+import React, { forwardRef, useId } from 'react';
 
 export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   /** Label text */
@@ -115,8 +115,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               'w-full rounded-md border bg-white text-secondary-900',
               'placeholder:text-secondary-400',
               'transition-all duration-200',
-              // Focus styles
-              'focus:outline-none focus:ring-2 focus:ring-offset-0',
+              // Focus styles handled by global CSS (uses --input-focus)
+              'focus:outline-none',
               // Size
               inputSizes[size],
               // Left padding for addon
@@ -126,7 +126,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               // States
               hasError
                 ? 'border-error-500 focus:border-error-500 focus:ring-error-200'
-                : 'border-secondary-300 hover:border-secondary-400 focus:border-primary-500 focus:ring-primary-200',
+                : 'border-secondary-300 hover:border-secondary-400',
               // Disabled
               disabled && 'bg-secondary-50 cursor-not-allowed opacity-50',
               className
