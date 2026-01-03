@@ -45,10 +45,10 @@ public class JobController {
     private final JobService jobService;
 
     /**
-     * Get all active jobs with optional filters
+     * Get all open jobs with optional filters
      */
     @GetMapping
-    @Operation(summary = "Get all active jobs", description = "Retrieve paginated list of active job postings")
+    @Operation(summary = "Get all open jobs", description = "Retrieve paginated list of open job postings")
     public ResponseEntity<Page<JobResponse>> getAllJobs(
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) String jobType,
@@ -112,7 +112,7 @@ public class JobController {
      * Get all job categories
      */
     @GetMapping("/categories")
-    @Operation(summary = "Get all job categories", description = "Retrieve list of all active job categories")
+    @Operation(summary = "Get all job categories", description = "Retrieve list of all open job categories")
     public ResponseEntity<List<JobCategory>> getAllCategories() {
         List<JobCategory> categories = jobService.getAllCategories();
         return ResponseEntity.ok(categories);
@@ -193,7 +193,7 @@ public class JobController {
     @PostMapping("/{id}/publish")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'CLIENT')")
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "Publish a job", description = "Change job status from draft to active")
+    @Operation(summary = "Publish a job", description = "Change job status from draft to open")
     public ResponseEntity<JobResponse> publishJob(
             @PathVariable Long id,
             @AuthenticationPrincipal UserPrincipal currentUser) {

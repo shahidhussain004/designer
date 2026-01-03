@@ -1,5 +1,7 @@
 package com.designer.marketplace.dto;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +14,7 @@ public class UpdateProjectRequest {
     private String title;
     private String description;
     private Long categoryId;
-    private String[] requiredSkills;
+    private List<String> requiredSkills;
     private Double budget;
     private String budgetType;
     private Integer duration;

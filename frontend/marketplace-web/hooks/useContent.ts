@@ -140,7 +140,7 @@ export function useResources(filters?: { category?: string; tag?: string }) {
   return useQuery({
     queryKey: ['resources', filters],
     queryFn: async ({ signal }) => {
-      const { data } = await contentClient.get('/resources', {
+      const { data } = await contentClient.get('/content', {
         params: filters,
         signal,
       });
@@ -158,7 +158,7 @@ export function useResource(slug: string | null) {
     queryKey: ['resource', slug],
     queryFn: async ({ signal }) => {
       if (!slug) throw new Error('Resource slug is required');
-      const { data } = await contentClient.get(`/resources/${slug}`, { signal });
+      const { data } = await contentClient.get(`/content/${slug}`, { signal });
       return (data as any).data || data;
     },
     enabled: !!slug,

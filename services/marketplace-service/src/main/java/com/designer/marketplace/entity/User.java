@@ -1,6 +1,8 @@
 package com.designer.marketplace.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import org.hibernate.annotations.JdbcTypeCode;
@@ -68,8 +70,9 @@ public class User {
     @Column(name = "hourly_rate", columnDefinition = "NUMERIC(10,2)")
     private Double hourlyRate;
 
-    @Column(columnDefinition = "TEXT", name = "skills")
-    private String skills; // Stored as comma-separated string, converted to array in service layer
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "skills", columnDefinition = "json")
+    private List<String> skills = new ArrayList<>();
 
     @Column(name = "portfolio_url", length = 500)
     private String portfolioUrl;
@@ -99,13 +102,13 @@ public class User {
     @Column(name = "linkedin_url", length = 500)
     private String linkedinUrl;
 
-    @JdbcTypeCode(SqlTypes.ARRAY)
-    @Column(columnDefinition = "TEXT[]", name = "certifications")
-    private String certifications; // Stored as comma-separated string
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "certifications", columnDefinition = "json")
+    private List<String> certifications = new ArrayList<>();
 
-    @JdbcTypeCode(SqlTypes.ARRAY)
-    @Column(columnDefinition = "TEXT[]", name = "languages")
-    private String languages; // Stored as comma-separated string
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "languages", columnDefinition = "json")
+    private List<String> languages = new ArrayList<>();
 
     @Column(name = "experience_years")
     private Integer experienceYears;
@@ -144,7 +147,8 @@ public class User {
     public enum UserRole {
         CLIENT,
         FREELANCER,
-        ADMIN
+        ADMIN,
+        EMPLOYER // Backward compatibility - same as CLIENT
     }
     
     // Also expose as Role for backward compatibility
@@ -152,6 +156,7 @@ public class User {
         public static final UserRole CLIENT = UserRole.CLIENT;
         public static final UserRole FREELANCER = UserRole.FREELANCER;
         public static final UserRole ADMIN = UserRole.ADMIN;
+        public static final UserRole EMPLOYER = UserRole.EMPLOYER;
     }
 
     // Default constructor
@@ -161,10 +166,10 @@ public class User {
     // All-args constructor
     public User(Long id, String email, String username, String passwordHash, String fullName,
                 UserRole role, String bio, String profileImageUrl, String location, String phone,
-                Double hourlyRate, String[] skills, String portfolioUrl, String stripeCustomerId,
+                Double hourlyRate, List<String> skills, String portfolioUrl, String stripeCustomerId,
                 String stripeAccountId, Boolean emailVerified, Boolean isActive, Double ratingAvg,
-                Integer ratingCount, String githubUrl, String linkedinUrl, String[] certifications,
-                String[] languages, Integer experienceYears, VerificationStatus verificationStatus,
+                Integer ratingCount, String githubUrl, String linkedinUrl, List<String> certifications,
+                List<String> languages, Integer experienceYears, VerificationStatus verificationStatus,
                 Boolean identityVerified, LocalDateTime identityVerifiedAt, Double completionRate,
                 Double responseTimeHours, Double responseRate, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
@@ -178,7 +183,7 @@ public class User {
         this.location = location;
         this.phone = phone;
         this.hourlyRate = hourlyRate;
-        this.skills = (skills == null || skills.length == 0) ? "" : String.join(", ", skills);
+        this.skills = (skills == null) ? new ArrayList<>() : new ArrayList<>(skills);
         this.portfolioUrl = portfolioUrl;
         this.stripeCustomerId = stripeCustomerId;
         this.stripeAccountId = stripeAccountId;
@@ -188,8 +193,8 @@ public class User {
         this.ratingCount = ratingCount;
         this.githubUrl = githubUrl;
         this.linkedinUrl = linkedinUrl;
-        this.certifications = (certifications == null || certifications.length == 0) ? "" : String.join(", ", certifications);
-        this.languages = (languages == null || languages.length == 0) ? "" : String.join(", ", languages);
+        this.certifications = (certifications == null) ? new ArrayList<>() : new ArrayList<>(certifications);
+        this.languages = (languages == null) ? new ArrayList<>() : new ArrayList<>(languages);
         this.experienceYears = experienceYears;
         this.verificationStatus = verificationStatus;
         this.identityVerified = identityVerified;
@@ -213,8 +218,8 @@ public class User {
     public String getLocation() { return location; }
     public String getPhone() { return phone; }
     public Double getHourlyRate() { return hourlyRate; }
-    public String[] getSkills() { 
-        return (skills == null || skills.isEmpty()) ? new String[0] : skills.split(",\\s*"); 
+    public List<String> getSkills() { 
+        return (skills == null) ? new ArrayList<>() : skills; 
     }
     public String getPortfolioUrl() { return portfolioUrl; }
     public String getStripeCustomerId() { return stripeCustomerId; }
@@ -225,11 +230,11 @@ public class User {
     public Integer getRatingCount() { return ratingCount; }
     public String getGithubUrl() { return githubUrl; }
     public String getLinkedinUrl() { return linkedinUrl; }
-    public String[] getCertifications() { 
-        return (certifications == null || certifications.isEmpty()) ? new String[0] : certifications.split(",\\s*"); 
+    public List<String> getCertifications() { 
+        return (certifications == null) ? new ArrayList<>() : certifications; 
     }
-    public String[] getLanguages() { 
-        return (languages == null || languages.isEmpty()) ? new String[0] : languages.split(",\\s*"); 
+    public List<String> getLanguages() { 
+        return (languages == null) ? new ArrayList<>() : languages; 
     }
     public Integer getExperienceYears() { return experienceYears; }
     public VerificationStatus getVerificationStatus() { return verificationStatus; }
@@ -253,8 +258,8 @@ public class User {
     public void setLocation(String location) { this.location = location; }
     public void setPhone(String phone) { this.phone = phone; }
     public void setHourlyRate(Double hourlyRate) { this.hourlyRate = hourlyRate; }
-    public void setSkills(String[] skills) { 
-        this.skills = (skills == null || skills.length == 0) ? "" : String.join(", ", skills); 
+    public void setSkills(List<String> skills) { 
+        this.skills = (skills == null) ? new ArrayList<>() : new ArrayList<>(skills); 
     }
     public void setPortfolioUrl(String portfolioUrl) { this.portfolioUrl = portfolioUrl; }
     public void setStripeCustomerId(String stripeCustomerId) { this.stripeCustomerId = stripeCustomerId; }
@@ -265,11 +270,11 @@ public class User {
     public void setRatingCount(Integer ratingCount) { this.ratingCount = ratingCount; }
     public void setGithubUrl(String githubUrl) { this.githubUrl = githubUrl; }
     public void setLinkedinUrl(String linkedinUrl) { this.linkedinUrl = linkedinUrl; }
-    public void setCertifications(String[] certifications) { 
-        this.certifications = (certifications == null || certifications.length == 0) ? "" : String.join(", ", certifications); 
+    public void setCertifications(List<String> certifications) { 
+        this.certifications = (certifications == null) ? new ArrayList<>() : new ArrayList<>(certifications); 
     }
-    public void setLanguages(String[] languages) { 
-        this.languages = (languages == null || languages.length == 0) ? "" : String.join(", ", languages); 
+    public void setLanguages(List<String> languages) { 
+        this.languages = (languages == null) ? new ArrayList<>() : new ArrayList<>(languages); 
     }
     public void setExperienceYears(Integer experienceYears) { this.experienceYears = experienceYears; }
     public void setVerificationStatus(VerificationStatus verificationStatus) { this.verificationStatus = verificationStatus; }

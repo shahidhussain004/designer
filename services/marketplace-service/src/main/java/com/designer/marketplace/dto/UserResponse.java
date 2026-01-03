@@ -1,12 +1,14 @@
 package com.designer.marketplace.dto;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import com.designer.marketplace.entity.User;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 /**
  * DTO for User responses
@@ -27,7 +29,7 @@ public class UserResponse {
     private String location;
     private String phone;
     private Double hourlyRate;
-    private String[] skills;
+    private List<String> skills;
     private String portfolioUrl;
     private Boolean emailVerified;
     private Boolean isActive;

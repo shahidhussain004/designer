@@ -59,7 +59,7 @@ public class InvoiceService {
         String invoiceNumber = generateInvoiceNumber();
 
         // Create line items
-        String lineItemsJson = createLineItemsJson(payment);
+        List<InvoiceLineItem> lineItems = createLineItems(payment);
 
         Invoice invoice = Invoice.builder()
                 .invoiceNumber(invoiceNumber)
@@ -74,7 +74,7 @@ public class InvoiceService {
                 .total(payment.getAmount())
                 .currency(payment.getCurrency())
                 .status(InvoiceStatus.PAID)
-                .lineItems(lineItemsJson)
+                .lineItems(lineItems)
                 .invoiceDate(LocalDateTime.now())
                 .dueDate(LocalDateTime.now())
                 .paidAt(payment.getPaidAt())
@@ -109,7 +109,7 @@ public class InvoiceService {
         String invoiceNumber = generateInvoiceNumber();
 
         // Create line items for milestone
-        String lineItemsJson = createMilestoneLineItemsJson(milestone, payment);
+        List<InvoiceLineItem> lineItems = createMilestoneLineItems(milestone, payment);
 
         Invoice invoice = Invoice.builder()
                 .invoiceNumber(invoiceNumber)
@@ -125,7 +125,7 @@ public class InvoiceService {
                 .total(payment.getAmount())
                 .currency(payment.getCurrency())
                 .status(InvoiceStatus.PAID)
-                .lineItems(lineItemsJson)
+                .lineItems(lineItems)
                 .notes("Milestone: " + milestone.getTitle())
                 .invoiceDate(LocalDateTime.now())
                 .dueDate(LocalDateTime.now())
@@ -239,7 +239,7 @@ public class InvoiceService {
     /**
      * Create line items JSON for a payment.
      */
-    private String createLineItemsJson(Payment payment) {
+    private List<InvoiceLineItem> createLineItems(Payment payment) {
         InvoiceLineItem lineItem = InvoiceLineItem.builder()
                 .description("Service: " + payment.getProject().getTitle())
                 .quantity(1L)
@@ -254,18 +254,13 @@ public class InvoiceService {
                 .amount(payment.getPlatformFee())
                 .build();
 
-        try {
-            return objectMapper.writeValueAsString(List.of(lineItem, feeItem));
-        } catch (JsonProcessingException e) {
-            log.error("Error serializing line items", e);
-            return "[]";
-        }
+        return List.of(lineItem, feeItem);
     }
 
     /**
-     * Create line items JSON for a milestone payment.
+     * Create line items for a milestone payment.
      */
-    private String createMilestoneLineItemsJson(Milestone milestone, Payment payment) {
+    private List<InvoiceLineItem> createMilestoneLineItems(Milestone milestone, Payment payment) {
         InvoiceLineItem lineItem = InvoiceLineItem.builder()
                 .description("Milestone: " + milestone.getTitle())
                 .quantity(1L)
@@ -280,12 +275,7 @@ public class InvoiceService {
                 .amount(payment.getPlatformFee())
                 .build();
 
-        try {
-            return objectMapper.writeValueAsString(List.of(lineItem, feeItem));
-        } catch (JsonProcessingException e) {
-            log.error("Error serializing line items", e);
-            return "[]";
-        }
+        return List.of(lineItem, feeItem);
     }
 
     /**

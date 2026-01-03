@@ -1,5 +1,7 @@
 package com.designer.marketplace.dto;
 
+import java.util.List;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -34,7 +36,7 @@ public class UserUpdateRequest {
 
     private Double hourlyRate;
 
-    private String[] skills;
+    private List<String> skills;
 
     @Size(max = 500, message = "Portfolio URL must not exceed 500 characters")
     private String portfolioUrl;

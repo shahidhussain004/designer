@@ -1,6 +1,7 @@
 package com.designer.marketplace.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.designer.marketplace.entity.Proposal;
 
@@ -45,7 +46,7 @@ public class ProposalResponse {
         private String location;
         private String bio;
         private Double hourlyRate;
-        private String[] skills;
+        private List<String> skills;
         private String portfolioUrl;
         private Double ratingAvg;
         private Integer ratingCount;

@@ -420,10 +420,10 @@ describe('Designer Marketplace API - Integration Tests', () => {
       );
 
       expect(response.data).toHaveProperty('stats');
-      expect(response.data).toHaveProperty('activeJobs');
+      expect(response.data).toHaveProperty('openJobs');
       expect(response.data).toHaveProperty('recentProposals');
       expect(response.data.stats).toHaveProperty('totalJobsPosted');
-      expect(response.data.stats).toHaveProperty('activeJobs');
+      expect(response.data.stats).toHaveProperty('openJobs');
       expect(response.data.stats).toHaveProperty('completedJobs');
       expect(typeof response.data.stats.totalJobsPosted).toBe('number');
     });
@@ -610,5 +610,6 @@ describe('Designer Marketplace API - Integration Tests', () => {
 });
 
 // Export for testing frameworks (using export type for isolatedModules)
-export type { TestUser, TestJob };
-export { registerUser, login, getAuthHeader };
+export { getAuthHeader, login, registerUser };
+export type { TestJob, TestUser };
+
