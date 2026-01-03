@@ -252,7 +252,7 @@ export default function ProjectDetailsPage() {
               <Card padding="m">
                 <Flex flex-direction="column" gap="xs">
                   <Text font-size="body-s" color="secondary">Experience Level</Text>
-                  <Text font-size="heading-s">{project.experienceLevel.name}</Text>
+                  <Text font-size="heading-s">{project.experienceLevel?.name}</Text>
                 </Flex>
               </Card>
               <Card padding="m">
