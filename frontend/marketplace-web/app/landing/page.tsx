@@ -3,7 +3,109 @@
 import { useProjectCategories } from '@/hooks/useProjects';
 import type { PostCategory } from '@/lib/apiTypes';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+import { AnimatePresence, motion } from "framer-motion";
+import type React from "react";
+import HowItWorksCarousel from './how-it-works-carousel';
+import SuccessFeaturesSection from './success-feature-section';
+
+const MotionDiv = motion.div as unknown as React.ComponentType<React.ComponentProps<'div'> & any>
+const MotionP = motion.p as unknown as React.ComponentType<React.ComponentProps<'p'> & any>
+const MotionSpan = motion.span as unknown as React.ComponentType<React.ComponentProps<'span'> & any>
+
+const TAGLINES = [
+  ["Talent", "Opportunity"],
+  ["Skills", "Growth"],
+  ["Creators", "the Future"],
+  ["Innovation", "Success"],
+  ["Vision", "Reality"],
+]
+
+// Particle component for the morphing effect
+function Particle({ delay, x, y }: { delay: number; x: number; y: number }) {
+  return (
+    <MotionSpan
+      className="absolute w-1 h-1 rounded-full bg-red-500"
+      initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
+      animate={{
+        opacity: [0, 1, 0],
+        scale: [0, 1.5, 0],
+        x: [0, x],
+        y: [0, y - 40],
+      }}
+      transition={{
+        duration: 0.8,
+        delay,
+        ease: "easeOut",
+      }}
+    />
+  )
+}
+
+// Animated word with glow and particle trail
+function MorphingWord({ word, color = "text-red-500" }: { word: string; color?: string }) {
+  const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; delay: number }>>([])
+
+  useEffect(() => {
+    // Generate particles on word change
+    const newParticles = Array.from({ length: 8 }, (_, i) => ({
+      id: Date.now() + i,
+      x: (Math.random() - 0.5) * 60,
+      y: (Math.random() - 0.5) * 20,
+      delay: i * 0.05,
+    }))
+    setParticles(newParticles)
+  }, [word])
+
+  return (
+    <span className="relative inline-block">
+      {/* Glow effect behind text */}
+      <MotionSpan
+        className="absolute inset-0 blur-xl bg-red-500/30 -z-10"
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: [0, 0.6, 0.3], scale: [0.8, 1.1, 1] }}
+        transition={{ duration: 0.6 }}
+      />
+
+      {/* Particles */}
+      <span className="absolute inset-0 overflow-visible pointer-events-none">
+        {particles.map((p) => (
+          <Particle key={p.id} delay={p.delay} x={p.x} y={p.y} />
+        ))}
+      </span>
+
+      {/* Main text with morphing animation */}
+      <AnimatePresence mode="wait">
+        <MotionSpan
+          key={word}
+          className={`${color} inline-block`}
+          initial={{
+            opacity: 0,
+            scale: 0.8,
+            filter: "blur(8px)",
+          }}
+          animate={{
+            opacity: 1,
+            scale: 1,
+            filter: "blur(0px)",
+          }}
+          exit={{
+            opacity: 0,
+            scale: 1.1,
+            filter: "blur(8px)",
+          }}
+          transition={{
+            duration: 0.5,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+        >
+          {word}
+        </MotionSpan>
+      </AnimatePresence>
+    </span>
+  )
+}
 
 type Category = PostCategory
 
@@ -34,6 +136,17 @@ const LandingPage = () => {
   const { data: categoriesData = [] } = useProjectCategories();
   const categories = categoriesData.length > 0 ? categoriesData : FALLBACK_CATEGORIES;
 
+  const [index, setIndex] = useState(0)
+
+  useEffect(() => {
+      const interval = setInterval(() => {
+        setIndex((prev) => (prev + 1) % TAGLINES.length)
+      }, 3500)
+      return () => clearInterval(interval)
+    }, [])
+  
+    const [left, right] = TAGLINES[index]
+
   return (
     <div className="bg-white">
       {/* Hero Section */}
@@ -46,21 +159,43 @@ const LandingPage = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left content */}
             <div className="text-white">
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-500/20 text-primary-400 mb-6">
-                🚀 The #1 Platform for Creative Professionals
-              </span>
+              <MotionSpan
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-500/20 text-primary-400 mb-6"
+            >
+              🚀 The #1 Platform for Creative Professionals
+            </MotionSpan>
               
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6">
-                Where <span className="text-primary-500">Talent</span> Meets <span className="text-primary-500">Opportunity</span>
-              </h1>
+             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+              <MotionSpan initial={{ opacity: 0 }} animate={{ opacity: 0.9 }} transition={{ delay: 0.2 }}>
+                Where{" "}
+              </MotionSpan>
+              <MorphingWord word={left} />
+              <MotionSpan initial={{ opacity: 0 }} animate={{ opacity: 0.9 }} transition={{ delay: 0.3 }}>
+                {" "}
+                Meets{" "}
+              </MotionSpan>
+              <MorphingWord word={right} />
+            </h1>
               
-              <p className="text-xl text-gray-300 mb-8 max-w-xl">
+              <MotionP
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              className="text-xl text-gray-300 mb-8 max-w-xl"
+            >
                 Connect with world-class designers, developers, and creative professionals. 
                 Build your dream team or find your next opportunity.
-              </p>
+              </MotionP>
               
               {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 mb-12">
+            <MotionDiv
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.6 }}
+             className="flex flex-col sm:flex-row gap-4 mb-12">
                 <Link
                   href="/signup"
                   className="inline-flex items-center justify-center px-8 py-4 rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-semibold text-lg transition-all shadow-lg hover:shadow-primary-500/25"
@@ -76,11 +211,15 @@ const LandingPage = () => {
                 >
                   Browse Jobs
                 </Link>
-              </div>
+              </MotionDiv>
             </div>
             
             {/* Right - Search Panel */}
-            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 lg:p-8 border border-white/20 shadow-2xl">
+             <MotionDiv
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 lg:p-8 border border-white/20 shadow-2xl">
               {/* Tabs */}
               <div className="flex gap-2 mb-6">
                 <button
@@ -136,19 +275,19 @@ const LandingPage = () => {
                   ))}
                 </div>
               </div>
-            </div>
+            </MotionDiv>
           </div>
         </div>
       </section>
 
       {/* Stats Section */}
-      <section className="bg-gray-50 py-12 border-b border-gray-100">
+      <section className="bg-primary-700 py-12 border-b border-primary-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, idx) => (
               <div key={idx} className="text-center">
-                <div className="text-3xl lg:text-4xl font-bold text-gray-900">{stat.value}</div>
-                <div className="text-gray-600 mt-1">{stat.label}</div>
+                <div className="text-3xl lg:text-4xl font-bold text-white">{stat.value}</div>
+                <div className="text-white/80 mt-1">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -175,98 +314,10 @@ const LandingPage = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              How It Works
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Get started in minutes with our simple, streamlined process
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { step: '1', title: 'Post Your Project', desc: 'Describe what you need and set your budget', icon: '📝' },
-              { step: '2', title: 'Review Proposals', desc: 'Get bids from qualified professionals', icon: '📋' },
-              { step: '3', title: 'Fund Milestones', desc: 'Securely deposit funds into escrow', icon: '💰' },
-              { step: '4', title: 'Approve & Pay', desc: 'Release payment when work is complete', icon: '✅' },
-            ].map((item, idx) => (
-              <div key={idx} className="text-center group">
-                <div className="w-16 h-16 mx-auto mb-6 bg-primary-100 text-primary-600 rounded-2xl flex items-center justify-center text-2xl group-hover:bg-primary-600 group-hover:text-white transition-all">
-                  {item.icon}
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-gray-600">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <HowItWorksCarousel />
 
       {/* Feature Cards Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Everything You Need to Succeed
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Whether you&apos;re hiring or looking for work, we&apos;ve got you covered
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { 
-                title: 'Post a Job', 
-                desc: 'Describe your project and find the perfect freelancer', 
-                href: '/jobs/create',
-                icon: '💼',
-                color: 'bg-blue-50 border-blue-100'
-              },
-              { 
-                title: 'Browse Talent', 
-                desc: 'Explore profiles of skilled designers and developers', 
-                href: '/talents',
-                icon: '🎨',
-                color: 'bg-purple-50 border-purple-100'
-              },
-              { 
-                title: 'Find Work', 
-                desc: 'Browse available jobs and submit proposals', 
-                href: '/jobs',
-                icon: '🔍',
-                color: 'bg-green-50 border-green-100'
-              },
-              { 
-                title: 'Learn Skills', 
-                desc: 'Take courses from industry experts', 
-                href: '/courses',
-                icon: '📚',
-                color: 'bg-amber-50 border-amber-100'
-              },
-            ].map((card, idx) => (
-              <Link key={idx} href={card.href} className="group">
-                <div className={`h-full p-6 rounded-xl border-2 ${card.color} hover:border-primary-300 hover:shadow-lg transition-all`}>
-                  <div className="text-3xl mb-4">{card.icon}</div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
-                    {card.title}
-                  </h3>
-                  <p className="text-gray-600 text-sm">{card.desc}</p>
-                  <div className="mt-4 text-primary-600 font-medium text-sm group-hover:translate-x-1 transition-transform inline-flex items-center">
-                    Get Started
-                    <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+      <SuccessFeaturesSection />
 
       {/* Featured Courses Section */}
       <section className="py-20 bg-white">

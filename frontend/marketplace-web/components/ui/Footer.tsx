@@ -242,6 +242,9 @@ export const Footer = React.forwardRef<HTMLElement, FooterProps>(
                 <Link href="/accessibility" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
                   Accessibility
                 </Link>
+                <Link href="/design-system" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
+                  Design System
+                </Link>
               </div>
             </div>
           </div>
