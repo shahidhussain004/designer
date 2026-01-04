@@ -5,6 +5,7 @@ import type { PostCategory } from '@/lib/apiTypes';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+import { VideoBackground } from '@/components/ui';
 import { AnimatePresence, motion } from "framer-motion";
 import type React from "react";
 import HowItWorksCarousel from './how-it-works-carousel';
@@ -151,8 +152,10 @@ const LandingPage = () => {
     <div className="bg-white">
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
-        {/* Background pattern */}
-        <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10" />
+        {/* Background video (covers hero) */}
+        <VideoBackground />
+        {/* Background pattern overlay for grain */}
+        <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10 mix-blend-overlay" />
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent" />
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
@@ -197,7 +200,7 @@ const LandingPage = () => {
               transition={{ delay: 0.5, duration: 0.6 }}
              className="flex flex-col sm:flex-row gap-4 mb-12">
                 <Link
-                  href="/signup"
+                  href="/auth/register"
                   className="inline-flex items-center justify-center px-8 py-4 rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-semibold text-lg transition-all shadow-lg hover:shadow-primary-500/25"
                 >
                   Get Started Free
@@ -229,8 +232,7 @@ const LandingPage = () => {
                       ? 'bg-white text-gray-900 shadow-lg'
                       : 'bg-white/10 text-white hover:bg-white/20'
                   }`}
-                >
-                  🎨 Find Talent
+                >Find Talent
                 </button>
                 <button
                   onClick={() => setActiveTab('jobs')}
@@ -239,8 +241,7 @@ const LandingPage = () => {
                       ? 'bg-white text-gray-900 shadow-lg'
                       : 'bg-white/10 text-white hover:bg-white/20'
                   }`}
-                >
-                  💼 Find Jobs
+                >Find Jobs
                 </button>
               </div>
               
@@ -400,7 +401,7 @@ const LandingPage = () => {
             </div>
             <div className="flex flex-col sm:flex-row gap-4 lg:justify-end">
               <Link
-                href="/signup"
+                href="/auth/register"
                 className="inline-flex items-center justify-center px-8 py-4 rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-semibold text-lg transition-all shadow-lg"
               >
                 Create Free Account
