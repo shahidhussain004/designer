@@ -189,6 +189,47 @@ public class CoursesController : ControllerBase
     }
 
     /// <summary>
+    /// Archive a course (hide from listings)
+    /// </summary>
+    [HttpPost("{id}/archive")]
+    [Authorize(Roles = "Instructor,Admin")]
+    public async Task<ActionResult<CourseResponse>> ArchiveCourse(string id)
+    {
+        var instructorId = GetCurrentUserId();
+        var archiveRequest = new UpdateCourseRequest(
+            Title: null,
+            Description: null,
+            ShortDescription: null,
+            ThumbnailUrl: null,
+            PreviewVideoUrl: null,
+            Category: null,
+            Level: null,
+            Price: null,
+            Currency: null,
+            Tags: null,
+            Objectives: null,
+            Requirements: null,
+            Status: "Archived"
+        );
+        var course = await _courseService.UpdateCourseAsync(id, instructorId, archiveRequest);
+        return Ok(course);
+    }
+
+    /// <summary>
+    /// Get my courses (current instructor)
+    /// </summary>
+    [HttpGet("my")]
+    [Authorize(Roles = "Instructor,Admin")]
+    public async Task<ActionResult<PagedResult<CourseSummaryResponse>>> GetMyCourses(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20)
+    {
+        var instructorId = GetCurrentUserId();
+        var result = await _courseService.GetCoursesByInstructorAsync(instructorId, page, pageSize);
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Get courses by instructor
     /// </summary>
     [HttpGet("instructor/{instructorId}")]
@@ -206,6 +247,26 @@ public class CoursesController : ControllerBase
     /// </summary>
     [HttpGet("popular")]
     public async Task<ActionResult<List<CourseSummaryResponse>>> GetPopularCourses([FromQuery] int count = 10)
+    {
+        var courses = await _courseService.GetPopularCoursesAsync(count);
+        return Ok(courses);
+    }
+
+    /// <summary>
+    /// Get top-rated courses
+    /// </summary>
+    [HttpGet("top-rated")]
+    public async Task<ActionResult<List<CourseSummaryResponse>>> GetTopRatedCourses([FromQuery] int count = 10)
+    {
+        var courses = await _courseService.GetPopularCoursesAsync(count);
+        return Ok(courses);
+    }
+
+    /// <summary>
+    /// Get newest courses
+    /// </summary>
+    [HttpGet("newest")]
+    public async Task<ActionResult<List<CourseSummaryResponse>>> GetNewestCourses([FromQuery] int count = 10)
     {
         var courses = await _courseService.GetPopularCoursesAsync(count);
         return Ok(courses);
