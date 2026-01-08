@@ -109,12 +109,6 @@
             <artifactId>spring-kafka</artifactId>
         </dependency>
 
-        <!-- MongoDB for LMS -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
-        </dependency>
-
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
