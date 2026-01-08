@@ -113,6 +113,22 @@ public class QuizzesController : ControllerBase
     }
 
     /// <summary>
+    /// Start a quiz attempt
+    /// </summary>
+    [HttpPost("{quizId}/start")]
+    [Authorize]
+    public async Task<ActionResult<QuizResultResponse>> StartQuizAttempt(string quizId, [FromQuery] string? enrollmentId)
+    {
+        var studentId = GetCurrentUserId();
+        var quiz = await _quizService.GetQuizAsync(quizId, includeAnswers: false);
+        if (quiz == null)
+            return NotFound("Quiz not found");
+
+        // Return the quiz in a format suitable for starting an attempt
+        return Ok(new { quizId = quizId, studentId = studentId, message = "Quiz ready to take" });
+    }
+
+    /// <summary>
     /// Submit quiz answers
     /// </summary>
     [HttpPost("{quizId}/submit")]

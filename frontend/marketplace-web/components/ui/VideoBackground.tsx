@@ -11,7 +11,7 @@ export function VideoBackground() {
         playsInline
         poster="/images/landing-poster.svg"
         className="h-full w-full object-cover">
-        <source src="/videos/1766537892312202694-0_839a2992.mp4" type="video/mp4" />
+        <source src="/videos/designer-ai-video.mp4" type="video/mp4" />
       </video>
     </div>
   )
