@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class ProjectResponse {
 
     private Long id;
-    private ClientInfo client;
+    private CompanyInfo company;
     private String title;
     private String description;
     private ProjectCategoryResponse category;
@@ -38,7 +38,7 @@ public class ProjectResponse {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ClientInfo {
+    public static class CompanyInfo {
         private Long id;
         private String username;
         private String fullName;
@@ -53,22 +53,22 @@ public class ProjectResponse {
             return null;
         }
 
-        ClientInfo clientInfo = null;
-        if (project.getClient() != null) {
-            clientInfo = ClientInfo.builder()
-                    .id(project.getClient().getId())
-                    .username(project.getClient().getUsername())
-                    .fullName(project.getClient().getFullName())
-                    .profileImageUrl(project.getClient().getProfileImageUrl())
-                    .location(project.getClient().getLocation())
-                    .ratingAvg(project.getClient().getRatingAvg())
-                    .ratingCount(project.getClient().getRatingCount())
+        CompanyInfo companyInfo = null;
+        if (project.getCompany() != null) {
+            companyInfo = CompanyInfo.builder()
+                    .id(project.getCompany().getId())
+                    .username(project.getCompany().getUsername())
+                    .fullName(project.getCompany().getFullName())
+                    .profileImageUrl(project.getCompany().getProfileImageUrl())
+                    .location(project.getCompany().getLocation())
+                    .ratingAvg(project.getCompany().getRatingAvg())
+                    .ratingCount(project.getCompany().getRatingCount())
                     .build();
         }
 
         return ProjectResponse.builder()
                 .id(project.getId())
-                .client(clientInfo)
+                .company(companyInfo)
                 .title(project.getTitle())
                 .description(project.getDescription())
                 .category(project.getProjectCategory() != null ? ProjectCategoryResponse.fromEntity(project.getProjectCategory()) : null)

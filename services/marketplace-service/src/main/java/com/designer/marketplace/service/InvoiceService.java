@@ -64,7 +64,7 @@ public class InvoiceService {
         Invoice invoice = Invoice.builder()
                 .invoiceNumber(invoiceNumber)
                 .payment(payment)
-                .client(payment.getClient())
+                .company(payment.getCompany())
                 .freelancer(payment.getFreelancer())
                 .project(payment.getProject())
                 .invoiceType(InvoiceType.PAYMENT)
@@ -115,7 +115,7 @@ public class InvoiceService {
                 .invoiceNumber(invoiceNumber)
                 .payment(payment)
                 .milestone(milestone)
-                .client(payment.getClient())
+                .company(payment.getCompany())
                 .freelancer(payment.getFreelancer())
                 .project(payment.getProject())
                 .invoiceType(InvoiceType.MILESTONE)
@@ -159,11 +159,11 @@ public class InvoiceService {
     }
 
     /**
-     * Get invoices for a client.
+     * Get invoices for a company.
      */
     @Transactional(readOnly = true)
-    public Page<InvoiceResponse> getInvoicesForClient(Long clientId, Pageable pageable) {
-        return invoiceRepository.findByClientIdOrderByCreatedAtDesc(clientId, pageable)
+    public Page<InvoiceResponse> getInvoicesForCompany(Long companyId, Pageable pageable) {
+        return invoiceRepository.findByCompanyIdOrderByCreatedAtDesc(companyId, pageable)
                 .map(InvoiceResponse::fromEntity);
     }
 
@@ -177,7 +177,7 @@ public class InvoiceService {
     }
 
     /**
-     * Get invoices for a user (client or freelancer).
+     * Get invoices for a user (company or freelancer).
      */
     @Transactional(readOnly = true)
     public Page<InvoiceResponse> getInvoicesForUser(Long userId, Pageable pageable) {

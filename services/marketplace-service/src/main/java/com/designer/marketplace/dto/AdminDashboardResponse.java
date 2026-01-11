@@ -18,7 +18,7 @@ public class AdminDashboardResponse {
 
     // User statistics
     private Long totalUsers;
-    private Long totalClients;
+    private Long totalCompanies;
     private Long totalFreelancers;
     private Long newUsersToday;
     private Long newUsersThisWeek;

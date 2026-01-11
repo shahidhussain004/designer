@@ -1,11 +1,11 @@
 package com.designer.marketplace.kafka.events;
 
+import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal;
 
 /**
  * Event payload for contract-related events.
@@ -18,8 +18,8 @@ public class ContractEventPayload {
     private Long contractId;
     private Long jobId;
     private String jobTitle;
-    private Long clientId;
-    private String clientName;
+    private Long companyId;
+    private String companyName;
     private Long freelancerId;
     private String freelancerName;
     private BigDecimal amount;

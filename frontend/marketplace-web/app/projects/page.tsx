@@ -35,7 +35,7 @@ interface Project {
   budget: number;
   status: string;
   createdAt: string;
-  client: {
+  company: {
     id: number;
     username: string;
     fullName: string;
@@ -144,7 +144,7 @@ function ProjectsPageContent() {
           </h4>
           
           <p className="text-sm text-gray-500 mb-3">
-            Posted by {project.client?.fullName || 'Unknown'} • {formatDate(project.createdAt)}
+            Posted by {project.company?.fullName || 'Unknown'} • {formatDate(project.createdAt)}
           </p>
           
           <p className="text-gray-600 text-sm line-clamp-3 mb-4 flex-grow">

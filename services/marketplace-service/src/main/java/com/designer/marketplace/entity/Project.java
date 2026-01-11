@@ -27,13 +27,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Project entity - represents freelance/gig project postings by clients
+ * Project entity - represents freelance/gig project postings by companies
  * Maps to 'projects' table in PostgreSQL (formerly 'jobs')
  * This is for short-term, project-based work - NOT traditional employment
  */
 @Entity
 @Table(name = "projects", indexes = {
-        @Index(name = "idx_projects_client", columnList = "client_id"),
+        @Index(name = "idx_projects_company", columnList = "company_id"),
         @Index(name = "idx_projects_status", columnList = "status"),
         @Index(name = "idx_projects_category_fk", columnList = "category_id"),
         @Index(name = "idx_projects_created", columnList = "created_at")
@@ -49,8 +49,8 @@ public class Project {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_id", nullable = false)
-    private User client;
+    @JoinColumn(name = "company_id", nullable = false)
+    private User company;
 
     @Column(nullable = false, length = 200)
     private String title;

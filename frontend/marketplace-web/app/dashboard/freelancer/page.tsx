@@ -65,7 +65,7 @@ export default function FreelancerDashboardPage() {
 
   const quickLinks = [
     { href: `/portfolio/${authService.getCurrentUser()?.id}`, icon: FolderOpen, title: 'Portfolio', subtitle: 'Manage your work' },
-    { href: '/dashboard/freelancer/reviews', icon: Star, title: 'Reviews', subtitle: 'Client feedback' },
+    { href: '/dashboard/freelancer/reviews', icon: Star, title: 'Reviews', subtitle: 'Company feedback' },
     { href: '/dashboard/freelancer/time-tracking', icon: Clock, title: 'Time Tracking', subtitle: 'Log your hours' },
     { href: '/dashboard/freelancer/contracts', icon: FileText, title: 'Contracts', subtitle: 'Active agreements' },
   ]
@@ -198,7 +198,7 @@ export default function FreelancerDashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-xl font-bold text-gray-900">Available Projects</h2>
-                  <p className="text-sm text-gray-500 mt-1">Open projects posted by clients</p>
+                  <p className="text-sm text-gray-500 mt-1">Open projects posted by companies</p>
                 </div>
                 <Link
                   href="/projects"

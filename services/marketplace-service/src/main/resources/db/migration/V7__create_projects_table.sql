@@ -1,11 +1,11 @@
 -- =====================================================
 -- V7: Create Freelance Projects Table
--- Description: Freelance/gig project postings by clients
+-- Description: Freelance/gig project postings by companies
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS projects (
     id BIGSERIAL PRIMARY KEY,
-    client_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    company_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     category_id BIGINT REFERENCES project_categories(id) ON DELETE SET NULL,
     
     -- Basic Information
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS projects (
 );
 
 -- Create indexes for performance
-CREATE INDEX IF NOT EXISTS idx_projects_client_id ON projects(client_id);
+CREATE INDEX IF NOT EXISTS idx_projects_company_id ON projects(company_id);
 CREATE INDEX IF NOT EXISTS idx_projects_category_id ON projects(category_id);
 CREATE INDEX IF NOT EXISTS idx_projects_status ON projects(status);
 CREATE INDEX IF NOT EXISTS idx_projects_budget_min_max ON projects(budget_min, budget_max);
@@ -88,7 +88,7 @@ BEFORE UPDATE ON projects
 FOR EACH ROW
 EXECUTE FUNCTION update_projects_updated_at();
 
-COMMENT ON TABLE projects IS 'Freelance and gig projects posted by clients';
+COMMENT ON TABLE projects IS 'Freelance and gig projects posted by companies';
 COMMENT ON COLUMN projects.budget_type IS 'Budget type: HOURLY (pay per hour), FIXED_PRICE (flat rate), NOT_SURE';
 COMMENT ON COLUMN projects.timeline IS 'Estimated project timeline for completion';
 COMMENT ON COLUMN projects.project_type IS 'Type: SINGLE_PROJECT (one-time), ONGOING (multiple milestones), CONTRACT (long-term)';

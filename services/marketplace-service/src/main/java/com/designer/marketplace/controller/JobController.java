@@ -132,7 +132,7 @@ public class JobController {
      * Get jobs by employer (requires authentication)
      */
     @GetMapping("/employer/{employerId}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'CLIENT')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'COMPANY')")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Get jobs by employer", description = "Get all jobs posted by a specific employer")
     public ResponseEntity<Page<JobResponse>> getJobsByEmployer(
@@ -155,10 +155,10 @@ public class JobController {
     }
 
     /**
-     * Create a new job (requires authentication as employer/client)
+     * Create a new job (requires authentication as employer/company)
      */
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'CLIENT')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'COMPANY')")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Create a new job", description = "Post a new employment opportunity")
     public ResponseEntity<JobResponse> createJob(
@@ -173,7 +173,7 @@ public class JobController {
      * Update a job
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'CLIENT')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'COMPANY')")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Update a job", description = "Update an existing job posting")
     public ResponseEntity<JobResponse> updateJob(
@@ -191,7 +191,7 @@ public class JobController {
      * Publish a job
      */
     @PostMapping("/{id}/publish")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'CLIENT')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'COMPANY')")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Publish a job", description = "Change job status from draft to open")
     public ResponseEntity<JobResponse> publishJob(
@@ -206,7 +206,7 @@ public class JobController {
      * Close a job
      */
     @PostMapping("/{id}/close")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'CLIENT')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'COMPANY')")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Close a job", description = "Close a job posting (no longer accepting applications)")
     public ResponseEntity<JobResponse> closeJob(
@@ -221,7 +221,7 @@ public class JobController {
      * Delete a job
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'CLIENT')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'COMPANY')")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Delete a job", description = "Permanently delete a job posting")
     public ResponseEntity<Void> deleteJob(

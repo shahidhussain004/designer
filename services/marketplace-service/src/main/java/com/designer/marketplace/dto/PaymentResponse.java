@@ -20,11 +20,11 @@ public class PaymentResponse {
 
     private Long id;
     private String paymentIntentId;
-    private String clientSecret; // For frontend to complete payment
+    private String companySecret; // For frontend to complete payment
     
     // User info
-    private Long clientId;
-    private String clientName;
+    private Long companyId;
+    private String companyName;
     private Long freelancerId;
     private String freelancerName;
     
@@ -62,8 +62,8 @@ public class PaymentResponse {
         return PaymentResponse.builder()
                 .id(payment.getId())
                 .paymentIntentId(payment.getPaymentIntentId())
-                .clientId(payment.getClient().getId())
-                .clientName(payment.getClient().getFullName())
+                .companyId(payment.getCompany().getId())
+                .companyName(payment.getCompany().getFullName())
                 .freelancerId(payment.getFreelancer().getId())
                 .freelancerName(payment.getFreelancer().getFullName())
                 .projectId(payment.getProject().getId())

@@ -138,7 +138,7 @@ export default function LoginPage() {
             <div className="mt-8 pt-6 border-t border-gray-200">
               <p className="text-center text-xs text-gray-500 mb-4">Test Credentials</p>
               <div className="space-y-2 text-sm text-gray-600">
-                <p><span className="font-medium">Client:</span> client1@example.com / password123</p>
+                <p><span className="font-medium">Company:</span> company1@example.com / password123</p>
                 <p><span className="font-medium">Freelancer:</span> freelancer1@example.com / password123</p>
               </div>
             </div>

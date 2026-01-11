@@ -16,7 +16,7 @@ interface ContractDetail {
   startDate: string;
   endDate?: string;
   job: { id: number; title: string };
-  client: { id: number; username: string; fullName: string };
+  company: { id: number; username: string; fullName: string };
   freelancer: { id: number; username: string; fullName: string };
 }
 
@@ -85,8 +85,8 @@ export default function ContractDetailPage() {
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <p className="text-sm text-gray-500">Client</p>
-              <p className="font-medium text-gray-900">{contract.client.fullName}</p>
+              <p className="text-sm text-gray-500">Company</p>
+              <p className="font-medium text-gray-900">{contract.company.fullName}</p>
 
               <p className="text-sm text-gray-500 mt-4">Freelancer</p>
               <p className="font-medium text-gray-900">{contract.freelancer.fullName}</p>

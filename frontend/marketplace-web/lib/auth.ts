@@ -11,7 +11,7 @@ export interface RegisterData {
   username: string;
   password: string;
   fullName: string;
-  role: 'CLIENT' | 'FREELANCER';
+  role: 'COMPANY' | 'FREELANCER';
 }
 
 export interface AuthResponse {

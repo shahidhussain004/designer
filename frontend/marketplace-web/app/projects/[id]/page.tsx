@@ -35,7 +35,7 @@ interface Project {
     yearsMax: number | null;
     displayOrder: number;
   };
-  clientId: number;
+  companyId: number;
   status: string;
   createdAt: string;
   updatedAt: string;
@@ -53,7 +53,7 @@ export default function ProjectDetailsPage() {
   const projectId = params.id as string;
 
   const { data: project, isLoading, error, refetch } = useProject(projectId);
-  const { data: client } = useUserProfile(project?.clientId || null);
+  const { data: company } = useUserProfile(project?.companyId || null);
   const submitProposalMutation = useSubmitProposal();
 
   const [user, setUser] = useState<User | null>(null);
@@ -191,7 +191,7 @@ export default function ProjectDetailsPage() {
         <div className="bg-green-50 border-b border-green-200 p-4">
           <div className="max-w-7xl mx-auto flex items-center gap-3">
             <CheckCircle className="w-5 h-5 text-green-600" />
-            <p className="text-green-700">Proposal submitted successfully! The client will review your proposal.</p>
+            <p className="text-green-700">Proposal submitted successfully! The company will review your proposal.</p>
           </div>
         </div>
       )}
@@ -271,21 +271,21 @@ export default function ProjectDetailsPage() {
               </div>
             </div>
 
-            {/* Client Info */}
-            {client && (
+            {/* Company Info */}
+            {company && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">About the Client</h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">About the Company</h2>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
                       <UserIcon className="w-6 h-6 text-gray-500" />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900">{client.fullName}</p>
-                      <p className="text-sm text-gray-500">@{client.username}</p>
+                      <p className="font-semibold text-gray-900">{company.fullName}</p>
+                      <p className="text-sm text-gray-500">@{company.username}</p>
                     </div>
                   </div>
-                  <Link href={`/users/${client.id}/profile`} className="text-primary-600 hover:text-primary-700 font-medium text-sm">
+                  <Link href={`/users/${company.id}/profile`} className="text-primary-600 hover:text-primary-700 font-medium text-sm">
                     View Profile →
                   </Link>
                 </div>
@@ -302,7 +302,7 @@ export default function ProjectDetailsPage() {
                 <p className="text-3xl font-bold text-gray-900">${project.budget}</p>
               </div>
               
-              {user && user.role === 'FREELANCER' && user.id !== project.clientId ? (
+              {user && user.role === 'FREELANCER' && user.id !== project.companyId ? (
                 <button
                   onClick={() => {
                     if (!proposalOpen) {
@@ -323,7 +323,7 @@ export default function ProjectDetailsPage() {
                 >
                   {proposalOpen ? 'Cancel' : 'Send Proposal'}
                 </button>
-              ) : user && user.id === project.clientId ? (
+              ) : user && user.id === project.companyId ? (
                 <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-center">
                   <p className="text-sm text-blue-700">This is your project posting</p>
                 </div>

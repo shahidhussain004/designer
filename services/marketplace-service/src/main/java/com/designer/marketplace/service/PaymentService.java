@@ -69,12 +69,12 @@ public class PaymentService {
      * Create a payment intent for a job/proposal.
      */
     @Transactional
-    public PaymentResponse createPaymentIntent(Long clientId, CreatePaymentRequest request) {
-        log.info("Creating payment intent for client {} on project {}", clientId, request.getProjectId());
+    public PaymentResponse createPaymentIntent(Long companyId, CreatePaymentRequest request) {
+        log.info("Creating payment intent for company {} on project {}", companyId, request.getProjectId());
 
-        // Validate client
-        User client = userRepository.findById(clientId)
-                .orElseThrow(() -> new IllegalArgumentException("Client not found"));
+        // Validate company
+        User company = userRepository.findById(companyId)
+                .orElseThrow(() -> new IllegalArgumentException("Company not found"));
 
         // Validate project
         Project project = projectRepository.findById(request.getProjectId())
@@ -96,7 +96,7 @@ public class PaymentService {
             Map<String, String> metadata = new HashMap<>();
             metadata.put("project_id", project.getId().toString());
             metadata.put("proposal_id", proposal.getId().toString());
-            metadata.put("client_id", client.getId().toString());
+            metadata.put("company_id", company.getId().toString());
             metadata.put("freelancer_id", freelancer.getId().toString());
 
             PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
@@ -116,7 +116,7 @@ public class PaymentService {
             // Save payment record
             Payment payment = Payment.builder()
                     .paymentIntentId(paymentIntent.getId())
-                    .client(client)
+                    .company(company)
                     .freelancer(freelancer)
                     .project(project)
                     .proposal(proposal)
@@ -131,11 +131,13 @@ public class PaymentService {
             payment = paymentRepository.save(payment);
 
             // Create ledger entry
-            createLedgerEntry(payment, null, client, TransactionType.PAYMENT_RECEIVED, amount,
+            createLedgerEntry(payment, null, company, TransactionType.PAYMENT_RECEIVED, amount,
                     "Payment initiated for project: " + project.getTitle());
 
             PaymentResponse response = PaymentResponse.fromEntity(payment);
-            response.setClientSecret(paymentIntent.getClientSecret());
+            // Stripe's PaymentIntent provides a client secret used by the frontend
+            // keep the DTO field name `companySecret` for backward compatibility
+            response.setCompanySecret(paymentIntent.getClientSecret());
 
             log.info("Payment intent created: {}", paymentIntent.getId());
             return response;
@@ -177,7 +179,7 @@ public class PaymentService {
         paymentRepository.save(payment);
 
         // Create ledger entries
-        createLedgerEntry(payment, escrow, payment.getClient(), TransactionType.ESCROW_HOLD,
+        createLedgerEntry(payment, escrow, payment.getCompany(), TransactionType.ESCROW_HOLD,
                 payment.getFreelancerAmount(), "Funds held in escrow");
 
         createLedgerEntry(payment, null, null, TransactionType.PLATFORM_FEE,
@@ -213,9 +215,9 @@ public class PaymentService {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new IllegalArgumentException("Payment not found"));
 
-        // Verify the releaser is the client
-        if (!payment.getClient().getId().equals(releaserId)) {
-            throw new IllegalArgumentException("Only the client can release escrow");
+        // Verify the releaser is the company
+        if (!payment.getCompany().getId().equals(releaserId)) {
+            throw new IllegalArgumentException("Only the company can release escrow");
         }
 
         if (payment.getEscrowStatus() != EscrowStatus.HELD) {
@@ -281,7 +283,7 @@ public class PaymentService {
             });
 
             // Create ledger entry
-            createLedgerEntry(payment, null, payment.getClient(), TransactionType.REFUND,
+            createLedgerEntry(payment, null, payment.getCompany(), TransactionType.REFUND,
                     payment.getAmount(), "Payment refunded");
 
             log.info("Payment refunded: {} - Stripe refund: {}", paymentId, refund.getId());
@@ -304,7 +306,7 @@ public class PaymentService {
     }
 
     /**
-     * Get payments for a user (as client or freelancer).
+     * Get payments for a user (as company or freelancer).
      */
     @Transactional(readOnly = true)
     public Page<PaymentResponse> getPaymentsForUser(Long userId, Pageable pageable) {

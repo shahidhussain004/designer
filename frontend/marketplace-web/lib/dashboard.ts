@@ -41,7 +41,7 @@ export interface ProjectSummary {
   experienceLevel: string | ExperienceLevel;
   status: string;
   createdAt: string;
-  client?: {
+  company?: {
     id: number;
     username: string;
     fullName: string;
@@ -70,7 +70,7 @@ export interface JobApplicationSummary {
   createdAt: string;
 }
 
-export interface ClientDashboard {
+export interface CompanyDashboard {
   stats: DashboardStats;
   activeProjects: ProjectSummary[];
   completedProjects: ProjectSummary[];
@@ -103,10 +103,10 @@ export interface Notification {
  */
 export const dashboardService = {
   /**
-   * Get client dashboard data
+   * Get company dashboard data
    */
-  async getClientDashboard(): Promise<ClientDashboard> {
-    const response = await apiClient.get<ClientDashboard>('/dashboard/client');
+  async getCompanyDashboard(): Promise<CompanyDashboard> {
+    const response = await apiClient.get<CompanyDashboard>('/dashboard/company');
     return response.data;
   },
 
@@ -127,7 +127,7 @@ export const dashboardService = {
   },
 
   /**
-   * Get current user's jobs (CLIENT only)
+   * Get current user's jobs (COMPANY only)
    */
   async getMyJobs(page = 0, size = 20): Promise<{ content: JobSummary[]; totalElements: number }> {
     const response = await apiClient.get('/jobs/my-jobs', {
@@ -167,8 +167,8 @@ export async function getDashboardData() {
     throw new Error('User not authenticated');
   }
 
-  if (user.role === 'CLIENT') {
-    return dashboardService.getClientDashboard();
+  if (user.role === 'COMPANY') {
+    return dashboardService.getCompanyDashboard();
   } else if (user.role === 'FREELANCER') {
     return dashboardService.getFreelancerDashboard();
   } else {
