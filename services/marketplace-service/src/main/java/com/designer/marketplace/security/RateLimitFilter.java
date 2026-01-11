@@ -1,17 +1,19 @@
 package com.designer.marketplace.security;
 
-import com.designer.marketplace.config.RateLimitConfig.RateLimiterService;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
+import com.designer.marketplace.config.RateLimitConfig.RateLimiterService;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Rate limiting filter to prevent abuse of API endpoints
@@ -33,21 +35,21 @@ public class RateLimitFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         
-        String clientIp = getClientIp(request);
+        String companyIp = getCompanyIp(request);
         String requestPath = request.getRequestURI();
         
         boolean allowed;
         
         // Apply stricter rate limiting to auth endpoints
         if (requestPath.startsWith("/api/auth/")) {
-            allowed = rateLimiterService.tryConsumeAuth(clientIp);
+            allowed = rateLimiterService.tryConsumeAuth(companyIp);
             if (!allowed) {
-                log.warn("Rate limit exceeded for auth endpoint from IP: {}", clientIp);
+                log.warn("Rate limit exceeded for auth endpoint from IP: {}", companyIp);
             }
         } else {
-            allowed = rateLimiterService.tryConsumeGeneral(clientIp);
+            allowed = rateLimiterService.tryConsumeGeneral(companyIp);
             if (!allowed) {
-                log.warn("Rate limit exceeded for general endpoint from IP: {}", clientIp);
+                log.warn("Rate limit exceeded for general endpoint from IP: {}", companyIp);
             }
         }
         
@@ -62,9 +64,9 @@ public class RateLimitFilter extends OncePerRequestFilter {
     }
 
     /**
-     * Extract client IP address, handling proxies
+     * Extract company IP address, handling proxies
      */
-    private String getClientIp(HttpServletRequest request) {
+    private String getCompanyIp(HttpServletRequest request) {
         String xForwardedFor = request.getHeader("X-Forwarded-For");
         if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
             // Take the first IP in case of multiple proxies

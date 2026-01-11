@@ -24,7 +24,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 
     Optional<Invoice> findByMilestoneId(Long milestoneId);
 
-    Page<Invoice> findByClientIdOrderByCreatedAtDesc(Long clientId, Pageable pageable);
+    Page<Invoice> findByCompanyIdOrderByCreatedAtDesc(Long companyId, Pageable pageable);
 
     Page<Invoice> findByFreelancerIdOrderByCreatedAtDesc(Long freelancerId, Pageable pageable);
 
@@ -34,7 +34,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 
     List<Invoice> findByInvoiceType(InvoiceType invoiceType);
 
-    @Query("SELECT i FROM Invoice i WHERE i.client.id = :userId OR i.freelancer.id = :userId ORDER BY i.createdAt DESC")
+    @Query("SELECT i FROM Invoice i WHERE i.company.id = :userId OR i.freelancer.id = :userId ORDER BY i.createdAt DESC")
     Page<Invoice> findByUserId(@Param("userId") Long userId, Pageable pageable);
 
     @Query("SELECT i FROM Invoice i WHERE i.dueDate < :now AND i.status = 'SENT'")

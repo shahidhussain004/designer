@@ -28,7 +28,7 @@ public class ContractService {
         // Use Hibernate.initialize to eagerly load all associations
         contracts.forEach(c -> {
             Hibernate.initialize(c.getProject());
-            Hibernate.initialize(c.getClient());
+            Hibernate.initialize(c.getCompany());
             Hibernate.initialize(c.getFreelancer());
             Hibernate.initialize(c.getProposal());
             if (c.getProject() != null) {
@@ -43,7 +43,7 @@ public class ContractService {
                 .orElseThrow(() -> new RuntimeException("Contract not found: " + id));
         // Use Hibernate.initialize to eagerly load all associations
         Hibernate.initialize(contract.getProject());
-        Hibernate.initialize(contract.getClient());
+        Hibernate.initialize(contract.getCompany());
         Hibernate.initialize(contract.getFreelancer());
         Hibernate.initialize(contract.getProposal());
         if (contract.getProject() != null) {
@@ -57,7 +57,7 @@ public class ContractService {
         // Use Hibernate.initialize to eagerly load all associations
         contracts.forEach(c -> {
             Hibernate.initialize(c.getProject());
-            Hibernate.initialize(c.getClient());
+            Hibernate.initialize(c.getCompany());
             Hibernate.initialize(c.getFreelancer());
             Hibernate.initialize(c.getProposal());
             if (c.getProject() != null) {

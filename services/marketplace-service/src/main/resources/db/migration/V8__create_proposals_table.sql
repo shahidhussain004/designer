@@ -22,12 +22,12 @@ CREATE TABLE IF NOT EXISTS proposals (
     -- Status & Engagement
     status VARCHAR(50) DEFAULT 'SUBMITTED' NOT NULL,
     is_featured BOOLEAN DEFAULT FALSE,
-    client_notes TEXT,
+    company_notes TEXT,
     rejection_reason TEXT,
     
     -- Ratings & Reviews (after completion)
-    client_rating DECIMAL(3,2),
-    client_review TEXT,
+    company_rating DECIMAL(3,2),
+    company_review TEXT,
     freelancer_rating DECIMAL(3,2),
     freelancer_review TEXT,
     
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS proposals (
     -- Unique constraint to prevent duplicate proposals per project-freelancer
     CONSTRAINT unique_project_freelancer UNIQUE(project_id, freelancer_id),
     CONSTRAINT chk_proposal_status CHECK (status IN ('SUBMITTED', 'REVIEWING', 'SHORTLISTED', 'ACCEPTED', 'REJECTED', 'WITHDRAWN')),
-    CONSTRAINT chk_ratings CHECK (client_rating IS NULL OR (client_rating >= 0 AND client_rating <= 5)),
+    CONSTRAINT chk_ratings CHECK (company_rating IS NULL OR (company_rating >= 0 AND company_rating <= 5)),
     CONSTRAINT chk_freelancer_rating CHECK (freelancer_rating IS NULL OR (freelancer_rating >= 0 AND freelancer_rating <= 5))
 );
 

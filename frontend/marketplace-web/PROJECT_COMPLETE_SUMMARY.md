@@ -44,7 +44,7 @@ The **Designer Marketplace Frontend UI Redesign** project has been **100% comple
 - Settings
 
 **Dashboard Pages (12)**
-- Client & Freelancer Dashboards
+- Company & Freelancer Dashboards
 - Invoicing & Billing
 - Contract Management
 - Time Tracking

@@ -16,5 +16,5 @@ public class UpdateProposalStatusRequest {
     @NotBlank(message = "Status is required")
     private String status; // SHORTLISTED, ACCEPTED, REJECTED
 
-    private String clientMessage;
+    private String companyMessage;
 }

@@ -60,14 +60,14 @@ public class ProjectService {
     public ProjectResponse createProject(CreateProjectRequest request) {
         User currentUser = userService.getCurrentUser();
 
-        if (currentUser.getRole() != User.UserRole.CLIENT) {
-            throw new RuntimeException("Only clients can create projects");
+        if (currentUser.getRole() != User.UserRole.COMPANY) {
+            throw new RuntimeException("Only companies can create projects");
         }
 
         log.info("Creating new project by user: {}", currentUser.getUsername());
 
         Project project = new Project();
-        project.setClient(currentUser);
+        project.setCompany(currentUser);
         project.setTitle(request.getTitle());
         project.setDescription(request.getDescription());
         
@@ -110,7 +110,7 @@ public class ProjectService {
                 .orElseThrow(() -> new RuntimeException("Project not found with id: " + id));
 
         User currentUser = userService.getCurrentUser();
-        if (!project.getClient().getId().equals(currentUser.getId())) {
+        if (!project.getCompany().getId().equals(currentUser.getId())) {
             throw new RuntimeException("You can only update your own projects");
         }
 
@@ -164,7 +164,7 @@ public class ProjectService {
                 .orElseThrow(() -> new RuntimeException("Project not found with id: " + id));
 
         User currentUser = userService.getCurrentUser();
-        if (!project.getClient().getId().equals(currentUser.getId())) {
+        if (!project.getCompany().getId().equals(currentUser.getId())) {
             throw new RuntimeException("You can only delete your own projects");
         }
 
@@ -184,14 +184,14 @@ public class ProjectService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project not found with id: " + projectId));
         User currentUser = userService.getCurrentUser();
-        return project.getClient().getId().equals(currentUser.getId());
+        return project.getCompany().getId().equals(currentUser.getId());
     }
 
     @Transactional(readOnly = true)
     public Page<ProjectResponse> getMyProjects(Pageable pageable) {
         User currentUser = userService.getCurrentUser();
         log.info("Getting projects for user: {}", currentUser.getUsername());
-        Page<Project> projects = projectRepository.findByClientId(currentUser.getId(), pageable);
+        Page<Project> projects = projectRepository.findByCompanyId(currentUser.getId(), pageable);
         return projects.map(ProjectResponse::fromEntity);
     }
 }

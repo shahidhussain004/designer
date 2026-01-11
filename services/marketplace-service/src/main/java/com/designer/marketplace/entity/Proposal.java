@@ -64,8 +64,8 @@ public class Proposal {
     @Column(nullable = false, length = 20)
     private ProposalStatus status = ProposalStatus.SUBMITTED;
 
-    @Column(name = "client_message", columnDefinition = "TEXT")
-    private String clientMessage;
+    @Column(name = "company_message", columnDefinition = "TEXT")
+    private String companyMessage;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)

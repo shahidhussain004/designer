@@ -77,9 +77,9 @@ public class MilestoneService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalArgumentException("Project not found"));
 
-        // Verify user is the client
-        if (!project.getClient().getId().equals(userId)) {
-            throw new IllegalArgumentException("Only the project client can create milestones");
+        // Verify user is the company
+        if (!project.getCompany().getId().equals(userId)) {
+            throw new IllegalArgumentException("Only the project company can create milestones");
         }
 
         // Check if milestones already exist
@@ -118,23 +118,23 @@ public class MilestoneService {
      * Fund a milestone (create payment and hold in escrow).
      */
     @Transactional
-    public MilestoneResponse fundMilestone(Long milestoneId, Long clientId) {
-        log.info("Funding milestone {} by client {}", milestoneId, clientId);
+    public MilestoneResponse fundMilestone(Long milestoneId, Long companyId) {
+        log.info("Funding milestone {} by company {}", milestoneId, companyId);
 
         Milestone milestone = milestoneRepository.findById(milestoneId)
                 .orElseThrow(() -> new IllegalArgumentException("Milestone not found"));
 
-        // Verify client owns the project
-        if (!milestone.getProject().getClient().getId().equals(clientId)) {
-            throw new IllegalArgumentException("Only the project client can fund milestones");
+        // Verify company owns the project
+        if (!milestone.getProject().getCompany().getId().equals(companyId)) {
+            throw new IllegalArgumentException("Only the project company can fund milestones");
         }
 
         if (milestone.getStatus() != MilestoneStatus.PENDING) {
             throw new IllegalStateException("Milestone is not in PENDING status");
         }
 
-        User client = userRepository.findById(clientId)
-                .orElseThrow(() -> new IllegalArgumentException("Client not found"));
+        User company = userRepository.findById(companyId)
+                .orElseThrow(() -> new IllegalArgumentException("Company not found"));
 
         User freelancer = milestone.getProposal() != null
                 ? milestone.getProposal().getFreelancer()
@@ -154,7 +154,7 @@ public class MilestoneService {
             Map<String, String> metadata = new HashMap<>();
             metadata.put("milestone_id", milestone.getId().toString());
             metadata.put("project_id", milestone.getProject().getId().toString());
-            metadata.put("client_id", client.getId().toString());
+            metadata.put("company_id", company.getId().toString());
             metadata.put("freelancer_id", freelancer.getId().toString());
 
             PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
@@ -173,7 +173,7 @@ public class MilestoneService {
             // Create payment record
             Payment payment = Payment.builder()
                     .paymentIntentId(paymentIntent.getId())
-                    .client(client)
+                    .company(company)
                     .freelancer(freelancer)
                     .project(milestone.getProject())
                     .proposal(milestone.getProposal())
@@ -210,7 +210,7 @@ public class MilestoneService {
             milestoneRepository.save(milestone);
 
             // Create ledger entries
-            createLedgerEntry(payment, escrow, client, TransactionType.ESCROW_HOLD,
+            createLedgerEntry(payment, escrow, company, TransactionType.ESCROW_HOLD,
                     freelancerAmount, "Milestone funded: " + milestone.getTitle());
 
             log.info("Milestone {} funded with payment {}", milestoneId, payment.getId());
@@ -280,13 +280,13 @@ public class MilestoneService {
      * Approve milestone and release escrow.
      */
     @Transactional
-    public MilestoneResponse approveMilestone(Long milestoneId, Long clientId,
+    public MilestoneResponse approveMilestone(Long milestoneId, Long companyId,
             ApproveMilestoneRequest request) {
         Milestone milestone = milestoneRepository.findById(milestoneId)
                 .orElseThrow(() -> new IllegalArgumentException("Milestone not found"));
 
-        if (!milestone.getProject().getClient().getId().equals(clientId)) {
-            throw new IllegalArgumentException("Only the project client can approve milestones");
+        if (!milestone.getProject().getCompany().getId().equals(companyId)) {
+            throw new IllegalArgumentException("Only the project company can approve milestones");
         }
 
         if (milestone.getStatus() != MilestoneStatus.SUBMITTED) {
@@ -317,7 +317,7 @@ public class MilestoneService {
         milestone.setApprovedAt(LocalDateTime.now());
         milestoneRepository.save(milestone);
 
-        log.info("Milestone {} approved by client {}", milestoneId, clientId);
+        log.info("Milestone {} approved by company {}", milestoneId, companyId);
         return MilestoneResponse.fromEntity(milestone);
     }
 
@@ -325,13 +325,13 @@ public class MilestoneService {
      * Request revision for a milestone.
      */
     @Transactional
-    public MilestoneResponse requestRevision(Long milestoneId, Long clientId,
+    public MilestoneResponse requestRevision(Long milestoneId, Long companyId,
             RequestRevisionRequest request) {
         Milestone milestone = milestoneRepository.findById(milestoneId)
                 .orElseThrow(() -> new IllegalArgumentException("Milestone not found"));
 
-        if (!milestone.getProject().getClient().getId().equals(clientId)) {
-            throw new IllegalArgumentException("Only the project client can request revisions");
+        if (!milestone.getProject().getCompany().getId().equals(companyId)) {
+            throw new IllegalArgumentException("Only the project company can request revisions");
         }
 
         if (milestone.getStatus() != MilestoneStatus.SUBMITTED) {
@@ -408,11 +408,11 @@ public class MilestoneService {
     }
 
     /**
-     * Get milestones for a client.
+     * Get milestones for a company.
      */
     @Transactional(readOnly = true)
-    public Page<MilestoneResponse> getMilestonesByClientId(Long clientId, Pageable pageable) {
-        return milestoneRepository.findByClientId(clientId, pageable)
+    public Page<MilestoneResponse> getMilestonesByCompanyId(Long companyId, Pageable pageable) {
+        return milestoneRepository.findByCompanyId(companyId, pageable)
                 .map(MilestoneResponse::fromEntity);
     }
 

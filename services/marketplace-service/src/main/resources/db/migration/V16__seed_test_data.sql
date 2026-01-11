@@ -1,15 +1,6 @@
--- =====================================================
--- V19: Seed Test Data for Development & Testing
--- Description: Complete seed data with proper relationships
--- WARNING: For development/testing only
--- =====================================================
 
--- Disable triggers temporarily for faster bulk insert
 SET session_replication_role = 'replica';
 
--- =====================================================
--- STEP 1: Seed Users (Clients and Freelancers)
--- =====================================================
 
 -- Create users with password set to 'password123'
 -- WARNING: Run in development only or after taking backups.
@@ -32,16 +23,16 @@ INSERT INTO users (
     created_at, updated_at
 )
 VALUES
--- Clients/Employers
-('client1@example.com', 'client_john', crypt('password123', gen_salt('bf', 12)), 'John Client', 'CLIENT', 'CLIENT',
+-- Companies/Employers
+('company1@example.com', 'company_john', crypt('password123', gen_salt('bf', 12)), 'John Company', 'COMPANY', 'COMPANY',
  'Product Manager at Tech Corp', 'San Francisco, CA', NULL, '[]'::json, 5,
  4.8, 12, true, true, 100.0, 95.0, NOW(), NOW()),
 
-('client2@example.com', 'client_sarah', crypt('password123', gen_salt('bf', 12)), 'Sarah Martinez', 'CLIENT', 'CLIENT',
+('company2@example.com', 'company_sarah', crypt('password123', gen_salt('bf', 12)), 'Sarah Martinez', 'COMPANY', 'COMPANY',
  'Startup Founder', 'New York, NY', NULL, '[]'::json, 3,
  4.5, 8, true, true, 98.0, 92.0, NOW(), NOW()),
 
-('client3@example.com', 'client_mike', crypt('password123', gen_salt('bf', 12)), 'Mike Johnson', 'CLIENT', 'CLIENT',
+('company3@example.com', 'company_mike', crypt('password123', gen_salt('bf', 12)), 'Mike Johnson', 'COMPANY', 'COMPANY',
  'Marketing Director', 'Los Angeles, CA', NULL, '[]'::json, 7,
  4.9, 25, true, true, 99.0, 96.0, NOW(), NOW()),
 
@@ -96,9 +87,9 @@ DECLARE
     v_cat_design_id BIGINT;
     v_cat_marketing_id BIGINT;
     
-    v_client1_id BIGINT;
-    v_client2_id BIGINT;
-    v_client3_id BIGINT;
+    v_company1_id BIGINT;
+    v_company2_id BIGINT;
+    v_company3_id BIGINT;
 BEGIN
     -- Get category IDs
     SELECT id INTO v_cat_web_dev_id FROM project_categories WHERE slug = 'web-development' LIMIT 1;
@@ -107,14 +98,14 @@ BEGIN
     SELECT id INTO v_cat_design_id FROM project_categories WHERE slug = 'design' LIMIT 1;
     SELECT id INTO v_cat_marketing_id FROM project_categories WHERE slug = 'marketing' LIMIT 1;
     
-    -- Get client IDs
-    SELECT id INTO v_client1_id FROM users WHERE email = 'client1@example.com';
-    SELECT id INTO v_client2_id FROM users WHERE email = 'client2@example.com';
-    SELECT id INTO v_client3_id FROM users WHERE email = 'client3@example.com';
+    -- Get company IDs
+    SELECT id INTO v_company1_id FROM users WHERE email = 'company1@example.com';
+    SELECT id INTO v_company2_id FROM users WHERE email = 'company2@example.com';
+    SELECT id INTO v_company3_id FROM users WHERE email = 'company3@example.com';
     
     -- Insert projects
     INSERT INTO projects (
-        client_id, category_id, title, description,
+        company_id, category_id, title, description,
         budget_min, budget_max, budget, budget_type, currency,
         duration, status, required_skills, experience_level,
         project_type, priority_level, visibility,
@@ -122,7 +113,7 @@ BEGIN
     )
     VALUES 
     -- Project 1: E-commerce Platform
-    (v_client1_id, v_cat_web_dev_id,
+    (v_company1_id, v_cat_web_dev_id,
      'E-commerce Platform Redesign',
      'Complete redesign of existing e-commerce platform with focus on mobile UX and performance optimization',
      12000.00, 18000.00, 15000.00, 'FIXED_PRICE', 'USD',
@@ -131,7 +122,7 @@ BEGIN
      NOW(), NOW(), NOW()),
     
     -- Project 2: Mobile App
-    (v_client2_id, v_cat_mobile_dev_id,
+    (v_company2_id, v_cat_mobile_dev_id,
      'Fitness Tracking Mobile App',
      'Native iOS and Android app for fitness tracking with real-time sync and social features',
      20000.00, 30000.00, 25000.00, 'FIXED_PRICE', 'USD',
@@ -140,7 +131,7 @@ BEGIN
      NOW(), NOW(), NOW()),
     
     -- Project 3: AI Chatbot
-    (v_client3_id, v_cat_data_science_id,
+    (v_company3_id, v_cat_data_science_id,
      'AI Chatbot Integration',
      'Integrate OpenAI ChatGPT into existing customer support system with custom training',
      6000.00, 10000.00, 8000.00, 'FIXED_PRICE', 'USD',
@@ -149,20 +140,18 @@ BEGIN
      NOW(), NOW(), NOW()),
     
     -- Project 4: Brand Identity
-    (v_client1_id, v_cat_design_id,
+    (v_company1_id, v_cat_design_id,
      'Complete Brand Identity Design',
      'Create comprehensive brand identity package including logo, color palette, typography, and brand guidelines',
      3000.00, 7000.00, 5000.00, 'FIXED_PRICE', 'USD',
     4, 'OPEN', '["Graphic Design","Branding","Illustrator","Figma"]'::json, 'INTERMEDIATE',
      'SINGLE_PROJECT', 'MEDIUM', 'PUBLIC',
      NOW(), NOW(), NOW()),
-    
-    -- Project 5: SEO & Content
-    (v_client2_id, v_cat_marketing_id,
+    (v_company1_id, v_cat_marketing_id,
      'SEO & Content Marketing Strategy',
      'Implement comprehensive SEO strategy and create 50 high-quality blog posts',
      4000.00, 8000.00, 6000.00, 'FIXED_PRICE', 'USD',
-    8, 'OPEN', '["SEO","Content Writing","Google Analytics","Marketing"]'::json, 'INTERMEDIATE',
+     8, 'OPEN', '["SEO","Content Writing","Google Analytics","Marketing"]'::json, 'INTERMEDIATE',
      'ONGOING', 'MEDIUM', 'PUBLIC',
      NOW(), NOW(), NOW())
     ON CONFLICT DO NOTHING;
@@ -180,9 +169,9 @@ DECLARE
     v_cat_product_mgmt_id BIGINT;
     v_cat_marketing_id BIGINT;
     
-    v_client1_id BIGINT;
-    v_client2_id BIGINT;
-    v_client3_id BIGINT;
+    v_company1_id BIGINT;
+    v_company2_id BIGINT;
+    v_company3_id BIGINT;
 BEGIN
     -- Get job category IDs
     SELECT id INTO v_cat_software_id FROM job_categories WHERE slug = 'software-development' LIMIT 1;
@@ -192,9 +181,9 @@ BEGIN
     SELECT id INTO v_cat_marketing_id FROM job_categories WHERE slug = 'marketing' LIMIT 1;
     
     -- Get employer IDs
-    SELECT id INTO v_client1_id FROM users WHERE email = 'client1@example.com';
-    SELECT id INTO v_client2_id FROM users WHERE email = 'client2@example.com';
-    SELECT id INTO v_client3_id FROM users WHERE email = 'client3@example.com';
+    SELECT id INTO v_company1_id FROM users WHERE email = 'company1@example.com';
+    SELECT id INTO v_company2_id FROM users WHERE email = 'company2@example.com';
+    SELECT id INTO v_company3_id FROM users WHERE email = 'company3@example.com';
     
     -- Insert job postings
     INSERT INTO jobs (
@@ -207,7 +196,7 @@ BEGIN
     )
     VALUES 
     -- Job 1: Senior Backend Engineer
-    (v_client1_id, v_cat_software_id,
+    (v_company1_id, v_cat_software_id,
      'Senior Backend Engineer',
      'We are looking for an experienced backend engineer to build scalable microservices and APIs. You will work on high-traffic systems serving millions of users.',
      'FULL_TIME', 'SENIOR',
@@ -218,7 +207,7 @@ BEGIN
      NOW(), NOW(), NOW()),
     
     -- Job 2: Product Designer
-    (v_client1_id, v_cat_design_id,
+    (v_company1_id, v_cat_design_id,
      'Senior Product Designer',
      'Join our design team to create beautiful and intuitive user experiences for our mobile and web applications.',
      'FULL_TIME', 'SENIOR',
@@ -229,7 +218,7 @@ BEGIN
      NOW(), NOW(), NOW()),
     
     -- Job 3: Data Scientist
-    (v_client2_id, v_cat_data_science_id,
+    (v_company2_id, v_cat_data_science_id,
      'Lead Data Scientist',
      'Looking for a data scientist to drive insights and build ML models for our recommendation engine.',
      'FULL_TIME', 'LEAD',
@@ -240,7 +229,7 @@ BEGIN
      NOW(), NOW(), NOW()),
     
     -- Job 4: Frontend Developer (Draft)
-    (v_client2_id, v_cat_software_id,
+    (v_company2_id, v_cat_software_id,
      'Frontend React Developer',
      'Draft position for frontend developer with React expertise.',
      'FULL_TIME', 'INTERMEDIATE',
@@ -251,7 +240,7 @@ BEGIN
      NOW(), NOW(), NULL),
     
     -- Job 5: Marketing Manager
-    (v_client3_id, v_cat_marketing_id,
+    (v_company3_id, v_cat_marketing_id,
      'Digital Marketing Manager',
      'Lead our digital marketing efforts including SEO, content, and paid advertising.',
      'FULL_TIME', 'SENIOR',

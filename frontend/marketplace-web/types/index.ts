@@ -3,7 +3,7 @@ export interface User {
   email: string;
   username: string;
   fullName?: string;
-  role: 'CLIENT' | 'FREELANCER' | 'ADMIN';
+  role: 'COMPANY' | 'FREELANCER' | 'ADMIN';
   bio?: string;
   profileImageUrl?: string;
   location?: string;
@@ -32,7 +32,7 @@ export interface Job {
     name: string;
   };
   status: 'DRAFT' | 'OPEN' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'CLOSED';
-  clientId: number;
+  companyId: number;
   viewCount?: number;
   proposalCount?: number;
   createdAt: string;

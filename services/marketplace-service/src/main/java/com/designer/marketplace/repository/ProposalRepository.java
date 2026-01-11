@@ -35,16 +35,15 @@ public interface ProposalRepository extends JpaRepository<Proposal, Long> {
     Long countByFreelancerIdAndStatus(@Param("freelancerId") Long freelancerId,
             @Param("status") Proposal.ProposalStatus status);
 
-    @Query("SELECT COUNT(p) FROM Proposal p WHERE p.project.client.id = :clientId")
-    Long countByProjectClientId(@Param("clientId") Long clientId);
+    @Query("SELECT COUNT(p) FROM Proposal p WHERE p.project.company.id = :companyId")
+    Long countByProjectCompanyId(@Param("companyId") Long companyId);
 
-    @Query("SELECT COUNT(p) FROM Proposal p WHERE p.project.client.id = :clientId AND p.status = :status")
-    Long countByProjectClientIdAndStatus(@Param("clientId") Long clientId,
+    @Query("SELECT COUNT(p) FROM Proposal p WHERE p.project.company.id = :companyId AND p.status = :status")
+    Long countByProjectCompanyIdAndStatus(@Param("companyId") Long companyId,
             @Param("status") Proposal.ProposalStatus status);
 
-    @Query("SELECT p FROM Proposal p WHERE p.project.client.id = :clientId ORDER BY p.createdAt DESC")
-    List<Proposal> findTopByProjectClientId(@Param("clientId") Long clientId, Pageable pageable);
-
+    @Query("SELECT p FROM Proposal p WHERE p.project.company.id = :companyId ORDER BY p.createdAt DESC")
+    List<Proposal> findTopByProjectCompanyId(@Param("companyId") Long companyId, Pageable pageable);
     @Query("SELECT p FROM Proposal p WHERE p.freelancer.id = :freelancerId ORDER BY p.createdAt DESC")
     List<Proposal> findTopByFreelancerId(@Param("freelancerId") Long freelancerId, Pageable pageable);
     

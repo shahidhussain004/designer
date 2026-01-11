@@ -98,7 +98,7 @@ const HowItWorksCarousel = () => {
     {
       id: 7,
       title: "Submit Deliverables",
-      description: "Designers upload completed work for each milestone, ready for client review",
+      description: "Designers upload completed work for each milestone, ready for company review",
       icon: (
         <svg className="w-24 h-24" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M40 15V45M40 45L50 35M40 45L30 35" stroke="#EF4444" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>

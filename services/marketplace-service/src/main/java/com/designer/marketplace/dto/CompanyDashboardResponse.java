@@ -8,13 +8,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * DTO for Client Dashboard response
+ * DTO for Company Dashboard response
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ClientDashboardResponse {
+public class CompanyDashboardResponse {
 
     private DashboardStats stats;
     private List<ProjectResponse> activeProjects;

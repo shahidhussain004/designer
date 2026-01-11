@@ -27,7 +27,7 @@ public class ProposalResponse {
     private Double proposedRate;
     private Integer estimatedDuration;
     private String status;
-    private String clientMessage;
+    private String companyMessage;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -86,7 +86,7 @@ public class ProposalResponse {
                 .proposedRate(proposal.getProposedRate())
                 .estimatedDuration(proposal.getEstimatedDuration())
                 .status(proposal.getStatus() != null ? proposal.getStatus().name() : null)
-                .clientMessage(proposal.getClientMessage())
+                .companyMessage(proposal.getCompanyMessage())
                 .createdAt(proposal.getCreatedAt())
                 .updatedAt(proposal.getUpdatedAt())
                 .build();

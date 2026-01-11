@@ -31,7 +31,7 @@ export default function CreateProjectPage() {
 
   useEffect(() => {
     const currentUser = authService.getCurrentUser();
-    if (!currentUser || currentUser.role !== 'CLIENT') {
+    if (!currentUser || currentUser.role !== 'COMPANY') {
       router.push('/auth/login');
       return;
     }

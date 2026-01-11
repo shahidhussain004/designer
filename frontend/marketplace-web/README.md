@@ -37,7 +37,7 @@ Next.js 14 App Router application for the Designer Marketplace platform. Provide
 - ✅ Token-based auth integration
 
 ### 🔄 In Progress
-- 🔄 Dashboard pages (client & freelancer)
+- 🔄 Dashboard pages (company & freelancer)
 - 🔄 Profile editing pages
 - 🔄 Payment UI integration
 - 🔄 Admin dashboard (for Sprint 13)

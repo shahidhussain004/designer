@@ -20,7 +20,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Payment entity representing a transaction between client and freelancer.
+ * Payment entity representing a transaction between company and freelancer.
  * Integrates with Stripe for payment processing.
  */
 @Entity
@@ -43,8 +43,8 @@ public class Payment {
 
     // Relationships
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_id", nullable = false)
-    private User client;
+    @JoinColumn(name = "company_id", nullable = false)
+    private User company;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "freelancer_id", nullable = false)

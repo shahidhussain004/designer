@@ -72,7 +72,7 @@
 | Page | File | Status | Notes |
 |------|------|--------|-------|
 | Dashboard | `app/dashboard/page.tsx` | ✅ Complete | Main dashboard |
-| Dashboard Client | `app/dashboard/client/page.tsx` | ✅ Complete | Client dashboard |
+| Dashboard Company | `app/dashboard/company/page.tsx` | ✅ Complete | Company dashboard |
 | Dashboard Invoices | `app/dashboard/invoices/page.tsx` | ✅ Complete | Billing & payments |
 | Dashboard Contracts | `app/dashboard/contracts/[id]/page.tsx` | ✅ Complete | Contract details |
 | Dashboard Freelancer | `app/dashboard/freelancer/page.tsx` | ✅ Complete | Freelancer dashboard |

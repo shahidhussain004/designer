@@ -64,7 +64,7 @@ public class ProjectController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('CLIENT')")
+    @PreAuthorize("hasRole('COMPANY')")
     public ResponseEntity<ProjectResponse> createProject(@Valid @RequestBody CreateProjectRequest request) {
         log.info("Creating new project");
         ProjectResponse project = projectService.createProject(request);
@@ -102,7 +102,7 @@ public class ProjectController {
     }
 
     @GetMapping("/my-projects")
-    @PreAuthorize("hasRole('CLIENT')")
+    @PreAuthorize("hasRole('COMPANY')")
     public ResponseEntity<Page<ProjectResponse>> getMyProjects(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
@@ -112,6 +112,4 @@ public class ProjectController {
         Page<ProjectResponse> projects = projectService.getMyProjects(pageable);
         return ResponseEntity.ok(projects);
     }
-
-
 }

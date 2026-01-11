@@ -3,7 +3,7 @@ import { apiClient } from './api-client';
 // Payment types
 export interface PaymentIntent {
   id: string;
-  clientSecret: string;
+  companySecret: string;
   amount: number;
   currency: string;
   status: string;

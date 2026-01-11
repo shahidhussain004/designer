@@ -58,7 +58,7 @@
 ### Dashboard Pages (12 pages)
 ```
 ✅ Main Dashboard - app/dashboard/page.tsx
-✅ Client Dashboard - app/dashboard/client/page.tsx
+✅ Company Dashboard - app/dashboard/company/page.tsx
 ✅ Invoices & Billing - app/dashboard/invoices/page.tsx
 ✅ Contract Details - app/dashboard/contracts/[id]/page.tsx
 ✅ Freelancer Dashboard - app/dashboard/freelancer/page.tsx

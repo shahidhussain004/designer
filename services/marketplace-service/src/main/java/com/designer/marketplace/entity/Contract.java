@@ -28,12 +28,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Contract entity - Represents a formal agreement between client and freelancer
+ * Contract entity - Represents a formal agreement between company and freelancer
  */
 @Entity
 @Table(name = "contracts", indexes = {
     @Index(name = "idx_contract_project_id", columnList = "project_id"),
-    @Index(name = "idx_contract_client_id", columnList = "client_id"),
+    @Index(name = "idx_contract_company_id", columnList = "company_id"),
     @Index(name = "idx_contract_freelancer_id", columnList = "freelancer_id"),
     @Index(name = "idx_contract_status", columnList = "status")
 })
@@ -53,8 +53,8 @@ public class Contract {
     private Project project;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_id", nullable = false, foreignKey = @ForeignKey(name = "fk_contract_client"))
-    private User client;
+    @JoinColumn(name = "company_id", nullable = false, foreignKey = @ForeignKey(name = "fk_contract_company"))
+    private User company;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "freelancer_id", nullable = false, foreignKey = @ForeignKey(name = "fk_contract_freelancer"))

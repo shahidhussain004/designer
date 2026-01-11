@@ -3,7 +3,7 @@
 ## ✅ PROJECT COMPLETION CERTIFICATE
 
 **Project**: Designer Marketplace Frontend UI Redesign  
-**Client**: Designer Marketplace Platform  
+**Company**: Designer Marketplace Platform  
 **Completion Date**: January 3, 2026  
 **Status**: ✅ **100% COMPLETE AND VERIFIED**
 
@@ -56,7 +56,7 @@ Production Readiness:              100% ✅
 
 ### ✅ TIER 4 - DASHBOARDS (12 pages)
 - [x] Main Dashboard (app/dashboard/page.tsx)
-- [x] Client Dashboard (app/dashboard/client/page.tsx)
+- [x] Company Dashboard (app/dashboard/company/page.tsx)
 - [x] Invoices & Billing (app/dashboard/invoices/page.tsx)
 - [x] Contract Details (app/dashboard/contracts/[id]/page.tsx)
 - [x] Freelancer Dashboard (app/dashboard/freelancer/page.tsx)

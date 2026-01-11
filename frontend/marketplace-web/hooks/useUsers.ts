@@ -60,7 +60,7 @@ interface Review {
 interface Contract {
   id: number;
   projectId: number;
-  clientId: number;
+  companyId: number;
   freelancerId: number;
   status: 'DRAFT' | 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED' | 'DISPUTED';
   totalAmount: number;
@@ -113,7 +113,7 @@ interface CreateReviewInput {
 }
 
 interface UsersFilters {
-  role?: 'FREELANCER' | 'EMPLOYER' | 'ADMIN';
+  role?: 'FREELANCER' | 'COMPANY' | 'ADMIN';
   search?: string;
   page?: number;
   limit?: number;
@@ -669,15 +669,15 @@ export function useContract(contractId: number | null) {
  */
 export function useUserContracts(
   userId: number | null,
-  role?: 'client' | 'freelancer'
+  role?: 'COMPANY' | 'FREELANCER'
 ) {
   return useQuery({
     queryKey: ['contracts', 'user', userId, role],
     queryFn: async ({ signal }) => {
       if (!userId) throw new Error('User ID is required');
-      const endpoint = role === 'client' 
-        ? `/contracts/client/${userId}`
-        : role === 'freelancer'
+      const endpoint = role === 'COMPANY' 
+        ? `/contracts/company/${userId}`
+        : role === 'FREELANCER'
           ? `/contracts/freelancer/${userId}`
           : `/contracts/user/${userId}`;
           

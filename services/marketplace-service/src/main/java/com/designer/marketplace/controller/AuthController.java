@@ -1,16 +1,25 @@
 package com.designer.marketplace.controller;
 
-import com.designer.marketplace.dto.*;
-import com.designer.marketplace.security.LoginAttemptService;
-import com.designer.marketplace.security.SecurityAuditService;
-import com.designer.marketplace.service.AuthService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.designer.marketplace.dto.AuthResponse;
+import com.designer.marketplace.dto.LoginRequest;
+import com.designer.marketplace.dto.RefreshTokenRequest;
+import com.designer.marketplace.dto.RegisterRequest;
+import com.designer.marketplace.security.LoginAttemptService;
+import com.designer.marketplace.security.SecurityAuditService;
+import com.designer.marketplace.service.AuthService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 /**
  * Authentication REST Controller
@@ -68,7 +77,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request,
                                                  HttpServletRequest httpRequest) {
-        String clientIp = getClientIp(httpRequest);
+        String companyIp = getCompanyIp(httpRequest);
         log.info("==== POST /api/auth/register called - Email: {}, Username: {}, Role: {} ====",
                 request.getEmail(), request.getUsername(), request.getRole());
         
@@ -77,7 +86,7 @@ public class AuthController {
         securityAuditService.logRegistration(
                 response.getUser().getId(), 
                 response.getUser().getEmail(), 
-                clientIp);
+                companyIp);
         
         log.info("==== Registration successful for user: {} ====", response.getUser().getUsername());
         return ResponseEntity.ok(response);
@@ -91,11 +100,11 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request,
                                    HttpServletRequest httpRequest) {
-        String clientIp = getClientIp(httpRequest);
+        String companyIp = getCompanyIp(httpRequest);
         String loginKey = request.getEmailOrUsername().toLowerCase();
         
         log.info("==== POST /api/auth/login called - EmailOrUsername: {} from IP: {} ====", 
-                request.getEmailOrUsername(), clientIp);
+                request.getEmailOrUsername(), companyIp);
         
         // Check if account is locked due to failed attempts
         if (loginAttemptService.isBlocked(loginKey)) {
@@ -105,8 +114,8 @@ public class AuthController {
         }
         
         // Check if IP is blocked
-        if (loginAttemptService.isIpBlocked(clientIp)) {
-            log.warn("Login attempt from blocked IP: {}", clientIp);
+        if (loginAttemptService.isIpBlocked(companyIp)) {
+            log.warn("Login attempt from blocked IP: {}", companyIp);
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                     .body(new ErrorResponse("Too many failed attempts from this location. Please try again later."));
         }
@@ -119,15 +128,15 @@ public class AuthController {
             securityAuditService.logLoginSuccess(
                     response.getUser().getId(), 
                     response.getUser().getEmail(), 
-                    clientIp);
+                    companyIp);
             
             log.info("==== Login successful for user: {} ====", response.getUser().getUsername());
             return ResponseEntity.ok(response);
             
         } catch (Exception e) {
             // Failed login - record attempt
-            loginAttemptService.loginFailed(loginKey, clientIp);
-            securityAuditService.logLoginFailure(loginKey, e.getMessage(), clientIp);
+            loginAttemptService.loginFailed(loginKey, companyIp);
+            securityAuditService.logLoginFailure(loginKey, e.getMessage(), companyIp);
             
             int remaining = loginAttemptService.getRemainingAttempts(loginKey);
             String message = remaining > 0 
@@ -152,9 +161,9 @@ public class AuthController {
     }
     
     /**
-     * Extract client IP address, handling proxies
+     * Extract company IP address, handling proxies
      */
-    private String getClientIp(HttpServletRequest request) {
+    private String getCompanyIp(HttpServletRequest request) {
         String xForwardedFor = request.getHeader("X-Forwarded-For");
         if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
             return xForwardedFor.split(",")[0].trim();

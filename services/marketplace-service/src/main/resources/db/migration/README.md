@@ -21,7 +21,7 @@ This directory contains all database migrations for the Marketplace application.
 
 ### V8 - Contracts
 **File**: `V8__create_contracts_table.sql`  
-**Purpose**: Formal agreements between clients and freelancers with payment tracking  
+**Purpose**: Formal agreements between companies and freelancers with payment tracking  
 **Tables**: `contracts`
 
 ### V9 - Time Entries

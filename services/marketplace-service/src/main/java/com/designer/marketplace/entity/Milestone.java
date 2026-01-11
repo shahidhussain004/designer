@@ -112,11 +112,11 @@ public class Milestone {
 
     public enum MilestoneStatus {
         PENDING, // Not started, awaiting funding
-        FUNDED, // Client has funded the milestone
+        FUNDED, // Company has funded the milestone
         IN_PROGRESS, // Freelancer is working on it
         SUBMITTED, // Freelancer submitted deliverables for review
-        REVISION_REQUESTED, // Client requested changes
-        APPROVED, // Client approved, funds released
+        REVISION_REQUESTED, // Company requested changes
+        APPROVED, // Company approved, funds released
         CANCELLED, // Milestone cancelled
         DISPUTED // Under dispute resolution
     }

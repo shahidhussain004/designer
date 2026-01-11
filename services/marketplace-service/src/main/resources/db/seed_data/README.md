@@ -10,7 +10,7 @@ Seed data migrations follow the pattern `V{NUMBER}__seed_{description}.sql` to d
 
 - **V100__seed_job_categories.sql** - Inserts standard job categories
 - **V101__seed_experience_levels.sql** - Inserts standard experience levels  
-- **V102__seed_test_data.sql** - Test users (clients, freelancers, admin), test jobs, proposals, and notifications
+- **V102__seed_test_data.sql** - Test users (companies, freelancers, admin), test jobs, proposals, and notifications
 
 ## Usage
 
