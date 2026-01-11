@@ -39,7 +39,7 @@ The schema is designed from scratch based on the actual running database, follow
   - 10 default categories for freelance work types
   - Similar structure to job_categories for consistency
   
-- **V7__create_projects_table.sql**: Freelance project postings by clients
+- **V7__create_projects_table.sql**: Freelance project postings by companies
   - 50+ columns for comprehensive project details
   - Budget tracking (min/max), timeline, visibility controls
   - Proposal counter auto-maintained via triggers
@@ -47,7 +47,7 @@ The schema is designed from scratch based on the actual running database, follow
   
 - **V8__create_proposals_table.sql**: Freelancer proposals for projects
   - UNIQUE constraint on (project_id, freelancer_id)
-  - Client ratings and review comments stored
+  - Company ratings and review comments stored
   - Auto-increment proposal counter on projects
   - Screening question answers in JSON format
 

@@ -67,7 +67,7 @@ All 46 pages of the Designer Marketplace Frontend have been successfully convert
 
 #### Dashboard Pages (12)
 - ✅ `app/dashboard/page.tsx` - Main Dashboard
-- ✅ `app/dashboard/client/page.tsx` - Client Dashboard
+- ✅ `app/dashboard/company/page.tsx` - Company Dashboard
 - ✅ `app/dashboard/invoices/page.tsx` - Billing & Payments
 - ✅ `app/dashboard/contracts/[id]/page.tsx` - Contract Details
 - ✅ `app/dashboard/freelancer/page.tsx` - Freelancer Dashboard

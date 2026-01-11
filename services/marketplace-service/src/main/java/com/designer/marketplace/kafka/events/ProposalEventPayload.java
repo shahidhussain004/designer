@@ -18,7 +18,7 @@ public class ProposalEventPayload {
     private String jobTitle;
     private Long freelancerId;
     private String freelancerName;
-    private Long clientId;
+    private Long companyId;
     private Double proposedRate;
     private Integer estimatedDuration;
     private String status;

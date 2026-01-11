@@ -18,7 +18,7 @@ interface TestUser {
   username: string;
   password: string;
   fullName: string;
-  role: 'CLIENT' | 'FREELANCER';
+  role: 'COMPANY' | 'FREELANCER';
   token?: string;
   refreshToken?: string;
 }
@@ -31,7 +31,7 @@ interface TestJob {
   category: string;
   experienceLevel: string;
   timelineWeeks: number;
-  clientId?: number;
+  companyId?: number;
 }
 
 // Utility functions
@@ -81,7 +81,7 @@ interface TestProposal {
 }
 
 describe('Designer Marketplace API - Integration Tests', () => {
-  let clientUser: TestUser;
+  let companyUser: TestUser;
   let freelancerUser: TestUser;
   let createdJob: TestJob;
   let createdProposal: TestProposal;
@@ -97,21 +97,21 @@ describe('Designer Marketplace API - Integration Tests', () => {
 
   // ==================== AUTHENTICATION TESTS ====================
   describe('Authentication Flow', () => {
-    test('Should register a new CLIENT user', async () => {
+    test('Should register a new company user', async () => {
       const newUser: TestUser = {
-        email: `client_${Date.now()}@test.com`,
-        username: `client_${Date.now()}`,
+        email: `company_${Date.now()}@test.com`,
+        username: `company_${Date.now()}`,
         password: 'TestPassword123!',
-        fullName: 'Test Client',
-        role: 'CLIENT',
+        fullName: 'Test Company',
+        role: 'COMPANY',
       };
 
-      clientUser = await registerUser(newUser);
+      companyUser = await registerUser(newUser);
 
-      expect(clientUser.id).toBeDefined();
-      expect(clientUser.token).toBeDefined();
-      expect(clientUser.token).toMatch(/^eyJ/); // JWT format check
-      expect(clientUser.refreshToken).toBeDefined();
+      expect(companyUser.id).toBeDefined();
+      expect(companyUser.token).toBeDefined();
+      expect(companyUser.token).toMatch(/^eyJ/); // JWT format check
+      expect(companyUser.refreshToken).toBeDefined();
     });
 
     test('Should register a new FREELANCER user', async () => {
@@ -131,15 +131,15 @@ describe('Designer Marketplace API - Integration Tests', () => {
     });
 
     test('Should login with email', async () => {
-      const response = await login(clientUser.email, clientUser.password);
+      const response = await login(companyUser.email, companyUser.password);
 
       expect(response.accessToken).toBeDefined();
       expect(response.refreshToken).toBeDefined();
-      expect(response.user.id).toBe(clientUser.id);
-      expect(response.user.email).toBe(clientUser.email);
+      expect(response.user.id).toBe(companyUser.id);
+      expect(response.user.email).toBe(companyUser.email);
 
       // Update token for subsequent tests
-      clientUser.token = response.accessToken;
+      companyUser.token = response.accessToken;
     });
 
     test('Should login with username', async () => {
@@ -167,12 +167,12 @@ describe('Designer Marketplace API - Integration Tests', () => {
     test('Should refresh access token', async () => {
       const response = await api.post(
         '/auth/refresh',
-        { refreshToken: clientUser.refreshToken },
-        getAuthHeader(clientUser.token!)
+        { refreshToken: companyUser.refreshToken },
+        getAuthHeader(companyUser.token!)
       );
 
       expect(response.data.accessToken).toBeDefined();
-      expect(response.data.accessToken).not.toBe(clientUser.token); // Should be new token
+      expect(response.data.accessToken).not.toBe(companyUser.token); // Should be new token
       expect(response.data.refreshToken).toBeDefined();
     });
   });
@@ -180,18 +180,17 @@ describe('Designer Marketplace API - Integration Tests', () => {
   // ==================== USER TESTS ====================
   describe('User Management', () => {
     test('Should get current user profile', async () => {
-      const response = await api.get('/users/me', getAuthHeader(clientUser.token!));
+      const response = await api.get('/users/me', getAuthHeader(companyUser.token!));
 
-      expect(response.data.id).toBe(clientUser.id);
-      expect(response.data.email).toBe(clientUser.email);
-      expect(response.data.role).toBe('CLIENT');
+      expect(response.data.id).toBe(companyUser.id);
+      expect(response.data.email).toBe(companyUser.email);
+      expect(response.data.role).toBe('COMPANY');
     });
 
     test('Should get user by ID', async () => {
-      const response = await api.get(`/users/${clientUser.id}`, getAuthHeader(clientUser.token!));
-
-      expect(response.data.id).toBe(clientUser.id);
-      expect(response.data.email).toBe(clientUser.email);
+      const response = await api.get(`/users/${companyUser.id}`, getAuthHeader(companyUser.token!));
+      expect(response.data.id).toBe(companyUser.id);
+      expect(response.data.email).toBe(companyUser.email);
     });
 
     test('Should get user profile details', async () => {
@@ -210,7 +209,7 @@ describe('Designer Marketplace API - Integration Tests', () => {
       const response = await api.put(
         '/users/me',
         updateData,
-        getAuthHeader(clientUser.token!)
+        getAuthHeader(companyUser.token!)
       );
 
       expect(response.data.fullName).toBe(updateData.fullName);
@@ -227,7 +226,7 @@ describe('Designer Marketplace API - Integration Tests', () => {
       expect(response.data.length).toBeGreaterThan(0);
       expect(response.data[0]).toHaveProperty('title');
       expect(response.data[0]).toHaveProperty('budget');
-      expect(response.data[0]).toHaveProperty('clientId');
+      expect(response.data[0]).toHaveProperty('companyId');
     });
 
     test('Should filter jobs by category', async () => {
@@ -255,10 +254,10 @@ describe('Designer Marketplace API - Integration Tests', () => {
       expect(response.data.id).toBe(1);
       expect(response.data).toHaveProperty('title');
       expect(response.data).toHaveProperty('description');
-      expect(response.data).toHaveProperty('clientId');
+      expect(response.data).toHaveProperty('companyId');
     });
 
-    test('Should create a new job (CLIENT)', async () => {
+    test('Should create a new job (COMPANY)', async () => {
       const newJob: TestJob = {
         title: `Integration Test Job ${Date.now()}`,
         description: 'Test job description for integration testing',
@@ -271,19 +270,19 @@ describe('Designer Marketplace API - Integration Tests', () => {
       const response = await api.post(
         '/jobs',
         newJob,
-        getAuthHeader(clientUser.token!)
+        getAuthHeader(companyUser.token!)
       );
 
       expect(response.status).toBe(201);
       expect(response.data.id).toBeDefined();
       expect(response.data.title).toBe(newJob.title);
       expect(response.data.budget).toBe(newJob.budget);
-      expect(response.data.clientId).toBe(clientUser.id);
+      expect(response.data.companyId).toBe(companyUser.id);
 
       createdJob = { ...newJob, id: response.data.id };
     });
 
-    test('Should update a job (CLIENT)', async () => {
+    test('Should update a job (COMPANY)', async () => {
       const updatedJob = {
         title: `Updated Job Title ${Date.now()}`,
         budget: 5500,
@@ -296,19 +295,19 @@ describe('Designer Marketplace API - Integration Tests', () => {
       const response = await api.put(
         `/jobs/${createdJob.id}`,
         updatedJob,
-        getAuthHeader(clientUser.token!)
+        getAuthHeader(companyUser.token!)
       );
 
       expect(response.data.title).toBe(updatedJob.title);
       expect(response.data.budget).toBe(updatedJob.budget);
     });
 
-    test('Should get client jobs', async () => {
-      const response = await api.get('/jobs/my-jobs', getAuthHeader(clientUser.token!));
+    test('Should get company jobs', async () => {
+      const response = await api.get('/jobs/my-jobs', getAuthHeader(companyUser.token!));
 
       expect(Array.isArray(response.data)).toBe(true);
       response.data.forEach((job: TestJob) => {
-        expect(job.clientId).toBe(clientUser.id);
+        expect(job.companyId).toBe(companyUser.id);
       });
     });
   });
@@ -342,7 +341,7 @@ describe('Designer Marketplace API - Integration Tests', () => {
     test('Should get proposals for a job', async () => {
       const response = await api.get(
         `/jobs/${createdJob.id}/proposals`,
-        getAuthHeader(clientUser.token!)
+        getAuthHeader(companyUser.token!)
       );
 
       expect(Array.isArray(response.data)).toBe(true);
@@ -375,18 +374,18 @@ describe('Designer Marketplace API - Integration Tests', () => {
       expect(response.data.freelancerId).toBe(freelancerUser.id);
     });
 
-    test('Should accept a proposal (CLIENT)', async () => {
+    test('Should accept a proposal (COMPANY)', async () => {
       const response = await api.put(
         `/proposals/${createdProposal.id}/accept`,
         {},
-        getAuthHeader(clientUser.token!)
+        getAuthHeader(companyUser.token!)
       );
 
       expect(response.status).toBe(200);
       expect(response.data.status).toBe('ACCEPTED');
     });
 
-    test('Should reject a proposal (CLIENT)', async () => {
+    test('Should reject a proposal (COMPANY)', async () => {
       // Create another proposal first
       const proposal = {
         jobId: createdJob.id,
@@ -404,7 +403,7 @@ describe('Designer Marketplace API - Integration Tests', () => {
       const response = await api.put(
         `/proposals/${proposalResponse.data.id}/reject`,
         {},
-        getAuthHeader(clientUser.token!)
+        getAuthHeader(companyUser.token!)
       );
 
       expect(response.data.status).toBe('REJECTED');
@@ -413,10 +412,10 @@ describe('Designer Marketplace API - Integration Tests', () => {
 
   // ==================== DASHBOARD TESTS ====================
   describe('Dashboard Statistics', () => {
-    test('Should get CLIENT dashboard stats', async () => {
+    test('Should get COMPANY dashboard stats', async () => {
       const response = await api.get(
-        '/dashboard/client',
-        getAuthHeader(clientUser.token!)
+        '/dashboard/company',
+        getAuthHeader(companyUser.token!)
       );
 
       expect(response.data).toHaveProperty('stats');
@@ -519,7 +518,7 @@ describe('Designer Marketplace API - Integration Tests', () => {
         await api.post(
           '/jobs',
           { title: 'Test Job' }, // Missing required fields
-          getAuthHeader(clientUser.token!)
+          getAuthHeader(companyUser.token!)
         );
         throw new Error('Should have thrown error');
       } catch (error) {
@@ -530,7 +529,7 @@ describe('Designer Marketplace API - Integration Tests', () => {
 
     test('Should prevent duplicate email registration', async () => {
       try {
-        await registerUser(clientUser);
+        await registerUser(companyUser);
         throw new Error('Should have thrown error');
       } catch (error) {
         const axiosError = error as import('axios').AxiosError;
@@ -571,13 +570,13 @@ describe('Designer Marketplace API - Integration Tests', () => {
       console.log('✓ Users registered');
 
       // 2. Login and get tokens
-      expect(clientUser.token).toBeDefined();
+      expect(companyUser.token).toBeDefined();
       expect(freelancerUser.token).toBeDefined();
       console.log('✓ Users logged in');
 
-      // 3. CLIENT creates job
+      // 3. COMPANY creates job
       expect(createdJob.id).toBeDefined();
-      console.log('✓ Job created by CLIENT');
+      console.log('✓ Job created by COMPANY');
 
       // 4. FREELANCER browses jobs
       const jobsResponse = await api.get('/jobs');
@@ -588,19 +587,19 @@ describe('Designer Marketplace API - Integration Tests', () => {
       expect(createdProposal.id).toBeDefined();
       console.log('✓ FREELANCER submitted proposal');
 
-      // 6. CLIENT accepts proposal
+      // 6. COMPANY accepts proposal
       const acceptResponse = await api.put(
         `/proposals/${createdProposal.id}/accept`,
         {},
-        getAuthHeader(clientUser.token!)
+        getAuthHeader(companyUser.token!)
       );
       expect(acceptResponse.data.status).toBe('ACCEPTED');
-      console.log('✓ CLIENT accepted proposal');
+      console.log('✓ COMPANY accepted proposal');
 
       // 7. Check dashboards
-      const clientDash = await api.get('/dashboard/client', getAuthHeader(clientUser.token!));
+      const companyDash = await api.get('/dashboard/company', getAuthHeader(companyUser.token!));
       const freelancerDash = await api.get('/dashboard/freelancer', getAuthHeader(freelancerUser.token!));
-      expect(clientDash.data.totalJobsPosted).toBeGreaterThan(0);
+      expect(companyDash.data.totalJobsPosted).toBeGreaterThan(0);
       expect(freelancerDash.data.proposalsAccepted).toBeGreaterThan(0);
       console.log('✓ Dashboards show updated stats');
 

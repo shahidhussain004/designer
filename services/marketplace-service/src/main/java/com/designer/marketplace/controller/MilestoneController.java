@@ -1,20 +1,32 @@
 package com.designer.marketplace.controller;
 
-import com.designer.marketplace.dto.MilestoneDTOs.*;
-import com.designer.marketplace.service.MilestoneService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.designer.marketplace.dto.MilestoneDTOs.ApproveMilestoneRequest;
+import com.designer.marketplace.dto.MilestoneDTOs.CreateMilestoneRequest;
+import com.designer.marketplace.dto.MilestoneDTOs.MilestoneResponse;
+import com.designer.marketplace.dto.MilestoneDTOs.MilestoneSummary;
+import com.designer.marketplace.dto.MilestoneDTOs.RequestRevisionRequest;
+import com.designer.marketplace.dto.MilestoneDTOs.SubmitMilestoneRequest;
+import com.designer.marketplace.service.MilestoneService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/milestones")
@@ -39,8 +51,8 @@ public class MilestoneController {
     public ResponseEntity<MilestoneResponse> fundMilestone(
             @PathVariable Long milestoneId,
             @AuthenticationPrincipal UserDetails userDetails) {
-        Long clientId = getUserId(userDetails);
-        return ResponseEntity.ok(milestoneService.fundMilestone(milestoneId, clientId));
+        Long companyId = getUserId(userDetails);
+        return ResponseEntity.ok(milestoneService.fundMilestone(milestoneId, companyId));
     }
 
     @PostMapping("/{milestoneId}/start")
@@ -68,8 +80,8 @@ public class MilestoneController {
             @PathVariable Long milestoneId,
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody(required = false) ApproveMilestoneRequest request) {
-        Long clientId = getUserId(userDetails);
-        return ResponseEntity.ok(milestoneService.approveMilestone(milestoneId, clientId,
+        Long companyId = getUserId(userDetails);
+        return ResponseEntity.ok(milestoneService.approveMilestone(milestoneId, companyId,
                 request != null ? request : new ApproveMilestoneRequest()));
     }
 
@@ -79,8 +91,8 @@ public class MilestoneController {
             @PathVariable Long milestoneId,
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody RequestRevisionRequest request) {
-        Long clientId = getUserId(userDetails);
-        return ResponseEntity.ok(milestoneService.requestRevision(milestoneId, clientId, request));
+        Long companyId = getUserId(userDetails);
+        return ResponseEntity.ok(milestoneService.requestRevision(milestoneId, companyId, request));
     }
 
     @GetMapping("/job/{jobId}")
@@ -95,13 +107,13 @@ public class MilestoneController {
         return ResponseEntity.ok(milestoneService.getMilestoneSummary(jobId));
     }
 
-    @GetMapping("/client")
-    @Operation(summary = "Get milestones for the current client")
-    public ResponseEntity<Page<MilestoneResponse>> getClientMilestones(
+    @GetMapping("/company")
+    @Operation(summary = "Get milestones for the current company")
+    public ResponseEntity<Page<MilestoneResponse>> getCompanyMilestones(
             @AuthenticationPrincipal UserDetails userDetails,
             Pageable pageable) {
-        Long clientId = getUserId(userDetails);
-        return ResponseEntity.ok(milestoneService.getMilestonesByClientId(clientId, pageable));
+        Long companyId = getUserId(userDetails);
+        return ResponseEntity.ok(milestoneService.getMilestonesByCompanyId(companyId, pageable));
     }
 
     @GetMapping("/freelancer")

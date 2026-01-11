@@ -18,8 +18,8 @@ const termsData = [
     content: 'You are responsible for maintaining the confidentiality of your account and password, and for restricting access to your computer.',
   },
   {
-    title: '4. Freelancer and Client Responsibilities',
-    content: 'Freelancers and clients must adhere to fair use policies and maintain professional conduct throughout all interactions.',
+    title: '4. Freelancer and Company Responsibilities',
+    content: 'Freelancers and companies must adhere to fair use policies and maintain professional conduct throughout all interactions.',
   },
   {
     title: '5. Payment Terms',

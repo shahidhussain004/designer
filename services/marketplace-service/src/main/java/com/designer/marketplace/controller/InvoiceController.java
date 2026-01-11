@@ -1,21 +1,29 @@
 package com.designer.marketplace.controller;
 
-import com.designer.marketplace.dto.InvoiceDTOs.*;
-import com.designer.marketplace.entity.Invoice.InvoiceStatus;
-import com.designer.marketplace.service.InvoiceService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.designer.marketplace.dto.InvoiceDTOs.InvoiceResponse;
+import com.designer.marketplace.entity.Invoice.InvoiceStatus;
+import com.designer.marketplace.service.InvoiceService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/invoices")
@@ -59,13 +67,13 @@ public class InvoiceController {
         return ResponseEntity.ok(invoiceService.getInvoicesForUser(userId, pageable));
     }
 
-    @GetMapping("/client")
-    @Operation(summary = "Get invoices for the current client")
-    public ResponseEntity<Page<InvoiceResponse>> getClientInvoices(
+    @GetMapping("/company")
+    @Operation(summary = "Get invoices for the current company")
+    public ResponseEntity<Page<InvoiceResponse>> getCompanyInvoices(
             @AuthenticationPrincipal UserDetails userDetails,
             Pageable pageable) {
-        Long clientId = getUserId(userDetails);
-        return ResponseEntity.ok(invoiceService.getInvoicesForClient(clientId, pageable));
+        Long companyId = getUserId(userDetails);
+        return ResponseEntity.ok(invoiceService.getInvoicesForCompany(companyId, pageable));
     }
 
     @GetMapping("/freelancer")

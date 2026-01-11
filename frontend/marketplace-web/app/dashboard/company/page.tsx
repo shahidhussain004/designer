@@ -2,15 +2,15 @@
 
 import { PageLayout } from '@/components/ui'
 import { authService } from '@/lib/auth'
-import { ClientDashboard, getDashboardData } from '@/lib/dashboard'
+import { CompanyDashboard, getDashboardData } from '@/lib/dashboard'
 import { Briefcase, CheckCircle, FileText, Loader2, Plus, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
-export default function ClientDashboardPage() {
+export default function CompanyDashboardPage() {
   const router = useRouter()
-  const [data, setData] = useState<ClientDashboard | null>(null)
+  const [data, setData] = useState<CompanyDashboard | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -23,7 +23,7 @@ export default function ClientDashboardPage() {
     const load = async () => {
       try {
         const d = await getDashboardData()
-        setData(d as ClientDashboard)
+        setData(d as CompanyDashboard)
       } catch (err) {
         console.error(err)
         setError('Failed to load dashboard')
@@ -65,7 +65,7 @@ export default function ClientDashboardPage() {
       {/* Header Section */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <h1 className="text-4xl font-bold">Client Dashboard</h1>
+          <h1 className="text-4xl font-bold">Company Dashboard</h1>
           <p className="mt-2 text-blue-100">Manage your jobs and projects all in one place.</p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link

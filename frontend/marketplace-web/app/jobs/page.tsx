@@ -113,7 +113,7 @@ export default function JobsListPage() {
                 Explore {jobs?.length || 0} open position{(jobs?.length || 0) !== 1 ? 's' : ''} from leading companies — find the one that fits you.
               </p>
             </div>
-            {user && user.role === 'CLIENT' && (
+            {user && user.role === 'COMPANY' && (
               <Link
                 href="/jobs/create"
                 className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-semibold transition-all shadow-lg whitespace-nowrap"

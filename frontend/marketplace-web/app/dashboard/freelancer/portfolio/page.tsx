@@ -182,7 +182,7 @@ export default function PortfolioPage() {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">My Portfolio</h1>
-          <p className="text-gray-600 mt-2">Showcase your best work to potential clients</p>
+          <p className="text-gray-600 mt-2">Showcase your best work to potential companies</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
@@ -292,7 +292,7 @@ export default function PortfolioPage() {
                   className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                 />
                 <label htmlFor="isVisible" className="ml-2 text-sm text-gray-700">
-                  Make this project visible to clients
+                  Make this project visible to companies
                 </label>
               </div>
             </div>

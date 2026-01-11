@@ -89,15 +89,15 @@ public class RateLimitConfig {
          * Check if request is allowed and consume a token
          * @return true if allowed, false if rate limited
          */
-        public boolean tryConsumeAuth(String clientIp) {
-            return getAuthBucket(clientIp).tryConsume(1);
+        public boolean tryConsumeAuth(String companyIp) {
+            return getAuthBucket(companyIp).tryConsume(1);
         }
 
         /**
          * Check if request is allowed for general API
          */
-        public boolean tryConsumeGeneral(String clientIp) {
-            return getGeneralBucket(clientIp).tryConsume(1);
+        public boolean tryConsumeGeneral(String companyIp) {
+            return getGeneralBucket(companyIp).tryConsume(1);
         }
     }
 }

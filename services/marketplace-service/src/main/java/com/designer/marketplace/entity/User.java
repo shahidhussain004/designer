@@ -23,7 +23,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 
 /**
- * User entity - represents both clients and freelancers
+ * User entity - represents both companies and freelancers
  * Maps to 'users' table in PostgreSQL
  */
 @Entity
@@ -145,18 +145,16 @@ public class User {
     }
 
     public enum UserRole {
-        CLIENT,
+        COMPANY,
         FREELANCER,
-        ADMIN,
-        EMPLOYER // Backward compatibility - same as CLIENT
+        ADMIN
     }
     
     // Also expose as Role for backward compatibility
     public static final class Role {
-        public static final UserRole CLIENT = UserRole.CLIENT;
+        public static final UserRole COMPANY = UserRole.COMPANY;
         public static final UserRole FREELANCER = UserRole.FREELANCER;
         public static final UserRole ADMIN = UserRole.ADMIN;
-        public static final UserRole EMPLOYER = UserRole.EMPLOYER;
     }
 
     // Default constructor

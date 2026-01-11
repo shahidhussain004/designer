@@ -38,7 +38,7 @@ export default function CreateJobPage() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    if (user && user.role !== 'CLIENT') {
+    if (user && user.role !== 'COMPANY') {
       router.push('/jobs');
     }
   }, [router, user]);
@@ -101,14 +101,14 @@ export default function CreateJobPage() {
     );
   }
 
-  if (user.role !== 'CLIENT') {
+  if (user.role !== 'COMPANY') {
     return (
       <PageLayout>
         <div className="bg-gray-50 min-h-screen py-12">
           <div className="mx-auto max-w-4xl px-4">
             <div className="bg-red-50 text-red-700 border border-red-200 rounded-lg px-4 py-3 flex items-center gap-2 mb-4">
               <XCircle className="w-5 h-5" />
-              Only clients can post jobs
+              Only companies can post jobs
             </div>
             <Link href="/jobs" className="text-primary-600 hover:text-primary-700 flex items-center gap-2">
               <ArrowLeft className="w-4 h-4" /> Back to Jobs

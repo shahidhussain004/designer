@@ -4,7 +4,7 @@ import { ReactNode } from 'react'
 
 interface ProtectedRouteProps {
   children: ReactNode
-  requiredRole?: 'INSTRUCTOR' | 'ADMIN' | 'CLIENT' | 'FREELANCER'
+  requiredRole?: 'INSTRUCTOR' | 'ADMIN' | 'COMPANY' | 'FREELANCER'
   redirectTo?: string
 }
 
@@ -42,7 +42,7 @@ export function ProtectedRoute({
  * }
  */
 export function useProtectedRoute(
-  requiredRole?: 'INSTRUCTOR' | 'ADMIN' | 'CLIENT' | 'FREELANCER',
+  requiredRole?: 'INSTRUCTOR' | 'ADMIN' | 'COMPANY' | 'FREELANCER',
   redirectTo = '/auth/login'
 ) {
   if (typeof window === 'undefined') return

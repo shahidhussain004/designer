@@ -258,7 +258,7 @@ export default function ReviewsPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Reviewee ID * (Client User ID)
+                  Reviewee ID * (Company User ID)
                 </label>
                 <input
                   type="number"
@@ -266,7 +266,7 @@ export default function ReviewsPage() {
                   value={formData.revieweeId}
                   onChange={(e) => setFormData({ ...formData, revieweeId: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Enter client user ID..."
+                  placeholder="Enter company user ID..."
                 />
               </div>
 
@@ -299,7 +299,7 @@ export default function ReviewsPage() {
                   onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
                   rows={4}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Share your experience working with this client..."
+                  placeholder="Share your experience working with this company..."
                 />
               </div>
 
@@ -366,7 +366,7 @@ export default function ReviewsPage() {
               <MessageSquare size={48} className="mx-auto text-gray-400 mb-4" />
               <p className="text-gray-600">No reviews received yet</p>
               <p className="text-sm text-gray-500 mt-2">
-                Complete projects to receive reviews from clients
+                Complete projects to receive reviews from companies
               </p>
             </div>
           )}
@@ -376,7 +376,7 @@ export default function ReviewsPage() {
               <MessageSquare size={48} className="mx-auto text-gray-400 mb-4" />
               <p className="text-gray-600">No reviews given yet</p>
               <p className="text-sm text-gray-500 mt-2">
-                Complete a contract and write a review for your client
+                Complete a contract and write a review for your company
               </p>
             </div>
           )}

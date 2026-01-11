@@ -20,7 +20,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     Page<Project> findByStatus(Project.ProjectStatus status, Pageable pageable);
 
-    Page<Project> findByClientId(Long clientId, Pageable pageable);
+    Page<Project> findByCompanyId(Long companyId, Pageable pageable);
 
     Page<Project> findByProjectCategoryId(Long categoryId, Pageable pageable);
 
@@ -41,19 +41,18 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             Pageable pageable);
 
     // Dashboard queries
-    @Query("SELECT COUNT(p) FROM Project p WHERE p.client.id = :clientId")
-    Long countByClientId(@Param("clientId") Long clientId);
+    @Query("SELECT COUNT(p) FROM Project p WHERE p.company.id = :companyId")
+    Long countByCompanyId(@Param("companyId") Long companyId);
 
-    @Query("SELECT COUNT(p) FROM Project p WHERE p.client.id = :clientId AND p.status = :status")
-    Long countByClientIdAndStatus(@Param("clientId") Long clientId, @Param("status") Project.ProjectStatus status);
-
-    @Query("SELECT p FROM Project p WHERE p.client.id = :clientId AND p.status IN :statuses ORDER BY p.createdAt DESC")
-    List<Project> findTopByClientIdAndStatusIn(@Param("clientId") Long clientId, 
+    @Query("SELECT COUNT(p) FROM Project p WHERE p.company.id = :companyId AND p.status = :status")
+    Long countByCompanyIdAndStatus(@Param("companyId") Long companyId, @Param("status") Project.ProjectStatus status);
+    @Query("SELECT p FROM Project p WHERE p.company.id = :companyId AND p.status IN :statuses ORDER BY p.createdAt DESC")
+    List<Project> findTopByCompanyIdAndStatusIn(@Param("companyId") Long companyId, 
                                                 @Param("statuses") List<Project.ProjectStatus> statuses,
                                                 Pageable pageable);
 
-    @Query("SELECT p FROM Project p WHERE p.client.id = :clientId AND p.status = :status ORDER BY p.createdAt DESC")
-    List<Project> findTopByClientIdAndStatus(@Param("clientId") Long clientId,
+    @Query("SELECT p FROM Project p WHERE p.company.id = :companyId AND p.status = :status ORDER BY p.createdAt DESC")
+    List<Project> findTopByCompanyIdAndStatus(@Param("companyId") Long companyId,
                                             @Param("status") Project.ProjectStatus status,
                                             Pageable pageable);
 

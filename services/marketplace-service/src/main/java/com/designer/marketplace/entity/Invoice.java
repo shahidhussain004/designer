@@ -53,8 +53,8 @@ public class Invoice {
     private Milestone milestone;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_id", nullable = false)
-    private User client;
+    @JoinColumn(name = "company_id", nullable = false)
+    private User company;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "freelancer_id", nullable = false)
@@ -105,12 +105,11 @@ public class Invoice {
     private InvoiceStatus status = InvoiceStatus.DRAFT;
 
     /**
-     * Client's billing information (stored as JSON)
+     * Company's billing information (stored as JSON)
      */
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "client_billing_info", columnDefinition = "json")
-    private BillingInfo clientBillingInfo;
-
+    @Column(name = "company_billing_info", columnDefinition = "json")
+    private BillingInfo companyBillingInfo;
     /**
      * Freelancer's billing information (stored as JSON)
      */
@@ -169,7 +168,7 @@ public class Invoice {
 
     public enum InvoiceStatus {
         DRAFT, // Invoice created but not finalized
-        SENT, // Invoice sent to client
+        SENT, // Invoice sent to company
         PAID, // Invoice has been paid
         OVERDUE, // Payment is overdue
         CANCELLED, // Invoice cancelled

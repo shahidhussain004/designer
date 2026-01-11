@@ -31,9 +31,9 @@ export default function DashboardPage() {
 
       // Role-based redirect
       console.log('[Dashboard] User role:', currentUser.role);
-      if (currentUser.role === 'CLIENT') {
-        console.log('[Dashboard] Redirecting to /dashboard/client');
-        router.replace('/dashboard/client')
+      if (currentUser.role === 'COMPANY') {
+        console.log('[Dashboard] Redirecting to /dashboard/company');
+        router.replace('/dashboard/company')
       } else if (currentUser.role === 'FREELANCER') {
         console.log('[Dashboard] Redirecting to /dashboard/freelancer');
         router.replace('/dashboard/freelancer')

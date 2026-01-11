@@ -14,7 +14,7 @@ import { useState } from 'react'
 interface MilestoneListProps {
   milestones: Milestone[]
   jobId: number
-  isClient: boolean
+  isCompany: boolean
   isFreelancer: boolean
   onMilestoneUpdated: () => void
 }
@@ -22,7 +22,7 @@ interface MilestoneListProps {
 export default function MilestoneList({ 
   milestones, 
   jobId, 
-  isClient, 
+  isCompany, 
   isFreelancer,
   onMilestoneUpdated 
 }: MilestoneListProps) {
@@ -109,7 +109,7 @@ export default function MilestoneList({
 
     switch (milestone.status) {
       case 'PENDING':
-        if (isClient) {
+        if (isCompany) {
           return (
             <button
               onClick={() => handleFundMilestone(milestone.id)}
@@ -151,7 +151,7 @@ export default function MilestoneList({
         return <span className="text-sm text-gray-500">Work in progress</span>
 
       case 'SUBMITTED':
-        if (isClient) {
+        if (isCompany) {
           return (
             <div className="flex gap-2">
               <button
@@ -346,7 +346,7 @@ export default function MilestoneList({
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <h3 className="text-lg font-semibold mb-4">Submit Milestone for Review</h3>
             <p className="text-gray-600 mb-4">
-              Describe the work you&apos;ve completed and any deliverables for the client to review.
+              Describe the work you&apos;ve completed and any deliverables for the company to review.
             </p>
             <textarea
               value={deliverables}

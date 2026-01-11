@@ -28,7 +28,7 @@ interface Project {
   budget: number;
   status: string;
   createdAt: string;
-  client: {
+  company: {
     id: number;
     username: string;
     fullName: string;

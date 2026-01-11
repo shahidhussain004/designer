@@ -53,7 +53,7 @@ public class ProposalService {
 
         // Check if current user is the project owner
         User currentUser = userService.getCurrentUser();
-        if (!project.getClient().getId().equals(currentUser.getId())) {
+        if (!project.getCompany().getId().equals(currentUser.getId())) {
             throw new RuntimeException("You can only view proposals for your own projects");
         }
 
@@ -105,7 +105,7 @@ public class ProposalService {
 
         // Create notification for project owner
         notificationService.createNotification(
-                project.getClient(),
+                project.getCompany(),
                 Notification.NotificationType.PROPOSAL_RECEIVED,
                 "New Proposal Received",
                 String.format("%s submitted a proposal for your project: %s",
@@ -129,7 +129,7 @@ public class ProposalService {
         User currentUser = userService.getCurrentUser();
 
         // Check if current user is the project owner
-        if (!proposal.getProject().getClient().getId().equals(currentUser.getId())) {
+        if (!proposal.getProject().getCompany().getId().equals(currentUser.getId())) {
             throw new RuntimeException("Only the project owner can update proposal status");
         }
 
@@ -139,8 +139,8 @@ public class ProposalService {
         Proposal.ProposalStatus newStatus = Proposal.ProposalStatus.valueOf(request.getStatus().toUpperCase());
         proposal.setStatus(newStatus);
 
-        if (request.getClientMessage() != null) {
-            proposal.setClientMessage(request.getClientMessage());
+        if (request.getCompanyMessage() != null) {
+            proposal.setCompanyMessage(request.getCompanyMessage());
         }
 
         // If accepting a proposal, mark project as in progress
@@ -203,7 +203,7 @@ public class ProposalService {
         Proposal proposal = proposalRepository.findById(proposalId)
                 .orElseThrow(() -> new RuntimeException("Proposal not found with id: " + proposalId));
         User currentUser = userService.getCurrentUser();
-        return proposal.getProject().getClient().getId().equals(currentUser.getId());
+        return proposal.getProject().getCompany().getId().equals(currentUser.getId());
     }
 
     /**

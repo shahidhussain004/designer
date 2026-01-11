@@ -1,12 +1,12 @@
 -- =====================================================
 -- V9: Create Contracts Table
--- Description: Formal agreements between clients and freelancers
+-- Description: Formal agreements between companies and freelancers
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS contracts (
     id BIGSERIAL PRIMARY KEY,
     project_id BIGINT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
-    client_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    company_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     freelancer_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     proposal_id BIGINT REFERENCES proposals(id) ON DELETE SET NULL,
     
@@ -42,12 +42,11 @@ CREATE TABLE IF NOT EXISTS contracts (
 
 -- Create indexes for performance
 CREATE INDEX IF NOT EXISTS idx_contracts_project_id ON contracts(project_id);
-CREATE INDEX IF NOT EXISTS idx_contracts_client_id ON contracts(client_id);
+CREATE INDEX IF NOT EXISTS idx_contracts_company_id ON contracts(company_id);
 CREATE INDEX IF NOT EXISTS idx_contracts_freelancer_id ON contracts(freelancer_id);
 CREATE INDEX IF NOT EXISTS idx_contracts_status ON contracts(status);
 CREATE INDEX IF NOT EXISTS idx_contracts_created_at ON contracts(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_contracts_client_freelancer ON contracts(client_id, freelancer_id);
-
+CREATE INDEX IF NOT EXISTS idx_contracts_company_freelancer ON contracts(company_id, freelancer_id);
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_contracts_updated_at()
 RETURNS TRIGGER AS $$
@@ -70,7 +69,7 @@ DECLARE
 BEGIN
     SELECT COUNT(*) INTO count
     FROM contracts
-    WHERE (freelancer_id = user_id_param OR client_id = user_id_param)
+    WHERE (freelancer_id = user_id_param OR company_id = user_id_param)
     AND status = 'ACTIVE';
     
     RETURN count;
@@ -96,12 +95,12 @@ DECLARE
 BEGIN
     SELECT COUNT(*) INTO completed_count
     FROM contracts
-    WHERE (freelancer_id = user_id_param OR client_id = user_id_param)
+    WHERE (freelancer_id = user_id_param OR company_id = user_id_param)
     AND status = 'COMPLETED';
     
     SELECT COUNT(*) INTO total_count
     FROM contracts
-    WHERE (freelancer_id = user_id_param OR client_id = user_id_param)
+    WHERE (freelancer_id = user_id_param OR company_id = user_id_param)
     AND status IN ('ACTIVE', 'COMPLETED');
     
     IF total_count = 0 THEN
@@ -125,8 +124,8 @@ BEGIN
         WHERE id = NEW.freelancer_id;
         
         UPDATE users
-        SET completion_rate = calculate_user_completion_rate(NEW.client_id)
-        WHERE id = NEW.client_id;
+        SET completion_rate = calculate_user_completion_rate(NEW.company_id)
+        WHERE id = NEW.company_id;
     END IF;
     
     RETURN NEW;
@@ -138,7 +137,7 @@ AFTER UPDATE ON contracts
 FOR EACH ROW
 EXECUTE FUNCTION update_user_completion_rate();
 
-COMMENT ON TABLE contracts IS 'Formal agreements between clients and freelancers for project completion';
+COMMENT ON TABLE contracts IS 'Formal agreements between companies and freelancers for project completion';
 COMMENT ON COLUMN contracts.contract_type IS 'Type: FIXED_PRICE (lump sum), HOURLY (time-based), MILESTONE_BASED';
 COMMENT ON COLUMN contracts.payment_schedule IS 'How payments are released: UPFRONT, ON_COMPLETION, MILESTONE_BASED, WEEKLY, MONTHLY';
 COMMENT ON COLUMN contracts.status IS 'Contract status: PENDING, ACTIVE, COMPLETED, CANCELLED, DISPUTED';

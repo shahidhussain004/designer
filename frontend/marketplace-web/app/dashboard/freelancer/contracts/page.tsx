@@ -19,7 +19,7 @@ interface Contract {
   startDate: string;
   endDate?: string;
   job: { id: number; title: string };
-  client: { id: number; username: string; fullName: string };
+  company: { id: number; username: string; fullName: string };
   freelancer: { id: number; username: string; fullName: string };
   createdAt: string;
 }
@@ -245,7 +245,7 @@ export default function ContractsPage() {
                   <div className="flex items-center gap-4 text-sm text-gray-600">
                     <div className="flex items-center gap-1">
                       <Users size={16} />
-                      <span>Client: {contract.client.fullName}</span>
+                      <span>Company: {contract.company.fullName}</span>
                     </div>
                     {contract.endDate && (
                       <div className="flex items-center gap-1">

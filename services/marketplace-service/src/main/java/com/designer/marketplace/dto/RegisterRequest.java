@@ -29,7 +29,7 @@ public class RegisterRequest {
     private String fullName;
 
     @NotBlank(message = "Role is required")
-    @Pattern(regexp = "CLIENT|FREELANCER", message = "Role must be either CLIENT or FREELANCER")
+    @Pattern(regexp = "COMPANY|FREELANCER", message = "Role must be either COMPANY or FREELANCER")
     private String role;
 
     public String getEmail() { return email; }

@@ -18,8 +18,8 @@ public class JobEventPayload {
     private Long jobId;
     private String title;
     private String description;
-    private Long clientId;
-    private String clientName;
+    private Long companyId;
+    private String companyName;
     private Long categoryId;
     private String categoryName;
     private Double budget;

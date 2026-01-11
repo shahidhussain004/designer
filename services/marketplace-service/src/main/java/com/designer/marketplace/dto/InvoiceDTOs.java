@@ -51,7 +51,7 @@ public class InvoiceDTOs {
         private List<InvoiceLineItem> lineItems;
         private String notes;
         private LocalDateTime dueDate;
-        private BillingInfo clientBillingInfo;
+        private BillingInfo companyBillingInfo;
         private BillingInfo freelancerBillingInfo;
     }
 
@@ -63,7 +63,7 @@ public class InvoiceDTOs {
         private List<InvoiceLineItem> lineItems;
         private String notes;
         private LocalDateTime dueDate;
-        private BillingInfo clientBillingInfo;
+        private BillingInfo companyBillingInfo;
         private BillingInfo freelancerBillingInfo;
     }
 
@@ -76,9 +76,9 @@ public class InvoiceDTOs {
         private String invoiceNumber;
         private Long paymentId;
         private Long milestoneId;
-        private Long clientId;
-        private String clientName;
-        private String clientEmail;
+        private Long companyId;
+        private String companyName;
+        private String companyEmail;
         private Long freelancerId;
         private String freelancerName;
         private String freelancerEmail;
@@ -98,7 +98,7 @@ public class InvoiceDTOs {
         private LocalDateTime dueDate;
         private LocalDateTime paidAt;
         private LocalDateTime createdAt;
-        private BillingInfo clientBillingInfo;
+        private BillingInfo companyBillingInfo;
         private BillingInfo freelancerBillingInfo;
 
         public static InvoiceResponse fromEntity(Invoice invoice) {
@@ -107,9 +107,9 @@ public class InvoiceDTOs {
                     .invoiceNumber(invoice.getInvoiceNumber())
                     .paymentId(invoice.getPayment().getId())
                     .milestoneId(invoice.getMilestone() != null ? invoice.getMilestone().getId() : null)
-                    .clientId(invoice.getClient().getId())
-                    .clientName(invoice.getClient().getFullName())
-                    .clientEmail(invoice.getClient().getEmail())
+                    .companyId(invoice.getCompany().getId())
+                    .companyName(invoice.getCompany().getFullName())
+                    .companyEmail(invoice.getCompany().getEmail())
                     .freelancerId(invoice.getFreelancer().getId())
                     .freelancerName(invoice.getFreelancer().getFullName())
                     .freelancerEmail(invoice.getFreelancer().getEmail())

@@ -37,7 +37,7 @@
 ✅ **Core**: Home, Landing, Layout  
 ✅ **Marketplace**: Jobs, Talents, Courses, Resources, Projects, Tutorials  
 ✅ **Auth & User**: Login, Register, Profile, Settings  
-✅ **Dashboards**: Client, Freelancer, Instructor, Invoices  
+✅ **Dashboards**: Company, Freelancer, Instructor, Invoices  
 ✅ **Info**: About, Terms, Privacy, Contact  
 ✅ **System**: Design System, Design Studio  
 ✅ **Checkout**: Checkout, Checkout Success  

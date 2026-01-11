@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS invoices (
     milestone_id BIGINT,
     
     -- Parties
-    client_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    company_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     freelancer_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     payment_id BIGINT NOT NULL,
     
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS invoices (
     
     -- Details
     line_items TEXT,
-    client_billing_info TEXT,
+    company_billing_info TEXT,
     freelancer_billing_info TEXT,
     notes TEXT,
     pdf_url TEXT,
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS invoices (
 
 -- Create indexes for invoices
 CREATE INDEX IF NOT EXISTS idx_invoices_project_id ON invoices(project_id);
-CREATE INDEX IF NOT EXISTS idx_invoices_client_id ON invoices(client_id);
+CREATE INDEX IF NOT EXISTS idx_invoices_company_id ON invoices(company_id);
 CREATE INDEX IF NOT EXISTS idx_invoices_freelancer_id ON invoices(freelancer_id);
 CREATE INDEX IF NOT EXISTS idx_invoices_status ON invoices(status);
 CREATE INDEX IF NOT EXISTS idx_invoices_invoice_number ON invoices(invoice_number);
@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS milestones (
     order_number INTEGER,
     
     -- Approval & Feedback
-    client_notes TEXT,
+    company_notes TEXT,
     freelancer_notes TEXT,
     approval_date TIMESTAMP,
     rejection_reason TEXT,

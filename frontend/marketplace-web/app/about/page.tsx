@@ -49,7 +49,7 @@ export default function AboutPage() {
               <p className="text-gray-600 text-lg leading-relaxed">
                 Designer Marketplace was founded by product and design practitioners. Our small,
                 distributed team focuses on building tools and workflows that remove friction from
-                hiring and enable sustained collaboration between clients and creatives.
+                hiring and enable sustained collaboration between companies and creatives.
               </p>
             </div>
 

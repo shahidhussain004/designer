@@ -1,7 +1,7 @@
 {
   "name": "Designer Marketplace",
   "short_name": "Marketplace",
-  "description": "Connect with talented designers and clients",
+  "description": "Connect with talented designers and companies on Designer Marketplace.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

@@ -13,7 +13,7 @@ export default function RegisterPage() {
     username: string;
     password: string;
     fullName: string;
-    role: 'CLIENT' | 'FREELANCER';
+    role: 'COMPANY' | 'FREELANCER';
   }>({
     email: '',
     username: '',
@@ -158,7 +158,7 @@ export default function RegisterPage() {
 
                   <label
                     className={`flex items-center p-4 border rounded-lg cursor-pointer transition-colors ${
-                      formData.role === 'CLIENT'
+                      formData.role === 'COMPANY'
                         ? 'border-primary-500 bg-primary-50'
                         : 'border-gray-300 hover:border-gray-400'
                     }`}
@@ -166,13 +166,13 @@ export default function RegisterPage() {
                     <input
                       type="radio"
                       name="role"
-                      value="CLIENT"
-                      checked={formData.role === 'CLIENT'}
-                      onChange={() => setFormData({ ...formData, role: 'CLIENT' })}
+                      value="COMPANY"
+                      checked={formData.role === 'COMPANY'}
+                      onChange={() => setFormData({ ...formData, role: 'COMPANY' })}
                       className="w-4 h-4 text-primary-600 border-gray-300 focus:ring-input-focus"
                     />
                     <div className="ml-3">
-                      <p className="font-medium text-gray-900">Hire as a Client</p>
+                      <p className="font-medium text-gray-900">Hire as a Company</p>
                       <p className="text-sm text-gray-500">Post jobs and find talent</p>
                     </div>
                   </label>

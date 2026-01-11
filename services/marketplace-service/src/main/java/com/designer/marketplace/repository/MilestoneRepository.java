@@ -40,14 +40,14 @@ public interface MilestoneRepository extends JpaRepository<Milestone, Long> {
     @Query("SELECT SUM(m.amount) FROM Milestone m WHERE m.project.id = :projectId AND m.status = :status")
     Long sumAmountByProjectIdAndStatus(@Param("projectId") Long projectId, @Param("status") MilestoneStatus status);
 
-    @Query("SELECT m FROM Milestone m WHERE m.project.client.id = :clientId ORDER BY m.createdAt DESC")
-    Page<Milestone> findByClientId(@Param("clientId") Long clientId, Pageable pageable);
+    @Query("SELECT m FROM Milestone m WHERE m.project.company.id = :companyId ORDER BY m.createdAt DESC")
+    Page<Milestone> findByCompanyId(@Param("companyId") Long companyId, Pageable pageable);
 
     @Query("SELECT m FROM Milestone m WHERE m.proposal.freelancer.id = :freelancerId ORDER BY m.createdAt DESC")
     Page<Milestone> findByFreelancerId(@Param("freelancerId") Long freelancerId, Pageable pageable);
 
-    @Query("SELECT m FROM Milestone m WHERE m.status = 'SUBMITTED' AND m.project.client.id = :clientId ORDER BY m.submittedAt ASC")
-    List<Milestone> findPendingApprovalByClientId(@Param("clientId") Long clientId);
+    @Query("SELECT m FROM Milestone m WHERE m.status = 'SUBMITTED' AND m.project.company.id = :companyId ORDER BY m.submittedAt ASC")
+    List<Milestone> findPendingApprovalByCompanyId(@Param("companyId") Long companyId);
 
     @Query("SELECT m FROM Milestone m WHERE m.dueDate < CURRENT_TIMESTAMP AND m.status IN ('PENDING', 'FUNDED', 'IN_PROGRESS')")
     List<Milestone> findOverdueMilestones();

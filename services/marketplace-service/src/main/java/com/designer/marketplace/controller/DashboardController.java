@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.designer.marketplace.dto.ClientDashboardResponse;
+import com.designer.marketplace.dto.CompanyDashboardResponse;
 import com.designer.marketplace.dto.FreelancerDashboardResponse;
 import com.designer.marketplace.dto.NotificationResponse;
 import com.designer.marketplace.service.DashboardService;
@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
  * Controller for dashboard endpoints
  * 
  * Endpoints:
- * - GET /api/dashboard/client - Client dashboard
+ * - GET /api/dashboard/company - Company dashboard
  * - GET /api/dashboard/freelancer - Freelancer dashboard
  * - GET /api/notifications - User notifications
  */
@@ -38,32 +38,32 @@ public class DashboardController {
     private final Environment env;
 
     /**
-     * Task 3.17: Get client dashboard
-     * GET /api/dashboard/client
+     * Task 3.17: Get company dashboard
+     * GET /api/dashboard/company
      */
-    @GetMapping("/dashboard/client")
-    public ResponseEntity<ClientDashboardResponse> getClientDashboard() {
-        log.info("Getting client dashboard");
+    @GetMapping("/dashboard/company")
+    public ResponseEntity<CompanyDashboardResponse> getCompanyDashboard() {
+        log.info("Getting company dashboard");
 
         // If running with 'local' profile, skip strict role check to aid local testing
         boolean isLocal = env != null && env.acceptsProfiles(Profiles.of("local"));
         if (!isLocal) {
-            // Check if user has CLIENT role
-            boolean hasClientRole = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-                    .stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_CLIENT"));
-            if (!hasClientRole) {
-                log.warn("Unauthorized access to client dashboard");
+            // Check if user has COMPANY role
+            boolean hasCompanyRole = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                    .stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_COMPANY"));
+            if (!hasCompanyRole) {
+                log.warn("Unauthorized access to company dashboard");
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
         } else {
-            log.debug("Local profile active - bypassing client role check for dashboard");
+            log.debug("Local profile active - bypassing company role check for dashboard");
         }
 
         try {
-            ClientDashboardResponse dashboard = dashboardService.getClientDashboard();
+            CompanyDashboardResponse dashboard = dashboardService.getCompanyDashboard();
             return ResponseEntity.ok(dashboard);
         } catch (Exception e) {
-            log.error("Error getting client dashboard", e);
+            log.error("Error getting company dashboard", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
