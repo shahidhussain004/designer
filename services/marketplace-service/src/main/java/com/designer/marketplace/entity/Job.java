@@ -81,10 +81,6 @@ public class Job {
     private JobType jobType = JobType.FULL_TIME;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "employment_type", length = 50)
-    private EmploymentType employmentType = EmploymentType.PERMANENT;
-
-    @Enumerated(EnumType.STRING)
     @Column(name = "experience_level", length = 50)
     private ExperienceLevel experienceLevel = ExperienceLevel.INTERMEDIATE;
 
@@ -243,12 +239,6 @@ public class Job {
         CONTRACT,
         TEMPORARY,
         INTERNSHIP
-    }
-
-    public enum EmploymentType {
-        PERMANENT,
-        CONTRACT,
-        TEMPORARY
     }
 
     public enum ExperienceLevel {

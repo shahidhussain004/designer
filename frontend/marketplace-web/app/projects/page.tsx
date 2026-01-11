@@ -179,12 +179,9 @@ function ProjectsPageContent() {
         {/* Page Header */}
         <div className="bg-gray-900 text-white py-16 lg:py-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <h1 className="text-4xl font-bold mb-4">Find Your Next Project</h1>
+            <h1 className="text-4xl font-bold mb-4">Discover Your Next Project</h1>
             <p className="text-gray-300 text-lg max-w-2xl">
-              Discover curated opportunities matched to your expertise
-            </p>
-            <p className="text-gray-400 mt-2">
-              {projects.length} project{projects.length !== 1 ? 's' : ''} available
+              Explore {projects.length} curated project{projects.length !== 1 ? 's' : ''} matched to your expertise.
             </p>
           </div>
         </div>

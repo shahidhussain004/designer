@@ -5,12 +5,16 @@ import { authService } from './auth';
 export interface DashboardStats {
   totalJobsPosted?: number;
   openJobs?: number;
+  filledJobs?: number;
+  totalApplicationsReceived?: number;
   completedJobs?: number;
   totalProposalsReceived?: number;
   pendingProposals?: number;
   proposalsSubmitted?: number;
   proposalsAccepted?: number;
   activeProposals?: number;
+  totalProjectsPosted?: number;
+  activeProjects?: number;
   completedProjects?: number;
   totalEarnings?: number;
   avgRating?: number;
@@ -28,6 +32,23 @@ export interface JobSummary {
   createdAt: string;
 }
 
+export interface ProjectSummary {
+  id: number;
+  title: string;
+  description: string;
+  budget: number;
+  category: string | PostCategory;
+  experienceLevel: string | ExperienceLevel;
+  status: string;
+  createdAt: string;
+  client?: {
+    id: number;
+    username: string;
+    fullName: string;
+    profileImageUrl?: string | null;
+  };
+}
+
 export interface ProposalSummary {
   id: number;
   jobId: number;
@@ -39,16 +60,30 @@ export interface ProposalSummary {
   createdAt: string;
 }
 
+export interface JobApplicationSummary {
+  id: number;
+  jobId: number;
+  jobTitle: string;
+  applicantName: string;
+  applicantEmail: string;
+  status: string;
+  createdAt: string;
+}
+
 export interface ClientDashboard {
   stats: DashboardStats;
+  activeProjects: ProjectSummary[];
+  completedProjects: ProjectSummary[];
   openJobs: JobSummary[];
   recentProposals: ProposalSummary[];
+  recentApplications: JobApplicationSummary[];
 }
 
 export interface FreelancerDashboard {
   stats: DashboardStats;
   myProposals: ProposalSummary[];
   availableJobs: JobSummary[];
+  availableProjects?: ProjectSummary[];
 }
 
 export interface Notification {
@@ -106,6 +141,16 @@ export const dashboardService = {
    */
   async getMyProposals(page = 0, size = 20): Promise<{ content: ProposalSummary[]; totalElements: number }> {
     const response = await apiClient.get('/proposals/my-proposals', {
+      params: { page, size },
+    });
+    return response.data;
+  },
+
+  /**
+   * Get available jobs (public listing) - fallback for dashboard
+   */
+  async getAvailableJobs(page = 0, size = 20): Promise<{ content: JobSummary[]; totalElements: number }> {
+    const response = await apiClient.get('/jobs', {
       params: { page, size },
     });
     return response.data;

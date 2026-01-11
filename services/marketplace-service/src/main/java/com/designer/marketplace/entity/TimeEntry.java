@@ -8,6 +8,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -31,6 +33,7 @@ import lombok.NoArgsConstructor;
  * TimeEntry entity - Represents tracked work hours for hourly contracts
  */
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(name = "time_entries", indexes = {
     @Index(name = "idx_time_entry_contract_id", columnList = "contract_id"),
     @Index(name = "idx_time_entry_freelancer_id", columnList = "freelancer_id"),

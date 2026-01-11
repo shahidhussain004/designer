@@ -34,7 +34,6 @@ public class JobResponse {
     
     // Job details
     private String jobType;
-    private String employmentType;
     private String experienceLevel;
     
     // Location
@@ -111,7 +110,6 @@ public class JobResponse {
                 .responsibilities(job.getResponsibilities())
                 .requirements(job.getRequirements())
                 .jobType(job.getJobType() != null ? job.getJobType().name() : null)
-                .employmentType(job.getEmploymentType() != null ? job.getEmploymentType().name() : null)
                 .experienceLevel(job.getExperienceLevel() != null ? job.getExperienceLevel().name() : null)
                 .location(job.getLocation())
                 .city(job.getCity())
