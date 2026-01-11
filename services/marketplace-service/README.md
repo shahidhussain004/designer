@@ -12,7 +12,6 @@ Java Spring Boot REST API service for the Designer Marketplace platform with com
 - ✅ Job Marketplace (CRUD, search, filtering)
 - ✅ Proposals & Contracts
 - ✅ Payment Integration (Stripe)
-- ✅ Learning Management System (MongoDB, courses, quizzes, certificates)
 - ✅ Admin Portal (dashboard, moderation, user management)
 - ✅ Security Hardening (rate limiting, brute force protection, audit logging)
 - ✅ Production Deployment (Docker, SSL/TLS, optimized configs)
@@ -27,7 +26,6 @@ Java Spring Boot REST API service for the Designer Marketplace platform. Provide
 - **Spring Boot 3.3.0**
 - **Spring Security 6.1.8** (JWT + BCrypt)
 - **PostgreSQL 15** (via Docker) - 74 users, 18 jobs
-- **MongoDB 7** (LMS content storage)
 - **Redis** (caching & sessions)
 - **Kafka** (event streaming)
 - **Flyway** (database migrations - V1-V3)

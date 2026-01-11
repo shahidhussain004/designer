@@ -52,6 +52,11 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
                                                 @Param("statuses") List<Project.ProjectStatus> statuses,
                                                 Pageable pageable);
 
+    @Query("SELECT p FROM Project p WHERE p.client.id = :clientId AND p.status = :status ORDER BY p.createdAt DESC")
+    List<Project> findTopByClientIdAndStatus(@Param("clientId") Long clientId,
+                                            @Param("status") Project.ProjectStatus status,
+                                            Pageable pageable);
+
     @Query("SELECT COUNT(p) FROM Project p WHERE p.status = 'OPEN'")
     Long countOpenProjects();
 

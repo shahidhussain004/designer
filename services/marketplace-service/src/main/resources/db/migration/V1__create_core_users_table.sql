@@ -29,10 +29,10 @@ CREATE TABLE IF NOT EXISTS users (
     github_url VARCHAR(500),
     linkedin_url VARCHAR(500),
     
-    -- Skills
-    skills TEXT[],
-    certifications TEXT[],
-    languages TEXT[],
+    -- Skills (stored as JSON for Hibernate compatibility)
+    skills JSON DEFAULT '[]'::json,
+    certifications JSON DEFAULT '[]'::json,
+    languages JSON DEFAULT '[]'::json,
     
     -- Status
     email_verified BOOLEAN DEFAULT FALSE NOT NULL,
@@ -58,8 +58,8 @@ CREATE TABLE IF NOT EXISTS users (
     deleted_at TIMESTAMP,
     
     -- Constraints
-    CONSTRAINT chk_user_type CHECK (user_type IN ('EMPLOYER', 'FREELANCER', 'ADMIN')),
-    CONSTRAINT chk_role CHECK (role IN ('FREELANCER', 'EMPLOYER', 'ADMIN')),
+    CONSTRAINT chk_user_type CHECK (user_type IN ('CLIENT', 'FREELANCER', 'ADMIN')),
+    CONSTRAINT chk_role CHECK (role IN ('FREELANCER', 'CLIENT', 'ADMIN')),
     CONSTRAINT chk_verification_status CHECK (verification_status IN ('UNVERIFIED', 'VERIFIED', 'REJECTED'))
 );
 
@@ -86,6 +86,6 @@ FOR EACH ROW
 EXECUTE FUNCTION update_users_updated_at();
 
 COMMENT ON TABLE users IS 'Core users table for all user types';
-COMMENT ON COLUMN users.user_type IS 'User type: EMPLOYER, FREELANCER, or ADMIN';
+COMMENT ON COLUMN users.user_type IS 'User type: CLIENT, FREELANCER, or ADMIN';
 COMMENT ON COLUMN users.role IS 'JPA mapped role field';
 COMMENT ON COLUMN users.verification_status IS 'Identity verification status: UNVERIFIED, VERIFIED, REJECTED';

@@ -43,6 +43,12 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.getReviewsByUserId(userId));
     }
 
+    // Reviews written by a user (reviewer)
+    @GetMapping("/reviewer/{reviewerId}")
+    public ResponseEntity<List<Review>> getReviewsByReviewer(@PathVariable Long reviewerId) {
+        return ResponseEntity.ok(reviewService.getReviewsByReviewerId(reviewerId));
+    }
+
     @PostMapping
     public ResponseEntity<Review> createReview(@RequestBody Review review) {
         Review created = reviewService.createReview(review);

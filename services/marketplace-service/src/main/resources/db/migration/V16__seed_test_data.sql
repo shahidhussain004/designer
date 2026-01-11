@@ -11,6 +11,19 @@ SET session_replication_role = 'replica';
 -- STEP 1: Seed Users (Clients and Freelancers)
 -- =====================================================
 
+-- Create users with password set to 'password123'
+-- WARNING: Run in development only or after taking backups.
+-- This script uses pgcrypto's crypt()/gen_salt() to create bcrypt hashes server-side.
+
+-- Backup recommendation:
+-- pg_dump -h <host> -p <port> -U <user> -d <db> -t users -Fc -f users_before_insert.dump
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+BEGIN;
+
+SET session_replication_role = 'replica'; -- speed up bulk insert (if desired)
+
 INSERT INTO users (
     email, username, password_hash, full_name, user_type, role,
     bio, location, hourly_rate, skills, experience_years,
@@ -18,51 +31,58 @@ INSERT INTO users (
     completion_rate, response_rate,
     created_at, updated_at
 )
-VALUES 
+VALUES
 -- Clients/Employers
-('client1@example.com', 'client_john', '$2a$10$randomhashedpassword1', 'John Client', 'EMPLOYER', 'EMPLOYER',
- 'Product Manager at Tech Corp', 'San Francisco, CA', NULL, '', 5,
+('client1@example.com', 'client_john', crypt('password123', gen_salt('bf', 12)), 'John Client', 'CLIENT', 'CLIENT',
+ 'Product Manager at Tech Corp', 'San Francisco, CA', NULL, '[]'::json, 5,
  4.8, 12, true, true, 100.0, 95.0, NOW(), NOW()),
- 
-('client2@example.com', 'client_sarah', '$2a$10$randomhashedpassword2', 'Sarah Martinez', 'EMPLOYER', 'EMPLOYER',
- 'Startup Founder', 'New York, NY', NULL, '', 3,
+
+('client2@example.com', 'client_sarah', crypt('password123', gen_salt('bf', 12)), 'Sarah Martinez', 'CLIENT', 'CLIENT',
+ 'Startup Founder', 'New York, NY', NULL, '[]'::json, 3,
  4.5, 8, true, true, 98.0, 92.0, NOW(), NOW()),
- 
-('client3@example.com', 'client_mike', '$2a$10$randomhashedpassword3', 'Mike Johnson', 'EMPLOYER', 'EMPLOYER',
- 'Marketing Director', 'Los Angeles, CA', NULL, '', 7,
+
+('client3@example.com', 'client_mike', crypt('password123', gen_salt('bf', 12)), 'Mike Johnson', 'CLIENT', 'CLIENT',
+ 'Marketing Director', 'Los Angeles, CA', NULL, '[]'::json, 7,
  4.9, 25, true, true, 99.0, 96.0, NOW(), NOW()),
 
 -- Freelancers
-('freelancer1@example.com', 'dev_alice', '$2a$10$randomhashedpassword4', 'Alice Chen', 'FREELANCER', 'FREELANCER',
+('freelancer1@example.com', 'dev_alice', crypt('password123', gen_salt('bf', 12)), 'Alice Chen', 'FREELANCER', 'FREELANCER',
  'Full-stack developer with 8+ years experience', 'Remote - Seattle', 85.0,
- 'JavaScript, React, Node.js, PostgreSQL, Docker', 8,
+ '["JavaScript","React","Node.js","PostgreSQL","Docker"]'::json, 8,
  4.9, 45, true, true, 99.0, 98.0, NOW(), NOW()),
- 
-('freelancer2@example.com', 'designer_bob', '$2a$10$randomhashedpassword5', 'Bob Smith', 'FREELANCER', 'FREELANCER',
+
+('freelancer2@example.com', 'designer_bob', crypt('password123', gen_salt('bf', 12)), 'Bob Smith', 'FREELANCER', 'FREELANCER',
  'UI/UX Designer - Brand specialist', 'Remote - London', 75.0,
- 'Figma, Adobe XD, UI Design, Branding', 6,
+ '["Figma","Adobe XD","UI Design","Branding"]'::json, 6,
  4.7, 32, true, true, 97.0, 95.0, NOW(), NOW()),
- 
-('freelancer3@example.com', 'dev_carol', '$2a$10$randomhashedpassword6', 'Carol Davis', 'FREELANCER', 'FREELANCER',
+
+('freelancer3@example.com', 'dev_carol', crypt('password123', gen_salt('bf', 12)), 'Carol Davis', 'FREELANCER', 'FREELANCER',
  'Python developer & Data analyst', 'Remote - Toronto', 70.0,
- 'Python, Django, SQL, Data Analysis, Machine Learning', 5,
+ '["Python","Django","SQL","Data Analysis","Machine Learning"]'::json, 5,
  4.6, 28, true, true, 96.0, 94.0, NOW(), NOW()),
- 
-('freelancer4@example.com', 'writer_diana', '$2a$10$randomhashedpassword7', 'Diana Wilson', 'FREELANCER', 'FREELANCER',
+
+('freelancer4@example.com', 'writer_diana', crypt('password123', gen_salt('bf', 12)), 'Diana Wilson', 'FREELANCER', 'FREELANCER',
  'Technical writer & Content creator', 'Remote - Dublin', 55.0,
- 'Content Writing, SEO, Technical Documentation, Copywriting', 4,
+ '["Content Writing","SEO","Technical Documentation","Copywriting"]'::json, 4,
  4.8, 18, true, true, 98.0, 97.0, NOW(), NOW()),
- 
-('freelancer5@example.com', 'dev_evan', '$2a$10$randomhashedpassword8', 'Evan Moore', 'FREELANCER', 'FREELANCER',
+
+('freelancer5@example.com', 'dev_evan', crypt('password123', gen_salt('bf', 12)), 'Evan Moore', 'FREELANCER', 'FREELANCER',
  'Mobile app developer', 'Remote - Sydney', 80.0,
- 'Swift, Kotlin, React Native, Mobile Development', 7,
+ '["Swift","Kotlin","React Native","Mobile Development"]'::json, 7,
  4.5, 22, true, true, 95.0, 93.0, NOW(), NOW()),
- 
-('freelancer6@example.com', 'marketing_fiona', '$2a$10$randomhashedpassword9', 'Fiona Lee', 'FREELANCER', 'FREELANCER',
+
+('freelancer6@example.com', 'marketing_fiona', crypt('password123', gen_salt('bf', 12)), 'Fiona Lee', 'FREELANCER', 'FREELANCER',
  'Digital marketing specialist', 'Remote - Singapore', 60.0,
- 'SEO, Google Ads, Social Media, Analytics', 4,
+ '["SEO","Google Ads","Social Media","Analytics"]'::json, 4,
  4.7, 15, true, true, 97.0, 96.0, NOW(), NOW())
 ON CONFLICT (email) DO NOTHING;
+
+SET session_replication_role = 'origin';
+
+COMMIT;
+
+-- After running, users can log in with password: password123
+-- Consider setting a flag forcing password change on next login for security.
 
 -- =====================================================
 -- STEP 2: Seed Projects
@@ -106,7 +126,7 @@ BEGIN
      'E-commerce Platform Redesign',
      'Complete redesign of existing e-commerce platform with focus on mobile UX and performance optimization',
      12000.00, 18000.00, 15000.00, 'FIXED_PRICE', 'USD',
-     12, 'OPEN', ARRAY['UI Design', 'React', 'Web Development', 'UX Research']::text[], 'SENIOR',
+    12, 'OPEN', '["UI Design","React","Web Development","UX Research"]'::json, 'SENIOR',
      'SINGLE_PROJECT', 'HIGH', 'PUBLIC',
      NOW(), NOW(), NOW()),
     
@@ -115,7 +135,7 @@ BEGIN
      'Fitness Tracking Mobile App',
      'Native iOS and Android app for fitness tracking with real-time sync and social features',
      20000.00, 30000.00, 25000.00, 'FIXED_PRICE', 'USD',
-     16, 'OPEN', ARRAY['Swift', 'Kotlin', 'Mobile Development', 'API Integration']::text[], 'SENIOR',
+    16, 'OPEN', '["Swift","Kotlin","Mobile Development","API Integration"]'::json, 'SENIOR',
      'SINGLE_PROJECT', 'HIGH', 'PUBLIC',
      NOW(), NOW(), NOW()),
     
@@ -124,7 +144,7 @@ BEGIN
      'AI Chatbot Integration',
      'Integrate OpenAI ChatGPT into existing customer support system with custom training',
      6000.00, 10000.00, 8000.00, 'FIXED_PRICE', 'USD',
-     6, 'IN_PROGRESS', ARRAY['Python', 'API Integration', 'AI/ML', 'NLP']::text[], 'INTERMEDIATE',
+    6, 'IN_PROGRESS', '["Python","API Integration","AI/ML","NLP"]'::json, 'INTERMEDIATE',
      'SINGLE_PROJECT', 'URGENT', 'PUBLIC',
      NOW(), NOW(), NOW()),
     
@@ -133,7 +153,7 @@ BEGIN
      'Complete Brand Identity Design',
      'Create comprehensive brand identity package including logo, color palette, typography, and brand guidelines',
      3000.00, 7000.00, 5000.00, 'FIXED_PRICE', 'USD',
-     4, 'OPEN', ARRAY['Graphic Design', 'Branding', 'Illustrator', 'Figma']::text[], 'INTERMEDIATE',
+    4, 'OPEN', '["Graphic Design","Branding","Illustrator","Figma"]'::json, 'INTERMEDIATE',
      'SINGLE_PROJECT', 'MEDIUM', 'PUBLIC',
      NOW(), NOW(), NOW()),
     
@@ -142,7 +162,7 @@ BEGIN
      'SEO & Content Marketing Strategy',
      'Implement comprehensive SEO strategy and create 50 high-quality blog posts',
      4000.00, 8000.00, 6000.00, 'FIXED_PRICE', 'USD',
-     8, 'OPEN', ARRAY['SEO', 'Content Writing', 'Google Analytics', 'Marketing']::text[], 'INTERMEDIATE',
+    8, 'OPEN', '["SEO","Content Writing","Google Analytics","Marketing"]'::json, 'INTERMEDIATE',
      'ONGOING', 'MEDIUM', 'PUBLIC',
      NOW(), NOW(), NOW())
     ON CONFLICT DO NOTHING;
@@ -179,7 +199,7 @@ BEGIN
     -- Insert job postings
     INSERT INTO jobs (
         employer_id, category_id, title, description,
-        job_type, employment_type, experience_level,
+        job_type, experience_level,
         location, city, country, is_remote, remote_type,
         salary_min, salary_max, salary_currency, salary_period, show_salary,
         required_skills, status, positions_available,
@@ -190,10 +210,10 @@ BEGIN
     (v_client1_id, v_cat_software_id,
      'Senior Backend Engineer',
      'We are looking for an experienced backend engineer to build scalable microservices and APIs. You will work on high-traffic systems serving millions of users.',
-     'FULL_TIME', 'PERMANENT', 'SENIOR',
+     'FULL_TIME', 'SENIOR',
      'San Francisco, CA', 'San Francisco', 'United States', false, 'HYBRID',
      120000.00, 160000.00, 'USD', 'ANNUAL', true,
-     '["Node.js", "PostgreSQL", "Microservices", "Docker", "Kubernetes"]'::json,
+    '["Node.js","PostgreSQL","Microservices","Docker","Kubernetes"]'::json,
      'OPEN', 2,
      NOW(), NOW(), NOW()),
     
@@ -201,10 +221,10 @@ BEGIN
     (v_client1_id, v_cat_design_id,
      'Senior Product Designer',
      'Join our design team to create beautiful and intuitive user experiences for our mobile and web applications.',
-     'FULL_TIME', 'PERMANENT', 'SENIOR',
+     'FULL_TIME', 'SENIOR',
      'New York, NY', 'New York', 'United States', false, 'HYBRID',
      100000.00, 140000.00, 'USD', 'ANNUAL', true,
-     '["Figma", "UI/UX Design", "Prototyping", "Design Systems"]'::json,
+    '["Figma","UI/UX Design","Prototyping","Design Systems"]'::json,
      'OPEN', 1,
      NOW(), NOW(), NOW()),
     
@@ -212,10 +232,10 @@ BEGIN
     (v_client2_id, v_cat_data_science_id,
      'Lead Data Scientist',
      'Looking for a data scientist to drive insights and build ML models for our recommendation engine.',
-     'FULL_TIME', 'PERMANENT', 'LEAD',
+     'FULL_TIME', 'LEAD',
      'Remote', 'Remote', 'United States', true, 'FULLY_REMOTE',
      140000.00, 180000.00, 'USD', 'ANNUAL', true,
-     '["Python", "Machine Learning", "TensorFlow", "SQL", "Statistics"]'::json,
+    '["Python","Machine Learning","TensorFlow","SQL","Statistics"]'::json,
      'OPEN', 1,
      NOW(), NOW(), NOW()),
     
@@ -223,10 +243,10 @@ BEGIN
     (v_client2_id, v_cat_software_id,
      'Frontend React Developer',
      'Draft position for frontend developer with React expertise.',
-     'FULL_TIME', 'PERMANENT', 'INTERMEDIATE',
+     'FULL_TIME', 'INTERMEDIATE',
      'Austin, TX', 'Austin', 'United States', false, 'ON_SITE',
      90000.00, 120000.00, 'USD', 'ANNUAL', true,
-     '["React", "TypeScript", "CSS", "Jest"]'::json,
+    '["React","TypeScript","CSS","Jest"]'::json,
      'DRAFT', 1,
      NOW(), NOW(), NULL),
     
@@ -234,10 +254,10 @@ BEGIN
     (v_client3_id, v_cat_marketing_id,
      'Digital Marketing Manager',
      'Lead our digital marketing efforts including SEO, content, and paid advertising.',
-     'FULL_TIME', 'PERMANENT', 'SENIOR',
+     'FULL_TIME', 'SENIOR',
      'Los Angeles, CA', 'Los Angeles', 'United States', false, 'HYBRID',
      80000.00, 110000.00, 'USD', 'ANNUAL', true,
-     '["SEO", "Google Ads", "Content Marketing", "Analytics"]'::json,
+    '["SEO","Google Ads","Content Marketing","Analytics"]'::json,
      'OPEN', 1,
      NOW(), NOW(), NOW())
     ON CONFLICT DO NOTHING;
@@ -390,12 +410,12 @@ BEGIN
         (v_freelancer1_id, 'E-commerce SPA',
          'Single page application for online fashion retailer with 100k+ monthly users',
          'https://example.com/portfolio/ecommerce-spa',
-         ARRAY['React', 'TypeScript', 'Node.js', 'PostgreSQL', 'Docker']::text[],
+         '["React","TypeScript","Node.js","PostgreSQL","Docker"]'::json,
          1, true, NOW(), NOW()),
         (v_freelancer1_id, 'Real-time Chat Application',
          'WebSocket-based chat with file sharing and video calls',
          'https://example.com/portfolio/chat-app',
-         ARRAY['React', 'Socket.io', 'WebRTC', 'MongoDB']::text[],
+         '["React","Socket.io","WebRTC","MongoDB"]'::json,
          2, true, NOW(), NOW())
         ON CONFLICT DO NOTHING;
     END IF;
@@ -410,7 +430,7 @@ BEGIN
         (v_freelancer2_id, 'Brand Identity Package',
          'Complete brand identity for tech startup including logo and guidelines',
          'https://example.com/portfolio/brand-identity',
-         ARRAY['Figma', 'Illustrator', 'Branding']::text[],
+         '["Figma","Illustrator","Branding"]'::json,
          1, true, NOW(), NOW())
         ON CONFLICT DO NOTHING;
     END IF;
@@ -425,7 +445,7 @@ BEGIN
         (v_freelancer3_id, 'Data ETL Pipeline',
          'Airflow-based ETL pipeline processing 1M+ records daily',
          'https://example.com/portfolio/etl-pipeline',
-         ARRAY['Python', 'Airflow', 'PostgreSQL', 'AWS']::text[],
+         '["Python","Airflow","PostgreSQL","AWS"]'::json,
          1, true, NOW(), NOW())
         ON CONFLICT DO NOTHING;
     END IF;
@@ -440,7 +460,7 @@ BEGIN
         (v_freelancer4_id, 'Technical Documentation Suite',
          'Comprehensive API documentation for SaaS platform',
          'https://example.com/portfolio/tech-docs',
-         ARRAY['Markdown', 'Technical Writing', 'API Documentation']::text[],
+         '["Markdown","Technical Writing","API Documentation"]'::json,
          1, true, NOW(), NOW())
         ON CONFLICT DO NOTHING;
     END IF;

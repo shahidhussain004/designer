@@ -8,6 +8,22 @@ import { useAuth } from '@/lib/auth';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
+interface Job {
+  id: number | string;
+  title?: string;
+  description?: string;
+  companyName?: string;
+  salary?: number;
+  jobType?: string;
+  location?: string;
+  requirements?: string;
+  benefits?: string;
+  status?: string;
+  employerId?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 const jobTypes = [
   { value: 'ALL', label: 'All Types' },
   { value: 'FULL_TIME', label: 'Full Time' },
@@ -25,6 +41,7 @@ const statusOptions = [
 
 export default function JobsListPage() {
   const { data: jobs, isLoading, error, refetch } = useJobs();
+  
   const { user } = useAuth();
   const [filterStatus, setFilterStatus] = useState('OPEN');
   const [filterType, setFilterType] = useState('ALL');
@@ -32,7 +49,8 @@ export default function JobsListPage() {
 
   const filteredJobs = useMemo(() => {
     if (!jobs) return [];
-    return jobs.filter((job: any) => {
+    const typedJobs = jobs as Job[];
+    return typedJobs.filter((job) => {
       const matchesStatus = filterStatus === 'ALL' || job.status === filterStatus;
       const matchesType = filterType === 'ALL' || job.jobType === filterType;
       const matchesSearch = !searchQuery || 
@@ -89,10 +107,10 @@ export default function JobsListPage() {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div>
               <h1 className="text-3xl lg:text-4xl font-bold text-white mb-3">
-                Find Your Next Opportunity
+                Discover Your Next Role
               </h1>
               <p className="text-xl text-gray-300">
-                Browse {jobs?.length || 0} job openings from top companies
+                Explore {jobs?.length || 0} open position{(jobs?.length || 0) !== 1 ? 's' : ''} from leading companies — find the one that fits you.
               </p>
             </div>
             {user && user.role === 'CLIENT' && (
@@ -193,7 +211,7 @@ export default function JobsListPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {filteredJobs.map((job: any) => (
+              {filteredJobs.map((job: Job) => (
                 <Link key={job.id} href={`/jobs/${job.id}`} className="block group">
                   <div className="bg-white rounded-xl border border-gray-200 p-6 hover:border-primary-300 hover:shadow-lg transition-all">
                     <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
@@ -212,15 +230,15 @@ export default function JobsListPage() {
                               <h2 className="text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors truncate">
                                 {job.title}
                               </h2>
-                              <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(job.status)}`}>
+                              <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(job.status || '')}`}>
                                 {job.status}
                               </span>
                             </div>
                             <p className="text-gray-600 mt-1">{job.companyName || 'Company'}</p>
                             
                             <p className="text-gray-600 mt-3 line-clamp-2">
-                              {job.description?.substring(0, 200) || 'No description available'}
-                              {job.description?.length > 200 && '...'}
+                              {job.description ? job.description.substring(0, 200) : 'No description available'}
+                              {job.description && job.description.length > 200 && '...'}
                             </p>
                             
                             {/* Meta Info */}

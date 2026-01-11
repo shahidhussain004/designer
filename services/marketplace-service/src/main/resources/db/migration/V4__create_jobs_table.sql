@@ -1,6 +1,6 @@
 -- =====================================================
 -- V4: Create Traditional Job Postings Table
--- Description: Employment job postings for permanent/contract positions
+-- Description: Employment job postings for FULL_TIME, PART_TIME, CONTRACT, TEMPORARY, INTERNSHIP positions
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS jobs (
@@ -16,7 +16,6 @@ CREATE TABLE IF NOT EXISTS jobs (
     
     -- Employment Details
     job_type VARCHAR(50) DEFAULT 'FULL_TIME' NOT NULL,
-    employment_type VARCHAR(50) DEFAULT 'PERMANENT',
     experience_level VARCHAR(50) DEFAULT 'INTERMEDIATE',
     
     -- Location & Remote Work
@@ -82,7 +81,6 @@ CREATE TABLE IF NOT EXISTS jobs (
     
     -- Constraints
     CONSTRAINT chk_job_type CHECK (job_type IN ('FULL_TIME', 'PART_TIME', 'CONTRACT', 'TEMPORARY', 'INTERNSHIP')),
-    CONSTRAINT chk_employment_type CHECK (employment_type IN ('PERMANENT', 'CONTRACT', 'TEMPORARY')),
     CONSTRAINT chk_experience_level CHECK (experience_level IN ('ENTRY', 'INTERMEDIATE', 'SENIOR', 'LEAD', 'EXECUTIVE')),
     CONSTRAINT chk_remote_type CHECK (remote_type IN ('FULLY_REMOTE', 'HYBRID', 'ON_SITE')),
     CONSTRAINT chk_salary_period CHECK (salary_period IN ('ANNUAL', 'MONTHLY', 'HOURLY')),
@@ -124,6 +122,6 @@ EXECUTE FUNCTION update_jobs_updated_at();
 
 COMMENT ON TABLE jobs IS 'Traditional employment job postings table';
 COMMENT ON COLUMN jobs.employer_id IS 'User ID of the employer/recruiter posting the job';
-COMMENT ON COLUMN jobs.job_type IS 'Employment type: FULL_TIME, PART_TIME, CONTRACT, TEMPORARY, INTERNSHIP';
+COMMENT ON COLUMN jobs.job_type IS 'Job type: FULL_TIME, PART_TIME, CONTRACT, TEMPORARY, INTERNSHIP';
 COMMENT ON COLUMN jobs.remote_type IS 'Work location option: FULLY_REMOTE, HYBRID, ON_SITE';
 COMMENT ON COLUMN jobs.status IS 'Job posting status: DRAFT, OPEN, PAUSED, CLOSED, FILLED';

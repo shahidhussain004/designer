@@ -1,7 +1,10 @@
+"use client"
+
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 
 const HowItWorksCarousel = () => {
+  // `currentIndex` represents the index of the centered card (position 1)
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const steps = [
@@ -145,11 +148,13 @@ const HowItWorksCarousel = () => {
   };
 
   const getVisibleCards = () => {
+    // Show previous, current, next with positions 0,1,2 where position 1 is centered
     const cards = [];
-    for (let i = 0; i < 3; i++) {
-      const index = (currentIndex + i) % steps.length;
-      cards.push({ ...steps[index], position: i });
-    }
+    const prevIndex = (currentIndex - 1 + steps.length) % steps.length;
+    const nextIndex = (currentIndex + 1) % steps.length;
+    cards.push({ ...steps[prevIndex], position: 0 });
+    cards.push({ ...steps[currentIndex], position: 1 });
+    cards.push({ ...steps[nextIndex], position: 2 });
     return cards;
   };
 
@@ -240,18 +245,14 @@ const HowItWorksCarousel = () => {
               }`}
               aria-label={`Go to step ${idx + 1}`}
             >
-              {idx === currentIndex && (
+              {idx === currentIndex ? (
                 <span className="text-white font-bold text-sm">{idx + 1}</span>
+              ) : (
+                // show small dot but still keep the element size consistent
+                <span className="sr-only">Step {idx + 1}</span>
               )}
             </button>
           ))}
-        </div>
-
-        {/* Progress indicator */}
-        <div className="text-center mt-8">
-          <p className="text-gray-500 text-sm font-medium">
-            Step {currentIndex + 1} of {steps.length}
-          </p>
         </div>
       </div>
     </div>

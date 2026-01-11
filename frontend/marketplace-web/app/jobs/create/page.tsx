@@ -308,6 +308,37 @@ export default function CreateJobPage() {
               </div>
             </form>
           </div>
+
+          {/* Tips Section */}
+          <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h2 className="text-lg font-semibold text-blue-900 mb-4">💡 Tips for a Great Job Post</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="font-medium text-blue-900 mb-2">Title</h3>
+                <p className="text-sm text-blue-800">Be clear and specific. Include the level and key technology if relevant. Example: &quot;Senior React Developer&quot; instead of just &quot;Developer&quot;</p>
+              </div>
+              <div>
+                <h3 className="font-medium text-blue-900 mb-2">Description</h3>
+                <p className="text-sm text-blue-800">Explain what the role entails, day-to-day responsibilities, and the impact they&apos;ll have. Help candidates understand the position fully.</p>
+              </div>
+              <div>
+                <h3 className="font-medium text-blue-900 mb-2">Requirements</h3>
+                <p className="text-sm text-blue-800">List essential skills first, then nice-to-have skills separately. Be realistic about the experience level needed for the role.</p>
+              </div>
+              <div>
+                <h3 className="font-medium text-blue-900 mb-2">Salary & Benefits</h3>
+                <p className="text-sm text-blue-800">Provide a salary range to attract qualified candidates. Highlight unique benefits and company culture to stand out.</p>
+              </div>
+              <div>
+                <h3 className="font-medium text-blue-900 mb-2">Location</h3>
+                <p className="text-sm text-blue-800">Be clear about remote work options. If flexible, mention it explicitly. Candidates appreciate transparency about location requirements.</p>
+              </div>
+              <div>
+                <h3 className="font-medium text-blue-900 mb-2">Be Specific</h3>
+                <p className="text-sm text-blue-800">Mention specific technologies, tools, and frameworks you use. This helps qualified candidates self-select and reduces noise.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </PageLayout>

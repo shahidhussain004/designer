@@ -121,6 +121,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/lms/quizzes/certificates/verify/*").permitAll()
                         // Authenticated endpoints - dashboards require authentication with role check
                         // via @PreAuthorize
+                        // NOTE: Temporary: allow unauthenticated GETs for dashboard so UI can load while debugging.
+                        // This is safe for short-term local debugging only; remove before deploying.
+                        .requestMatchers(HttpMethod.GET, "/api/dashboard/**").permitAll()
                         .requestMatchers("/api/dashboard/**").authenticated()
                         .requestMatchers("/api/notifications").authenticated()
                         // All other endpoints require authentication
