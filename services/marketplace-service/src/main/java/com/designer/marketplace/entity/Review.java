@@ -9,6 +9,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -34,6 +36,7 @@ import lombok.NoArgsConstructor;
  * Review entity - Represents ratings and feedback for completed contracts
  */
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(name = "reviews", indexes = {
     @Index(name = "idx_review_contract_id", columnList = "contract_id"),
     @Index(name = "idx_review_reviewer_user_id", columnList = "reviewer_user_id"),

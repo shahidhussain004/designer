@@ -13,12 +13,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.designer.marketplace.dto.ClientDashboardResponse;
 import com.designer.marketplace.dto.FreelancerDashboardResponse;
+import com.designer.marketplace.dto.JobApplicationResponse;
+import com.designer.marketplace.dto.JobResponse;
 import com.designer.marketplace.dto.NotificationResponse;
 import com.designer.marketplace.dto.ProjectResponse;
 import com.designer.marketplace.dto.ProposalResponse;
+import com.designer.marketplace.entity.Job;
+import com.designer.marketplace.entity.JobApplication;
 import com.designer.marketplace.entity.Project;
 import com.designer.marketplace.entity.Proposal;
 import com.designer.marketplace.entity.User;
+import com.designer.marketplace.repository.JobApplicationRepository;
+import com.designer.marketplace.repository.JobRepository;
 import com.designer.marketplace.repository.ProjectRepository;
 import com.designer.marketplace.repository.ProposalRepository;
 
@@ -36,6 +42,8 @@ public class DashboardService {
         private final UserService userService;
         private final ProjectRepository projectRepository;
         private final ProposalRepository proposalRepository;
+        private final JobRepository jobRepository;
+        private final JobApplicationRepository jobApplicationRepository;
         private final NotificationService notificationService;
 
         /**
@@ -51,7 +59,7 @@ public class DashboardService {
 
                 log.info("Getting client dashboard for user: {}", currentUser.getUsername());
 
-                // Get statistics
+                // Get project statistics
                 Long totalProjectsPosted = projectRepository.countByClientId(currentUser.getId());
                 Long activeProjects = projectRepository.countByClientIdAndStatus(currentUser.getId(), Project.ProjectStatus.OPEN) +
                                 projectRepository.countByClientIdAndStatus(currentUser.getId(), Project.ProjectStatus.IN_PROGRESS);
@@ -61,12 +69,22 @@ public class DashboardService {
                 Long pendingProposals = proposalRepository.countByProjectClientIdAndStatus(
                                 currentUser.getId(), Proposal.ProposalStatus.SUBMITTED);
 
+                // Get job statistics
+                Long totalJobsPosted = jobRepository.countByEmployerId(currentUser.getId());
+                Long openJobs = jobRepository.countByEmployerIdAndStatus(currentUser.getId(), Job.JobStatus.OPEN);
+                Long totalApplicationsReceived = jobApplicationRepository.countByEmployerId(currentUser.getId());
+                Long filledJobs = jobRepository.countByEmployerIdAndStatus(currentUser.getId(), Job.JobStatus.FILLED);
+
                 ClientDashboardResponse.DashboardStats stats = ClientDashboardResponse.DashboardStats.builder()
                                 .totalProjectsPosted(totalProjectsPosted)
                                 .activeProjects(activeProjects)
                                 .completedProjects(completedProjects)
                                 .totalProposalsReceived(totalProposalsReceived)
                                 .pendingProposals(pendingProposals)
+                                .totalJobsPosted(totalJobsPosted)
+                                .openJobs(openJobs)
+                                .totalApplicationsReceived(totalApplicationsReceived)
+                                .filledJobs(filledJobs)
                                 .build();
 
                 // Get active projects (OPEN and IN_PROGRESS)
@@ -79,6 +97,16 @@ public class DashboardService {
                                 .map(ProjectResponse::fromEntity)
                                 .collect(Collectors.toList());
 
+                // Get completed projects
+                Pageable completedProjectsPageable = PageRequest.of(0, 5);
+                List<Project> completedProjectsList = projectRepository.findTopByClientIdAndStatus(
+                                currentUser.getId(),
+                                Project.ProjectStatus.COMPLETED,
+                                completedProjectsPageable);
+                List<ProjectResponse> completedProjectsResponse = completedProjectsList.stream()
+                                .map(ProjectResponse::fromEntity)
+                                .collect(Collectors.toList());
+
                 // Get recent proposals for all client's projects
                 Pageable proposalsPageable = PageRequest.of(0, 10);
                 List<Proposal> recentProposalsList = proposalRepository.findTopByProjectClientId(
@@ -87,10 +115,28 @@ public class DashboardService {
                                 .map(ProposalResponse::fromEntity)
                                 .collect(Collectors.toList());
 
+                // Get open jobs posted by client
+                Pageable openJobsPageable = PageRequest.of(0, 5, Sort.by("publishedAt").descending());
+                Page<Job> openJobsPage = jobRepository.findByEmployerId(currentUser.getId(), openJobsPageable);
+                List<JobResponse> openJobsResponse = openJobsPage.getContent().stream()
+                                .filter(job -> job.getStatus() == Job.JobStatus.OPEN)
+                                .map(JobResponse::fromEntity)
+                                .collect(Collectors.toList());
+
+                // Get recent applications for client's jobs
+                Pageable applicationsPageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+                Page<JobApplication> recentApplicationsPage = jobApplicationRepository.findByJobEmployerId(currentUser.getId(), applicationsPageable);
+                List<JobApplicationResponse> recentApplicationsResponse = recentApplicationsPage.getContent().stream()
+                                .map(JobApplicationResponse::fromEntity)
+                                .collect(Collectors.toList());
+
                 return ClientDashboardResponse.builder()
                                 .stats(stats)
                                 .activeProjects(activeProjectsResponse)
+                                .completedProjects(completedProjectsResponse)
                                 .recentProposals(recentProposalsResponse)
+                                .openJobs(openJobsResponse)
+                                .recentApplications(recentApplicationsResponse)
                                 .build();
         }
 

@@ -2,35 +2,54 @@
 
 import { PageLayout } from '@/components/ui'
 import { authService } from '@/lib/auth'
+import { useAuth } from '@/lib/context/AuthContext'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function LoginPage() {
   const router = useRouter()
+  const { user, loading, refreshUser } = useAuth()
   const [formData, setFormData] = useState({
     emailOrUsername: '',
     password: '',
   })
   const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    setLoading(true)
+    setIsSubmitting(true)
 
     try {
+      console.log('[Login] Submitting credentials...');
       await authService.login(formData)
+      console.log('[Login] Login successful');
+      
+      // Ensure AuthProvider reads the newly stored user/token
+      console.log('[Login] Calling refreshUser...');
+      await refreshUser()
+      console.log('[Login] refreshUser completed, redirecting to /dashboard');
+      
       router.push('/dashboard')
     } catch (err) {
+      console.error('[Login] Error:', err);
       const error = err as { response?: { data?: { message?: string } } }
       setError(error.response?.data?.message || 'Login failed. Please check your credentials.')
     } finally {
-      setLoading(false)
+      setIsSubmitting(false)
     }
   }
+
+  // Redirect already-authenticated users to dashboard
+  useEffect(() => {
+    if (!loading && user) {
+      // Use replace to avoid back-navigation to login
+      router.replace('/dashboard')
+    }
+  }, [loading, user, router])
 
   return (
     <PageLayout>
@@ -109,10 +128,10 @@ export default function LoginPage() {
 
               <button
                 type="submit"
-                disabled={loading}
+                disabled={isSubmitting}
                 className="w-full py-3 px-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Signing in...' : 'Sign in'}
+                {isSubmitting ? 'Signing in...' : 'Sign in'}
               </button>
             </form>
 

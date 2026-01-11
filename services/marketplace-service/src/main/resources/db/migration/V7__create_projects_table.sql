@@ -23,8 +23,8 @@ CREATE TABLE IF NOT EXISTS projects (
     estimated_duration VARCHAR(100),
     
     -- Skills & Requirements
-    required_skills TEXT[],
-    preferred_skills TEXT[],
+    required_skills JSON DEFAULT '[]'::json,
+    preferred_skills JSON DEFAULT '[]'::json,
     experience_level VARCHAR(50), -- ENTRY, INTERMEDIATE, SENIOR, LEAD, EXECUTIVE
     
     -- Project Details

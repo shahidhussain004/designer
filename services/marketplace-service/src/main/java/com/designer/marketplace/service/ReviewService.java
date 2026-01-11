@@ -35,6 +35,10 @@ public class ReviewService {
         return reviewRepository.findPublishedReviewsByUserId(userId);
     }
 
+    public List<Review> getReviewsByReviewerId(Long reviewerId) {
+        return reviewRepository.findByReviewerId(reviewerId);
+    }
+
     public Review createReview(Review review) {
         log.info("Creating new review");
         

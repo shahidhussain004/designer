@@ -18,7 +18,10 @@ public class ClientDashboardResponse {
 
     private DashboardStats stats;
     private List<ProjectResponse> activeProjects;
+    private List<ProjectResponse> completedProjects;
     private List<ProposalResponse> recentProposals;
+    private List<JobResponse> openJobs;
+    private List<JobApplicationResponse> recentApplications;
 
     @Data
     @Builder
@@ -30,5 +33,9 @@ public class ClientDashboardResponse {
         private Long completedProjects;
         private Long totalProposalsReceived;
         private Long pendingProposals;
+        private Long totalJobsPosted;
+        private Long openJobs;
+        private Long totalApplicationsReceived;
+        private Long filledJobs;
     }
 }

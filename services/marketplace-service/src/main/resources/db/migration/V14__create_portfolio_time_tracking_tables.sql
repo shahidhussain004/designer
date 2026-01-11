@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS portfolio_items (
     -- Media & Links
     image_url TEXT,
     thumbnail_url TEXT,
-    images TEXT[], -- Array of image URLs
+    images JSON DEFAULT '[]'::json, -- Array of image URLs
     
     -- External Links
     project_url TEXT,
@@ -23,17 +23,17 @@ CREATE TABLE IF NOT EXISTS portfolio_items (
     source_url TEXT,
     
     -- Metadata
-    skills_demonstrated TEXT[],
-    tools_used TEXT[],
+    skills_demonstrated JSON DEFAULT '[]'::json,
+    tools_used JSON DEFAULT '[]'::json,
+    technologies JSON DEFAULT '[]'::json,
     project_category VARCHAR(100),
     start_date DATE,
     end_date DATE,
     
-    -- Engagement & Visibility
-    view_count INTEGER DEFAULT 0,
+    -- Display & Ordering
+    display_order INTEGER DEFAULT 0,
     highlight_order INTEGER, -- For featured items
-    is_featured BOOLEAN DEFAULT FALSE,
-    is_public BOOLEAN DEFAULT TRUE,
+    is_visible BOOLEAN DEFAULT TRUE,
     
     -- Timestamps
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -43,9 +43,9 @@ CREATE TABLE IF NOT EXISTS portfolio_items (
 
 -- Create indexes for portfolio_items
 CREATE INDEX IF NOT EXISTS idx_portfolio_items_user_id ON portfolio_items(user_id);
-CREATE INDEX IF NOT EXISTS idx_portfolio_items_is_featured ON portfolio_items(is_featured);
-CREATE INDEX IF NOT EXISTS idx_portfolio_items_is_public ON portfolio_items(is_public);
+CREATE INDEX IF NOT EXISTS idx_portfolio_items_is_visible ON portfolio_items(is_visible);
 CREATE INDEX IF NOT EXISTS idx_portfolio_items_created_at ON portfolio_items(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_portfolio_visible_order ON portfolio_items(is_visible, display_order);
 
 CREATE TABLE IF NOT EXISTS time_entries (
     id BIGSERIAL PRIMARY KEY,
@@ -64,8 +64,8 @@ CREATE TABLE IF NOT EXISTS time_entries (
     work_diary JSONB, -- Detailed breakdown of work done
     
     -- Screenshots & Proof of Work
-    screenshot_urls TEXT[],
-    file_attachments TEXT[],
+    screenshot_urls JSON DEFAULT '[]'::json,
+    file_attachments JSON DEFAULT '[]'::json,
     
     -- Status & Approval
     status VARCHAR(50) DEFAULT 'SUBMITTED' NOT NULL, -- DRAFT, SUBMITTED, APPROVED, REJECTED

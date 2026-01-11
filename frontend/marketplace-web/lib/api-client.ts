@@ -36,6 +36,12 @@ apiClient.interceptors.request.use(
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
+      // Debug: log whether Authorization header will be sent
+      try {
+        console.debug('[API] Request interceptor - Authorization header set?:', !!token, 'url:', config.url);
+      } catch (e) {
+        // ignore
+      }
     }
 
     // Log API request
@@ -143,8 +149,14 @@ apiClient.interceptors.response.use(
           logger.warn('No refresh token found, cannot refresh');
         }
       } catch (refreshError) {
-        // Refresh failed, logout user
+        // Refresh failed, logout user - add debug trace
         logger.error('Token refresh failed, logging out user', refreshError as Error);
+        try {
+          console.warn('[API] Token refresh failed - clearing tokens and redirecting to login');
+          console.trace();
+        } catch (e) {
+          // ignore
+        }
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         window.location.href = '/auth/login';

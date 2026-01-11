@@ -34,15 +34,30 @@ export const authService = {
    * Login user and store tokens
    */
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    const { data } = await apiClient.post<AuthResponse>('/auth/login', credentials);
-    
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('access_token', data.accessToken);
-      localStorage.setItem('refresh_token', data.refreshToken);
-      localStorage.setItem('user', JSON.stringify(data.user));
+    try {
+      const { data } = await apiClient.post<AuthResponse>('/auth/login', credentials);
+      
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('access_token', data.accessToken);
+        localStorage.setItem('refresh_token', data.refreshToken);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        // Ensure axios instance includes the new token for immediate requests
+        apiClient.defaults.headers.Authorization = `Bearer ${data.accessToken}`;
+        
+        // DEBUG: Verify storage
+        console.log('[AUTH] Login successful');
+        console.log('[AUTH] Stored tokens:', {
+          accessToken: data.accessToken?.substring(0, 20) + '...',
+          refreshToken: data.refreshToken?.substring(0, 20) + '...',
+          user: data.user
+        });
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('[AUTH] Login failed:', error);
+      throw error;
     }
-    
-    return data;
   },
 
   /**
@@ -55,6 +70,8 @@ export const authService = {
       localStorage.setItem('access_token', data.accessToken);
       localStorage.setItem('refresh_token', data.refreshToken);
       localStorage.setItem('user', JSON.stringify(data.user));
+      // Ensure axios instance includes the new token for immediate requests
+      apiClient.defaults.headers.Authorization = `Bearer ${data.accessToken}`;
     }
     
     return data;
@@ -65,6 +82,14 @@ export const authService = {
    */
   logout() {
     if (typeof window !== 'undefined') {
+      // Debug tracing: log a stack trace so we can see who triggered logout
+      try {
+        console.warn('[AUTH] logout() called - clearing localStorage');
+        console.trace();
+      } catch (e) {
+        // ignore
+      }
+
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('user');
@@ -83,30 +108,15 @@ export const authService = {
   },
 
   /**
-   * Check if user is authenticated and token is valid
+   * Check if user is authenticated
+   * NOTE: Does NOT check expiration - the API interceptor will handle 401 errors and refresh automatically
+   * This prevents false logouts when token is expired but refresh token is still valid
    */
   isAuthenticated(): boolean {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('access_token');
-      if (!token) return false;
-      
-      // Try to decode JWT and check expiration
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        const isExpired = payload.exp && payload.exp * 1000 < Date.now();
-        
-        if (isExpired) {
-          // Clear expired tokens
-          this.logout();
-          return false;
-        }
-        
-        return true;
-      } catch {
-        // If token is malformed, clear it
-        this.logout();
-        return false;
-      }
+      // Just check if token exists - let the API interceptor handle expiration and refresh
+      return !!token;
     }
     return false;
   },

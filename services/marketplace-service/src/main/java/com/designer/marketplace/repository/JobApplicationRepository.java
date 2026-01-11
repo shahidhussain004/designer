@@ -44,4 +44,7 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
 
     @Query("SELECT COUNT(a) FROM JobApplication a WHERE a.job.employer.id = :employerId AND a.status = :status")
     Long countByEmployerIdAndStatus(@Param("employerId") Long employerId, @Param("status") JobApplication.ApplicationStatus status);
+
+    @Query("SELECT a FROM JobApplication a WHERE a.job.employer.id = :employerId ORDER BY a.createdAt DESC")
+    Page<JobApplication> findByJobEmployerId(@Param("employerId") Long employerId, Pageable pageable);
 }

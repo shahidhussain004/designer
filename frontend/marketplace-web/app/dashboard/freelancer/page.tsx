@@ -1,7 +1,8 @@
 "use client"
 
+import { PageLayout } from '@/components/ui'
 import { authService } from '@/lib/auth'
-import { FreelancerDashboard, getDashboardData } from '@/lib/dashboard'
+import { DashboardStats, FreelancerDashboard, ProjectSummary, dashboardService, getDashboardData } from '@/lib/dashboard'
 import { ArrowRight, Briefcase, CheckCircle, Clock, FileText, FolderOpen, Loader2, Send, Star } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -22,7 +23,17 @@ export default function FreelancerDashboardPage() {
     const load = async () => {
       try {
         const d = await getDashboardData()
-        setData(d as FreelancerDashboard)
+        const fd = d as FreelancerDashboard
+        // if backend didn't include availableJobs, fetch public jobs as a fallback
+        if ((!fd.availableJobs || fd.availableJobs.length === 0)) {
+          try {
+            const jobsResp = await dashboardService.getAvailableJobs(0, 5)
+            fd.availableJobs = jobsResp?.content || []
+          } catch (e) {
+            console.debug('Fallback jobs fetch failed', e)
+          }
+        }
+        setData(fd)
       } catch (err) {
         console.error(err)
         setError('Failed to load dashboard')
@@ -34,18 +45,23 @@ export default function FreelancerDashboardPage() {
   }, [router])
 
   if (loading) return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
-    </div>
+    <PageLayout>
+      <div className="max-w-4xl mx-auto py-24 text-center">
+        <Loader2 className="w-8 h-8 text-primary-600 animate-spin mx-auto" />
+        <p className="text-gray-700 mt-4">Loading your dashboard…</p>
+      </div>
+    </PageLayout>
   )
 
   if (error || !data) return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <p className="text-red-600">{error || 'No data'}</p>
-    </div>
+    <PageLayout>
+      <div className="max-w-4xl mx-auto py-24 text-center">
+        <p className="text-red-600">{error || 'Failed to load dashboard'}</p>
+      </div>
+    </PageLayout>
   )
 
-  const { stats, availableJobs } = data
+  const { stats = {} as DashboardStats, availableJobs = [], availableProjects = [] } = data
 
   const quickLinks = [
     { href: `/portfolio/${authService.getCurrentUser()?.id}`, icon: FolderOpen, title: 'Portfolio', subtitle: 'Manage your work' },
@@ -55,12 +71,12 @@ export default function FreelancerDashboardPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-gray-900 text-white">
+    <PageLayout>
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <h1 className="text-3xl font-bold">Freelancer Dashboard</h1>
-          <p className="mt-2 text-gray-400">Welcome back! Find jobs and manage your work.</p>
+          <h1 className="text-4xl font-bold">Freelancer Dashboard</h1>
+          <p className="mt-2 text-emerald-100">Welcome back! Find jobs and manage your work.</p>
         </div>
       </div>
 
@@ -121,8 +137,9 @@ export default function FreelancerDashboardPage() {
           </div>
         </div>
 
-        {/* Available Jobs */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        {/* Available Jobs & Projects */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div>
@@ -173,8 +190,63 @@ export default function FreelancerDashboardPage() {
               ))
             )}
           </div>
+          </div>
+
+          {/* Available Projects */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">Available Projects</h2>
+                  <p className="text-sm text-gray-500 mt-1">Open projects posted by clients</p>
+                </div>
+                <Link
+                  href="/projects"
+                  className="inline-flex items-center gap-1 text-primary-600 hover:text-primary-700 font-medium text-sm"
+                >
+                  View All
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+            <div className="divide-y divide-gray-100">
+              {(!availableProjects || availableProjects.length === 0) ? (
+                <div className="p-8 text-center">
+                  <Briefcase className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-gray-500">No projects available at the moment.</p>
+                </div>
+              ) : (
+                availableProjects.slice(0, 5).map((project: ProjectSummary) => (
+                  <Link key={project.id} href={`/projects/${project.id}`} className="block hover:bg-gray-50 transition-colors">
+                    <div className="p-6">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-gray-900">{project.title}</h3>
+                          <p className="text-sm text-gray-500 mt-1 line-clamp-2">{project.description.substring(0, 100)}...</p>
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">
+                              {typeof project.category === 'string' ? project.category : project.category?.name}
+                            </span>
+                            <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">
+                              {typeof project.experienceLevel === 'string' ? project.experienceLevel : project.experienceLevel?.name}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <p className="text-lg font-bold text-primary-600">${project.budget}</p>
+                          <span className="inline-block mt-2 px-3 py-1 bg-primary-600 text-white text-xs font-medium rounded hover:bg-primary-700 transition-colors">
+                            View Details
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                ))
+              )}
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </PageLayout>
   )
 }
