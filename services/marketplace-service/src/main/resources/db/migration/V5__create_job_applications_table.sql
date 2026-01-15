@@ -6,7 +6,7 @@
 CREATE TABLE IF NOT EXISTS job_applications (
     id BIGSERIAL PRIMARY KEY,
     job_id BIGINT NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
-    applicant_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    applicant_id BIGINT NOT NULL REFERENCES freelancers(id) ON DELETE CASCADE,
     
     -- Application Information
     cover_letter TEXT,

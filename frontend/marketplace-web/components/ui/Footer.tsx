@@ -163,14 +163,14 @@ export const Footer = React.forwardRef<HTMLElement, FooterProps>(
               </p>
               {/* Social links */}
               <div className="flex items-center gap-4">
-                {socialLinks.map((social) => (
+                {socialLinks.map((social, idx) => (
                   <a
-                    key={social.name}
+                    key={social.name ?? `social-${idx}`}
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-gray-400 hover:text-primary-500 transition-colors"
-                    aria-label={social.name}
+                    aria-label={social.name ?? 'social'}
                   >
                     {social.icon}
                   </a>

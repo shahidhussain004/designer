@@ -145,48 +145,5 @@ SELECT
 FROM users u WHERE u.email = 'freelancer5@example.com' AND u.role = 'FREELANCER'
 AND NOT EXISTS (SELECT 1 FROM freelancers WHERE user_id = u.id);
 
--- =====================================================
--- DOMAIN SEEDS: Projects, Jobs, Portfolio (idempotent)
--- These reference companies/freelancers by user email and use NOT EXISTS guards
--- =====================================================
-
--- Projects
-INSERT INTO projects (company_id, title, description, budget_min, budget_max, budget_type, currency, created_at, updated_at)
-SELECT c.id, 'Website Redesign', 'Full website redesign and migration', 5000.00, 15000.00, 'FIXED_PRICE', 'USD', NOW(), NOW()
-FROM companies c
-JOIN users u ON c.user_id = u.id
-WHERE u.email = 'company1@example.com'
-    AND NOT EXISTS (SELECT 1 FROM projects p WHERE p.company_id = c.id AND p.title = 'Website Redesign');
-
-INSERT INTO projects (company_id, title, description, budget_min, budget_max, budget_type, currency, created_at, updated_at)
-SELECT c.id, 'New Mobile App', 'Design and build new mobile application', 20000.00, 80000.00, 'FIXED_PRICE', 'USD', NOW(), NOW()
-FROM companies c
-JOIN users u ON c.user_id = u.id
-WHERE u.email = 'company3@example.com'
-    AND NOT EXISTS (SELECT 1 FROM projects p WHERE p.company_id = c.id AND p.title = 'New Mobile App');
-
--- Jobs
-INSERT INTO jobs (employer_id, title, description, salary_min, salary_max, salary_currency, created_at, updated_at)
-SELECT c.id, 'Backend Engineer', 'Develop backend APIs and services', 90000.00, 140000.00, 'USD', NOW(), NOW()
-FROM companies c
-JOIN users u ON c.user_id = u.id
-WHERE u.email = 'company2@example.com'
-    AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.employer_id = c.id AND j.title = 'Backend Engineer');
-
--- Portfolio Items (for freelancers)
-INSERT INTO portfolio_items (user_id, title, description, project_url, github_url, created_at, updated_at)
-SELECT f.id, 'E-Commerce Platform', 'Payment integration and performance tuning', 'https://alice.portfolio.com/ecom', 'https://github.com/alice/ecom', NOW(), NOW()
-FROM freelancers f
-JOIN users u ON f.user_id = u.id
-WHERE u.email = 'freelancer1@example.com'
-    AND NOT EXISTS (SELECT 1 FROM portfolio_items pi WHERE pi.user_id = f.id AND pi.title = 'E-Commerce Platform');
-
-INSERT INTO portfolio_items (user_id, title, description, project_url, github_url, created_at, updated_at)
-SELECT f.id, 'Mobile App Case Study', 'Native iOS/Android performance optimization', 'https://david.portfolio.com/mobile', 'https://github.com/david/mobile', NOW(), NOW()
-FROM freelancers f
-JOIN users u ON f.user_id = u.id
-WHERE u.email = 'freelancer4@example.com'
-    AND NOT EXISTS (SELECT 1 FROM portfolio_items pi WHERE pi.user_id = f.id AND pi.title = 'Mobile App Case Study');
-
 COMMIT;
 SET session_replication_role = 'origin';

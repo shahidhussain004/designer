@@ -5,7 +5,7 @@
 
 CREATE TABLE IF NOT EXISTS projects (
     id BIGSERIAL PRIMARY KEY,
-    company_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    company_id BIGINT NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
     category_id BIGINT REFERENCES project_categories(id) ON DELETE SET NULL,
     
     -- Basic Information
@@ -15,8 +15,8 @@ CREATE TABLE IF NOT EXISTS projects (
     deliverables TEXT[],
     
     -- Project Budget & Timeline
-    budget_min DECIMAL(12,2),
-    budget_max DECIMAL(12,2),
+    budget_min NUMERIC(12,2),
+    budget_max NUMERIC(12,2),
     budget_type VARCHAR(50), -- HOURLY, FIXED_PRICE, NOT_SURE
     currency VARCHAR(3) DEFAULT 'USD',
     timeline VARCHAR(100), -- ASAP, 1-3_MONTHS, 3-6_MONTHS, 6_PLUS_MONTHS
@@ -39,6 +39,12 @@ CREATE TABLE IF NOT EXISTS projects (
     proposal_count INTEGER DEFAULT 0,
     attachment_count INTEGER DEFAULT 0,
     views_count INTEGER DEFAULT 0,
+    
+    -- Additional Fields (from V15)
+    budget NUMERIC(10,2),
+    experience_level_id BIGINT REFERENCES experience_levels(id) ON DELETE SET NULL,
+    duration INTEGER,
+    view_count INTEGER DEFAULT 0,
     
     -- Engagement & Communication
     apply_instructions TEXT,
@@ -73,6 +79,10 @@ CREATE INDEX IF NOT EXISTS idx_projects_created_at ON projects(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_projects_is_featured ON projects(is_featured, status);
 CREATE INDEX IF NOT EXISTS idx_projects_title_desc ON projects USING GIN(to_tsvector('english', title || ' ' || COALESCE(description, '')));
 CREATE INDEX IF NOT EXISTS idx_projects_deleted_at ON projects(deleted_at);
+CREATE INDEX IF NOT EXISTS idx_projects_budget ON projects(budget);
+CREATE INDEX IF NOT EXISTS idx_projects_experience_level_id ON projects(experience_level_id);
+CREATE INDEX IF NOT EXISTS idx_projects_duration ON projects(duration);
+CREATE INDEX IF NOT EXISTS idx_projects_view_count ON projects(view_count);
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_projects_updated_at()

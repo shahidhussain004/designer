@@ -54,7 +54,7 @@ public class JobApplication {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "applicant_id", nullable = false)
-    private User applicant;
+    private Freelancer applicant;
 
     // Contact information (separate from user profile)
     @Column(name = "full_name", nullable = false)
@@ -116,9 +116,11 @@ public class JobApplication {
 
     public enum ApplicationStatus {
         PENDING,
+        SUBMITTED,
         REVIEWING,
         SHORTLISTED,
         INTERVIEWING,
+        OFFERED,
         ACCEPTED,
         REJECTED,
         WITHDRAWN

@@ -13,9 +13,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.designer.marketplace.dto.JobResponse;
+import com.designer.marketplace.entity.Company;
 import com.designer.marketplace.entity.Job;
 import com.designer.marketplace.entity.JobCategory;
 import com.designer.marketplace.entity.User;
+import com.designer.marketplace.repository.CompanyRepository;
 import com.designer.marketplace.repository.JobCategoryRepository;
 import com.designer.marketplace.repository.JobRepository;
 import com.designer.marketplace.repository.UserRepository;
@@ -34,6 +36,7 @@ public class JobService {
     private final JobRepository jobRepository;
     private final JobCategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final CompanyRepository companyRepository;
 
     /**
      * Get all open jobs with filters
@@ -131,8 +134,11 @@ public class JobService {
      */
     @Transactional
     public JobResponse createJob(Long employerId, Job job) {
-        User employer = userRepository.findById(employerId)
+        User employerUser = userRepository.findById(employerId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + employerId));
+
+        Company employer = companyRepository.findByUserId(employerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Company profile not found for user: " + employerId));
 
         job.setEmployer(employer);
         job.setStatus(Job.JobStatus.DRAFT);

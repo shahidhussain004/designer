@@ -156,7 +156,7 @@ export default function ResourceDetailPage() {
             </span>
             {content.category && (
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700">
-                {content.category.name}
+                {content.category?.name ?? 'Uncategorized'}
               </span>
             )}
             {content.isFeatured && (
@@ -251,7 +251,7 @@ export default function ResourceDetailPage() {
                     className="hover:opacity-80"
                   >
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-700 hover:bg-gray-200">
-                      #{tag.name}
+                      #{tag?.name ?? 'tag'}
                     </span>
                   </Link>
                 ))}

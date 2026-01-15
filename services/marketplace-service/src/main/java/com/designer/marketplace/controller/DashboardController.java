@@ -2,12 +2,9 @@ package com.designer.marketplace.controller;
 
 import java.util.List;
 
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,61 +32,48 @@ import lombok.extern.slf4j.Slf4j;
 public class DashboardController {
 
     private final DashboardService dashboardService;
-    private final Environment env;
 
     /**
      * Task 3.17: Get company dashboard
      * GET /api/dashboard/company
+     * 
+     * Requires COMPANY role. Will return 401 if token is expired, allowing frontend to refresh.
      */
     @GetMapping("/dashboard/company")
+    @PreAuthorize("hasRole('COMPANY')")
     public ResponseEntity<CompanyDashboardResponse> getCompanyDashboard() {
         log.info("Getting company dashboard");
-
-        // If running with 'local' profile, skip strict role check to aid local testing
-        boolean isLocal = env != null && env.acceptsProfiles(Profiles.of("local"));
-        if (!isLocal) {
-            // Check if user has COMPANY role
-            boolean hasCompanyRole = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-                    .stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_COMPANY"));
-            if (!hasCompanyRole) {
-                log.warn("Unauthorized access to company dashboard");
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-        } else {
-            log.debug("Local profile active - bypassing company role check for dashboard");
-        }
 
         try {
             CompanyDashboardResponse dashboard = dashboardService.getCompanyDashboard();
             return ResponseEntity.ok(dashboard);
         } catch (Exception e) {
             log.error("Error getting company dashboard", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            log.error("Stack trace: ", e);
+            // Return more detailed error for debugging
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
         }
     }
 
     /**
      * Task 3.18: Get freelancer dashboard
      * GET /api/dashboard/freelancer
+     * 
+     * Requires FREELANCER role. Will return 401 if token is expired, allowing frontend to refresh.
      */
     @GetMapping("/dashboard/freelancer")
+    @PreAuthorize("hasRole('FREELANCER')")
     public ResponseEntity<FreelancerDashboardResponse> getFreelancerDashboard() {
         log.info("Getting freelancer dashboard");
 
-        boolean isLocalFreelancer = env != null && env.acceptsProfiles(Profiles.of("local"));
-        if (!isLocalFreelancer) {
-            boolean hasFreelancerRole = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-                    .stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_FREELANCER"));
-            if (!hasFreelancerRole) {
-                log.warn("Unauthorized access to freelancer dashboard");
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-        } else {
-            log.debug("Local profile active - bypassing freelancer role check for dashboard");
+        try {
+            FreelancerDashboardResponse dashboard = dashboardService.getFreelancerDashboard();
+            return ResponseEntity.ok(dashboard);
+        } catch (Exception e) {
+            log.error("Error getting freelancer dashboard", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-
-        FreelancerDashboardResponse dashboard = dashboardService.getFreelancerDashboard();
-        return ResponseEntity.ok(dashboard);
     }
 
     /**

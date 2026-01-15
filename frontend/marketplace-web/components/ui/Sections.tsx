@@ -373,9 +373,9 @@ export const TrustedBySection: React.FC<TrustedBySectionProps> = ({
               className="flex items-center justify-center p-4 grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition-all"
             >
               {company.logo ? (
-                <img src={company.logo} alt={company.name} className="h-8 object-contain" />
+                <img src={company.logo} alt={company?.name ?? 'Company'} className="h-8 object-contain" />
               ) : (
-                <span className="text-lg font-bold text-gray-400">{company.name}</span>
+                <span className="text-lg font-bold text-gray-400">{company?.name ?? 'Company'}</span>
               )}
             </div>
           ))}

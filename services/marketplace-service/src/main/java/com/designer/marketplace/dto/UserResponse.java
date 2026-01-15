@@ -1,7 +1,6 @@
 package com.designer.marketplace.dto;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import com.designer.marketplace.entity.User;
 
@@ -28,13 +27,8 @@ public class UserResponse {
     private String profileImageUrl;
     private String location;
     private String phone;
-    private Double hourlyRate;
-    private List<String> skills;
-    private String portfolioUrl;
     private Boolean emailVerified;
     private Boolean isActive;
-    private Double ratingAvg;
-    private Integer ratingCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -56,13 +50,8 @@ public class UserResponse {
                 .profileImageUrl(user.getProfileImageUrl())
                 .location(user.getLocation())
                 .phone(user.getPhone())
-                .hourlyRate(user.getHourlyRate())
-                .skills(user.getSkills())
-                .portfolioUrl(user.getPortfolioUrl())
                 .emailVerified(user.getEmailVerified())
                 .isActive(user.getIsActive())
-                .ratingAvg(user.getRatingAvg())
-                .ratingCount(user.getRatingCount())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .build();

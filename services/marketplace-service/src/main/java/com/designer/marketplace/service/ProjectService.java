@@ -8,8 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.designer.marketplace.dto.CreateProjectRequest;
 import com.designer.marketplace.dto.ProjectResponse;
 import com.designer.marketplace.dto.UpdateProjectRequest;
+import com.designer.marketplace.entity.Company;
 import com.designer.marketplace.entity.Project;
 import com.designer.marketplace.entity.User;
+import com.designer.marketplace.repository.CompanyRepository;
 import com.designer.marketplace.repository.ProjectRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class ProjectService {
     private final UserService userService;
     private final ProjectCategoryService categoryService;
     private final ExperienceLevelService experienceLevelService;
+    private final CompanyRepository companyRepository;
 
     @Transactional(readOnly = true)
     public Page<ProjectResponse> getProjects(Long categoryId, Long experienceLevelId,
@@ -66,8 +69,11 @@ public class ProjectService {
 
         log.info("Creating new project by user: {}", currentUser.getUsername());
 
+        Company company = companyRepository.findByUserId(currentUser.getId())
+                .orElseThrow(() -> new RuntimeException("Company profile not found for user: " + currentUser.getUsername()));
+
         Project project = new Project();
-        project.setCompany(currentUser);
+        project.setCompany(company);
         project.setTitle(request.getTitle());
         project.setDescription(request.getDescription());
         
