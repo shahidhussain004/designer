@@ -412,14 +412,14 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
 ### Pattern 3: Dependent Queries (Fetch Related Data)
 
 ```typescript
-// hooks/useJobWithEmployer.ts
+// hooks/useJobWithCompany.ts
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/lib/apiClient';
 import { Job, User } from '@/types/api';
 
-export function useJobWithEmployer(jobId: string | null) {
+export function useJobWithCompany(jobId: string | null) {
   // First query: Get job
   const jobQuery = useQuery({
     queryKey: ['job', jobId],
@@ -432,30 +432,30 @@ export function useJobWithEmployer(jobId: string | null) {
     staleTime: 5 * 60 * 1000,
   });
 
-  // Second query: Get employer (depends on first query)
-  const employerQuery = useQuery({
-    queryKey: ['user', jobQuery.data?.employerId],
+  // Second query: Get company (depends on first query)
+  const companyQuery = useQuery({
+    queryKey: ['user', jobQuery.data?.companyId],
     queryFn: async ({ signal }) => {
-      const employerId = jobQuery.data?.employerId;
-      if (!employerId) throw new Error('Employer ID not found');
-      const { data } = await apiClient.get<User>(`/users/${employerId}/profile`, { signal });
+      const companyId = jobQuery.data?.companyId;
+      if (!companyId) throw new Error('Company ID not found');
+      const { data } = await apiClient.get<User>(`/users/${companyId}/profile`, { signal });
       return data;
     },
-    enabled: !!jobQuery.data?.employerId, // Only run if we have employer ID
+    enabled: !!jobQuery.data?.companyId, // Only run if we have company ID
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
 
   return {
     job: jobQuery.data,
-    employer: employerQuery.data,
-    isLoading: jobQuery.isLoading || (jobQuery.data?.employerId && employerQuery.isLoading),
-    error: jobQuery.error || employerQuery.error,
+    company: companyQuery.data,
+    isLoading: jobQuery.isLoading || (jobQuery.data?.companyId && companyQuery.isLoading),
+    error: jobQuery.error || companyQuery.error,
   };
 }
 
 // Usage
 export default function JobDetailsPage({ params }: { params: { id: string } }) {
-  const { job, employer, isLoading, error } = useJobWithEmployer(params.id);
+  const { job, company, isLoading, error } = useJobWithCompany(params.id);
 
   if (isLoading) return <JobDetailsSkeleton />;
   if (error) return <ErrorMessage message={error.message} />;
@@ -464,7 +464,7 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
   return (
     <div>
       <JobDetails job={job} />
-      {employer && <EmployerInfo employer={employer} />}
+      {company && <CompanyInfo company={company} />}
     </div>
   );
 }

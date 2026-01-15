@@ -14,7 +14,7 @@
 **Root Cause:** Code was querying for "ACTIVE" status but database has "OPEN"  
 **Solution:**
 - Changed JobService.findByFilters() from `Job.JobStatus.ACTIVE.name()` to `"OPEN"` string literal
-- Added EMPLOYER to UserRole enum for backward compatibility with database records
+- Added COMPANY to UserRole enum for backward compatibility with database records
 
 **Verification Test:**
 ```powershell
@@ -115,7 +115,7 @@ PS> Invoke-WebRequest "http://localhost:8083/api/v1/tutorials" -UseBasicParsing 
    - Line 58: Changed status filter from ACTIVE to "OPEN" string
 
 2. `services/marketplace-service/src/main/java/com/designer/marketplace/entity/User.java`
-   - Lines 144-152: Added EMPLOYER enum value for backward compatibility
+   - Lines 144-152: Added COMPANY enum value for backward compatibility
 
 3. `services/marketplace-service/src/main/java/com/designer/marketplace/entity/Project.java`
    - Lines 113-116: Added FIXED_PRICE to BudgetType enum
@@ -149,7 +149,7 @@ PS> Invoke-WebRequest "http://localhost:8083/api/v1/tutorials" -UseBasicParsing 
 **Problem:** Refactoring changed enum names but database records not updated  
 **Examples:**
 - JobStatus: `ACTIVE` → `OPEN`
-- UserRole: `EMPLOYER` → `CLIENT`
+- UserRole: `COMPANY` → `CLIENT`
 - BudgetType: `FIXED` → `FIXED_PRICE`
 - ExperienceLevelEnum: `EXPERT` → `SENIOR`
 

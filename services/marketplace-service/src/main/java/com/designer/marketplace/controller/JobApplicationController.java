@@ -38,8 +38,8 @@ public class JobApplicationController {
     private final JobApplicationService applicationService;
 
     /**
-     * Get applications for a specific job (employer only)
-     * GET /api/employment-jobs/{jobId}/applications
+     * Get applications for a specific job (company only)
+     * GET /api/company-jobs/{jobId}/applications
      */
     @GetMapping
     public ResponseEntity<Page<JobApplicationResponse>> getJobApplications(
@@ -87,7 +87,7 @@ public class JobApplicationController {
      * GET /api/job-applications/{id}
      */
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated() and (@jobApplicationService.isApplicationOwner(#id) or @jobApplicationService.isEmployerForApplication(#id))")
+    @PreAuthorize("isAuthenticated() and (@jobApplicationService.isApplicationOwner(#id) or @jobApplicationService.isCompanyForApplication(#id))")
     public ResponseEntity<JobApplicationResponse> getApplicationById(@PathVariable Long id) {
         log.info("Getting job application by id: {}", id);
         JobApplicationResponse application = applicationService.getApplicationById(id);
@@ -95,11 +95,11 @@ public class JobApplicationController {
     }
 
     /**
-     * Update application status (employer only)
+     * Update application status (company only)
      * PUT /api/job-applications/{id}/status
      */
     @PutMapping("/{id}/status")
-    @PreAuthorize("isAuthenticated() and @jobApplicationService.isEmployerForApplication(#id)")
+    @PreAuthorize("isAuthenticated() and @jobApplicationService.isCompanyForApplication(#id)")
     public ResponseEntity<JobApplicationResponse> updateApplicationStatus(
             @PathVariable Long id,
             @Valid @RequestBody UpdateJobApplicationStatusRequest request) {

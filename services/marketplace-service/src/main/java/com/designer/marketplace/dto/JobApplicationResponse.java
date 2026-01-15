@@ -33,7 +33,7 @@ public class JobApplicationResponse {
     private String linkedinUrl;
     private Map<String, Object> answers;
     private String status;
-    private String employerNotes;
+    private String companyNotes;
     private LocalDateTime appliedAt;
     private LocalDateTime updatedAt;
 
@@ -96,7 +96,7 @@ public class JobApplicationResponse {
                 .linkedinUrl(application.getLinkedinUrl())
                 .answers(answersMap)
                 .status(application.getStatus() != null ? application.getStatus().name() : null)
-                .employerNotes(application.getEmployerNotes())
+                .companyNotes(application.getCompanyNotes())
                 .appliedAt(application.getAppliedAt())
                 .updatedAt(application.getUpdatedAt())
                 .build();

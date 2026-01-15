@@ -11,14 +11,14 @@ import com.designer.marketplace.entity.Job;
 
 /**
  * Repository for Job entity
- * Handles employment job postings
+ * Handles company job postings
  */
 @Repository
 public interface JobRepository extends JpaRepository<Job, Long> {
 
     Page<Job> findByStatus(Job.JobStatus status, Pageable pageable);
 
-    Page<Job> findByEmployerId(Long employerId, Pageable pageable);
+    Page<Job> findByCompanyId(Long companyId, Pageable pageable);
 
     Page<Job> findByCategoryId(Long categoryId, Pageable pageable);
 
@@ -61,11 +61,10 @@ public interface JobRepository extends JpaRepository<Job, Long> {
     Page<Job> searchJobs(@Param("query") String query, Pageable pageable);
 
     // Dashboard queries
-    @Query("SELECT COUNT(j) FROM Job j WHERE j.employer.id = :employerId")
-    Long countByEmployerId(@Param("employerId") Long employerId);
-
-    @Query("SELECT COUNT(j) FROM Job j WHERE j.employer.id = :employerId AND j.status = :status")
-    Long countByEmployerIdAndStatus(@Param("employerId") Long employerId, @Param("status") Job.JobStatus status);
+    @Query("SELECT COUNT(j) FROM Job j WHERE j.company.id = :companyId")
+    Long countByCompanyId(@Param("companyId") Long companyId);
+    @Query("SELECT COUNT(j) FROM Job j WHERE j.company.id = :companyId AND j.status = :status")
+    Long countByCompanyIdAndStatus(@Param("companyId") Long companyId, @Param("status") Job.JobStatus status);
 
     @Query("SELECT COUNT(j) FROM Job j WHERE j.status = 'OPEN'")
     Long countOpenJobs();

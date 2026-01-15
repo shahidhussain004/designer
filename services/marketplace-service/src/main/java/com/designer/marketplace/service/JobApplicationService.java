@@ -39,7 +39,7 @@ public class JobApplicationService {
     private final CompanyRepository companyRepository;
 
     /**
-     * Get applications for a specific job (employer only)
+     * Get applications for a specific job (company only)
      */
     @Transactional(readOnly = true)
     public Page<JobApplicationResponse> getJobApplications(Long jobId, String status, Pageable pageable) {
@@ -48,9 +48,9 @@ public class JobApplicationService {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new RuntimeException("Job not found with id: " + jobId));
 
-        // Check if current user is the job employer
+        // Check if current user is the job company
         User currentUser = userService.getCurrentUser();
-        if (!job.getEmployer().getId().equals(currentUser.getId())) {
+        if (!job.getCompany().getId().equals(currentUser.getId())) {
             throw new RuntimeException("You can only view applications for your own jobs");
         }
 
@@ -129,9 +129,9 @@ public class JobApplicationService {
         job.setApplicationsCount(job.getApplicationsCount() + 1);
         jobRepository.save(job);
 
-        // Create notification for employer
+        // Create notification for company
         notificationService.createNotification(
-                job.getEmployer(),
+                job.getCompany(),
                 Notification.NotificationType.JOB_APPLICATION_RECEIVED,
                 "New Job Application",
                 String.format("%s applied for your job: %s",
@@ -155,9 +155,9 @@ public class JobApplicationService {
         // Check authorization
         User currentUser = userService.getCurrentUser();
         boolean isApplicant = application.getApplicant().getId().equals(currentUser.getId());
-        boolean isEmployer = application.getJob().getEmployer().getId().equals(currentUser.getId());
+        boolean isCompany = application.getJob().getCompany().getId().equals(currentUser.getId());
 
-        if (!isApplicant && !isEmployer) {
+        if (!isApplicant && !isCompany) {
             throw new RuntimeException("You don't have permission to view this application");
         }
 
@@ -165,7 +165,7 @@ public class JobApplicationService {
     }
 
     /**
-     * Update application status (employer only)
+     * Update application status (company only)
      */
     @Transactional
     public JobApplicationResponse updateApplicationStatus(Long id, UpdateJobApplicationStatusRequest request) {
@@ -174,9 +174,9 @@ public class JobApplicationService {
 
         User currentUser = userService.getCurrentUser();
 
-        // Check if current user is the employer
-        if (!application.getJob().getEmployer().getId().equals(currentUser.getId())) {
-            throw new RuntimeException("Only the employer can update application status");
+        // Check if current user is the company
+        if (!application.getJob().getCompany().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Only the company can update application status");
         }
 
         log.info("Updating application status: {} to: {}", id, request.getStatus());
@@ -185,8 +185,8 @@ public class JobApplicationService {
         JobApplication.ApplicationStatus newStatus = JobApplication.ApplicationStatus.valueOf(request.getStatus().toUpperCase());
         application.setStatus(newStatus);
 
-        if (request.getEmployerNotes() != null) {
-            application.setEmployerNotes(request.getEmployerNotes());
+        if (request.getCompanyNotes() != null) {
+            application.setCompanyNotes(request.getCompanyNotes());
         }
 
         application.setUpdatedAt(LocalDateTime.now());
@@ -254,9 +254,9 @@ public class JobApplicationService {
 
         applicationRepository.delete(application);
 
-        // Notify employer
+        // Notify company
         notificationService.createNotification(
-                job.getEmployer(),
+                job.getCompany(),
                 Notification.NotificationType.JOB_APPLICATION_WITHDRAWN,
                 "Application Withdrawn",
                 String.format("%s withdrew their application for: %s",
@@ -279,14 +279,14 @@ public class JobApplicationService {
     }
 
     /**
-     * Check if user is employer for the application
+     * Check if user is company for the application
      */
     @Transactional(readOnly = true)
-    public boolean isEmployerForApplication(Long applicationId) {
+    public boolean isCompanyForApplication(Long applicationId) {
         JobApplication application = applicationRepository.findById(applicationId)
                 .orElseThrow(() -> new RuntimeException("Application not found with id: " + applicationId));
         User currentUser = userService.getCurrentUser();
-        return application.getJob().getEmployer().getId().equals(currentUser.getId());
+        return application.getJob().getCompany().getId().equals(currentUser.getId());
     }
 }
 

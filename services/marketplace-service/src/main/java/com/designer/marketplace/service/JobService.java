@@ -16,17 +16,15 @@ import com.designer.marketplace.dto.JobResponse;
 import com.designer.marketplace.entity.Company;
 import com.designer.marketplace.entity.Job;
 import com.designer.marketplace.entity.JobCategory;
-import com.designer.marketplace.entity.User;
 import com.designer.marketplace.repository.CompanyRepository;
 import com.designer.marketplace.repository.JobCategoryRepository;
 import com.designer.marketplace.repository.JobRepository;
-import com.designer.marketplace.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Service for Jobs (employment opportunities)
+ * Service for Jobs (company opportunities)
  */
 @Service
 @RequiredArgsConstructor
@@ -35,7 +33,6 @@ public class JobService {
 
     private final JobRepository jobRepository;
     private final JobCategoryRepository categoryRepository;
-    private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
 
     /**
@@ -121,26 +118,23 @@ public class JobService {
     }
 
     /**
-     * Get jobs by employer
+     * Get jobs by company
      */
     @Transactional(readOnly = true)
-    public Page<JobResponse> getJobsByEmployer(Long employerId, Pageable pageable) {
-        Page<Job> jobs = jobRepository.findByEmployerId(employerId, pageable);
+    public Page<JobResponse> getJobsByCompany(Long companyId, Pageable pageable) {
+        Page<Job> jobs = jobRepository.findByCompanyId(companyId, pageable);
         return jobs.map(JobResponse::fromEntity);
     }
 
     /**
-     * Create a new job (for employers)
+     * Create a new job (for companies)
      */
     @Transactional
-    public JobResponse createJob(Long employerId, Job job) {
-        User employerUser = userRepository.findById(employerId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + employerId));
+    public JobResponse createJob(Long companyId, Job job) {        
+        Company company = companyRepository.findByUserId(companyId)
+                .orElseThrow(() -> new ResourceNotFoundException("Company profile not found for user: " + companyId));
 
-        Company employer = companyRepository.findByUserId(employerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Company profile not found for user: " + employerId));
-
-        job.setEmployer(employer);
+        job.setCompany(company);
         job.setStatus(Job.JobStatus.DRAFT);
         job.setViewsCount(0);
         job.setApplicationsCount(0);

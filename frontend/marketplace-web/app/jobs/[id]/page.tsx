@@ -19,8 +19,8 @@ export default function JobDetailsPage() {
   // Fetch job details
   const { data: job, isLoading: jobLoading, error: jobError, refetch } = useJob(jobId);
   
-  // Fetch employer details (dependent query)
-  const { data: employer } = useUserProfile(job?.employerId || null);
+  // Fetch company details (dependent query)
+  const { data: company } = useUserProfile(job?.companyId || null);
 
   // Application mutation
   const applyForJob = useApplyForJob();
@@ -100,7 +100,7 @@ export default function JobDetailsPage() {
         <div className="bg-green-50 border-b border-green-200 px-4 py-3">
           <div className="mx-auto max-w-7xl flex items-center gap-2 text-green-700">
             <CheckCircle className="w-5 h-5" />
-            Application submitted successfully! The employer will review your application.
+            Application submitted successfully! The company will review your application.
           </div>
         </div>
       )}
@@ -109,7 +109,7 @@ export default function JobDetailsPage() {
         <div className="bg-red-50 border-b border-red-200 px-4 py-3">
           <div className="mx-auto max-w-7xl flex items-center gap-2 text-red-700">
             <XCircle className="w-5 h-5" />
-            {applyForJob.error instanceof Error ? applyForJob.error.message : 'Failed to submit application'}
+            {applyForJob.error instanceof Error ? applyForJob.error.message : 'Failed to submit application to the company'}
           </div>
         </div>
       )}
@@ -195,25 +195,25 @@ export default function JobDetailsPage() {
                 </div>
               </div>
 
-              {/* Employer Info */}
-              {employer && (
+              {/* Company Info */}
+              {company && (
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">About the Employer</h2>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">About the Company</h2>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
                         <User className="w-6 h-6 text-gray-500" />
                       </div>
                       <div>
-                        <p className="font-semibold text-gray-900">{employer.fullName}</p>
-                        <p className="text-sm text-gray-500">@{employer.username}</p>
-                        {employer.email && (
-                          <p className="text-sm text-gray-500">{employer.email}</p>
+                        <p className="font-semibold text-gray-900">{company.fullName}</p>
+                        <p className="text-sm text-gray-500">@{company.username}</p>
+                        {company.email && (
+                          <p className="text-sm text-gray-500">{company.email}</p>
                         )}
                       </div>
                     </div>
                     <Link 
-                      href={`/users/${employer.id}/profile`}
+                      href={`/users/${company.id}/profile`}
                       className="text-primary-600 hover:text-primary-700 font-medium"
                     >
                       View Profile →
@@ -233,7 +233,7 @@ export default function JobDetailsPage() {
                   {job.salary?.toLocaleString()}
                 </p>
                 
-                {user && user.role === 'FREELANCER' && user.id !== job.employerId && (
+                {user && user.role === 'FREELANCER' && user.id !== job.companyId && (
                   <button 
                     onClick={() => setApplicationOpen(!applicationOpen)}
                     className={`w-full mt-4 py-3 px-4 rounded-lg font-medium transition-colors ${
@@ -259,7 +259,7 @@ export default function JobDetailsPage() {
                           Cover Letter <span className="text-red-500">*</span>
                         </label>
                         <textarea
-                          placeholder="Tell the employer why you're interested in this role"
+                          placeholder="Tell the company why you're interested in this role"
                           value={applicationData.coverLetter}
                           onChange={(e) => setApplicationData({ ...applicationData, coverLetter: e.target.value })}
                           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-transparent min-h-[150px]"

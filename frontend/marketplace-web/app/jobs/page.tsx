@@ -19,7 +19,7 @@ interface Job {
   requirements?: string;
   benefits?: string;
   status?: string;
-  employerId?: number;
+  companyId?: number;
   createdAt?: string;
   updatedAt?: string;
 }
