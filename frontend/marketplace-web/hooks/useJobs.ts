@@ -17,7 +17,7 @@ interface Job {
   requirements?: string;
   benefits?: string;
   status: string;
-  employerId?: number;
+  companyId?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -33,7 +33,7 @@ interface CreateJobInput {
   benefits: string;
 }
 
-interface UpdateJobInput extends Partial<CreateJobInput> {}
+type UpdateJobInput = Partial<CreateJobInput>
 
 // ============================================================================
 // Query Hooks

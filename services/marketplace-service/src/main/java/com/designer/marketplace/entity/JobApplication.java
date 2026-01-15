@@ -28,7 +28,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * JobApplication entity - represents applications submitted for employment jobs
+ * JobApplication entity - represents applications submitted for companies jobs
  * Maps to 'job_applications' table in PostgreSQL
  */
 @Entity
@@ -93,8 +93,8 @@ public class JobApplication {
     @Column(nullable = false, length = 50)
     private ApplicationStatus status = ApplicationStatus.PENDING;
 
-    @Column(name = "employer_notes", columnDefinition = "TEXT")
-    private String employerNotes;
+    @Column(name = "company_notes", columnDefinition = "TEXT")
+    private String companyNotes;
 
     @Column(name = "rejection_reason", columnDefinition = "TEXT")
     private String rejectionReason;

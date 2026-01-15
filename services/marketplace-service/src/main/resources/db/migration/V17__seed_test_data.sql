@@ -166,12 +166,12 @@ WHERE u.email = 'company3@example.com'
     AND NOT EXISTS (SELECT 1 FROM projects p WHERE p.company_id = c.id AND p.title = 'New Mobile App');
 
 -- Jobs
-INSERT INTO jobs (employer_id, title, description, salary_min, salary_max, salary_currency, created_at, updated_at)
+INSERT INTO jobs (company_id, title, description, salary_min, salary_max, salary_currency, created_at, updated_at)
 SELECT c.id, 'Backend Engineer', 'Develop backend APIs and services', 90000.00, 140000.00, 'USD', NOW(), NOW()
 FROM companies c
 JOIN users u ON c.user_id = u.id
 WHERE u.email = 'company2@example.com'
-    AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.employer_id = c.id AND j.title = 'Backend Engineer');
+    AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.company_id = c.id AND j.title = 'Backend Engineer');
 
 -- Portfolio Items (for freelancers)
 INSERT INTO portfolio_items (user_id, title, description, project_url, github_url, created_at, updated_at)

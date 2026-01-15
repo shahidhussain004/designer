@@ -29,7 +29,7 @@ import lombok.NoArgsConstructor;
 /**
  * Project entity - represents freelance/gig project postings by companies
  * Maps to 'projects' table in PostgreSQL (formerly 'jobs')
- * This is for short-term, project-based work - NOT traditional employment
+ * This is for short-term, project-based work - NOT traditional company jobs
  */
 @Entity
 @Table(name = "projects", indexes = {

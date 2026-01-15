@@ -16,5 +16,5 @@ public class UpdateJobApplicationStatusRequest {
     @NotBlank(message = "Status is required")
     private String status; // PENDING, REVIEWING, SHORTLISTED, INTERVIEWING, ACCEPTED, REJECTED
 
-    private String employerNotes;
+    private String companyNotes;
 }

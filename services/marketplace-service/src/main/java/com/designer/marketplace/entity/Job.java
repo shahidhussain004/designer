@@ -29,13 +29,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Job entity - represents employment opportunities
+ * Job entity - represents company job opportunities
  * Maps to 'jobs' table in PostgreSQL
  * This is for full-time/part-time/contract positions - NOT freelance projects
  */
 @Entity
 @Table(name = "jobs", indexes = {
-        @Index(name = "idx_jobs_employer", columnList = "employer_id"),
+        @Index(name = "idx_jobs_company", columnList = "company_id"),
         @Index(name = "idx_jobs_category", columnList = "category_id"),
         @Index(name = "idx_jobs_status", columnList = "status"),
         @Index(name = "idx_jobs_job_type", columnList = "job_type"),
@@ -55,8 +55,8 @@ public class Job {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "employer_id", nullable = false)
-    private Company employer;
+    @JoinColumn(name = "company_id", nullable = false)
+    private Company company;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
@@ -180,7 +180,7 @@ public class Job {
     @Column
     private String industry;
 
-    // Employment details
+    // Company details
     @Column(name = "start_date")
     private LocalDate startDate;
 

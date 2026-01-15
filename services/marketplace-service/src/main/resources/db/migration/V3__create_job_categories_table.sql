@@ -1,6 +1,6 @@
 -- =====================================================
 -- V3: Create Job Categories Reference Table
--- Description: Categories for traditional employment job postings
+-- Description: Categories for traditional company job postings
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS job_categories (
@@ -48,5 +48,5 @@ BEFORE UPDATE ON job_categories
 FOR EACH ROW
 EXECUTE FUNCTION update_job_categories_updated_at();
 
-COMMENT ON TABLE job_categories IS 'Categories for traditional employment job postings';
+COMMENT ON TABLE job_categories IS 'Categories for traditional company job postings';
 COMMENT ON COLUMN job_categories.slug IS 'URL-friendly identifier for the category';
