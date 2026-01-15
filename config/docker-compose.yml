@@ -30,6 +30,7 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+      - ./mongodb-seed/init-lms.js:/docker-entrypoint-initdb.d/init-lms.js
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 10s

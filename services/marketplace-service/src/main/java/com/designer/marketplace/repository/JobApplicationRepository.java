@@ -13,7 +13,7 @@ import com.designer.marketplace.entity.JobApplication;
 
 /**
  * Repository for JobApplication entity
- * Handles applications for employment jobs
+ * Handles applications for company jobs
  */
 @Repository
 public interface JobApplicationRepository extends JpaRepository<JobApplication, Long> {
@@ -39,12 +39,11 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
     @Query("SELECT COUNT(a) FROM JobApplication a WHERE a.applicant.id = :applicantId")
     Long countByApplicantId(@Param("applicantId") Long applicantId);
 
-    @Query("SELECT COUNT(a) FROM JobApplication a WHERE a.job.employer.id = :employerId")
-    Long countByEmployerId(@Param("employerId") Long employerId);
+    @Query("SELECT COUNT(a) FROM JobApplication a WHERE a.job.company.id = :companyId")
+    Long countByCompanyId(@Param("companyId") Long companyId);
 
-    @Query("SELECT COUNT(a) FROM JobApplication a WHERE a.job.employer.id = :employerId AND a.status = :status")
-    Long countByEmployerIdAndStatus(@Param("employerId") Long employerId, @Param("status") JobApplication.ApplicationStatus status);
-
-    @Query("SELECT a FROM JobApplication a WHERE a.job.employer.id = :employerId ORDER BY a.createdAt DESC")
-    Page<JobApplication> findByJobEmployerId(@Param("employerId") Long employerId, Pageable pageable);
+    @Query("SELECT COUNT(a) FROM JobApplication a WHERE a.job.company.id = :companyId AND a.status = :status")
+    Long countByCompanyIdAndStatus(@Param("companyId") Long companyId, @Param("status") JobApplication.ApplicationStatus status);
+    @Query("SELECT a FROM JobApplication a WHERE a.job.company.id = :companyId ORDER BY a.createdAt DESC")
+    Page<JobApplication> findByJobCompanyId(@Param("companyId") Long companyId, Pageable pageable);
 }

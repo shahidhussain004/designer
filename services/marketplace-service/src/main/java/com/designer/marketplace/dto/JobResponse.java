@@ -21,8 +21,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class JobResponse {
     private Long id;
-    private Long employerId;
-    private String employerName;
     private Long categoryId;
     private String categoryName;
     
@@ -68,6 +66,7 @@ public class JobResponse {
     private String applyInstructions;
     
     // Company
+    private Long companyId;
     private String companyName;
     private String companyDescription;
     private String companyLogoUrl;
@@ -75,7 +74,7 @@ public class JobResponse {
     private String companySize;
     private String industry;
     
-    // Employment details
+    // Company details
     private LocalDate startDate;
     private Integer positionsAvailable;
     private String travelRequirement;
@@ -101,8 +100,8 @@ public class JobResponse {
     public static JobResponse fromEntity(Job job) {
         return JobResponse.builder()
                 .id(job.getId())
-                .employerId(job.getEmployer() != null ? job.getEmployer().getId() : null)
-                .employerName(job.getEmployer() != null ? job.getEmployer().getFullName() : null)
+                .companyId(job.getCompany() != null ? job.getCompany().getId() : null)
+                .companyName(job.getCompany() != null ? job.getCompany().getFullName() : null)
                 .categoryId(job.getCategory() != null ? job.getCategory().getId() : null)
                 .categoryName(job.getCategory() != null ? job.getCategory().getName() : null)
                 .title(job.getTitle())
