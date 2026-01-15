@@ -51,8 +51,8 @@ Invoke-RestMethod -Uri "http://localhost:8080/api/jobs/search?keyword=Senior&pag
 # Get featured jobs
 Invoke-RestMethod -Uri "http://localhost:8080/api/jobs/featured?page=0&size=10" -Method Get
 
-# Get jobs by employer
-Invoke-RestMethod -Uri "http://localhost:8080/api/jobs/employer/3" -Method Get
+# Get jobs by company
+Invoke-RestMethod -Uri "http://localhost:8080/api/jobs/company/3" -Method Get
 ```
 
 ### 4. Job Category Endpoints
