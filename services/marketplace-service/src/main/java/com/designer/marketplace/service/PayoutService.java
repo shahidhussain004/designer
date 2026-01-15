@@ -1,28 +1,39 @@
 package com.designer.marketplace.service;
 
-import com.designer.marketplace.dto.PayoutDTOs.*;
-import com.designer.marketplace.entity.*;
-import com.designer.marketplace.entity.Payment.EscrowStatus;
-import com.designer.marketplace.entity.Payout.PayoutMethod;
-import com.designer.marketplace.entity.Payout.PayoutStatus;
-import com.designer.marketplace.entity.TransactionLedger.TransactionType;
-import com.designer.marketplace.repository.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.stripe.exception.StripeException;
-import com.stripe.model.Transfer;
-import com.stripe.param.TransferCreateParams;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
+import com.designer.marketplace.dto.PayoutDTOs.CreatePayoutRequest;
+import com.designer.marketplace.dto.PayoutDTOs.PayoutResponse;
+import com.designer.marketplace.dto.PayoutDTOs.PayoutSummary;
+import com.designer.marketplace.entity.Freelancer;
+import com.designer.marketplace.entity.Payment.EscrowStatus;
+import com.designer.marketplace.entity.Payout;
+import com.designer.marketplace.entity.Payout.PayoutMethod;
+import com.designer.marketplace.entity.Payout.PayoutStatus;
+import com.designer.marketplace.entity.TransactionLedger;
+import com.designer.marketplace.entity.TransactionLedger.TransactionType;
+import com.designer.marketplace.entity.User;
+import com.designer.marketplace.repository.FreelancerRepository;
+import com.designer.marketplace.repository.PaymentRepository;
+import com.designer.marketplace.repository.PayoutRepository;
+import com.designer.marketplace.repository.TransactionLedgerRepository;
+import com.designer.marketplace.repository.UserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.stripe.exception.StripeException;
+import com.stripe.model.Transfer;
+import com.stripe.param.TransferCreateParams;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Service for managing freelancer payouts.
@@ -35,6 +46,7 @@ public class PayoutService {
     private final PayoutRepository payoutRepository;
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
+    private final FreelancerRepository freelancerRepository;
     private final TransactionLedgerRepository transactionLedgerRepository;
     private final ObjectMapper objectMapper;
 
@@ -50,7 +62,7 @@ public class PayoutService {
     public PayoutResponse createPayout(CreatePayoutRequest request) {
         log.info("Creating payout for freelancer {}", request.getFreelancerId());
 
-        User freelancer = userRepository.findById(request.getFreelancerId())
+        Freelancer freelancer = freelancerRepository.findByUserId(request.getFreelancerId())
                 .orElseThrow(() -> new IllegalArgumentException("Freelancer not found"));
 
         // Validate payout amount
@@ -116,7 +128,7 @@ public class PayoutService {
                 TransferCreateParams params = TransferCreateParams.builder()
                         .setAmount(payout.getAmount())
                         .setCurrency(payout.getCurrency().toLowerCase())
-                        .setDestination(getStripeConnectAccountId(payout.getFreelancer()))
+                        .setDestination(getStripeConnectAccountId(payout.getFreelancer() != null ? payout.getFreelancer().getUser() : null))
                         .setDescription("Payout: " + payout.getPayoutReference())
                         .build();
 
@@ -326,9 +338,10 @@ public class PayoutService {
     }
 
     private void createLedgerEntry(Payout payout, TransactionType type, String description) {
+        User user = payout.getFreelancer() != null ? payout.getFreelancer().getUser() : null;
         TransactionLedger entry = TransactionLedger.builder()
                 .transactionType(type)
-                .user(payout.getFreelancer())
+                .user(user)
                 .amount(payout.getAmount())
                 .currency(payout.getCurrency())
                 .description(description)

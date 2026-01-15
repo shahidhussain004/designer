@@ -8,10 +8,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.designer.marketplace.dto.CreateProposalRequest;
 import com.designer.marketplace.dto.ProposalResponse;
 import com.designer.marketplace.dto.UpdateProposalStatusRequest;
+import com.designer.marketplace.entity.Freelancer;
 import com.designer.marketplace.entity.Notification;
 import com.designer.marketplace.entity.Project;
 import com.designer.marketplace.entity.Proposal;
 import com.designer.marketplace.entity.User;
+import com.designer.marketplace.repository.FreelancerRepository;
 import com.designer.marketplace.repository.ProjectRepository;
 import com.designer.marketplace.repository.ProposalRepository;
 
@@ -30,6 +32,7 @@ public class ProposalService {
     private final ProjectRepository projectRepository;
     private final UserService userService;
     private final NotificationService notificationService;
+    private final FreelancerRepository freelancerRepository;
 
     /**
      * Task 3.12: Get user's proposals
@@ -89,12 +92,15 @@ public class ProposalService {
             throw new RuntimeException("You have already submitted a proposal for this project");
         }
 
+        Freelancer freelancer = freelancerRepository.findByUserId(currentUser.getId())
+                .orElseThrow(() -> new RuntimeException("Freelancer profile not found for user: " + currentUser.getUsername()));
+
         Proposal proposal = new Proposal();
         proposal.setProject(project);
-        proposal.setFreelancer(currentUser);
+        proposal.setFreelancer(freelancer);
         proposal.setCoverLetter(request.getCoverLetter());
-        proposal.setProposedRate(request.getProposedRate());
-        proposal.setEstimatedDuration(request.getEstimatedDuration());
+        proposal.setSuggestedBudget(request.getProposedRate());
+        proposal.setEstimatedHours(request.getEstimatedDuration() != null ? request.getEstimatedDuration().doubleValue() : null);
         proposal.setStatus(Proposal.ProposalStatus.SUBMITTED);
 
         Proposal savedProposal = proposalRepository.save(proposal);
@@ -140,7 +146,7 @@ public class ProposalService {
         proposal.setStatus(newStatus);
 
         if (request.getCompanyMessage() != null) {
-            proposal.setCompanyMessage(request.getCompanyMessage());
+            proposal.setCompanyNotes(request.getCompanyMessage());
         }
 
         // If accepting a proposal, mark project as in progress

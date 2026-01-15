@@ -18,9 +18,11 @@ import com.designer.marketplace.dto.MilestoneDTOs.MilestoneResponse;
 import com.designer.marketplace.dto.MilestoneDTOs.MilestoneSummary;
 import com.designer.marketplace.dto.MilestoneDTOs.RequestRevisionRequest;
 import com.designer.marketplace.dto.MilestoneDTOs.SubmitMilestoneRequest;
+import com.designer.marketplace.entity.Company;
 import com.designer.marketplace.entity.Escrow;
 import com.designer.marketplace.entity.Escrow.EscrowHoldStatus;
 import com.designer.marketplace.entity.Escrow.ReleaseCondition;
+import com.designer.marketplace.entity.Freelancer;
 import com.designer.marketplace.entity.Milestone;
 import com.designer.marketplace.entity.Milestone.MilestoneStatus;
 import com.designer.marketplace.entity.Payment;
@@ -31,7 +33,9 @@ import com.designer.marketplace.entity.Proposal;
 import com.designer.marketplace.entity.TransactionLedger;
 import com.designer.marketplace.entity.TransactionLedger.TransactionType;
 import com.designer.marketplace.entity.User;
+import com.designer.marketplace.repository.CompanyRepository;
 import com.designer.marketplace.repository.EscrowRepository;
+import com.designer.marketplace.repository.FreelancerRepository;
 import com.designer.marketplace.repository.MilestoneRepository;
 import com.designer.marketplace.repository.PaymentRepository;
 import com.designer.marketplace.repository.ProjectRepository;
@@ -60,6 +64,8 @@ public class MilestoneService {
     private final EscrowRepository escrowRepository;
     private final TransactionLedgerRepository transactionLedgerRepository;
     private final UserRepository userRepository;
+    private final CompanyRepository companyRepository;
+    private final FreelancerRepository freelancerRepository;
 
     @Value("${payment.platform.fee.percent:10}")
     private int platformFeePercent;
@@ -133,10 +139,10 @@ public class MilestoneService {
             throw new IllegalStateException("Milestone is not in PENDING status");
         }
 
-        User company = userRepository.findById(companyId)
+        Company company = companyRepository.findByUserId(companyId)
                 .orElseThrow(() -> new IllegalArgumentException("Company not found"));
 
-        User freelancer = milestone.getProposal() != null
+        Freelancer freelancer = milestone.getProposal() != null
                 ? milestone.getProposal().getFreelancer()
                 : null;
 
@@ -439,5 +445,17 @@ public class MilestoneService {
                 .build();
 
         transactionLedgerRepository.save(entry);
+    }
+
+    private void createLedgerEntry(Payment payment, Escrow escrow, Company company,
+            TransactionType type, Long amount, String description) {
+        User user = company != null ? company.getUser() : null;
+        createLedgerEntry(payment, escrow, user, type, amount, description);
+    }
+
+    private void createLedgerEntry(Payment payment, Escrow escrow, Freelancer freelancer,
+            TransactionType type, Long amount, String description) {
+        User user = freelancer != null ? freelancer.getUser() : null;
+        createLedgerEntry(payment, escrow, user, type, amount, description);
     }
 }

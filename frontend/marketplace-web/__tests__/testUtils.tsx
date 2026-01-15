@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
+import { AuthProvider } from '../lib/context/AuthContext';
 
 // Do not require next/navigation at module load time — that can import the real Next module
 // Tests use jest.setup.js to mock next/navigation. This helper wraps UI in a small
@@ -15,7 +16,7 @@ export function withAppRouter(ui: React.ReactElement, { pathname: _pathname = '/
 
   return (
     <QueryClientProvider client={queryClient}>
-      {ui}
+      <AuthProvider>{ui}</AuthProvider>
     </QueryClientProvider>
   );
 }

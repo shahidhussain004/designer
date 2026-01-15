@@ -83,10 +83,10 @@ public class ProposalResponse {
                 .projectTitle(proposal.getProject() != null ? proposal.getProject().getTitle() : null)
                 .freelancer(freelancerInfo)
                 .coverLetter(proposal.getCoverLetter())
-                .proposedRate(proposal.getProposedRate())
-                .estimatedDuration(proposal.getEstimatedDuration())
+                .proposedRate(proposal.getSuggestedBudget())
+                .estimatedDuration(proposal.getEstimatedHours() != null ? proposal.getEstimatedHours().intValue() : null)
                 .status(proposal.getStatus() != null ? proposal.getStatus().name() : null)
-                .companyMessage(proposal.getCompanyMessage())
+                .companyMessage(proposal.getCompanyNotes())
                 .createdAt(proposal.getCreatedAt())
                 .updatedAt(proposal.getUpdatedAt())
                 .build();

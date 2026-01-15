@@ -151,7 +151,7 @@ export default function ResourcesPage() {
                   <option value="">All Categories</option>
                   {categories.map((cat: any) => (
                     <option key={cat.id} value={cat.id}>
-                      {cat.name}
+                      {cat?.name ?? 'Unnamed'}
                     </option>
                   ))}
                 </select>
@@ -187,7 +187,7 @@ export default function ResourcesPage() {
             </form>
 
             {/* Tags Filter */}
-            {tags.length > 0 && (
+                  {tags.length > 0 && (
               <div className="mt-4">
                 <p className="text-sm text-gray-600 mb-2">Filter by tags:</p>
                 <div className="flex flex-wrap gap-2">
@@ -201,7 +201,7 @@ export default function ResourcesPage() {
                           : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                       }`}
                     >
-                      {tag.name}
+                      {tag?.name ?? 'Tag'}
                     </button>
                   ))}
                 </div>
@@ -295,7 +295,7 @@ export default function ResourcesPage() {
                           {/* Category */}
                           {item.category && (
                             <p className="text-xs text-primary-600 font-medium mb-2">
-                              {item.category.name}
+                              {item.category?.name ?? 'Uncategorized'}
                             </p>
                           )}
 
@@ -355,7 +355,7 @@ export default function ResourcesPage() {
                                   key={tag.id}
                                   className="inline-block px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded"
                                 >
-                                  {tag.name}
+                                  {tag?.name ?? 'tag'}
                                 </span>
                               ))}
                               {item.tags.length > 3 && (

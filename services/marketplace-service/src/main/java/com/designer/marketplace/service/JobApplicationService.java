@@ -10,10 +10,13 @@ import org.springframework.transaction.annotation.Transactional;
 import com.designer.marketplace.dto.CreateJobApplicationRequest;
 import com.designer.marketplace.dto.JobApplicationResponse;
 import com.designer.marketplace.dto.UpdateJobApplicationStatusRequest;
+import com.designer.marketplace.entity.Freelancer;
 import com.designer.marketplace.entity.Job;
 import com.designer.marketplace.entity.JobApplication;
 import com.designer.marketplace.entity.Notification;
 import com.designer.marketplace.entity.User;
+import com.designer.marketplace.repository.CompanyRepository;
+import com.designer.marketplace.repository.FreelancerRepository;
 import com.designer.marketplace.repository.JobApplicationRepository;
 import com.designer.marketplace.repository.JobRepository;
 
@@ -32,6 +35,8 @@ public class JobApplicationService {
     private final JobRepository jobRepository;
     private final UserService userService;
     private final NotificationService notificationService;
+    private final FreelancerRepository freelancerRepository;
+    private final CompanyRepository companyRepository;
 
     /**
      * Get applications for a specific job (employer only)
@@ -94,9 +99,13 @@ public class JobApplicationService {
             throw new RuntimeException("You have already applied to this job");
         }
 
+        // Get freelancer profile
+        Freelancer freelancer = freelancerRepository.findByUserId(currentUser.getId())
+                .orElseThrow(() -> new RuntimeException("Freelancer profile not found for user: " + currentUser.getUsername()));
+
         JobApplication application = new JobApplication();
         application.setJob(job);
-        application.setApplicant(currentUser);
+        application.setApplicant(freelancer);
         application.setFullName(request.getFullName());
         application.setEmail(request.getEmail());
         application.setPhone(request.getPhone());

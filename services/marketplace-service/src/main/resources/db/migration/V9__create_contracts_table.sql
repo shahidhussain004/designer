@@ -6,15 +6,15 @@
 CREATE TABLE IF NOT EXISTS contracts (
     id BIGSERIAL PRIMARY KEY,
     project_id BIGINT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
-    company_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    freelancer_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    company_id BIGINT NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    freelancer_id BIGINT NOT NULL REFERENCES freelancers(id) ON DELETE CASCADE,
     proposal_id BIGINT REFERENCES proposals(id) ON DELETE SET NULL,
     
     -- Contract Details
     title VARCHAR(255) NOT NULL,
     description TEXT,
     contract_type VARCHAR(20) NOT NULL, -- FIXED_PRICE, HOURLY, MILESTONE_BASED
-    total_amount DECIMAL(12,2) NOT NULL,
+    total_amount NUMERIC(12,2) NOT NULL,
     
     -- Payment Schedule
     payment_schedule VARCHAR(20), -- UPFRONT, ON_COMPLETION, MILESTONE_BASED, WEEKLY, MONTHLY

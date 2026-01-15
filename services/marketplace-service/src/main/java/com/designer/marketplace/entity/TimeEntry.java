@@ -57,7 +57,7 @@ public class TimeEntry {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "freelancer_id", nullable = false, foreignKey = @ForeignKey(name = "fk_time_entry_freelancer"))
-    private User freelancer;
+    private Freelancer freelancer;
 
     @Column(columnDefinition = "TEXT")
     private String description;

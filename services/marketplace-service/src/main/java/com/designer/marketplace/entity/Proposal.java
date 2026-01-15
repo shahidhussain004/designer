@@ -49,23 +49,56 @@ public class Proposal {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "freelancer_id", nullable = false)
-    private User freelancer;
+    private Freelancer freelancer;
 
     @Column(name = "cover_letter", nullable = false, columnDefinition = "TEXT")
     private String coverLetter;
 
-    @Column(name = "proposed_rate", nullable = false, columnDefinition = "NUMERIC(10,2)")
-    private Double proposedRate;
+    @Column(name = "suggested_budget", columnDefinition = "NUMERIC(12,2)")
+    private Double suggestedBudget;
 
-    @Column(name = "estimated_duration")
-    private Integer estimatedDuration;
+    @Column(name = "proposed_timeline")
+    private String proposedTimeline;
+
+    @Column(name = "estimated_hours", columnDefinition = "NUMERIC(10,2)")
+    private Double estimatedHours;
+
+    @Column(name = "attachments")
+    private String[] attachments;
+
+    @Column(name = "portfolio_links")
+    private String[] portfolioLinks;
+
+    @Column(name = "answers", columnDefinition = "jsonb")
+    private String answers;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 50)
     private ProposalStatus status = ProposalStatus.SUBMITTED;
 
-    @Column(name = "company_message", columnDefinition = "TEXT")
-    private String companyMessage;
+    @Column(name = "is_featured")
+    private Boolean isFeatured = false;
+
+    @Column(name = "company_notes", columnDefinition = "TEXT")
+    private String companyNotes;
+
+    @Column(name = "rejection_reason", columnDefinition = "TEXT")
+    private String rejectionReason;
+
+    @Column(name = "company_rating", columnDefinition = "NUMERIC(3,2)")
+    private Double companyRating;
+
+    @Column(name = "company_review", columnDefinition = "TEXT")
+    private String companyReview;
+
+    @Column(name = "freelancer_rating", columnDefinition = "NUMERIC(3,2)")
+    private Double freelancerRating;
+
+    @Column(name = "freelancer_review", columnDefinition = "TEXT")
+    private String freelancerReview;
+
+    @Column(name = "reviewed_at")
+    private LocalDateTime reviewedAt;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -78,6 +111,7 @@ public class Proposal {
     public enum ProposalStatus {
         DRAFT,
         SUBMITTED,
+        REVIEWING,
         SHORTLISTED,
         ACCEPTED,
         REJECTED,

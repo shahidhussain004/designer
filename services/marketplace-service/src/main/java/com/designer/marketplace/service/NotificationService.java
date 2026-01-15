@@ -1,17 +1,21 @@
 package com.designer.marketplace.service;
 
-import com.designer.marketplace.dto.NotificationResponse;
-import com.designer.marketplace.entity.Notification;
-import com.designer.marketplace.entity.User;
-import com.designer.marketplace.repository.NotificationRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.designer.marketplace.dto.NotificationResponse;
+import com.designer.marketplace.entity.Company;
+import com.designer.marketplace.entity.Freelancer;
+import com.designer.marketplace.entity.Notification;
+import com.designer.marketplace.entity.User;
+import com.designer.marketplace.repository.NotificationRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Service for notification operations
@@ -57,6 +61,30 @@ public class NotificationService {
 
         notificationRepository.save(notification);
         log.info("Created notification for user {}: {}", user.getUsername(), title);
+    }
+
+    /**
+     * Create notification for company
+     */
+    @Transactional
+    public void createNotification(Company company, Notification.NotificationType type,
+            String title, String message,
+            String relatedEntityType, Long relatedEntityId) {
+        if (company != null && company.getUser() != null) {
+            createNotification(company.getUser(), type, title, message, relatedEntityType, relatedEntityId);
+        }
+    }
+
+    /**
+     * Create notification for freelancer
+     */
+    @Transactional
+    public void createNotification(Freelancer freelancer, Notification.NotificationType type,
+            String title, String message,
+            String relatedEntityType, Long relatedEntityId) {
+        if (freelancer != null && freelancer.getUser() != null) {
+            createNotification(freelancer.getUser(), type, title, message, relatedEntityType, relatedEntityId);
+        }
     }
 
     /**

@@ -1,11 +1,5 @@
 package com.designer.marketplace.service;
 
-import com.designer.marketplace.dto.*;
-import com.designer.marketplace.entity.User;
-import com.designer.marketplace.repository.UserRepository;
-import com.designer.marketplace.security.JwtTokenProvider;
-import com.designer.marketplace.security.UserPrincipal;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -13,6 +7,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.designer.marketplace.dto.AuthResponse;
+import com.designer.marketplace.dto.LoginRequest;
+import com.designer.marketplace.dto.RegisterRequest;
+import com.designer.marketplace.dto.UserDto;
+import com.designer.marketplace.entity.User;
+import com.designer.marketplace.repository.UserRepository;
+import com.designer.marketplace.security.JwtTokenProvider;
+import com.designer.marketplace.security.UserPrincipal;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * Authentication Service
@@ -51,8 +56,6 @@ public class AuthService {
         user.setRole(User.UserRole.valueOf(request.getRole()));
         user.setEmailVerified(false);
         user.setIsActive(true);
-        user.setRatingAvg(0.0);
-        user.setRatingCount(0);
 
         user = userRepository.save(user);
 
@@ -128,13 +131,8 @@ public class AuthService {
                 .bio(user.getBio())
                 .profileImageUrl(user.getProfileImageUrl())
                 .location(user.getLocation())
-                .hourlyRate(user.getHourlyRate())
-                .skills(user.getSkills())
-                .portfolioUrl(user.getPortfolioUrl())
                 .emailVerified(user.getEmailVerified())
                 .isActive(user.getIsActive())
-                .ratingAvg(user.getRatingAvg())
-                .ratingCount(user.getRatingCount())
                 .build();
     }
 }
