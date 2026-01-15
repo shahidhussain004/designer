@@ -12,7 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.designer.marketplace.dto.CreatePaymentRequest;
 import com.designer.marketplace.dto.PaymentResponse;
+import com.designer.marketplace.entity.Company;
 import com.designer.marketplace.entity.Escrow;
+import com.designer.marketplace.entity.Freelancer;
 import com.designer.marketplace.entity.Payment;
 import com.designer.marketplace.entity.Payment.EscrowStatus;
 import com.designer.marketplace.entity.Payment.PaymentStatus;
@@ -348,5 +350,17 @@ public class PaymentService {
                 .build();
 
         transactionLedgerRepository.save(entry);
+    }
+
+    private void createLedgerEntry(Payment payment, Escrow escrow, Company company, 
+                                   TransactionType type, Long amount, String description) {
+        User user = company != null ? company.getUser() : null;
+        createLedgerEntry(payment, escrow, user, type, amount, description);
+    }
+
+    private void createLedgerEntry(Payment payment, Escrow escrow, Freelancer freelancer, 
+                                   TransactionType type, Long amount, String description) {
+        User user = freelancer != null ? freelancer.getUser() : null;
+        createLedgerEntry(payment, escrow, user, type, amount, description);
     }
 }

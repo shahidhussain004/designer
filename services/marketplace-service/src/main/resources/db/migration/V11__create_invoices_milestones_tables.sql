@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS invoices (
     milestone_id BIGINT,
     
     -- Parties
-    company_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    freelancer_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    company_id BIGINT NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    freelancer_id BIGINT NOT NULL REFERENCES freelancers(id) ON DELETE CASCADE,
     payment_id BIGINT NOT NULL,
     
     -- Invoice Information

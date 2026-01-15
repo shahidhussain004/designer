@@ -1,12 +1,8 @@
 package com.designer.marketplace.entity;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -52,7 +48,7 @@ public class User {
     private String fullName;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "user_type", nullable = false, length = 20)
+    @Column(name = "role", nullable = false, length = 20)
     private UserRole role = UserRole.FREELANCER;
 
     @Column(columnDefinition = "TEXT")
@@ -67,16 +63,6 @@ public class User {
     @Column(length = 20)
     private String phone;
 
-    @Column(name = "hourly_rate", columnDefinition = "NUMERIC(10,2)")
-    private Double hourlyRate;
-
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "skills", columnDefinition = "json")
-    private List<String> skills = new ArrayList<>();
-
-    @Column(name = "portfolio_url", length = 500)
-    private String portfolioUrl;
-
     @Column(name = "stripe_customer_id", length = 100)
     private String stripeCustomerId;
 
@@ -88,49 +74,6 @@ public class User {
 
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
-
-    @Column(name = "rating_avg", columnDefinition = "NUMERIC(3,2)")
-    private Double ratingAvg = 0.0;
-
-    @Column(name = "rating_count", nullable = false)
-    private Integer ratingCount = 0;
-
-    // Enhanced profile fields from V11 migration
-    @Column(name = "github_url", length = 500)
-    private String githubUrl;
-
-    @Column(name = "linkedin_url", length = 500)
-    private String linkedinUrl;
-
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "certifications", columnDefinition = "json")
-    private List<String> certifications = new ArrayList<>();
-
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "languages", columnDefinition = "json")
-    private List<String> languages = new ArrayList<>();
-
-    @Column(name = "experience_years")
-    private Integer experienceYears;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "verification_status", length = 20)
-    private VerificationStatus verificationStatus = VerificationStatus.UNVERIFIED;
-
-    @Column(name = "identity_verified", nullable = false)
-    private Boolean identityVerified = false;
-
-    @Column(name = "identity_verified_at")
-    private LocalDateTime identityVerifiedAt;
-
-    @Column(name = "completion_rate", columnDefinition = "NUMERIC(5,2)")
-    private Double completionRate = 100.0;
-
-    @Column(name = "response_time_hours", columnDefinition = "NUMERIC(5,1)")
-    private Double responseTimeHours;
-
-    @Column(name = "response_rate", columnDefinition = "NUMERIC(5,2)")
-    private Double responseRate;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -164,12 +107,8 @@ public class User {
     // All-args constructor
     public User(Long id, String email, String username, String passwordHash, String fullName,
                 UserRole role, String bio, String profileImageUrl, String location, String phone,
-                Double hourlyRate, List<String> skills, String portfolioUrl, String stripeCustomerId,
-                String stripeAccountId, Boolean emailVerified, Boolean isActive, Double ratingAvg,
-                Integer ratingCount, String githubUrl, String linkedinUrl, List<String> certifications,
-                List<String> languages, Integer experienceYears, VerificationStatus verificationStatus,
-                Boolean identityVerified, LocalDateTime identityVerifiedAt, Double completionRate,
-                Double responseTimeHours, Double responseRate, LocalDateTime createdAt, LocalDateTime updatedAt) {
+                String stripeCustomerId, String stripeAccountId, Boolean emailVerified, Boolean isActive,
+                LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.email = email;
         this.username = username;
@@ -180,26 +119,10 @@ public class User {
         this.profileImageUrl = profileImageUrl;
         this.location = location;
         this.phone = phone;
-        this.hourlyRate = hourlyRate;
-        this.skills = (skills == null) ? new ArrayList<>() : new ArrayList<>(skills);
-        this.portfolioUrl = portfolioUrl;
         this.stripeCustomerId = stripeCustomerId;
         this.stripeAccountId = stripeAccountId;
         this.emailVerified = emailVerified;
         this.isActive = isActive;
-        this.ratingAvg = ratingAvg;
-        this.ratingCount = ratingCount;
-        this.githubUrl = githubUrl;
-        this.linkedinUrl = linkedinUrl;
-        this.certifications = (certifications == null) ? new ArrayList<>() : new ArrayList<>(certifications);
-        this.languages = (languages == null) ? new ArrayList<>() : new ArrayList<>(languages);
-        this.experienceYears = experienceYears;
-        this.verificationStatus = verificationStatus;
-        this.identityVerified = identityVerified;
-        this.identityVerifiedAt = identityVerifiedAt;
-        this.completionRate = completionRate;
-        this.responseTimeHours = responseTimeHours;
-        this.responseRate = responseRate;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -215,32 +138,10 @@ public class User {
     public String getProfileImageUrl() { return profileImageUrl; }
     public String getLocation() { return location; }
     public String getPhone() { return phone; }
-    public Double getHourlyRate() { return hourlyRate; }
-    public List<String> getSkills() { 
-        return (skills == null) ? new ArrayList<>() : skills; 
-    }
-    public String getPortfolioUrl() { return portfolioUrl; }
     public String getStripeCustomerId() { return stripeCustomerId; }
     public String getStripeAccountId() { return stripeAccountId; }
     public Boolean getEmailVerified() { return emailVerified; }
     public Boolean getIsActive() { return isActive; }
-    public Double getRatingAvg() { return ratingAvg; }
-    public Integer getRatingCount() { return ratingCount; }
-    public String getGithubUrl() { return githubUrl; }
-    public String getLinkedinUrl() { return linkedinUrl; }
-    public List<String> getCertifications() { 
-        return (certifications == null) ? new ArrayList<>() : certifications; 
-    }
-    public List<String> getLanguages() { 
-        return (languages == null) ? new ArrayList<>() : languages; 
-    }
-    public Integer getExperienceYears() { return experienceYears; }
-    public VerificationStatus getVerificationStatus() { return verificationStatus; }
-    public Boolean getIdentityVerified() { return identityVerified; }
-    public LocalDateTime getIdentityVerifiedAt() { return identityVerifiedAt; }
-    public Double getCompletionRate() { return completionRate; }
-    public Double getResponseTimeHours() { return responseTimeHours; }
-    public Double getResponseRate() { return responseRate; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
 
@@ -255,32 +156,10 @@ public class User {
     public void setProfileImageUrl(String profileImageUrl) { this.profileImageUrl = profileImageUrl; }
     public void setLocation(String location) { this.location = location; }
     public void setPhone(String phone) { this.phone = phone; }
-    public void setHourlyRate(Double hourlyRate) { this.hourlyRate = hourlyRate; }
-    public void setSkills(List<String> skills) { 
-        this.skills = (skills == null) ? new ArrayList<>() : new ArrayList<>(skills); 
-    }
-    public void setPortfolioUrl(String portfolioUrl) { this.portfolioUrl = portfolioUrl; }
     public void setStripeCustomerId(String stripeCustomerId) { this.stripeCustomerId = stripeCustomerId; }
     public void setStripeAccountId(String stripeAccountId) { this.stripeAccountId = stripeAccountId; }
     public void setEmailVerified(Boolean emailVerified) { this.emailVerified = emailVerified; }
     public void setIsActive(Boolean isActive) { this.isActive = isActive; }
-    public void setRatingAvg(Double ratingAvg) { this.ratingAvg = ratingAvg; }
-    public void setRatingCount(Integer ratingCount) { this.ratingCount = ratingCount; }
-    public void setGithubUrl(String githubUrl) { this.githubUrl = githubUrl; }
-    public void setLinkedinUrl(String linkedinUrl) { this.linkedinUrl = linkedinUrl; }
-    public void setCertifications(List<String> certifications) { 
-        this.certifications = (certifications == null) ? new ArrayList<>() : new ArrayList<>(certifications); 
-    }
-    public void setLanguages(List<String> languages) { 
-        this.languages = (languages == null) ? new ArrayList<>() : new ArrayList<>(languages); 
-    }
-    public void setExperienceYears(Integer experienceYears) { this.experienceYears = experienceYears; }
-    public void setVerificationStatus(VerificationStatus verificationStatus) { this.verificationStatus = verificationStatus; }
-    public void setIdentityVerified(Boolean identityVerified) { this.identityVerified = identityVerified; }
-    public void setIdentityVerifiedAt(LocalDateTime identityVerifiedAt) { this.identityVerifiedAt = identityVerifiedAt; }
-    public void setCompletionRate(Double completionRate) { this.completionRate = completionRate; }
-    public void setResponseTimeHours(Double responseTimeHours) { this.responseTimeHours = responseTimeHours; }
-    public void setResponseRate(Double responseRate) { this.responseRate = responseRate; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 

@@ -37,11 +37,11 @@ CREATE INDEX IF NOT EXISTS idx_escrow_status ON escrow(status);
 CREATE TABLE IF NOT EXISTS payments (
     id BIGSERIAL PRIMARY KEY,
     contract_id BIGINT REFERENCES contracts(id) ON DELETE SET NULL,
-    payer_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    payee_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    payer_id BIGINT NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    payee_id BIGINT NOT NULL REFERENCES freelancers(id) ON DELETE CASCADE,
     
     -- Payment Details
-    amount DECIMAL(15,2) NOT NULL,
+    amount NUMERIC(15,2) NOT NULL,
     currency VARCHAR(3) DEFAULT 'USD',
     payment_method VARCHAR(50), -- CREDIT_CARD, BANK_TRANSFER, WALLET, PAYPAL
     description TEXT,
@@ -74,7 +74,7 @@ CREATE INDEX IF NOT EXISTS idx_payments_transaction_id ON payments(transaction_i
 
 CREATE TABLE IF NOT EXISTS payouts (
     id BIGSERIAL PRIMARY KEY,
-    user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id BIGINT NOT NULL REFERENCES freelancers(id) ON DELETE CASCADE,
     
     -- Payout Details
     amount DECIMAL(15,2) NOT NULL,

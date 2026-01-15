@@ -6,13 +6,13 @@
 CREATE TABLE IF NOT EXISTS proposals (
     id BIGSERIAL PRIMARY KEY,
     project_id BIGINT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
-    freelancer_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    freelancer_id BIGINT NOT NULL REFERENCES freelancers(id) ON DELETE CASCADE,
     
     -- Proposal Information
     cover_letter TEXT NOT NULL,
-    suggested_budget DECIMAL(12,2),
+    suggested_budget NUMERIC(12,2),
     proposed_timeline VARCHAR(100),
-    estimated_hours DECIMAL(10,2),
+    estimated_hours NUMERIC(10,2),
     attachments TEXT[],
     portfolio_links TEXT[],
     
@@ -26,9 +26,9 @@ CREATE TABLE IF NOT EXISTS proposals (
     rejection_reason TEXT,
     
     -- Ratings & Reviews (after completion)
-    company_rating DECIMAL(3,2),
+    company_rating NUMERIC(3,1),
     company_review TEXT,
-    freelancer_rating DECIMAL(3,2),
+    freelancer_rating NUMERIC(3,1),
     freelancer_review TEXT,
     
     -- Timestamps

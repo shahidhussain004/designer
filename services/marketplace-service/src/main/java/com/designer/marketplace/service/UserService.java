@@ -108,18 +108,6 @@ public class UserService {
             user.setPhone(request.getPhone());
         }
 
-        if (request.getHourlyRate() != null) {
-            user.setHourlyRate(request.getHourlyRate());
-        }
-
-        if (request.getSkills() != null) {
-            user.setSkills(request.getSkills());
-        }
-
-        if (request.getPortfolioUrl() != null) {
-            user.setPortfolioUrl(request.getPortfolioUrl());
-        }
-
         User updatedUser = userRepository.save(user);
         log.info("User profile updated: {}", updatedUser.getUsername());
 

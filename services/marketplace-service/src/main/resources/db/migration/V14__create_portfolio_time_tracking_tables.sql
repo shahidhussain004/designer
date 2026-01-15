@@ -5,7 +5,7 @@
 
 CREATE TABLE IF NOT EXISTS portfolio_items (
     id BIGSERIAL PRIMARY KEY,
-    user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id BIGINT NOT NULL REFERENCES freelancers(id) ON DELETE CASCADE,
     
     -- Portfolio Item Details
     title VARCHAR(255) NOT NULL,
@@ -50,13 +50,13 @@ CREATE INDEX IF NOT EXISTS idx_portfolio_visible_order ON portfolio_items(is_vis
 CREATE TABLE IF NOT EXISTS time_entries (
     id BIGSERIAL PRIMARY KEY,
     contract_id BIGINT NOT NULL REFERENCES contracts(id) ON DELETE CASCADE,
-    freelancer_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    freelancer_id BIGINT NOT NULL REFERENCES freelancers(id) ON DELETE CASCADE,
     
     -- Time Details
     date DATE NOT NULL,
     start_time TIME,
     end_time TIME,
-    hours_logged DECIMAL(10,2) NOT NULL,
+    hours_logged NUMERIC(10,2) NOT NULL,
     
     -- Description
     description TEXT,

@@ -54,11 +54,11 @@ public class Contract {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", nullable = false, foreignKey = @ForeignKey(name = "fk_contract_company"))
-    private User company;
+    private Company company;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "freelancer_id", nullable = false, foreignKey = @ForeignKey(name = "fk_contract_freelancer"))
-    private User freelancer;
+    private Freelancer freelancer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "proposal_id", foreignKey = @ForeignKey(name = "fk_contract_proposal"))

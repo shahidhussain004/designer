@@ -5,7 +5,7 @@
 
 CREATE TABLE IF NOT EXISTS jobs (
     id BIGSERIAL PRIMARY KEY,
-    employer_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    employer_id BIGINT NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
     category_id BIGINT REFERENCES job_categories(id) ON DELETE SET NULL,
     
     -- Basic Information
@@ -27,8 +27,8 @@ CREATE TABLE IF NOT EXISTS jobs (
     remote_type VARCHAR(50), -- FULLY_REMOTE, HYBRID, ON_SITE
     
     -- Compensation
-    salary_min DECIMAL(12,2),
-    salary_max DECIMAL(12,2),
+    salary_min NUMERIC(12,2),
+    salary_max NUMERIC(12,2),
     salary_currency VARCHAR(3) DEFAULT 'USD',
     salary_period VARCHAR(20) DEFAULT 'ANNUAL', -- ANNUAL, MONTHLY, HOURLY
     show_salary BOOLEAN DEFAULT TRUE,

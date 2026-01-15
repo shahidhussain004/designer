@@ -190,7 +190,7 @@ services:
   marketplace-service:
     build:
       context: ../services/marketplace-service
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prebuilt
     ports:
       - "8080:8080"
     environment:

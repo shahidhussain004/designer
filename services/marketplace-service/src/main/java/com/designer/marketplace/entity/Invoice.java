@@ -54,11 +54,11 @@ public class Invoice {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", nullable = false)
-    private User company;
+    private Company company;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "freelancer_id", nullable = false)
-    private User freelancer;
+    private Freelancer freelancer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)
