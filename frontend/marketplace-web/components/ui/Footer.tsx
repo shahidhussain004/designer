@@ -19,8 +19,8 @@ const footerLinks = {
       { label: 'Freelancer Resources', href: '/resources' },
     ],
   },
-  forEmployers: {
-    title: 'For Employers',
+  forCompanies: {
+    title: 'For Companies',
     links: [
       { label: 'Post a Job', href: '/jobs/create' },
       { label: 'Browse Talents', href: '/talents' },

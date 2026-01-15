@@ -70,10 +70,10 @@ public class DashboardService {
                                 currentUser.getId(), Proposal.ProposalStatus.SUBMITTED);
 
                 // Get job statistics
-                Long totalJobsPosted = jobRepository.countByEmployerId(currentUser.getId());
-                Long openJobs = jobRepository.countByEmployerIdAndStatus(currentUser.getId(), Job.JobStatus.OPEN);
-                Long totalApplicationsReceived = jobApplicationRepository.countByEmployerId(currentUser.getId());
-                Long filledJobs = jobRepository.countByEmployerIdAndStatus(currentUser.getId(), Job.JobStatus.FILLED);
+                Long totalJobsPosted = jobRepository.countByCompanyId(currentUser.getId());
+                Long openJobs = jobRepository.countByCompanyIdAndStatus(currentUser.getId(), Job.JobStatus.OPEN);
+                Long totalApplicationsReceived = jobApplicationRepository.countByCompanyId(currentUser.getId());
+                Long filledJobs = jobRepository.countByCompanyIdAndStatus(currentUser.getId(), Job.JobStatus.FILLED);
 
                 CompanyDashboardResponse.DashboardStats stats = CompanyDashboardResponse.DashboardStats.builder()
                                 .totalProjectsPosted(totalProjectsPosted)
@@ -117,7 +117,7 @@ public class DashboardService {
 
                 // Get open jobs posted by company
                 Pageable openJobsPageable = PageRequest.of(0, 5, Sort.by("publishedAt").descending());
-                Page<Job> openJobsPage = jobRepository.findByEmployerId(currentUser.getId(), openJobsPageable);
+                Page<Job> openJobsPage = jobRepository.findByCompanyId(currentUser.getId(), openJobsPageable);
                 List<JobResponse> openJobsResponse = openJobsPage.getContent().stream()
                                 .filter(job -> job.getStatus() == Job.JobStatus.OPEN)
                                 .map(JobResponse::fromEntity)
@@ -125,7 +125,7 @@ public class DashboardService {
 
                 // Get recent applications for company's jobs
                 Pageable applicationsPageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
-                Page<JobApplication> recentApplicationsPage = jobApplicationRepository.findByJobEmployerId(currentUser.getId(), applicationsPageable);
+                Page<JobApplication> recentApplicationsPage = jobApplicationRepository.findByJobCompanyId(currentUser.getId(), applicationsPageable);
                 List<JobApplicationResponse> recentApplicationsResponse = recentApplicationsPage.getContent().stream()
                                 .map(JobApplicationResponse::fromEntity)
                                 .collect(Collectors.toList());

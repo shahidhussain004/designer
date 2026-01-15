@@ -12,7 +12,7 @@
 
 ### Brand Identity
 - **Professional yet approachable** - suitable for a tech/creative platform
-- **Target audience**: Freelancers, designers, IT developers, employers, job seekers, blog readers
+- **Target audience**: Freelancers, designers, IT developers, companies, job seekers, blog readers
 - **Core values**: Trust, competence, and forward-thinking innovation
 
 ### Visual Language

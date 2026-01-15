@@ -1,11 +1,11 @@
 -- =====================================================
 -- V4: Create Traditional Job Postings Table
--- Description: Employment job postings for FULL_TIME, PART_TIME, CONTRACT, TEMPORARY, INTERNSHIP positions
+-- Description: Company job postings for FULL_TIME, PART_TIME, CONTRACT, TEMPORARY, INTERNSHIP positions
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS jobs (
     id BIGSERIAL PRIMARY KEY,
-    employer_id BIGINT NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    company_id BIGINT NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
     category_id BIGINT REFERENCES job_categories(id) ON DELETE SET NULL,
     
     -- Basic Information
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS jobs (
     responsibilities TEXT,
     requirements TEXT,
     
-    -- Employment Details
+    -- Company Details
     job_type VARCHAR(50) DEFAULT 'FULL_TIME' NOT NULL,
     experience_level VARCHAR(50) DEFAULT 'INTERMEDIATE',
     
@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS jobs (
 );
 
 -- Create indexes for performance
-CREATE INDEX IF NOT EXISTS idx_jobs_employer_id ON jobs(employer_id);
+CREATE INDEX IF NOT EXISTS idx_jobs_company_id ON jobs(company_id);
 CREATE INDEX IF NOT EXISTS idx_jobs_category_id ON jobs(category_id);
 CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(status);
 CREATE INDEX IF NOT EXISTS idx_jobs_job_type ON jobs(job_type);
@@ -120,8 +120,8 @@ BEFORE UPDATE ON jobs
 FOR EACH ROW
 EXECUTE FUNCTION update_jobs_updated_at();
 
-COMMENT ON TABLE jobs IS 'Traditional employment job postings table';
-COMMENT ON COLUMN jobs.employer_id IS 'User ID of the employer/recruiter posting the job';
+COMMENT ON TABLE jobs IS 'Traditional company job postings table';
+COMMENT ON COLUMN jobs.company_id IS 'User ID of the company posting the job';
 COMMENT ON COLUMN jobs.job_type IS 'Job type: FULL_TIME, PART_TIME, CONTRACT, TEMPORARY, INTERNSHIP';
 COMMENT ON COLUMN jobs.remote_type IS 'Work location option: FULLY_REMOTE, HYBRID, ON_SITE';
 COMMENT ON COLUMN jobs.status IS 'Job posting status: DRAFT, OPEN, PAUSED, CLOSED, FILLED';

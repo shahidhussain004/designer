@@ -8,7 +8,7 @@ The schema is designed from scratch based on the actual running database, follow
 ## Migration Order & Purpose
 
 ### V1-V2: Core Infrastructure
-- **V1__create_core_users_table.sql**: Core users table supporting EMPLOYER, FREELANCER, and ADMIN roles
+- **V1__create_core_users_table.sql**: Core users table supporting COMPANY, FREELANCER, and ADMIN roles
   - 80+ columns for complete user profile, verification, ratings, and metrics
   - 8 strategic indexes for common queries
   - Automatic updated_at trigger
@@ -22,7 +22,7 @@ The schema is designed from scratch based on the actual running database, follow
   - 10 default categories: Software Development, Design, Marketing, Sales, Data Science, etc.
   - Slug-based lookups for SEO-friendly URLs
   
-- **V4__create_jobs_table.sql**: Traditional employment job postings
+- **V4__create_jobs_table.sql**: Traditional company job postings
   - Comprehensive 50+ column table for full job posting details
   - Support for remote work, salary ranges, benefits, requirements
   - Array fields for multi-valued data (skills[], perks[], benefits[])
@@ -99,7 +99,7 @@ The schema is designed from scratch based on the actual running database, follow
 
 ### V15: Development Data
 - **V15__seed_development_data.sql**: Sample data for testing
-  - 5 sample users (3 freelancers, 2 employers, 1 admin)
+  - 5 sample users (3 freelancers, 2 companies, 1 admin)
   - 3 job postings across different categories
   - 3 freelance projects with active proposals
   - 1 active contract with milestone structure

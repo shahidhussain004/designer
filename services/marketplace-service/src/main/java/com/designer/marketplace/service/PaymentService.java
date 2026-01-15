@@ -23,12 +23,12 @@ import com.designer.marketplace.entity.Proposal;
 import com.designer.marketplace.entity.TransactionLedger;
 import com.designer.marketplace.entity.TransactionLedger.TransactionType;
 import com.designer.marketplace.entity.User;
+import com.designer.marketplace.repository.CompanyRepository;
 import com.designer.marketplace.repository.EscrowRepository;
 import com.designer.marketplace.repository.PaymentRepository;
 import com.designer.marketplace.repository.ProjectRepository;
 import com.designer.marketplace.repository.ProposalRepository;
 import com.designer.marketplace.repository.TransactionLedgerRepository;
-import com.designer.marketplace.repository.UserRepository;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
@@ -51,7 +51,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final EscrowRepository escrowRepository;
     private final TransactionLedgerRepository transactionLedgerRepository;
-    private final UserRepository userRepository;
+    private final CompanyRepository companyRepository;
     private final ProjectRepository projectRepository;
     private final ProposalRepository proposalRepository;
 
@@ -75,7 +75,7 @@ public class PaymentService {
         log.info("Creating payment intent for company {} on project {}", companyId, request.getProjectId());
 
         // Validate company
-        User company = userRepository.findById(companyId)
+        Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new IllegalArgumentException("Company not found"));
 
         // Validate project
@@ -86,7 +86,7 @@ public class PaymentService {
         Proposal proposal = proposalRepository.findById(request.getProposalId())
                 .orElseThrow(() -> new IllegalArgumentException("Proposal not found"));
 
-        User freelancer = proposal.getFreelancer();
+        Freelancer freelancer = proposal.getFreelancer();
 
         // Calculate fees (amount in cents)
         Long amount = request.getAmount();
@@ -184,7 +184,7 @@ public class PaymentService {
         createLedgerEntry(payment, escrow, payment.getCompany(), TransactionType.ESCROW_HOLD,
                 payment.getFreelancerAmount(), "Funds held in escrow");
 
-        createLedgerEntry(payment, null, null, TransactionType.PLATFORM_FEE,
+        createLedgerEntry(payment, null, (User) null, TransactionType.PLATFORM_FEE,
                 payment.getPlatformFee(), "Platform fee collected");
 
         log.info("Payment succeeded and moved to escrow: {}", paymentIntentId);

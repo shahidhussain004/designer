@@ -33,13 +33,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Controller for Jobs (employment opportunities)
+ * Controller for Jobs (company job opportunities)
  */
 @RestController
 @RequestMapping("/api/jobs")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "Jobs", description = "APIs for employment job postings")
+@Tag(name = "Jobs", description = "APIs for company job postings")
 public class JobController {
 
     private final JobService jobService;
@@ -129,38 +129,38 @@ public class JobController {
     }
 
     /**
-     * Get jobs by employer (requires authentication)
+     * Get jobs by company (requires authentication)
      */
-    @GetMapping("/employer/{employerId}")
+    @GetMapping("/company/{companyId}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'COMPANY')")
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "Get jobs by employer", description = "Get all jobs posted by a specific employer")
-    public ResponseEntity<Page<JobResponse>> getJobsByEmployer(
-            @PathVariable Long employerId,
+    @Operation(summary = "Get jobs by company", description = "Get all jobs posted by a specific company")
+    public ResponseEntity<Page<JobResponse>> getJobsByCompany(
+            @PathVariable Long companyId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @AuthenticationPrincipal UserPrincipal currentUser) {
 
-        // Only allow employers to see their own jobs (or admins)
+        // Only allow companies to see their own jobs (or admins)
         if (!currentUser.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ADMIN")) &&
-                !currentUser.getId().equals(employerId)) {
+                !currentUser.getId().equals(companyId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<JobResponse> jobs = jobService.getJobsByEmployer(employerId, pageable);
+        Page<JobResponse> jobs = jobService.getJobsByCompany(companyId, pageable);
 
         return ResponseEntity.ok(jobs);
     }
 
     /**
-     * Create a new job (requires authentication as employer/company)
+     * Create a new job (requires authentication as company)
      */
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ADMIN', 'COMPANY')")
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "Create a new job", description = "Post a new employment opportunity")
+    @Operation(summary = "Create a new job", description = "Post a new company job opportunity")
     public ResponseEntity<JobResponse> createJob(
             @RequestBody Job job,
             @AuthenticationPrincipal UserPrincipal currentUser) {
@@ -175,7 +175,7 @@ public class JobController {
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'COMPANY')")
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "Update a job", description = "Update an existing job posting")
+    @Operation(summary = "Update a job", description = "Update an existing company job posting")
     public ResponseEntity<JobResponse> updateJob(
             @PathVariable Long id,
             @RequestBody Job job,
