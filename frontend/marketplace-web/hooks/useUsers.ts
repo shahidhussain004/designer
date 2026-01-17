@@ -172,6 +172,22 @@ export function useUserProfile(userId: string | number | null) {
 }
 
 /**
+ * Fetch company profile by ID
+ */
+export function useCompanyProfile(companyId: string | number | null) {
+  return useQuery({
+    queryKey: ['company', companyId, 'profile'],
+    queryFn: async ({ signal }) => {
+      if (!companyId) throw new Error('Company ID is required');
+      const { data } = await apiClient.get<User>(`/companies/${companyId}`, { signal });
+      return data;
+    },
+    enabled: !!companyId,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+}
+
+/**
  * Fetch all users with optional filters
  */
 export function useUsers(filters?: UsersFilters) {

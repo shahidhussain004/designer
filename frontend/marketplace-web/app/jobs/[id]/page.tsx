@@ -213,7 +213,7 @@ export default function JobDetailsPage() {
                       </div>
                     </div>
                     <Link 
-                      href={`/users/${company.id}/profile`}
+                      href={`/company/${company.id}`}
                       className="text-primary-600 hover:text-primary-700 font-medium"
                     >
                       View Profile →
