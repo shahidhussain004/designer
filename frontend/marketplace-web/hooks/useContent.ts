@@ -158,8 +158,17 @@ export function useResource(slug: string | null) {
     queryKey: ['resource', slug],
     queryFn: async ({ signal }) => {
       if (!slug) throw new Error('Resource slug is required');
-      const { data } = await contentClient.get(`/content/${slug}`, { signal });
-      return (data as any).data || data;
+      // Fetch all content and filter by slug client-side
+      const { data } = await contentClient.get('/content', {
+        params: { limit: 1000 },
+        signal,
+      });
+      const contentList = (data as any).data || [];
+      const resource = contentList.find((item: any) => item.slug === slug);
+      if (!resource) {
+        throw new Error(`Content with slug '${slug}' not found`);
+      }
+      return resource;
     },
     enabled: !!slug,
     staleTime: 5 * 60 * 1000,
