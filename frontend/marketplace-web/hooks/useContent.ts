@@ -158,7 +158,10 @@ export function useResource(slug: string | null) {
     queryKey: ['resource', slug],
     queryFn: async ({ signal }) => {
       if (!slug) throw new Error('Resource slug is required');
-      const { data } = await contentClient.get(`/content/${slug}`, { signal });
+      // Use dedicated slug endpoint - best practice for single item fetch
+      const { data } = await contentClient.get(`/content/slug/${slug}`, {
+        signal,
+      });
       return (data as any).data || data;
     },
     enabled: !!slug,
