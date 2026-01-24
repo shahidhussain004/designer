@@ -103,7 +103,7 @@ export async function confirmPayment(paymentIntentId: string): Promise<{ success
 
 // Milestones
 export async function getMilestones(jobId: number): Promise<Milestone[]> {
-  const response = await apiClient.get(`/milestones/job/${jobId}`);
+  const response = await apiClient.get(`/jobs/${jobId}/milestones`);
   return response.data;
 }
 

@@ -2,17 +2,22 @@ package com.designer.marketplace.entity;
 
 import java.time.LocalDateTime;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,11 +25,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Payment entity representing a transaction between company and freelancer.
- * Integrates with Stripe for payment processing.
+ * Payment entity - Represents transactions between company and freelancer
+ * Integrates with Stripe for payment processing
+ * Maps to 'payments' table in PostgreSQL
  */
 @Entity
-@Table(name = "payments")
+@Table(name = "payments", indexes = {
+        @Index(name = "idx_payments_company_id", columnList = "company_id"),
+        @Index(name = "idx_payments_freelancer_id", columnList = "freelancer_id"),
+        @Index(name = "idx_payments_status", columnList = "status"),
+        @Index(name = "idx_payments_created_at", columnList = "created_at")
+})
+@EntityListeners(AuditingEntityListener.class)
 @Data
 @Builder
 @NoArgsConstructor
@@ -41,7 +53,6 @@ public class Payment {
     @Column(name = "stripe_charge_id")
     private String stripeChargeId;
 
-    // Relationships
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", nullable = false)
     private Company company;
@@ -51,40 +62,29 @@ public class Payment {
     private Freelancer freelancer;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id", nullable = false)
+    @JoinColumn(name = "project_id")
     private Project project;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "proposal_id")
-    private Proposal proposal;
+    @Column(name = "amount_cents", nullable = false)
+    private Long amountCents;
 
-    // Amount in cents
-    @Column(nullable = false)
-    private Long amount;
+    @Column(name = "platform_fee_cents")
+    private Long platformFeeCents;
 
-    @Column(name = "platform_fee")
-    @Builder.Default
-    private Long platformFee = 0L;
-
-    @Column(name = "freelancer_amount", nullable = false)
-    private Long freelancerAmount;
+    @Column(name = "freelancer_amount_cents", nullable = false)
+    private Long freelancerAmountCents;
 
     @Column(length = 3)
-    @Builder.Default
     private String currency = "USD";
 
-    // Status
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 50)
-    @Builder.Default
-    private PaymentStatus status = PaymentStatus.PENDING;
+    @Column(name = "status", length = 50)
+    private PaymentStatus status;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "escrow_status", length = 50)
-    @Builder.Default
-    private EscrowStatus escrowStatus = EscrowStatus.NOT_ESCROWED;
+    private EscrowStatus escrowStatus;
 
-    // Stripe metadata
     @Column(name = "stripe_payment_method")
     private String stripePaymentMethod;
 
@@ -97,15 +97,6 @@ public class Payment {
     @Column(name = "failure_message", columnDefinition = "TEXT")
     private String failureMessage;
 
-    // Timestamps
-    @Column(name = "created_at")
-    @Builder.Default
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    @Column(name = "updated_at")
-    @Builder.Default
-    private LocalDateTime updatedAt = LocalDateTime.now();
-
     @Column(name = "paid_at")
     private LocalDateTime paidAt;
 
@@ -115,10 +106,13 @@ public class Payment {
     @Column(name = "refunded_at")
     private LocalDateTime refundedAt;
 
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     public enum PaymentStatus {
         PENDING,

@@ -1,9 +1,9 @@
 package com.designer.marketplace.dto;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
 import com.designer.marketplace.entity.JobApplication;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,19 +23,23 @@ public class JobApplicationResponse {
     private Long jobId;
     private String jobTitle;
     private Long applicantId;
-    private ApplicantInfo applicant;
+    private String applicantName;
     private String fullName;
     private String email;
     private String phone;
-    private String resumeUrl;
     private String coverLetter;
+    private String resumeUrl;
     private String portfolioUrl;
     private String linkedinUrl;
-    private Map<String, Object> answers;
+    private String[] additionalDocuments;
+    private JsonNode answers;
     private String status;
     private String companyNotes;
+    private String rejectionReason;
     private LocalDateTime appliedAt;
+    private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private LocalDateTime reviewedAt;
 
     /**
      * Nested DTO for applicant information
@@ -61,24 +65,9 @@ public class JobApplicationResponse {
             return null;
         }
 
-        ApplicantInfo applicantInfo = null;
+        String applicantName = null;
         if (application.getApplicant() != null) {
-            applicantInfo = ApplicantInfo.builder()
-                    .id(application.getApplicant().getId())
-                    .username(application.getApplicant().getUsername())
-                    .fullName(application.getApplicant().getFullName())
-                    .profileImageUrl(application.getApplicant().getProfileImageUrl())
-                    .location(application.getApplicant().getLocation())
-                    .bio(application.getApplicant().getBio())
-                    .build();
-        }
-
-        // Convert JsonNode to Map
-        Map<String, Object> answersMap = null;
-        if (application.getAnswers() != null) {
-            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-            answersMap = mapper.convertValue(application.getAnswers(), 
-                    new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
+            applicantName = application.getApplicant().getFullName();
         }
 
         return JobApplicationResponse.builder()
@@ -86,19 +75,23 @@ public class JobApplicationResponse {
                 .jobId(application.getJob() != null ? application.getJob().getId() : null)
                 .jobTitle(application.getJob() != null ? application.getJob().getTitle() : null)
                 .applicantId(application.getApplicant() != null ? application.getApplicant().getId() : null)
-                .applicant(applicantInfo)
+                .applicantName(applicantName)
                 .fullName(application.getFullName())
                 .email(application.getEmail())
                 .phone(application.getPhone())
-                .resumeUrl(application.getResumeUrl())
                 .coverLetter(application.getCoverLetter())
+                .resumeUrl(application.getResumeUrl())
                 .portfolioUrl(application.getPortfolioUrl())
                 .linkedinUrl(application.getLinkedinUrl())
-                .answers(answersMap)
+                .additionalDocuments(application.getAdditionalDocuments())
+                .answers(application.getAnswers())
                 .status(application.getStatus() != null ? application.getStatus().name() : null)
                 .companyNotes(application.getCompanyNotes())
+                .rejectionReason(application.getRejectionReason())
                 .appliedAt(application.getAppliedAt())
+                .createdAt(application.getCreatedAt())
                 .updatedAt(application.getUpdatedAt())
+                .reviewedAt(application.getReviewedAt())
                 .build();
     }
 }

@@ -27,7 +27,7 @@ import jakarta.validation.Valid;
  * Enhanced with security features: brute force protection, audit logging
  */
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 public class AuthController {
 
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);

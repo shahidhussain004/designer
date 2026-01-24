@@ -1,7 +1,5 @@
 package com.designer.marketplace.entity;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.CreatedDate;
@@ -14,7 +12,6 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,25 +20,24 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Contract entity - Represents a formal agreement between company and freelancer
+ * Contract entity - Represents contract between Company and Freelancer for Projects
+ * Maps to 'contracts' table in PostgreSQL
  */
 @Entity
 @Table(name = "contracts", indexes = {
-    @Index(name = "idx_contract_project_id", columnList = "project_id"),
-    @Index(name = "idx_contract_company_id", columnList = "company_id"),
-    @Index(name = "idx_contract_freelancer_id", columnList = "freelancer_id"),
-    @Index(name = "idx_contract_status", columnList = "status")
+        @Index(name = "idx_contracts_project_id", columnList = "project_id"),
+        @Index(name = "idx_contracts_freelancer_id", columnList = "freelancer_id"),
+        @Index(name = "idx_contracts_status", columnList = "status"),
+        @Index(name = "idx_contracts_created_at", columnList = "created_at")
 })
 @EntityListeners(AuditingEntityListener.class)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Contract {
 
     @Id
@@ -49,67 +45,52 @@ public class Contract {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id", nullable = false, foreignKey = @ForeignKey(name = "fk_contract_project"))
+    @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_id", nullable = false, foreignKey = @ForeignKey(name = "fk_contract_company"))
-    private Company company;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "freelancer_id", nullable = false, foreignKey = @ForeignKey(name = "fk_contract_freelancer"))
+    @JoinColumn(name = "freelancer_id", nullable = false)
     private Freelancer freelancer;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "proposal_id", foreignKey = @ForeignKey(name = "fk_contract_proposal"))
-    private Proposal proposal;
-
-    @Column(nullable = false, length = 200)
+    @Column(name = "title", nullable = false, length = 255)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "contract_type", nullable = false, length = 20)
-    @Builder.Default
-    private ContractType contractType = ContractType.FIXED_PRICE;
-
-    @Column(name = "total_amount", precision = 10, scale = 2)
-    private BigDecimal totalAmount;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "payment_schedule", length = 20)
-    private PaymentSchedule paymentSchedule;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    @Builder.Default
-    private ContractStatus status = ContractStatus.PENDING;
+    @Column(name = "status", nullable = false, length = 50)
+    private ContractStatus status;
 
     @Column(name = "start_date")
-    private LocalDate startDate;
+    private LocalDateTime startDate;
 
     @Column(name = "end_date")
-    private LocalDate endDate;
+    private LocalDateTime endDate;
+
+    @Column(name = "amount_cents", nullable = false)
+    private Long amountCents;
+
+    @Column(name = "milestone_count")
+    private Integer milestoneCount = 0;
+
+    @Column(name = "completion_percentage")
+    private Integer completionPercentage = 0;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @LastModifiedDate
-    @Column(name = "updated_at", nullable = false)
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public enum ContractType {
-        FIXED_PRICE, HOURLY, MILESTONE_BASED
-    }
-
-    public enum PaymentSchedule {
-        UPFRONT, ON_COMPLETION, MILESTONE_BASED, WEEKLY, MONTHLY
-    }
-
     public enum ContractStatus {
-        PENDING, ACTIVE, COMPLETED, CANCELLED, DISPUTED
+        DRAFT,
+        ACTIVE,
+        PAUSED,
+        COMPLETED,
+        CANCELLED,
+        DISPUTED
     }
 }

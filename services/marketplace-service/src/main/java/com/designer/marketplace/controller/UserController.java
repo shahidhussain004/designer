@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
  * - GET /api/users - List all users (admin only)
  */
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 @Slf4j
 public class UserController {

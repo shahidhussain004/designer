@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
  * Controller for Jobs (company job opportunities)
  */
 @RestController
-@RequestMapping("/api/jobs")
+@RequestMapping("/jobs")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Jobs", description = "APIs for company job postings")
@@ -50,6 +50,7 @@ public class JobController {
     @GetMapping
     @Operation(summary = "Get all open jobs", description = "Retrieve paginated list of open job postings")
     public ResponseEntity<Page<JobResponse>> getAllJobs(
+            @RequestParam(required = false) Long companyId,
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) String jobType,
             @RequestParam(required = false) String experienceLevel,
@@ -65,7 +66,7 @@ public class JobController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sort[0]));
 
         Page<JobResponse> jobs = jobService.getAllJobs(
-                categoryId, jobType, experienceLevel, isRemote, location, pageable);
+                companyId, categoryId, jobType, experienceLevel, isRemote, location, pageable);
 
         return ResponseEntity.ok(jobs);
     }
@@ -128,31 +129,7 @@ public class JobController {
         return ResponseEntity.ok(category);
     }
 
-    /**
-     * Get jobs by company (requires authentication)
-     */
-    @GetMapping("/company/{companyId}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'COMPANY')")
-    @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "Get jobs by company", description = "Get all jobs posted by a specific company")
-    public ResponseEntity<Page<JobResponse>> getJobsByCompany(
-            @PathVariable Long companyId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
-            @AuthenticationPrincipal UserPrincipal currentUser) {
-
-        // Only allow companies to see their own jobs (or admins)
-        if (!currentUser.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ADMIN")) &&
-                !currentUser.getId().equals(companyId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<JobResponse> jobs = jobService.getJobsByCompany(companyId, pageable);
-
-        return ResponseEntity.ok(jobs);
-    }
+    
 
     /**
      * Create a new job (requires authentication as company)

@@ -21,12 +21,14 @@ public interface TimeEntryRepository extends JpaRepository<TimeEntry, Long> {
     /**
      * Find all time entries for a contract
      */
-    List<TimeEntry> findByContractIdOrderByWorkDateDesc(Long contractId);
+    @Query("SELECT t FROM TimeEntry t WHERE t.contract.id = :contractId ORDER BY t.workDate DESC")
+    List<TimeEntry> findByContractIdOrderByWorkDateDesc(@Param("contractId") Long contractId);
 
     /**
      * Find all time entries for a freelancer
      */
-    List<TimeEntry> findByFreelancerIdOrderByWorkDateDesc(Long freelancerId);
+    @Query("SELECT t FROM TimeEntry t WHERE t.freelancer.id = :freelancerId ORDER BY t.workDate DESC")
+    List<TimeEntry> findByFreelancerIdOrderByWorkDateDesc(@Param("freelancerId") Long freelancerId);
 
     /**
      * Find time entries by status
@@ -36,7 +38,8 @@ public interface TimeEntryRepository extends JpaRepository<TimeEntry, Long> {
     /**
      * Find time entries for a contract with a specific status
      */
-    List<TimeEntry> findByContractIdAndStatus(Long contractId, TimeEntryStatus status);
+    @Query("SELECT t FROM TimeEntry t WHERE t.contract.id = :contractId AND t.status = :status")
+    List<TimeEntry> findByContractIdAndStatus(@Param("contractId") Long contractId, @Param("status") TimeEntryStatus status);
 
     /**
      * Find time entries for a date range
@@ -57,6 +60,6 @@ public interface TimeEntryRepository extends JpaRepository<TimeEntry, Long> {
     /**
      * Calculate total amount earned for a contract
      */
-    @Query("SELECT COALESCE(SUM(t.hoursWorked * t.ratePerHour), 0) FROM TimeEntry t WHERE t.contract.id = :contractId AND t.status = 'PAID'")
+    @Query("SELECT COALESCE(SUM(t.hoursWorked * t.ratePerHourCents), 0) FROM TimeEntry t WHERE t.contract.id = :contractId AND t.status = 'PAID'")
     BigDecimal calculateTotalEarningsByContract(@Param("contractId") Long contractId);
 }

@@ -125,8 +125,10 @@ public class DashboardService {
 
                 // Get recent applications for company's jobs
                 Pageable applicationsPageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
-                Page<JobApplication> recentApplicationsPage = jobApplicationRepository.findByJobCompanyId(currentUser.getId(), applicationsPageable);
+                Page<JobApplication> recentApplicationsPage = jobApplicationRepository.findAll(applicationsPageable);
                 List<JobApplicationResponse> recentApplicationsResponse = recentApplicationsPage.getContent().stream()
+                                .filter(app -> app.getJob() != null && app.getJob().getCompany() != null && 
+                                        app.getJob().getCompany().getId().equals(currentUser.getId()))
                                 .map(JobApplicationResponse::fromEntity)
                                 .collect(Collectors.toList());
 

@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/invoices")
+@RequestMapping("/invoices")
 @RequiredArgsConstructor
 @Tag(name = "Invoices", description = "Invoice generation and management")
 @SecurityRequirement(name = "bearerAuth")

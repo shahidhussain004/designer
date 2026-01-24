@@ -29,7 +29,7 @@ function CheckoutSuccessContent() {
           description:
             'The funds have been securely deposited into escrow. The freelancer has been notified and can begin work.',
           primaryAction: { label: 'View Milestone', href: `/jobs/${itemId}/milestones` },
-          secondaryAction: { label: 'Go to Dashboard', href: '/dashboard' },
+          secondaryAction: { label: 'Go to Dashboard', href: '/dashboards' },
         };
       case 'course':
         return {
@@ -45,7 +45,7 @@ function CheckoutSuccessContent() {
           title: 'Escrow Funded!',
           description: 'The funds are now held securely in escrow until the project is completed.',
           primaryAction: { label: 'View Project', href: `/jobs/${itemId}` },
-          secondaryAction: { label: 'Go to Dashboard', href: '/dashboard' },
+          secondaryAction: { label: 'Go to Dashboard', href: '/dashboards' },
         };
       default:
         return {
@@ -53,7 +53,7 @@ function CheckoutSuccessContent() {
           title: 'Payment Successful!',
           description: 'Your payment has been processed successfully.',
           primaryAction: { label: 'Go to Dashboard', href: '/dashboard' },
-          secondaryAction: { label: 'View Receipts', href: '/dashboard/invoices' },
+          secondaryAction: { label: 'View Receipts', href: '/dashboards/invoices' },
         };
     }
   };
@@ -131,7 +131,7 @@ function CheckoutSuccessContent() {
         {/* Receipt Link */}
         <p className="text-sm text-gray-500 mt-6">
           A receipt has been sent to your email address.
-          <Link href="/dashboard/invoices" className="text-primary-600 hover:text-primary-700 ml-1">
+          <Link href="/dashboards/invoices" className="text-primary-600 hover:text-primary-700 ml-1">
             View all invoices →
           </Link>
         </p>

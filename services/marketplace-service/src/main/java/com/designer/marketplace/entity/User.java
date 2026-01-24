@@ -1,8 +1,10 @@
 package com.designer.marketplace.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -16,40 +18,61 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 /**
- * User entity - represents both companies and freelancers
+ * User entity - Base authentication and profile data
  * Maps to 'users' table in PostgreSQL
+ * Uses SINGLE_TABLE inheritance for role-specific data
  */
 @Entity
 @Table(name = "users", indexes = {
-        @Index(name = "idx_users_email", columnList = "email"),
-        @Index(name = "idx_users_username", columnList = "username"),
-        @Index(name = "idx_users_role", columnList = "role")
+        @Index(name = "idx_users_role_active", columnList = "role, is_active"),
+        @Index(name = "idx_users_created_at_desc", columnList = "created_at"),
+        @Index(name = "idx_users_rating", columnList = "rating_avg, rating_count"),
+        @Index(name = "idx_users_location", columnList = "location"),
+        @Index(name = "idx_users_stripe_customer", columnList = "stripe_customer_id"),
+        @Index(name = "idx_users_email_verified", columnList = "email_verified")
 })
+@Inheritance(strategy = InheritanceType.JOINED)
 @EntityListeners(AuditingEntityListener.class)
+@SQLDelete(sql = "UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false, unique = true, length = 50)
+    @Column(nullable = false, unique = true, length = 100)
     private String username;
 
-    @Column(name = "password_hash", nullable = false, length = 255)
+    @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private UserRole role = UserRole.FREELANCER;
+
+    // Profile
     @Column(name = "full_name", length = 100)
     private String fullName;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false, length = 20)
-    private UserRole role = UserRole.FREELANCER;
+    @Column(length = 20)
+    private String phone;
 
     @Column(columnDefinition = "TEXT")
     private String bio;
@@ -60,21 +83,38 @@ public class User {
     @Column(length = 100)
     private String location;
 
-    @Column(length = 20)
-    private String phone;
+    // Status
+    @Column(name = "email_verified", nullable = false)
+    private Boolean emailVerified = false;
 
+    @Column(name = "identity_verified", nullable = false)
+    private Boolean identityVerified = false;
+
+    @Column(name = "identity_verified_at")
+    private LocalDateTime identityVerifiedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "verification_status", nullable = false, length = 20)
+    private VerificationStatus verificationStatus = VerificationStatus.UNVERIFIED;
+
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = true;
+
+    // Denormalized rating data (updated by triggers)
+    @Column(name = "rating_avg", precision = 3, scale = 2)
+    private BigDecimal ratingAvg = BigDecimal.ZERO;
+
+    @Column(name = "rating_count", nullable = false)
+    private Integer ratingCount = 0;
+
+    // Stripe integration
     @Column(name = "stripe_customer_id", length = 100)
     private String stripeCustomerId;
 
     @Column(name = "stripe_account_id", length = 100)
     private String stripeAccountId;
 
-    @Column(name = "email_verified", nullable = false)
-    private Boolean emailVerified = false;
-
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
-
+    // Timestamps
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -83,107 +123,20 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public enum VerificationStatus {
-        UNVERIFIED, PENDING, VERIFIED, REJECTED
-    }
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
+    // Enums
     public enum UserRole {
-        COMPANY,
         FREELANCER,
+        COMPANY,
         ADMIN
     }
-    
-    // Also expose as Role for backward compatibility
-    public static final class Role {
-        public static final UserRole COMPANY = UserRole.COMPANY;
-        public static final UserRole FREELANCER = UserRole.FREELANCER;
-        public static final UserRole ADMIN = UserRole.ADMIN;
+
+    public enum VerificationStatus {
+        UNVERIFIED,
+        VERIFIED,
+        REJECTED
     }
 
-    // Default constructor
-    public User() {
-    }
-
-    // All-args constructor
-    public User(Long id, String email, String username, String passwordHash, String fullName,
-                UserRole role, String bio, String profileImageUrl, String location, String phone,
-                String stripeCustomerId, String stripeAccountId, Boolean emailVerified, Boolean isActive,
-                LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
-        this.email = email;
-        this.username = username;
-        this.passwordHash = passwordHash;
-        this.fullName = fullName;
-        this.role = role;
-        this.bio = bio;
-        this.profileImageUrl = profileImageUrl;
-        this.location = location;
-        this.phone = phone;
-        this.stripeCustomerId = stripeCustomerId;
-        this.stripeAccountId = stripeAccountId;
-        this.emailVerified = emailVerified;
-        this.isActive = isActive;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
-
-    // Getters
-    public Long getId() { return id; }
-    public String getEmail() { return email; }
-    public String getUsername() { return username; }
-    public String getPasswordHash() { return passwordHash; }
-    public String getFullName() { return fullName; }
-    public UserRole getRole() { return role; }
-    public String getBio() { return bio; }
-    public String getProfileImageUrl() { return profileImageUrl; }
-    public String getLocation() { return location; }
-    public String getPhone() { return phone; }
-    public String getStripeCustomerId() { return stripeCustomerId; }
-    public String getStripeAccountId() { return stripeAccountId; }
-    public Boolean getEmailVerified() { return emailVerified; }
-    public Boolean getIsActive() { return isActive; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-
-    // Setters
-    public void setId(Long id) { this.id = id; }
-    public void setEmail(String email) { this.email = email; }
-    public void setUsername(String username) { this.username = username; }
-    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
-    public void setFullName(String fullName) { this.fullName = fullName; }
-    public void setRole(UserRole role) { this.role = role; }
-    public void setBio(String bio) { this.bio = bio; }
-    public void setProfileImageUrl(String profileImageUrl) { this.profileImageUrl = profileImageUrl; }
-    public void setLocation(String location) { this.location = location; }
-    public void setPhone(String phone) { this.phone = phone; }
-    public void setStripeCustomerId(String stripeCustomerId) { this.stripeCustomerId = stripeCustomerId; }
-    public void setStripeAccountId(String stripeAccountId) { this.stripeAccountId = stripeAccountId; }
-    public void setEmailVerified(Boolean emailVerified) { this.emailVerified = emailVerified; }
-    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(email, user.email);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, email);
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", email='" + email + '\'' +
-                ", username='" + username + '\'' +
-                ", role=" + role +
-                ", isActive=" + isActive +
-                '}';
-    }
 }

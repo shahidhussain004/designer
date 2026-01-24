@@ -1,25 +1,37 @@
 package com.designer.marketplace.config;
 
-import jakarta.persistence.EntityManagerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
+import java.util.Optional;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
- * JPA configuration for marketplace repositories.
- * Spring Boot auto-configures JPA/Hibernate with PostgreSQL datasource.
- * This configuration ensures proper transaction management.
+ * JPA configuration for marketplace repositories
+ * Enables auditing, transaction management, and custom auditor awareness
  */
 @Configuration
+@EnableJpaRepositories(basePackages = "com.designer.marketplace.repository")
+@EnableJpaAuditing(auditorAwareRef = "auditorAware")
+@EnableTransactionManagement
 public class JpaConfig {
-    
+
+    /**
+     * Provides current authenticated user for @CreatedBy and @LastModifiedBy annotations
+     */
     @Bean
-    @Primary
-    public PlatformTransactionManager transactionManager(
-            EntityManagerFactory entityManagerFactory) {
-        return new JpaTransactionManager(entityManagerFactory);
+    public AuditorAware<String> auditorAware() {
+        return () -> {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.isAuthenticated()) {
+                return Optional.of(authentication.getName());
+            }
+            return Optional.of("SYSTEM");
+        };
     }
 }

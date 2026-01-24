@@ -21,8 +21,8 @@ import lombok.extern.slf4j.Slf4j;
  * Controller for dashboard endpoints
  * 
  * Endpoints:
- * - GET /api/dashboard/company - Company dashboard
- * - GET /api/dashboard/freelancer - Freelancer dashboard
+ * - GET /api/dashboards/company - Company dashboard
+ * - GET /api/dashboards/freelancer - Freelancer dashboard
  * - GET /api/notifications - User notifications
  */
 @RestController
@@ -35,11 +35,11 @@ public class DashboardController {
 
     /**
      * Task 3.17: Get company dashboard
-     * GET /api/dashboard/company
+     * GET /api/dashboards/company
      * 
      * Requires COMPANY role. Will return 401 if token is expired, allowing frontend to refresh.
      */
-    @GetMapping("/dashboard/company")
+    @GetMapping("/dashboards/company")
     @PreAuthorize("hasRole('COMPANY')")
     public ResponseEntity<CompanyDashboardResponse> getCompanyDashboard() {
         log.info("Getting company dashboard");
@@ -58,11 +58,11 @@ public class DashboardController {
 
     /**
      * Task 3.18: Get freelancer dashboard
-     * GET /api/dashboard/freelancer
+     * GET /api/dashboards/freelancer
      * 
      * Requires FREELANCER role. Will return 401 if token is expired, allowing frontend to refresh.
      */
-    @GetMapping("/dashboard/freelancer")
+    @GetMapping("/dashboards/freelancer")
     @PreAuthorize("hasRole('FREELANCER')")
     public ResponseEntity<FreelancerDashboardResponse> getFreelancerDashboard() {
         log.info("Getting freelancer dashboard");

@@ -20,42 +20,51 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * REST Controller for Review operations
+ * 
+ * Endpoints:
+ * - GET /api/reviews - Get all reviews
+ * - GET /api/reviews/{id} - Get review by ID
+ * - POST /api/reviews - Create review
+ * - PUT /api/reviews/{id} - Update review
+ * - DELETE /api/reviews/{id} - Delete review
+ * - GET /api/users/{userId}/reviews - Get reviews for user (nested)
+ * - GET /api/users/{reviewerId}/reviews-given - Get reviews written by user (nested)
  */
 @RestController
-@RequestMapping("/api/reviews")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class ReviewController {
 
     private final ReviewService reviewService;
 
-    @GetMapping
+    @GetMapping("/reviews")
     public ResponseEntity<List<Review>> getAllReviews() {
         return ResponseEntity.ok(reviewService.getAllReviews());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/reviews/{id}")
     public ResponseEntity<Review> getReviewById(@PathVariable Long id) {
         return ResponseEntity.ok(reviewService.getReviewById(id));
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/users/{userId}/reviews")
     public ResponseEntity<List<Review>> getReviewsByUser(@PathVariable Long userId) {
         return ResponseEntity.ok(reviewService.getReviewsByUserId(userId));
     }
 
     // Reviews written by a user (reviewer)
-    @GetMapping("/reviewer/{reviewerId}")
+    @GetMapping("/users/{reviewerId}/reviews-given")
     public ResponseEntity<List<Review>> getReviewsByReviewer(@PathVariable Long reviewerId) {
         return ResponseEntity.ok(reviewService.getReviewsByReviewerId(reviewerId));
     }
 
-    @PostMapping
+    @PostMapping("/reviews")
     public ResponseEntity<Review> createReview(@RequestBody Review review) {
         Review created = reviewService.createReview(review);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/reviews/{id}")
     public ResponseEntity<Review> updateReview(
             @PathVariable Long id,
             @RequestBody Review updates) {
@@ -63,7 +72,7 @@ public class ReviewController {
         return ResponseEntity.ok(updated);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/reviews/{id}")
     public ResponseEntity<Void> deleteReview(@PathVariable Long id) {
         reviewService.deleteReview(id);
         return ResponseEntity.noContent().build();

@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
  * REST controller for experience levels
  */
 @RestController
-@RequestMapping("/api/experience-levels")
+@RequestMapping("/experience-levels")
 @RequiredArgsConstructor
 public class ExperienceLevelController {
 

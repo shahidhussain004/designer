@@ -172,6 +172,22 @@ export function useUserProfile(userId: string | number | null) {
 }
 
 /**
+ * Fetch company profile by ID
+ */
+export function useCompanyProfile(companyId: string | number | null) {
+  return useQuery({
+    queryKey: ['company', companyId, 'profile'],
+    queryFn: async ({ signal }) => {
+      if (!companyId) throw new Error('Company ID is required');
+      const { data } = await apiClient.get<User>(`/companies/${companyId}`, { signal });
+      return data;
+    },
+    enabled: !!companyId,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+}
+
+/**
  * Fetch all users with optional filters
  */
 export function useUsers(filters?: UsersFilters) {
@@ -239,7 +255,7 @@ export function useUserPortfolio(userId: string | number | null) {
     queryFn: async ({ signal }) => {
       if (!userId) throw new Error('User ID is required');
       const { data } = await apiClient.get<PortfolioItem[] | PaginatedResponse<PortfolioItem>>(
-        `/users/${userId}/portfolio`,
+        `/users/${userId}/portfolio-items`,
         { signal }
       );
       return normalizeArrayResponse(data);
@@ -287,8 +303,8 @@ export function useCreatePortfolio() {
   return useMutation({
     mutationFn: async ({ userId, input }: { userId: number; input: CreatePortfolioInput }) => {
       const { data } = await apiClient.post<PortfolioItem>(
-        `/users/${userId}/portfolio`,
-        input
+        `/portfolio-items`,
+        { ...input, userId }
       );
       return data;
     },
@@ -356,7 +372,7 @@ export function useTimeEntries(freelancerId: number | null) {
     queryFn: async ({ signal }) => {
       if (!freelancerId) throw new Error('Freelancer ID is required');
       const { data } = await apiClient.get<TimeEntry[] | PaginatedResponse<TimeEntry>>(
-        `/time-entries/freelancer/${freelancerId}`,
+        `/users/${freelancerId}/time-entries`,
         { signal }
       );
       return normalizeArrayResponse(data);
@@ -375,7 +391,7 @@ export function useContractTimeEntries(contractId: number | null) {
     queryFn: async ({ signal }) => {
       if (!contractId) throw new Error('Contract ID is required');
       const { data } = await apiClient.get<TimeEntry[] | PaginatedResponse<TimeEntry>>(
-        `/time-entries/contract/${contractId}`,
+        `/contracts/${contractId}/time-entries`,
         { signal }
       );
       return normalizeArrayResponse(data);
@@ -474,7 +490,7 @@ export function useGivenReviews(reviewerId: number | null) {
     queryFn: async ({ signal }) => {
       if (!reviewerId) throw new Error('Reviewer ID is required');
       const { data } = await apiClient.get<Review[] | PaginatedResponse<Review>>(
-        `/reviews/reviewer/${reviewerId}`,
+        `/users/${reviewerId}/reviews-given`,
         { signal }
       );
       return normalizeArrayResponse(data);
@@ -493,7 +509,7 @@ export function useReceivedReviews(reviewedUserId: number | null) {
     queryFn: async ({ signal }) => {
       if (!reviewedUserId) throw new Error('Reviewed user ID is required');
       const { data } = await apiClient.get<Review[] | PaginatedResponse<Review>>(
-        `/reviews/reviewee/${reviewedUserId}`,
+        `/users/${reviewedUserId}/reviews`,
         { signal }
       );
       return normalizeArrayResponse(data);
@@ -676,10 +692,10 @@ export function useUserContracts(
     queryFn: async ({ signal }) => {
       if (!userId) throw new Error('User ID is required');
       const endpoint = role === 'COMPANY' 
-        ? `/contracts/company/${userId}`
+        ? `/users/${userId}/contracts`
         : role === 'FREELANCER'
-          ? `/contracts/freelancer/${userId}`
-          : `/contracts/user/${userId}`;
+          ? `/users/${userId}/contracts`
+          : `/users/${userId}/contracts`;
           
       const { data } = await apiClient.get<Contract[] | PaginatedResponse<Contract>>(
         endpoint,

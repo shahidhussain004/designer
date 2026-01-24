@@ -21,7 +21,7 @@ function CheckoutContent() {
   const itemId = searchParams.get('id');
   const amount = parseInt(searchParams.get('amount') || '0', 10);
   const title = searchParams.get('title') || 'Payment';
-  const returnUrl = searchParams.get('returnUrl') || '/dashboard';
+  const returnUrl = searchParams.get('returnUrl') || '/dashboards';
 
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
