@@ -414,7 +414,7 @@ describe('Designer Marketplace API - Integration Tests', () => {
   describe('Dashboard Statistics', () => {
     test('Should get COMPANY dashboard stats', async () => {
       const response = await api.get(
-        '/dashboard/company',
+        '/dashboards/company',
         getAuthHeader(companyUser.token!)
       );
 
@@ -429,7 +429,7 @@ describe('Designer Marketplace API - Integration Tests', () => {
 
     test('Should get FREELANCER dashboard stats', async () => {
       const response = await api.get(
-        '/dashboard/freelancer',
+        '/dashboards/freelancer',
         getAuthHeader(freelancerUser.token!)
       );
 
@@ -597,8 +597,8 @@ describe('Designer Marketplace API - Integration Tests', () => {
       console.log('✓ COMPANY accepted proposal');
 
       // 7. Check dashboards
-      const companyDash = await api.get('/dashboard/company', getAuthHeader(companyUser.token!));
-      const freelancerDash = await api.get('/dashboard/freelancer', getAuthHeader(freelancerUser.token!));
+      const companyDash = await api.get('/dashboards/company', getAuthHeader(companyUser.token!));
+      const freelancerDash = await api.get('/dashboards/freelancer', getAuthHeader(freelancerUser.token!));
       expect(companyDash.data.totalJobsPosted).toBeGreaterThan(0);
       expect(freelancerDash.data.proposalsAccepted).toBeGreaterThan(0);
       console.log('✓ Dashboards show updated stats');

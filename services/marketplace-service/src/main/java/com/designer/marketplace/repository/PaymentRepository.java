@@ -36,26 +36,26 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     @Query("SELECT p FROM Payment p WHERE p.company.id = :userId OR p.freelancer.id = :userId ORDER BY p.createdAt DESC")
     Page<Payment> findByUserIdOrderByCreatedAtDesc(@Param("userId") Long userId, Pageable pageable);
 
-    @Query("SELECT SUM(p.amount) FROM Payment p WHERE p.freelancer.id = :freelancerId AND p.status = 'SUCCEEDED'")
+    @Query("SELECT SUM(p.amountCents) FROM Payment p WHERE p.freelancer.id = :freelancerId AND p.status = 'SUCCEEDED'")
     Long sumAmountByFreelancerId(@Param("freelancerId") Long freelancerId);
 
-    @Query("SELECT SUM(p.platformFee) FROM Payment p WHERE p.status = 'SUCCEEDED' AND p.createdAt BETWEEN :start AND :end")
+    @Query("SELECT SUM(p.platformFeeCents) FROM Payment p WHERE p.status = 'SUCCEEDED' AND p.createdAt BETWEEN :start AND :end")
     Long sumPlatformFeeBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
     @Query("SELECT COUNT(p) FROM Payment p WHERE p.status = :status")
     Long countByStatus(@Param("status") PaymentStatus status);
 
     // Admin dashboard queries
-    @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p WHERE p.status = 'SUCCEEDED'")
+    @Query("SELECT COALESCE(SUM(p.amountCents), 0) FROM Payment p WHERE p.status = 'SUCCEEDED'")
     BigDecimal sumTotalAmount();
 
-    @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p WHERE p.status = 'SUCCEEDED' AND p.createdAt > :date")
+    @Query("SELECT COALESCE(SUM(p.amountCents), 0) FROM Payment p WHERE p.status = 'SUCCEEDED' AND p.createdAt > :date")
     BigDecimal sumTotalAmountAfter(@Param("date") LocalDateTime date);
 
-    @Query("SELECT COALESCE(SUM(p.platformFee), 0) FROM Payment p WHERE p.status = 'SUCCEEDED'")
+    @Query("SELECT COALESCE(SUM(p.platformFeeCents), 0) FROM Payment p WHERE p.status = 'SUCCEEDED'")
     BigDecimal sumPlatformFees();
 
-    @Query("SELECT COALESCE(SUM(p.freelancerAmount), 0) FROM Payment p WHERE p.freelancer.id = :freelancerId AND p.escrowStatus = :escrowStatus")
+    @Query("SELECT COALESCE(SUM(p.freelancerAmountCents), 0) FROM Payment p WHERE p.freelancer.id = :freelancerId AND p.escrowStatus = :escrowStatus")
     Long sumFreelancerAmountByFreelancerIdAndEscrowStatus(@Param("freelancerId") Long freelancerId,
             @Param("escrowStatus") EscrowStatus escrowStatus);
 }

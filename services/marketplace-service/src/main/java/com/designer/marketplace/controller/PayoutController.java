@@ -1,24 +1,34 @@
 package com.designer.marketplace.controller;
 
-import com.designer.marketplace.dto.PayoutDTOs.*;
-import com.designer.marketplace.service.PayoutService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.designer.marketplace.dto.PayoutDTOs.CreatePayoutRequest;
+import com.designer.marketplace.dto.PayoutDTOs.PayoutResponse;
+import com.designer.marketplace.dto.PayoutDTOs.PayoutSummary;
+import com.designer.marketplace.service.PayoutService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/payouts")
+@RequestMapping("/payouts")
 @RequiredArgsConstructor
 @Tag(name = "Payouts", description = "Freelancer payout management")
 @SecurityRequirement(name = "bearerAuth")
@@ -94,7 +104,7 @@ public class PayoutController {
         return ResponseEntity.ok(payoutService.getPendingPayouts());
     }
 
-    @GetMapping("/freelancer/{freelancerId}")
+    @GetMapping("/users/{freelancerId}/payouts")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get payouts for a specific freelancer (Admin only)")
     public ResponseEntity<Page<PayoutResponse>> getFreelancerPayouts(
@@ -103,7 +113,7 @@ public class PayoutController {
         return ResponseEntity.ok(payoutService.getPayoutsForFreelancer(freelancerId, pageable));
     }
 
-    @GetMapping("/freelancer/{freelancerId}/summary")
+    @GetMapping("/users/{freelancerId}/payouts/summary")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get payout summary for a specific freelancer (Admin only)")
     public ResponseEntity<PayoutSummary> getFreelancerPayoutSummary(@PathVariable Long freelancerId) {

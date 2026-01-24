@@ -1,5 +1,6 @@
 package com.designer.marketplace.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -48,7 +49,7 @@ public class ProposalResponse {
         private Double hourlyRate;
         private List<String> skills;
         private String portfolioUrl;
-        private Double ratingAvg;
+        private BigDecimal ratingAvg;
         private Integer ratingCount;
     }
 
@@ -61,19 +62,19 @@ public class ProposalResponse {
         }
 
         FreelancerInfo freelancerInfo = null;
-        if (proposal.getFreelancer() != null) {
+        if (proposal.getFreelancer() != null && proposal.getFreelancer().getUser() != null) {
             freelancerInfo = FreelancerInfo.builder()
                     .id(proposal.getFreelancer().getId())
-                    .username(proposal.getFreelancer().getUsername())
-                    .fullName(proposal.getFreelancer().getFullName())
-                    .profileImageUrl(proposal.getFreelancer().getProfileImageUrl())
-                    .location(proposal.getFreelancer().getLocation())
-                    .bio(proposal.getFreelancer().getBio())
-                    .hourlyRate(proposal.getFreelancer().getHourlyRate())
-                    .skills(proposal.getFreelancer().getSkills())
+                    .username(proposal.getFreelancer().getUser().getUsername())
+                    .fullName(proposal.getFreelancer().getUser().getFullName())
+                    .profileImageUrl(proposal.getFreelancer().getUser().getProfileImageUrl())
+                    .location(proposal.getFreelancer().getUser().getLocation())
+                    .bio(proposal.getFreelancer().getUser().getBio())
+                    .hourlyRate(proposal.getFreelancer().getHourlyRateCents() != null ? proposal.getFreelancer().getHourlyRateCents().doubleValue() / 100.0 : null)
+                    .skills(proposal.getFreelancer().getSkills() != null ? java.util.Arrays.asList(proposal.getFreelancer().getSkills().asText().split(",")) : new java.util.ArrayList<>())
                     .portfolioUrl(proposal.getFreelancer().getPortfolioUrl())
-                    .ratingAvg(proposal.getFreelancer().getRatingAvg())
-                    .ratingCount(proposal.getFreelancer().getRatingCount())
+                    .ratingAvg(proposal.getFreelancer().getUser().getRatingAvg() != null ? proposal.getFreelancer().getUser().getRatingAvg() : BigDecimal.ZERO)
+                    .ratingCount(proposal.getFreelancer().getUser().getRatingCount() != null ? proposal.getFreelancer().getUser().getRatingCount() : 0)
                     .build();
         }
 
@@ -83,7 +84,7 @@ public class ProposalResponse {
                 .projectTitle(proposal.getProject() != null ? proposal.getProject().getTitle() : null)
                 .freelancer(freelancerInfo)
                 .coverLetter(proposal.getCoverLetter())
-                .proposedRate(proposal.getSuggestedBudget())
+                .proposedRate(proposal.getSuggestedBudgetCents() != null ? proposal.getSuggestedBudgetCents().doubleValue() / 100.0 : null)
                 .estimatedDuration(proposal.getEstimatedHours() != null ? proposal.getEstimatedHours().intValue() : null)
                 .status(proposal.getStatus() != null ? proposal.getStatus().name() : null)
                 .companyMessage(proposal.getCompanyNotes())

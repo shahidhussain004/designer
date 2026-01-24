@@ -19,8 +19,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * ProjectCategory entity - represents project categories for freelance/gig work
- * Maps to 'project_categories' table in PostgreSQL (formerly 'job_categories')
+ * ProjectCategory entity - Project categories for freelance/gig work
+ * Maps to 'project_categories' table in PostgreSQL
  */
 @Entity
 @Table(name = "project_categories", indexes = {
@@ -38,10 +38,10 @@ public class ProjectCategory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 50)
+    @Column(nullable = false, unique = true, length = 100)
     private String name;
 
-    @Column(nullable = false, unique = true, length = 50)
+    @Column(nullable = false, unique = true, length = 100)
     private String slug;
 
     @Column(columnDefinition = "TEXT")

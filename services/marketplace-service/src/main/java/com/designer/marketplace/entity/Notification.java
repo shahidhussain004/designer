@@ -2,6 +2,8 @@ package com.designer.marketplace.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -23,16 +25,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Notification entity - represents user notifications
+ * Notification entity - User notifications
  * Maps to 'notifications' table in PostgreSQL
  */
 @Entity
 @Table(name = "notifications", indexes = {
-        @Index(name = "idx_notifications_user", columnList = "user_id"),
-        @Index(name = "idx_notifications_read", columnList = "is_read"),
-        @Index(name = "idx_notifications_created", columnList = "created_at")
+        @Index(name = "idx_notifications_user_id", columnList = "user_id"),
+        @Index(name = "idx_notifications_is_read", columnList = "is_read"),
+        @Index(name = "idx_notifications_created_at", columnList = "created_at")
 })
 @EntityListeners(AuditingEntityListener.class)
+@SQLDelete(sql = "UPDATE notifications SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -47,10 +51,10 @@ public class Notification {
     private User user;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 50)
+    @Column(name = "type", nullable = false, length = 50)
     private NotificationType type;
 
-    @Column(nullable = false, length = 200)
+    @Column(nullable = false, length = 255)
     private String title;
 
     @Column(nullable = false, columnDefinition = "TEXT")
@@ -62,7 +66,7 @@ public class Notification {
     @Column(name = "related_entity_id")
     private Long relatedEntityId;
 
-    @Column(name = "is_read", nullable = false)
+    @Column(name = "is_read")
     private Boolean isRead = false;
 
     @CreatedDate
@@ -72,8 +76,11 @@ public class Notification {
     @Column(name = "read_at")
     private LocalDateTime readAt;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     public enum NotificationType {
-        JOB_POSTED,
+        PROJECT_POSTED,
         PROPOSAL_RECEIVED,
         PROPOSAL_ACCEPTED,
         PROPOSAL_REJECTED,

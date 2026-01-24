@@ -19,14 +19,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * JobCategory entity - represents job categories
+ * JobCategory entity - categorizes job opportunities
  * Maps to 'job_categories' table in PostgreSQL
+ * Standard lookup table for job classification
  */
 @Entity
 @Table(name = "job_categories", indexes = {
-        @Index(name = "idx_job_categories_slug", columnList = "slug"),
-        @Index(name = "idx_job_categories_active", columnList = "is_active"),
-        @Index(name = "idx_job_categories_order", columnList = "display_order")
+        @Index(name = "idx_job_categories_slug", columnList = "slug", unique = true)
 })
 @EntityListeners(AuditingEntityListener.class)
 @Data
@@ -38,16 +37,16 @@ public class JobCategory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 50)
+    @Column(nullable = false, length = 255)
     private String name;
 
-    @Column(nullable = false, unique = true, length = 50)
+    @Column(nullable = false, unique = true, length = 255)
     private String slug;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(length = 50)
+    @Column(length = 255)
     private String icon;
 
     @Column(name = "display_order")

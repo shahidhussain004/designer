@@ -99,8 +99,8 @@ public class ProposalService {
         proposal.setProject(project);
         proposal.setFreelancer(freelancer);
         proposal.setCoverLetter(request.getCoverLetter());
-        proposal.setSuggestedBudget(request.getProposedRate());
-        proposal.setEstimatedHours(request.getEstimatedDuration() != null ? request.getEstimatedDuration().doubleValue() : null);
+        proposal.setSuggestedBudgetCents(request.getProposedRate() != null ? (long)(request.getProposedRate() * 100) : null);
+        proposal.setEstimatedHours(request.getEstimatedDuration() != null ? java.math.BigDecimal.valueOf(request.getEstimatedDuration().doubleValue()) : null);
         proposal.setStatus(Proposal.ProposalStatus.SUBMITTED);
 
         Proposal savedProposal = proposalRepository.save(proposal);

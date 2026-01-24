@@ -61,7 +61,7 @@ export default function CreateCoursePage() {
         requirements: formData.requirements ? formData.requirements.split('\n').filter(r => r.trim()) : [],
       })
 
-      router.push(`/dashboard/instructor/courses/${newCourse.id}/edit`)
+      router.push(`/dashboards/instructor/courses/${newCourse.id}/edit`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create course')
       setLoading(false)
@@ -74,7 +74,7 @@ export default function CreateCoursePage() {
         {/* Header */}
         <div className="bg-gray-900 text-white py-12">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <Link href="/dashboard/instructor" className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-4">
+            <Link href="/dashboards/instructor" className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-4">
               <ArrowLeft className="w-4 h-4" />
               Back to My Courses
             </Link>

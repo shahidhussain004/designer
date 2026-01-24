@@ -1,14 +1,15 @@
 package com.designer.marketplace.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,16 +27,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Freelancer entity - represents freelancer profile data
+ * Freelancer entity - Role-specific data for FREELANCER users
  * Maps to 'freelancers' table in PostgreSQL
- * Linked to User via user_id foreign key
+ * Uses JSONB for skills, certifications, and languages
  */
 @Entity
 @Table(name = "freelancers", indexes = {
         @Index(name = "idx_freelancers_user_id", columnList = "user_id"),
-        @Index(name = "idx_freelancers_hourly_rate", columnList = "hourly_rate"),
-        @Index(name = "idx_freelancers_created_at", columnList = "created_at DESC"),
-        @Index(name = "idx_freelancers_completion_rate", columnList = "completion_rate DESC")
+        @Index(name = "idx_freelancers_hourly_rate", columnList = "hourly_rate_cents"),
+        @Index(name = "idx_freelancers_completion_rate", columnList = "completion_rate, total_projects_completed"),
+        @Index(name = "idx_freelancers_experience", columnList = "experience_years"),
+        @Index(name = "idx_freelancers_created_at", columnList = "created_at")
 })
 @EntityListeners(AuditingEntityListener.class)
 @Data
@@ -51,13 +53,14 @@ public class Freelancer {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @Column(name = "hourly_rate", columnDefinition = "NUMERIC(10,2)")
-    private Double hourlyRate;
+    // Professional Info
+    @Column(name = "hourly_rate_cents")
+    private Long hourlyRateCents;
 
     @Column(name = "experience_years")
     private Integer experienceYears;
 
-    @Column(name = "headline", length = 255)
+    @Column(length = 255)
     private String headline;
 
     @Column(name = "portfolio_url", length = 500)
@@ -69,39 +72,36 @@ public class Freelancer {
     @Column(name = "linkedin_url", length = 500)
     private String linkedinUrl;
 
+    // Skills & Certifications (JSONB)
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "skills", columnDefinition = "json")
-    private List<String> skills = new ArrayList<>();
-
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "certifications", columnDefinition = "json")
-    private List<String> certifications = new ArrayList<>();
+    @Column(columnDefinition = "jsonb")
+    private JsonNode skills;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "languages", columnDefinition = "json")
-    private List<String> languages = new ArrayList<>();
+    @Column(columnDefinition = "jsonb")
+    private JsonNode certifications;
 
-    @Column(name = "rating_avg", columnDefinition = "NUMERIC(3,1)")
-    private Double ratingAvg = 0.0;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    private JsonNode languages;
 
-    @Column(name = "rating_count")
-    private Integer ratingCount = 0;
+    // Performance Metrics
+    @Column(name = "completion_rate", precision = 5, scale = 2)
+    private BigDecimal completionRate = BigDecimal.ZERO;
 
-    @Column(name = "completion_rate", columnDefinition = "NUMERIC(5,2)")
-    private Double completionRate = 0.0;
-
-    @Column(name = "response_rate", columnDefinition = "NUMERIC(5,2)")
-    private Double responseRate;
+    @Column(name = "response_rate", precision = 5, scale = 2)
+    private BigDecimal responseRate;
 
     @Column(name = "response_time_hours")
     private Integer responseTimeHours;
 
-    @Column(name = "total_earnings", columnDefinition = "NUMERIC(15,2)")
-    private Double totalEarnings = 0.0;
+    @Column(name = "total_earnings_cents")
+    private Long totalEarningsCents = 0L;
 
     @Column(name = "total_projects_completed")
     private Integer totalProjectsCompleted = 0;
 
+    // Timestamps
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

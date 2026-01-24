@@ -39,9 +39,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
     
     Page<User> findByRoleAndIsActive(User.UserRole role, boolean isActive, Pageable pageable);
     
-    @Query("SELECT u FROM User u WHERE LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')) " +
-           "OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :search, '%')) " +
-           "OR LOWER(u.username) LIKE LOWER(CONCAT('%', :search, '%'))")
+    @Query("SELECT u FROM User u WHERE " +
+           "(:search IS NULL OR (" +
+           "LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "LOWER(u.fullName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "LOWER(u.username) LIKE LOWER(CONCAT('%', :search, '%'))" +
+           "))")
     Page<User> searchUsers(@Param("search") String search, Pageable pageable);
     
     @Query("SELECT u FROM User u ORDER BY u.createdAt DESC")

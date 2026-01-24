@@ -1,7 +1,9 @@
 package com.designer.marketplace.repository;
 
-import com.designer.marketplace.entity.Payout;
-import com.designer.marketplace.entity.Payout.PayoutStatus;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,9 +11,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import com.designer.marketplace.entity.Payout;
+import com.designer.marketplace.entity.Payout.PayoutStatus;
 
 @Repository
 public interface PayoutRepository extends JpaRepository<Payout, Long> {
@@ -43,7 +44,7 @@ public interface PayoutRepository extends JpaRepository<Payout, Long> {
     @Query("SELECT p FROM Payout p WHERE p.freelancer.id = :freelancerId AND p.status = 'PAID' ORDER BY p.completedAt DESC")
     Page<Payout> findPaidPayoutsByFreelancerId(@Param("freelancerId") Long freelancerId, Pageable pageable);
 
-    @Query("SELECT MAX(p.payoutReference) FROM Payout p WHERE p.payoutReference LIKE :prefix%")
+    @Query("SELECT MAX(p.payoutReference) FROM Payout p WHERE :prefix IS NULL OR p.payoutReference LIKE CONCAT(:prefix, '%')")
     String findMaxPayoutReferenceWithPrefix(@Param("prefix") String prefix);
 
     @Query("SELECT p FROM Payout p WHERE p.status = 'PROCESSING' AND p.initiatedAt < :timeout")

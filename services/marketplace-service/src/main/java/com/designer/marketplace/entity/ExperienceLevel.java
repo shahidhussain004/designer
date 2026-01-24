@@ -19,7 +19,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * ExperienceLevel entity - represents experience level requirements
+ * ExperienceLevel entity - Experience level requirements for projects
  * Maps to 'experience_levels' table in PostgreSQL
  */
 @Entity
@@ -38,10 +38,10 @@ public class ExperienceLevel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 50)
+    @Column(nullable = false, unique = true, length = 100)
     private String name;
 
-    @Column(nullable = false, unique = true, length = 20)
+    @Column(nullable = false, unique = true, length = 50)
     private String code;
 
     @Column(columnDefinition = "TEXT")

@@ -25,12 +25,14 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     /**
      * Find all reviews written by a user
      */
-    List<Review> findByReviewerId(Long reviewerId);
+    @Query("SELECT r FROM Review r WHERE r.reviewer.id = :reviewerId")
+    List<Review> findByReviewerId(@Param("reviewerId") Long reviewerId);
 
     /**
      * Find all reviews received by a user
      */
-    List<Review> findByReviewedUserId(Long reviewedUserId);
+    @Query("SELECT r FROM Review r WHERE r.reviewedUser.id = :reviewedUserId")
+    List<Review> findByReviewedUserId(@Param("reviewedUserId") Long reviewedUserId);
 
     /**
      * Find published reviews for a user

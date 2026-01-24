@@ -40,6 +40,7 @@ public class JobService {
      */
     @Transactional(readOnly = true)
     public Page<JobResponse> getAllJobs(
+            Long companyId,
             Long categoryId,
             String jobType,
             String experienceLevel,
@@ -47,18 +48,18 @@ public class JobService {
             String location,
             Pageable pageable) {
 
-        String jobTypeStr = jobType != null ? jobType : null;
-        String expLevelStr = experienceLevel != null ? experienceLevel : null;
+        Job.JobStatus status = Job.JobStatus.OPEN;
+        Job.JobType jobTypeEnum = jobType != null ? Job.JobType.valueOf(jobType) : null;
+        Job.ExperienceLevel expLevelEnum = experienceLevel != null ? Job.ExperienceLevel.valueOf(experienceLevel) : null;
 
         PageRequest safePageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.unsorted());
 
-        Page<Job> jobs = jobRepository.findByFilters(
-            "OPEN",
+        Page<Job> jobs = jobRepository.findByStatusAndFilters(
+            status,
+            companyId,
             categoryId,
-            jobTypeStr,
-            expLevelStr,
+            jobTypeEnum,
             isRemote,
-            location,
             safePageable);
 
         return jobs.map(JobResponse::fromEntity);
@@ -84,8 +85,12 @@ public class JobService {
      */
     @Transactional(readOnly = true)
     public Page<JobResponse> searchJobs(String query, Pageable pageable) {
-        Page<Job> jobs = jobRepository.searchJobs(query, pageable);
-        return jobs.map(JobResponse::fromEntity);
+        int offset = (int) pageable.getOffset();
+        int limit = pageable.getPageSize();
+        List<Job> jobs = jobRepository.searchJobs(query, offset, limit);
+        long total = jobs.size() >= limit ? offset + limit + 1 : offset + jobs.size();
+        Page<Job> jobPage = new org.springframework.data.domain.PageImpl<>(jobs, pageable, total);
+        return jobPage.map(JobResponse::fromEntity);
     }
 
     /**

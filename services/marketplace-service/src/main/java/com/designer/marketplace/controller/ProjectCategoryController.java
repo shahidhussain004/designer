@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping("/api/project-categories")
+@RequestMapping("/project-categories")
 @RequiredArgsConstructor
 @Slf4j
 public class ProjectCategoryController {

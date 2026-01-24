@@ -26,18 +26,16 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     Page<Project> findByProjectCategoryIdAndStatus(Long categoryId, Project.ProjectStatus status, Pageable pageable);
 
-    Page<Project> findByExperienceLevelEntityId(Long experienceLevelId, Pageable pageable);
-
     @Query("SELECT p FROM Project p WHERE p.status = :status AND " +
             "(:categoryId IS NULL OR p.projectCategory.id = :categoryId) AND " +
-            "(:experienceLevelId IS NULL OR p.experienceLevelEntity.id = :experienceLevelId) AND " +
-            "(:minBudget IS NULL OR p.budget >= :minBudget) AND " +
-            "(:maxBudget IS NULL OR p.budget <= :maxBudget)")
+            "(:experienceLevelId IS NULL OR p.experienceLevel = :experienceLevelId) AND " +
+            "(:minBudget IS NULL OR p.budgetMinCents >= :minBudget) AND " +
+            "(:maxBudget IS NULL OR p.budgetMaxCents <= :maxBudget)")
     Page<Project> findByFilters(@Param("status") Project.ProjectStatus status,
             @Param("categoryId") Long categoryId,
-            @Param("experienceLevelId") Long experienceLevelId,
-            @Param("minBudget") Double minBudget,
-            @Param("maxBudget") Double maxBudget,
+            @Param("experienceLevelId") String experienceLevelId,
+            @Param("minBudget") Long minBudget,
+            @Param("maxBudget") Long maxBudget,
             Pageable pageable);
 
     // Dashboard queries
@@ -61,8 +59,10 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     // Search query
     @Query("SELECT p FROM Project p WHERE " +
+            "(:searchTerm IS NULL OR (" +
             "LOWER(p.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
             "LOWER(p.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-            "LOWER(p.projectCategory.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
+            "LOWER(p.projectCategory.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" +
+            "))")
     Page<Project> searchProjects(@Param("searchTerm") String searchTerm, Pageable pageable);
 }

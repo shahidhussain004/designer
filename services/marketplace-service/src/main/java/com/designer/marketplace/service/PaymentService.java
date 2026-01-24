@@ -121,10 +121,9 @@ public class PaymentService {
                     .company(company)
                     .freelancer(freelancer)
                     .project(project)
-                    .proposal(proposal)
-                    .amount(amount)
-                    .platformFee(platformFee)
-                    .freelancerAmount(freelancerAmount)
+                    .amountCents(amount)
+                    .platformFeeCents(platformFee)
+                    .freelancerAmountCents(freelancerAmount)
                     .currency(request.getCurrency())
                     .status(PaymentStatus.PENDING)
                     .escrowStatus(EscrowStatus.NOT_ESCROWED)
@@ -170,7 +169,7 @@ public class PaymentService {
         Escrow escrow = Escrow.builder()
                 .payment(payment)
                 .project(payment.getProject())
-                .amount(payment.getFreelancerAmount())
+                .amount(payment.getFreelancerAmountCents())
                 .currency(payment.getCurrency())
                 .status(Escrow.EscrowHoldStatus.HELD)
                 .releaseCondition(Escrow.ReleaseCondition.PROJECT_COMPLETED)
@@ -182,10 +181,10 @@ public class PaymentService {
 
         // Create ledger entries
         createLedgerEntry(payment, escrow, payment.getCompany(), TransactionType.ESCROW_HOLD,
-                payment.getFreelancerAmount(), "Funds held in escrow");
+                payment.getFreelancerAmountCents(), "Funds held in escrow");
 
         createLedgerEntry(payment, null, (User) null, TransactionType.PLATFORM_FEE,
-                payment.getPlatformFee(), "Platform fee collected");
+                payment.getPlatformFeeCents(), "Platform fee collected");
 
         log.info("Payment succeeded and moved to escrow: {}", paymentIntentId);
     }
@@ -240,7 +239,7 @@ public class PaymentService {
 
         // Create ledger entry
         createLedgerEntry(payment, escrow, payment.getFreelancer(), TransactionType.ESCROW_RELEASE,
-                payment.getFreelancerAmount(), "Escrow released to freelancer");
+                payment.getFreelancerAmountCents(), "Escrow released to freelancer");
 
         log.info("Escrow released for payment: {}", paymentId);
         return PaymentResponse.fromEntity(payment);
@@ -286,7 +285,7 @@ public class PaymentService {
 
             // Create ledger entry
             createLedgerEntry(payment, null, payment.getCompany(), TransactionType.REFUND,
-                    payment.getAmount(), "Payment refunded");
+                    payment.getAmountCents(), "Payment refunded");
 
             log.info("Payment refunded: {} - Stripe refund: {}", paymentId, refund.getId());
             return PaymentResponse.fromEntity(payment);

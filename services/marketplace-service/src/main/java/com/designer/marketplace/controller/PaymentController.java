@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
  * REST controller for payment operations.
  */
 @RestController
-@RequestMapping("/api/payments")
+@RequestMapping("/payments")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Payments", description = "Payment management endpoints")

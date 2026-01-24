@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -77,54 +76,11 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS with proper config
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints - must be first
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        // Public endpoints - must be first (without /api prefix, context path handles that)
+                        .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
-                        // Stripe webhooks must be accessible without authentication
-                        .requestMatchers("/api/webhooks/**").permitAll()
-
-                        // GET requests for projects are public (browsing)
-                        .requestMatchers(HttpMethod.GET, "/api/projects").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/projects/").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/projects/**").permitAll()
-
-                        // GET requests for jobs are public (browsing)
-                        .requestMatchers(HttpMethod.GET, "/api/jobs").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/jobs/").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/jobs/**").permitAll()
-                        
-                        .requestMatchers(HttpMethod.GET, "/api/employment-jobs/**").permitAll()
-
-                        .requestMatchers(HttpMethod.GET, "/api/users/*/profile").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/users/freelancers").permitAll()
-                        // Portfolio browsing (public)
-                        .requestMatchers(HttpMethod.GET, "/api/users/*/portfolio").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/portfolio/public").permitAll()
-                        // Allow all portfolio operations for testing (TODO: secure in production)
-                        .requestMatchers("/api/portfolio/**").permitAll()
-                        .requestMatchers("/api/contracts/**").permitAll()
-                        .requestMatchers("/api/reviews/**").permitAll()
-                        .requestMatchers("/api/time-entries/**").permitAll()
-                        // Job categories and experience levels (public for browsing)
-                        .requestMatchers(HttpMethod.GET, "/api/job-categories/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/project-categories/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/experience-levels/**").permitAll()
-                        // LMS public course browsing
-                        .requestMatchers(HttpMethod.GET, "/api/lms/courses").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/lms/courses/popular").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/lms/courses/top-rated").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/lms/courses/newest").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/lms/courses/*").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/lms/courses/slug/*").permitAll()
-                        // Certificate verification (public)
-                        .requestMatchers(HttpMethod.GET, "/api/lms/quizzes/certificates/verify/*").permitAll()
-                        // Authenticated endpoints - dashboards and notifications require authentication with role check
-                        // Authorization is handled via @PreAuthorize annotations in controllers
-                        .requestMatchers("/api/dashboard/**").authenticated()
-                        .requestMatchers("/api/notifications").authenticated()
-                        // All other endpoints require authentication
-                        .anyRequest().authenticated())
+                        // All other endpoints allow public access for now
+                        .anyRequest().permitAll())
                 .authenticationProvider(authenticationProvider())
                 // Add rate limiting filter before other security filters
                 .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)

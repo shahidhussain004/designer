@@ -4,24 +4,45 @@ import { ErrorMessage } from '@/components/ErrorMessage';
 import { JobsSkeleton } from '@/components/Skeletons';
 import { PageLayout } from '@/components/ui';
 import { useJobs } from '@/hooks/useJobs';
+import { useCompanyProfile } from '@/hooks/useUsers';
 import { useAuth } from '@/lib/auth';
+import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
 
 interface Job {
   id: number | string;
   title?: string;
   description?: string;
+  categoryId?: number;
+  categoryName?: string;
   companyName?: string;
-  salary?: number;
+  companyId?: number;
+  salaryMinCents?: number;
+  salaryMaxCents?: number;
+  salaryCurrency?: string;
+  salaryPeriod?: string;
+  showSalary?: boolean;
   jobType?: string;
   location?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  isRemote?: boolean;
   requirements?: string;
+  responsibilities?: string;
   benefits?: string;
+  requiredSkills?: string;
+  preferredSkills?: string;
+  educationLevel?: string;
+  experienceLevel?: string;
   status?: string;
-  companyId?: number;
+  isFeatured?: boolean;
+  isUrgent?: boolean;
   createdAt?: string;
   updatedAt?: string;
+  publishedAt?: string;
 }
 
 const jobTypes = [
@@ -40,7 +61,12 @@ const statusOptions = [
 ];
 
 export default function JobsListPage() {
-  const { data: jobs, isLoading, error, refetch } = useJobs();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const companyIdParam = searchParams.get('company');
+  
+  const { data: jobs, isLoading, error, refetch } = useJobs(companyIdParam);
+  const { data: company } = useCompanyProfile(companyIdParam || null);
   
   const { user } = useAuth();
   const [filterStatus, setFilterStatus] = useState('OPEN');
@@ -106,14 +132,28 @@ export default function JobsListPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div>
+              {companyIdParam && (
+                <div className="mb-4 flex items-center gap-2">
+                  <button
+                    onClick={() => router.push('/jobs')}
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    <ArrowLeft className="w-5 h-5" />
+                  </button>
+                  <span className="text-gray-400 text-sm">Back to all jobs</span>
+                </div>
+              )}
               <h1 className="text-3xl lg:text-4xl font-bold text-white mb-3">
-                Discover Your Next Role
+                {companyIdParam ? `Jobs at ${company?.fullName ?? 'Company'}` : 'Discover Your Next Role'}
               </h1>
               <p className="text-xl text-gray-300">
-                Explore {jobs?.length || 0} open position{(jobs?.length || 0) !== 1 ? 's' : ''} from leading companies — find the one that fits you.
+                {companyIdParam 
+                  ? `Viewing ${jobs?.length || 0} open position${(jobs?.length || 0) !== 1 ? 's' : ''} from ${company?.fullName ?? 'this company'}`
+                  : `Explore ${jobs?.length || 0} open position${(jobs?.length || 0) !== 1 ? 's' : ''} from leading companies — find the one that fits you.`
+                }
               </p>
             </div>
-            {user && user.role === 'COMPANY' && (
+            {user && user.role === 'COMPANY' && !companyIdParam && (
               <Link
                 href="/jobs/create"
                 className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-semibold transition-all shadow-lg whitespace-nowrap"

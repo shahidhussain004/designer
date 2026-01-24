@@ -1,11 +1,10 @@
 package com.designer.marketplace.dto;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import com.designer.marketplace.entity.Job;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,6 +13,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * DTO for Job responses
+ * Maps from Job entity to API response
  */
 @Data
 @Builder
@@ -21,8 +21,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class JobResponse {
     private Long id;
+    
+    // Category info
     private Long categoryId;
     private String categoryName;
+    
+    // Company info
+    private Long companyId;
+    private String companyName;
     
     // Basic information
     private String title;
@@ -42,22 +48,22 @@ public class JobResponse {
     private Boolean isRemote;
     private String remoteType;
     
-    // Compensation
-    private BigDecimal salaryMin;
-    private BigDecimal salaryMax;
+    // Compensation (in cents, need to convert to decimal for API)
+    private Long salaryMinCents;
+    private Long salaryMaxCents;
     private String salaryCurrency;
     private String salaryPeriod;
     private Boolean showSalary;
     
-    // Benefits
-    private List<String> benefits;
-    private List<String> perks;
+    // Benefits and perks (JsonNode from JSONB)
+    private JsonNode benefits;
+    private JsonNode perks;
     
-    // Skills
-    private List<String> requiredSkills;
-    private List<String> preferredSkills;
+    // Skills and qualifications (JsonNode from JSONB)
+    private JsonNode requiredSkills;
+    private JsonNode preferredSkills;
     private String educationLevel;
-    private List<String> certifications;
+    private JsonNode certifications;
     
     // Application
     private LocalDateTime applicationDeadline;
@@ -65,23 +71,14 @@ public class JobResponse {
     private String applicationUrl;
     private String applyInstructions;
     
-    // Company
-    private Long companyId;
-    private String companyName;
-    private String companyDescription;
-    private String companyLogoUrl;
-    private String companyWebsite;
-    private String companySize;
-    private String industry;
-    
-    // Company details
+    // Details
     private LocalDate startDate;
     private Integer positionsAvailable;
     private String travelRequirement;
     private Boolean securityClearanceRequired;
     private Boolean visaSponsorship;
     
-    // Status
+    // Status and tracking
     private String status;
     private Integer viewsCount;
     private Integer applicationsCount;
@@ -98,6 +95,10 @@ public class JobResponse {
      * Convert Job entity to DTO
      */
     public static JobResponse fromEntity(Job job) {
+        if (job == null) {
+            return null;
+        }
+
         return JobResponse.builder()
                 .id(job.getId())
                 .companyId(job.getCompany() != null ? job.getCompany().getId() : null)
@@ -116,8 +117,8 @@ public class JobResponse {
                 .country(job.getCountry())
                 .isRemote(job.getIsRemote())
                 .remoteType(job.getRemoteType() != null ? job.getRemoteType().name() : null)
-                .salaryMin(job.getSalaryMin())
-                .salaryMax(job.getSalaryMax())
+                .salaryMinCents(job.getSalaryMinCents())
+                .salaryMaxCents(job.getSalaryMaxCents())
                 .salaryCurrency(job.getSalaryCurrency())
                 .salaryPeriod(job.getSalaryPeriod() != null ? job.getSalaryPeriod().name() : null)
                 .showSalary(job.getShowSalary())
@@ -131,12 +132,6 @@ public class JobResponse {
                 .applicationEmail(job.getApplicationEmail())
                 .applicationUrl(job.getApplicationUrl())
                 .applyInstructions(job.getApplyInstructions())
-                .companyName(job.getCompanyName())
-                .companyDescription(job.getCompanyDescription())
-                .companyLogoUrl(job.getCompanyLogoUrl())
-                .companyWebsite(job.getCompanyWebsite())
-                .companySize(job.getCompanySize() != null ? job.getCompanySize().name() : null)
-                .industry(job.getIndustry())
                 .startDate(job.getStartDate())
                 .positionsAvailable(job.getPositionsAvailable())
                 .travelRequirement(job.getTravelRequirement() != null ? job.getTravelRequirement().name() : null)

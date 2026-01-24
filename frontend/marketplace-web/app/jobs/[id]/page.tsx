@@ -155,7 +155,17 @@ export default function JobDetailsPage() {
               {job.requirements && (
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">Requirements</h2>
-                  <p className="text-gray-600 whitespace-pre-wrap">{job.requirements}</p>
+                  {typeof job.requirements === 'string' ? (
+                    <p className="text-gray-600 whitespace-pre-wrap">{job.requirements}</p>
+                  ) : Array.isArray(job.requirements) ? (
+                    <ul className="text-gray-600 space-y-2 list-disc list-inside">
+                      {job.requirements.map((req: any, idx: number) => (
+                        <li key={idx}>{typeof req === 'string' ? req : JSON.stringify(req)}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-gray-600">{JSON.stringify(job.requirements)}</p>
+                  )}
                 </div>
               )}
 
@@ -163,7 +173,17 @@ export default function JobDetailsPage() {
               {job.benefits && (
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">Benefits</h2>
-                  <p className="text-gray-600 whitespace-pre-wrap">{job.benefits}</p>
+                  {typeof job.benefits === 'string' ? (
+                    <p className="text-gray-600 whitespace-pre-wrap">{job.benefits}</p>
+                  ) : Array.isArray(job.benefits) ? (
+                    <ul className="text-gray-600 space-y-2 list-disc list-inside">
+                      {job.benefits.map((benefit: any, idx: number) => (
+                        <li key={idx}>{typeof benefit === 'string' ? benefit : JSON.stringify(benefit)}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-gray-600">{JSON.stringify(job.benefits)}</p>
+                  )}
                 </div>
               )}
 
@@ -230,7 +250,19 @@ export default function JobDetailsPage() {
                 <p className="text-sm text-primary-700 mb-1">Salary Range</p>
                 <p className="text-3xl font-bold text-primary-900 flex items-center gap-1">
                   <DollarSign className="w-8 h-8" />
-                  {job.salary?.toLocaleString()}
+                  {job.showSalary && job.salaryMinCents
+                    ? `${(job.salaryMinCents / 100).toLocaleString(undefined, {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0,
+                      })}${
+                        job.salaryMaxCents
+                          ? ` - ${(job.salaryMaxCents / 100).toLocaleString(undefined, {
+                              minimumFractionDigits: 0,
+                              maximumFractionDigits: 0,
+                            })}`
+                          : ''
+                      } ${job.salaryCurrency || 'USD'} ${job.salaryPeriod ? `/ ${job.salaryPeriod}` : ''}`
+                    : 'Salary not disclosed'}
                 </p>
                 
                 {user && user.role === 'FREELANCER' && user.id !== job.companyId && (
