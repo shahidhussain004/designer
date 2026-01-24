@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.designer.marketplace.dto.PortfolioItemDTO;
 import com.designer.marketplace.entity.PortfolioItem;
 import com.designer.marketplace.service.PortfolioService;
 import com.designer.marketplace.service.UserService;
@@ -34,7 +34,6 @@ import lombok.RequiredArgsConstructor;
  * - PATCH /api/portfolio-items/reorder - Reorder portfolio items
  */
 @RestController
-@RequestMapping("/api")
 @RequiredArgsConstructor
 public class PortfolioController {
 
@@ -42,7 +41,7 @@ public class PortfolioController {
     private final UserService userService;
 
     @GetMapping("/users/{userId}/portfolio-items")
-    public ResponseEntity<List<PortfolioItem>> getUserPortfolio(@PathVariable Long userId) {
+    public ResponseEntity<List<PortfolioItemDTO>> getUserPortfolio(@PathVariable Long userId) {
         Long requesterId = null;
         try {
             requesterId = userService.getCurrentUser().getId();
@@ -51,8 +50,32 @@ public class PortfolioController {
             requesterId = null;
         }
 
-        List<PortfolioItem> portfolio = portfolioService.getUserPortfolio(userId, requesterId);
-        return ResponseEntity.ok(portfolio);
+        // The userId path parameter could be either a user ID or a freelancer ID
+        // Try to find the freelancer associated with this user
+        List<PortfolioItem> portfolio = portfolioService.getUserPortfolioByUserId(userId, requesterId);
+        
+        // Convert to DTO to avoid lazy loading issues
+        List<PortfolioItemDTO> dtos = portfolio.stream()
+            .map(item -> PortfolioItemDTO.builder()
+                .id(item.getId())
+                .title(item.getTitle())
+                .description(item.getDescription())
+                .imageUrl(item.getImageUrl())
+                .projectUrl(item.getProjectUrl())
+                .technologies(item.getTechnologies())
+                .images(item.getImages())
+                .toolsUsed(item.getToolsUsed())
+                .skillsDemonstrated(item.getSkillsDemonstrated())
+                .startDate(item.getStartDate())
+                .endDate(item.getEndDate())
+                .displayOrder(item.getDisplayOrder())
+                .isVisible(item.getIsVisible())
+                .createdAt(item.getCreatedAt())
+                .updatedAt(item.getUpdatedAt())
+                .build())
+            .toList();
+        
+        return ResponseEntity.ok(dtos);
     }
 
     @PostMapping("/portfolio-items")

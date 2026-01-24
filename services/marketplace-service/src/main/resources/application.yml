@@ -149,7 +149,11 @@ logging:
     root: INFO
     com.designer.marketplace: DEBUG
     org.springframework.web: INFO
-    org.springframework.security: INFO
+    org.springframework.security: WARN
+    org.springframework.data: WARN
+    org.springframework.data.redis: WARN
+    org.springframework.boot.autoconfigure: WARN
+    org.springframework.boot.autoconfigure.data: WARN
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
   pattern:
