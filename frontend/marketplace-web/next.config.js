@@ -16,6 +16,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'api.example.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.example.com',
+      },
     ],
   },
   // Performance optimizations
