@@ -67,6 +67,15 @@ export default function JobsListPage() {
   
   const { data: jobs, isLoading, error, refetch } = useJobs(companyIdParam);
   const { data: company } = useCompanyProfile(companyIdParam || null);
+
+  // DEBUG: log runtime query param and jobs data to help diagnose filtering
+  // Remove these logs after debugging is complete
+  if (typeof window !== 'undefined') {
+    // eslint-disable-next-line no-console
+    console.log('JobsPage debug - company query param:', companyIdParam);
+    // eslint-disable-next-line no-console
+    console.log('JobsPage debug - jobs from useJobs():', jobs);
+  }
   
   const { user } = useAuth();
   const [filterStatus, setFilterStatus] = useState('OPEN');
