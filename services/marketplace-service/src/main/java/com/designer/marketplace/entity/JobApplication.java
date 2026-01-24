@@ -3,6 +3,8 @@ package com.designer.marketplace.entity;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -28,16 +30,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * JobApplication entity - represents applications submitted for companies jobs
+ * JobApplication entity - represents applications submitted for company jobs
  * Maps to 'job_applications' table in PostgreSQL
+ * Implements soft-delete pattern via deleted_at column
  */
 @Entity
 @Table(name = "job_applications", indexes = {
-        @Index(name = "idx_job_applications_job", columnList = "job_id"),
-        @Index(name = "idx_job_applications_applicant", columnList = "applicant_id"),
+        @Index(name = "idx_job_applications_job_id", columnList = "job_id"),
+        @Index(name = "idx_job_applications_applicant_id", columnList = "applicant_id"),
         @Index(name = "idx_job_applications_status", columnList = "status"),
-        @Index(name = "idx_job_applications_created", columnList = "created_at")
+        @Index(name = "idx_job_applications_created_at", columnList = "created_at")
 })
+@SQLDelete(sql = "UPDATE job_applications SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
 @EntityListeners(AuditingEntityListener.class)
 @Data
 @NoArgsConstructor
@@ -56,17 +61,15 @@ public class JobApplication {
     @JoinColumn(name = "applicant_id", nullable = false)
     private Freelancer applicant;
 
-    // Contact information (separate from user profile)
-    @Column(name = "full_name", nullable = false)
+    @Column(name = "full_name", nullable = false, length = 255)
     private String fullName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String email;
 
     @Column(length = 20)
     private String phone;
 
-    // Application details
     @Column(name = "cover_letter", columnDefinition = "TEXT")
     private String coverLetter;
 
@@ -83,12 +86,10 @@ public class JobApplication {
     @Column(name = "additional_documents", columnDefinition = "text[]")
     private String[] additionalDocuments;
 
-    // Answers to screening questions
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "JSONB")
+    @Column(name = "answers", columnDefinition = "jsonb")
     private JsonNode answers;
 
-    // Status tracking
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
     private ApplicationStatus status = ApplicationStatus.PENDING;
@@ -99,7 +100,6 @@ public class JobApplication {
     @Column(name = "rejection_reason", columnDefinition = "TEXT")
     private String rejectionReason;
 
-    // Timestamps
     @Column(name = "applied_at")
     private LocalDateTime appliedAt;
 
@@ -113,6 +113,9 @@ public class JobApplication {
 
     @Column(name = "reviewed_at")
     private LocalDateTime reviewedAt;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     public enum ApplicationStatus {
         PENDING,

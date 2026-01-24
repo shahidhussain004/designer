@@ -22,9 +22,10 @@ public interface ContractRepository extends JpaRepository<Contract, Long> {
     List<Contract> findByProjectId(Long projectId);
 
     /**
-     * Find all contracts where user is the company
+     * Find all contracts where user is the company (via project)
      */
-    List<Contract> findByCompanyId(Long companyId);
+    @Query("SELECT c FROM Contract c WHERE c.project.company.id = :companyId")
+    List<Contract> findByCompanyId(@Param("companyId") Long companyId);
 
     /**
      * Find all contracts where user is the freelancer
@@ -39,23 +40,18 @@ public interface ContractRepository extends JpaRepository<Contract, Long> {
     /**
      * Find all contracts for a user (either as company or freelancer)
      */
-    @Query("SELECT c FROM Contract c WHERE c.company.id = :userId OR c.freelancer.id = :userId")
+    @Query("SELECT c FROM Contract c WHERE c.project.company.id = :userId OR c.freelancer.id = :userId")
     List<Contract> findByUserId(@Param("userId") Long userId);
 
     /**
      * Find active contracts for a user (either as company or freelancer)
      */
-    @Query("SELECT c FROM Contract c WHERE (c.company.id = :userId OR c.freelancer.id = :userId) AND c.status = :status")
+    @Query("SELECT c FROM Contract c WHERE (c.project.company.id = :userId OR c.freelancer.id = :userId) AND c.status = :status")
     List<Contract> findByUserIdAndStatus(@Param("userId") Long userId, @Param("status") ContractStatus status);
 
     /**
      * Count active contracts for a user
      */
-    @Query("SELECT COUNT(c) FROM Contract c WHERE (c.company.id = :userId OR c.freelancer.id = :userId) AND c.status = 'ACTIVE'")
+    @Query("SELECT COUNT(c) FROM Contract c WHERE (c.project.company.id = :userId OR c.freelancer.id = :userId) AND c.status = com.designer.marketplace.entity.Contract.ContractStatus.ACTIVE")
     Long countActiveContractsByUserId(@Param("userId") Long userId);
-
-    /**
-     * Find contract by proposal ID
-     */
-    Contract findByProposalId(Long proposalId);
 }

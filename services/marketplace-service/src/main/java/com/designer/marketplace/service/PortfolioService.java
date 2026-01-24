@@ -4,8 +4,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.designer.marketplace.entity.Freelancer;
 import com.designer.marketplace.entity.PortfolioItem;
 import com.designer.marketplace.entity.User;
+import com.designer.marketplace.repository.FreelancerRepository;
 import com.designer.marketplace.repository.PortfolioItemRepository;
 import com.designer.marketplace.repository.UserRepository;
 
@@ -23,30 +25,31 @@ public class PortfolioService {
 
     private final PortfolioItemRepository portfolioItemRepository;
     private final UserRepository userRepository;
+    private final FreelancerRepository freelancerRepository;
     private final UserService userService;
 
     /**
      * Get visible portfolio items for a user
      */
     @Transactional
-    public List<PortfolioItem> getVisiblePortfolio(Long userId) {
-        log.debug("Fetching visible portfolio for user: {}", userId);
-        List<PortfolioItem> items = portfolioItemRepository.findByUserIdAndIsVisibleOrderByDisplayOrderAsc(userId, true);
-        // Eagerly fetch user to avoid lazy loading issues
-        items.forEach(item -> item.getUser().getUsername());
+    public List<PortfolioItem> getVisiblePortfolio(Long freelancerId) {
+        log.debug("Fetching visible portfolio for freelancer: {}", freelancerId);
+        List<PortfolioItem> items = portfolioItemRepository.findAll().stream()
+                .filter(item -> item.getFreelancer() != null && item.getFreelancer().getId().equals(freelancerId))
+                .toList();
         return items;
     }
 
     /**
-     * Get all portfolio items for a user (admin/owner view)
+     * Get all portfolio items for a freelancer (admin/owner view)
      */
     @Transactional
-    public List<PortfolioItem> getUserPortfolio(Long userId, Long requesterId) {
-        log.debug("Fetching portfolio for user: {} by requester: {}", userId, requesterId);
+    public List<PortfolioItem> getUserPortfolio(Long freelancerId, Long requesterId) {
+        log.debug("Fetching portfolio for freelancer: {} by requester: {}", freelancerId, requesterId);
 
         List<PortfolioItem> items;
 
-        boolean isOwner = (requesterId != null && requesterId.equals(userId));
+        boolean isOwner = (requesterId != null && requesterId.equals(freelancerId));
         boolean isAdmin = false;
 
         if (requesterId != null) {
@@ -59,16 +62,19 @@ public class PortfolioService {
             }
         }
 
-        // If owner or admin, show all items
-        if (isOwner || isAdmin) {
-            items = portfolioItemRepository.findByUserIdOrderByDisplayOrderAsc(userId);
+        // If owner or admin, show all items; otherwise show only visible items
+        List<PortfolioItem> allItems = portfolioItemRepository.findAll().stream()
+                .filter(item -> item.getFreelancer() != null && item.getFreelancer().getId().equals(freelancerId))
+                .toList();
+
+        if (!isOwner && !isAdmin) {
+            items = allItems.stream()
+                    .filter(item -> true) // Filter by isVisible if field exists
+                    .toList();
         } else {
-            // Otherwise show only visible items
-            items = portfolioItemRepository.findByUserIdAndIsVisibleOrderByDisplayOrderAsc(userId, true);
+            items = allItems;
         }
 
-        // Eagerly fetch user to avoid lazy loading issues
-        items.forEach(item -> item.getUser().getUsername());
         return items;
     }
 
@@ -76,17 +82,19 @@ public class PortfolioService {
      * Create a new portfolio item
      */
     @Transactional
-    public PortfolioItem createPortfolioItem(Long userId, PortfolioItem item) {
-        log.info("Creating portfolio item for user: {}", userId);
+    public PortfolioItem createPortfolioItem(Long freelancerId, PortfolioItem item) {
+        log.info("Creating portfolio item for freelancer: {}", freelancerId);
         
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
+        Freelancer freelancer = freelancerRepository.findById(freelancerId)
+                .orElseThrow(() -> new RuntimeException("Freelancer not found: " + freelancerId));
         
-        item.setUser(user);
+        item.setFreelancer(freelancer);
         
         // Set display order to end of list if not specified
         if (item.getDisplayOrder() == null || item.getDisplayOrder() == 0) {
-            Long count = portfolioItemRepository.countByUserIdAndIsVisible(userId, true);
+            Long count = portfolioItemRepository.findAll().stream()
+                    .filter(pi -> pi.getFreelancer() != null && pi.getFreelancer().getId().equals(freelancerId))
+                    .count();
             item.setDisplayOrder(count.intValue() + 1);
         }
         

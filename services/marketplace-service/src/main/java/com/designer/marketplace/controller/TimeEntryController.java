@@ -21,41 +21,51 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * REST Controller for Time Entry operations
+ * 
+ * Endpoints:
+ * - GET /api/time-entries - Get all time entries
+ * - GET /api/time-entries/{id} - Get time entry by ID
+ * - POST /api/time-entries - Create time entry
+ * - PUT /api/time-entries/{id} - Update time entry
+ * - DELETE /api/time-entries/{id} - Delete time entry
+ * - GET /api/contracts/{contractId}/time-entries - Get time entries for contract (nested)
+ * - GET /api/users/{freelancerId}/time-entries - Get time entries for freelancer (nested)
+ * - GET /api/contracts/{contractId}/time-entries/total-hours - Get total hours for contract
  */
 @RestController
-@RequestMapping("/api/time-entries")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class TimeEntryController {
 
     private final TimeEntryService timeEntryService;
 
-    @GetMapping
+    @GetMapping("/time-entries")
     public ResponseEntity<List<TimeEntry>> getAllTimeEntries() {
         return ResponseEntity.ok(timeEntryService.getAllTimeEntries());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/time-entries/{id}")
     public ResponseEntity<TimeEntry> getTimeEntryById(@PathVariable Long id) {
         return ResponseEntity.ok(timeEntryService.getTimeEntryById(id));
     }
 
-    @GetMapping("/contract/{contractId}")
+    @GetMapping("/contracts/{contractId}/time-entries")
     public ResponseEntity<List<TimeEntry>> getTimeEntriesByContract(@PathVariable Long contractId) {
         return ResponseEntity.ok(timeEntryService.getTimeEntriesByContractId(contractId));
     }
 
-    @GetMapping("/freelancer/{freelancerId}")
+    @GetMapping("/users/{freelancerId}/time-entries")
     public ResponseEntity<List<TimeEntry>> getTimeEntriesByFreelancer(@PathVariable Long freelancerId) {
         return ResponseEntity.ok(timeEntryService.getTimeEntriesByFreelancerId(freelancerId));
     }
 
-    @PostMapping
+    @PostMapping("/time-entries")
     public ResponseEntity<TimeEntry> createTimeEntry(@RequestBody TimeEntry timeEntry) {
         TimeEntry created = timeEntryService.createTimeEntry(timeEntry);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/time-entries/{id}")
     public ResponseEntity<TimeEntry> updateTimeEntry(
             @PathVariable Long id,
             @RequestBody TimeEntry updates) {
@@ -63,13 +73,13 @@ public class TimeEntryController {
         return ResponseEntity.ok(updated);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/time-entries/{id}")
     public ResponseEntity<Void> deleteTimeEntry(@PathVariable Long id) {
         timeEntryService.deleteTimeEntry(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/contract/{contractId}/total-hours")
+    @GetMapping("/contracts/{contractId}/time-entries/total-hours")
     public ResponseEntity<BigDecimal> getTotalHours(@PathVariable Long contractId) {
         BigDecimal totalHours = timeEntryService.getTotalHoursByContract(contractId);
         return ResponseEntity.ok(totalHours);

@@ -1,6 +1,7 @@
 -- =====================================================
 -- V8: Create Proposals Table
 -- Description: Freelancer proposals for projects
+-- OPTIMIZED: json → jsonb, budget in cents, GIN indexes
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS proposals (
@@ -10,14 +11,15 @@ CREATE TABLE IF NOT EXISTS proposals (
     
     -- Proposal Information
     cover_letter TEXT NOT NULL,
-    suggested_budget NUMERIC(12,2),
+    suggested_budget_cents BIGINT, -- CHANGED: Store in cents
     proposed_timeline VARCHAR(100),
     estimated_hours NUMERIC(10,2),
-    attachments TEXT[],
-    portfolio_links TEXT[],
+    attachments TEXT[] DEFAULT '{}', -- Simple array of URLs
+    portfolio_links TEXT[] DEFAULT '{}', -- Simple array of URLs
     
-    -- Answers to screening questions
-    answers JSONB,
+    -- Answers to screening questions (CHANGED: json → jsonb)
+    -- Format: [{"question": "What is your experience?", "answer": "5 years with React"}]
+    answers JSONB DEFAULT '[]'::jsonb,
     
     -- Status & Engagement
     status VARCHAR(50) DEFAULT 'SUBMITTED' NOT NULL,
@@ -32,40 +34,49 @@ CREATE TABLE IF NOT EXISTS proposals (
     freelancer_review TEXT,
     
     -- Timestamps
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    reviewed_at TIMESTAMP,
+    created_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    reviewed_at TIMESTAMP(6),
     
     -- Unique constraint to prevent duplicate proposals per project-freelancer
     CONSTRAINT unique_project_freelancer UNIQUE(project_id, freelancer_id),
-    CONSTRAINT chk_proposal_status CHECK (status IN ('SUBMITTED', 'REVIEWING', 'SHORTLISTED', 'ACCEPTED', 'REJECTED', 'WITHDRAWN')),
-    CONSTRAINT chk_ratings CHECK (company_rating IS NULL OR (company_rating >= 0 AND company_rating <= 5)),
-    CONSTRAINT chk_freelancer_rating CHECK (freelancer_rating IS NULL OR (freelancer_rating >= 0 AND freelancer_rating <= 5))
+    CONSTRAINT proposals_status_check CHECK (status IN ('SUBMITTED', 'REVIEWING', 'SHORTLISTED', 'ACCEPTED', 'REJECTED', 'WITHDRAWN')),
+    CONSTRAINT proposals_company_rating_check CHECK (company_rating IS NULL OR (company_rating >= 0 AND company_rating <= 5)),
+    CONSTRAINT proposals_freelancer_rating_check CHECK (freelancer_rating IS NULL OR (freelancer_rating >= 0 AND freelancer_rating <= 5)),
+    CONSTRAINT proposals_budget_check CHECK (suggested_budget_cents IS NULL OR suggested_budget_cents >= 0),
+    CONSTRAINT proposals_hours_check CHECK (estimated_hours IS NULL OR estimated_hours > 0)
 );
 
--- Create indexes for performance
-CREATE INDEX IF NOT EXISTS idx_proposals_project_id ON proposals(project_id);
-CREATE INDEX IF NOT EXISTS idx_proposals_freelancer_id ON proposals(freelancer_id);
-CREATE INDEX IF NOT EXISTS idx_proposals_status ON proposals(status);
-CREATE INDEX IF NOT EXISTS idx_proposals_created_at ON proposals(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_proposals_is_featured ON proposals(is_featured);
-CREATE INDEX IF NOT EXISTS idx_proposals_project_freelancer ON proposals(project_id, freelancer_id);
+-- Performance indexes
+CREATE INDEX idx_proposals_project_id ON proposals(project_id);
+CREATE INDEX idx_proposals_freelancer_id ON proposals(freelancer_id);
+CREATE INDEX idx_proposals_created_at ON proposals(created_at DESC);
 
--- Create trigger for updated_at
-CREATE OR REPLACE FUNCTION update_proposals_updated_at()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = CURRENT_TIMESTAMP;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+-- Status-based partial indexes
+CREATE INDEX idx_proposals_reviewing ON proposals(project_id, created_at DESC) 
+    WHERE status IN ('SUBMITTED', 'REVIEWING');
+CREATE INDEX idx_proposals_shortlisted ON proposals(project_id, created_at DESC) 
+    WHERE status = 'SHORTLISTED';
+CREATE INDEX idx_proposals_featured ON proposals(project_id, created_at DESC) 
+    WHERE is_featured = TRUE;
 
-CREATE TRIGGER trg_proposals_updated_at
-BEFORE UPDATE ON proposals
-FOR EACH ROW
-EXECUTE FUNCTION update_proposals_updated_at();
+-- Budget range for filtering
+CREATE INDEX idx_proposals_budget ON proposals(suggested_budget_cents) 
+    WHERE suggested_budget_cents IS NOT NULL;
 
--- Create trigger to increment project proposal count
+-- GIN index for answers searching
+CREATE INDEX idx_proposals_answers_gin ON proposals USING GIN(answers);
+
+-- Composite index for freelancer dashboard
+CREATE INDEX idx_proposals_freelancer_status ON proposals(freelancer_id, status, created_at DESC);
+
+-- Trigger for updated_at
+CREATE TRIGGER proposals_updated_at 
+    BEFORE UPDATE ON proposals 
+    FOR EACH ROW 
+    EXECUTE FUNCTION update_timestamp();
+
+-- Trigger to increment project proposal count
 CREATE OR REPLACE FUNCTION increment_project_proposal_count()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -77,11 +88,11 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER trg_increment_project_proposal_count
-AFTER INSERT ON proposals
-FOR EACH ROW
-EXECUTE FUNCTION increment_project_proposal_count();
+    AFTER INSERT ON proposals
+    FOR EACH ROW
+    EXECUTE FUNCTION increment_project_proposal_count();
 
--- Create trigger to decrement project proposal count
+-- Trigger to decrement project proposal count
 CREATE OR REPLACE FUNCTION decrement_project_proposal_count()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -93,10 +104,13 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER trg_decrement_project_proposal_count
-AFTER DELETE ON proposals
-FOR EACH ROW
-EXECUTE FUNCTION decrement_project_proposal_count();
+    AFTER DELETE ON proposals
+    FOR EACH ROW
+    EXECUTE FUNCTION decrement_project_proposal_count();
 
 COMMENT ON TABLE proposals IS 'Freelancer proposals submitted for project postings';
 COMMENT ON COLUMN proposals.status IS 'Proposal status: SUBMITTED, REVIEWING, SHORTLISTED, ACCEPTED, REJECTED, WITHDRAWN';
-COMMENT ON COLUMN proposals.answers IS 'JSON object with answers to project screening questions';
+COMMENT ON COLUMN proposals.suggested_budget_cents IS 'Proposed budget in cents (e.g., $2500 = 250000)';
+COMMENT ON COLUMN proposals.answers IS 'JSONB array: [{"question": "What is your experience?", "answer": "5 years with React"}]';
+COMMENT ON COLUMN proposals.attachments IS 'Text array of attachment URLs';
+COMMENT ON COLUMN proposals.portfolio_links IS 'Text array of portfolio URLs';

@@ -1,5 +1,7 @@
 package com.designer.marketplace.dto;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -29,6 +31,10 @@ public class UserDto {
     private String portfolioUrl;
     private Boolean emailVerified;
     private Boolean isActive;
-    private Double ratingAvg;
+    private BigDecimal ratingAvg;
     private Integer ratingCount;
+    private Boolean identityVerified;
+    private LocalDateTime identityVerifiedAt;
+    private String verificationStatus;
+    private LocalDateTime deletedAt;
 }

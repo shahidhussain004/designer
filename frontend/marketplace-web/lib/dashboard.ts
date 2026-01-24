@@ -106,7 +106,7 @@ export const dashboardService = {
    * Get company dashboard data
    */
   async getCompanyDashboard(): Promise<CompanyDashboard> {
-    const response = await apiClient.get<CompanyDashboard>('/dashboard/company');
+    const response = await apiClient.get<CompanyDashboard>('/dashboards/company');
     return response.data;
   },
 
@@ -114,7 +114,7 @@ export const dashboardService = {
    * Get freelancer dashboard data
    */
   async getFreelancerDashboard(): Promise<FreelancerDashboard> {
-    const response = await apiClient.get<FreelancerDashboard>('/dashboard/freelancer');
+    const response = await apiClient.get<FreelancerDashboard>('/dashboards/freelancer');
     return response.data;
   },
 

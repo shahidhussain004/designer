@@ -1,6 +1,7 @@
 -- =====================================================
 -- V6: Create Project Categories Reference Table
 -- Description: Categories for freelance/gig project postings
+-- OPTIMIZED: Added partial indexes, better constraints
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS project_categories (
@@ -9,16 +10,23 @@ CREATE TABLE IF NOT EXISTS project_categories (
     slug VARCHAR(50) NOT NULL UNIQUE,
     description TEXT,
     icon VARCHAR(50),
-    display_order INTEGER DEFAULT 0,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    display_order INTEGER DEFAULT 0 NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE NOT NULL,
+    created_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    
+    -- Constraints
+    CONSTRAINT project_categories_display_order_check CHECK (display_order >= 0)
 );
 
--- Create indexes for fast lookups
-CREATE INDEX IF NOT EXISTS idx_project_categories_slug ON project_categories(slug);
-CREATE INDEX IF NOT EXISTS idx_project_categories_is_active ON project_categories(is_active);
-CREATE INDEX IF NOT EXISTS idx_project_categories_display_order ON project_categories(display_order);
+-- Indexes (partial indexes for active records)
+CREATE UNIQUE INDEX idx_project_categories_slug_active ON project_categories(slug) WHERE is_active = TRUE;
+CREATE INDEX idx_project_categories_display_order ON project_categories(display_order) WHERE is_active = TRUE;
+
+-- Full-text search
+CREATE INDEX idx_project_categories_search ON project_categories USING GIN(
+    to_tsvector('english', name || ' ' || COALESCE(description, ''))
+) WHERE is_active = TRUE;
 
 -- Insert default project categories
 INSERT INTO project_categories (name, slug, description, icon, display_order) VALUES
@@ -34,19 +42,11 @@ INSERT INTO project_categories (name, slug, description, icon, display_order) VA
 ('Other', 'other', 'Other types of projects', 'folder', 10)
 ON CONFLICT (name) DO NOTHING;
 
--- Create trigger for updated_at
-CREATE OR REPLACE FUNCTION update_project_categories_updated_at()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = CURRENT_TIMESTAMP;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_project_categories_updated_at
-BEFORE UPDATE ON project_categories
-FOR EACH ROW
-EXECUTE FUNCTION update_project_categories_updated_at();
+-- Trigger for updated_at
+CREATE TRIGGER project_categories_updated_at 
+    BEFORE UPDATE ON project_categories 
+    FOR EACH ROW 
+    EXECUTE FUNCTION update_timestamp();
 
 COMMENT ON TABLE project_categories IS 'Categories for freelance/gig project postings';
 COMMENT ON COLUMN project_categories.slug IS 'URL-friendly identifier for the project category';

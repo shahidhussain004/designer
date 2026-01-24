@@ -19,22 +19,26 @@ public interface PortfolioItemRepository extends JpaRepository<PortfolioItem, Lo
     /**
      * Find all visible portfolio items for a user, ordered by display order
      */
-    List<PortfolioItem> findByUserIdAndIsVisibleOrderByDisplayOrderAsc(Long userId, Boolean isVisible);
+    @Query("SELECT p FROM PortfolioItem p WHERE p.freelancer.id = :userId AND p.isVisible = :isVisible ORDER BY p.displayOrder ASC")
+    List<PortfolioItem> findByUserIdAndIsVisibleOrderByDisplayOrderAsc(@Param("userId") Long userId, @Param("isVisible") Boolean isVisible);
 
     /**
      * Find all portfolio items for a user (regardless of visibility)
      */
-    List<PortfolioItem> findByUserIdOrderByDisplayOrderAsc(Long userId);
+    @Query("SELECT p FROM PortfolioItem p WHERE p.freelancer.id = :userId ORDER BY p.displayOrder ASC")
+    List<PortfolioItem> findByUserIdOrderByDisplayOrderAsc(@Param("userId") Long userId);
 
     /**
      * Find a specific portfolio item by ID and user ID
      */
-    PortfolioItem findByIdAndUserId(Long id, Long userId);
+    @Query("SELECT p FROM PortfolioItem p WHERE p.id = :id AND p.freelancer.id = :userId")
+    PortfolioItem findByIdAndUserId(@Param("id") Long id, @Param("userId") Long userId);
 
     /**
      * Count portfolio items for a user
      */
-    Long countByUserIdAndIsVisible(Long userId, Boolean isVisible);
+    @Query("SELECT COUNT(p) FROM PortfolioItem p WHERE p.freelancer.id = :userId AND p.isVisible = :isVisible")
+    Long countByUserIdAndIsVisible(@Param("userId") Long userId, @Param("isVisible") Boolean isVisible);
 
     /**
      * Update display order for a portfolio item
@@ -46,5 +50,7 @@ public interface PortfolioItemRepository extends JpaRepository<PortfolioItem, Lo
     /**
      * Delete all portfolio items for a user
      */
-    void deleteByUserId(Long userId);
+    @Modifying
+    @Query("DELETE FROM PortfolioItem p WHERE p.freelancer.id = :userId")
+    void deleteByUserId(@Param("userId") Long userId);
 }

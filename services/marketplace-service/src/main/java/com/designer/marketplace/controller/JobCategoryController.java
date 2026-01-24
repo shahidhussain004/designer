@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
  * REST controller for job categories
  */
 @RestController
-@RequestMapping("/api/job-categories")
+@RequestMapping("/job-categories")
 @RequiredArgsConstructor
 public class JobCategoryController {
 

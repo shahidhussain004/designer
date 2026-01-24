@@ -9,10 +9,12 @@ import com.designer.marketplace.dto.CreateProjectRequest;
 import com.designer.marketplace.dto.ProjectResponse;
 import com.designer.marketplace.dto.UpdateProjectRequest;
 import com.designer.marketplace.entity.Company;
+import com.designer.marketplace.entity.ExperienceLevel;
 import com.designer.marketplace.entity.Project;
 import com.designer.marketplace.entity.User;
 import com.designer.marketplace.repository.CompanyRepository;
 import com.designer.marketplace.repository.ProjectRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +30,7 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final UserService userService;
     private final ProjectCategoryService categoryService;
+    private final ObjectMapper objectMapper;
     private final ExperienceLevelService experienceLevelService;
     private final CompanyRepository companyRepository;
 
@@ -41,8 +44,18 @@ public class ProjectService {
             return searchProjects(search, pageable);
         }
 
+        String experienceLevelCode = null;
+        if (experienceLevelId != null) {
+            ExperienceLevel level = experienceLevelService.getExperienceLevelEntityById(experienceLevelId);
+            experienceLevelCode = level.getCode();
+        }
+
+        // Convert budget from dollars to cents for database query
+        Long minBudgetCents = minBudget != null ? (long)(minBudget * 100) : null;
+        Long maxBudgetCents = maxBudget != null ? (long)(maxBudget * 100) : null;
+
         Project.ProjectStatus status = Project.ProjectStatus.OPEN;
-        Page<Project> projects = projectRepository.findByFilters(status, categoryId, experienceLevelId, minBudget, maxBudget, pageable);
+        Page<Project> projects = projectRepository.findByFilters(status, categoryId, experienceLevelCode, minBudgetCents, maxBudgetCents, pageable);
         return projects.map(ProjectResponse::fromEntity);
     }
 
@@ -52,8 +65,8 @@ public class ProjectService {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Project not found with id: " + id));
 
-        Integer currentViewCount = project.getViewCount();
-        project.setViewCount((currentViewCount != null ? currentViewCount : 0) + 1);
+        Integer currentViewsCount = project.getViewsCount();
+        project.setViewsCount((currentViewsCount != null ? currentViewsCount : 0) + 1);
         projectRepository.save(project);
 
         return ProjectResponse.fromEntity(project);
@@ -81,17 +94,23 @@ public class ProjectService {
             project.setProjectCategory(categoryService.getCategoryEntityById(request.getCategoryId()));
         }
         
-        project.setRequiredSkills(request.getRequiredSkills());
-        project.setBudget(request.getBudget());
+        if (request.getRequiredSkills() != null && !request.getRequiredSkills().isEmpty()) {
+            project.setRequiredSkills(objectMapper.valueToTree(request.getRequiredSkills()));
+        }
+        if (request.getBudget() != null) {
+            project.setBudgetMinCents((long)(request.getBudget() * 100));
+            project.setBudgetMaxCents((long)(request.getBudget() * 100));
+        }
 
         if (request.getBudgetType() != null) {
             project.setBudgetType(Project.BudgetType.valueOf(request.getBudgetType().toUpperCase()));
         }
 
-        project.setDuration(request.getDuration());
+        project.setEstimatedDurationDays(request.getDuration());
 
         if (request.getExperienceLevelId() != null) {
-            project.setExperienceLevelEntity(experienceLevelService.getExperienceLevelEntityById(request.getExperienceLevelId()));
+            ExperienceLevel level = experienceLevelService.getExperienceLevelEntityById(request.getExperienceLevelId());
+            project.setExperienceLevel(level.getCode());
         }
 
         if (request.getStatus() != null) {
@@ -101,7 +120,7 @@ public class ProjectService {
         }
 
         project.setIsFeatured(false);
-        project.setViewCount(0);
+        project.setViewsCount(0);
         project.setProposalCount(0);
 
         Project savedProject = projectRepository.save(project);
@@ -134,12 +153,13 @@ public class ProjectService {
             project.setProjectCategory(categoryService.getCategoryEntityById(request.getCategoryId()));
         }
 
-        if (request.getRequiredSkills() != null) {
-            project.setRequiredSkills(request.getRequiredSkills());
+        if (request.getRequiredSkills() != null && !request.getRequiredSkills().isEmpty()) {
+            project.setRequiredSkills(objectMapper.valueToTree(request.getRequiredSkills()));
         }
 
         if (request.getBudget() != null) {
-            project.setBudget(request.getBudget());
+            project.setBudgetMinCents((long)(request.getBudget() * 100));
+            project.setBudgetMaxCents((long)(request.getBudget() * 100));
         }
 
         if (request.getBudgetType() != null) {
@@ -147,11 +167,12 @@ public class ProjectService {
         }
 
         if (request.getDuration() != null) {
-            project.setDuration(request.getDuration());
+            project.setEstimatedDurationDays(request.getDuration());
         }
 
         if (request.getExperienceLevelId() != null) {
-            project.setExperienceLevelEntity(experienceLevelService.getExperienceLevelEntityById(request.getExperienceLevelId()));
+            ExperienceLevel level = experienceLevelService.getExperienceLevelEntityById(request.getExperienceLevelId());
+            project.setExperienceLevel(level.getCode());
         }
 
         if (request.getStatus() != null) {

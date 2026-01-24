@@ -133,6 +133,12 @@ public class AuthService {
                 .location(user.getLocation())
                 .emailVerified(user.getEmailVerified())
                 .isActive(user.getIsActive())
+                .ratingAvg(user.getRatingAvg())
+                .ratingCount(user.getRatingCount())
+                .identityVerified(user.getIdentityVerified())
+                .identityVerifiedAt(user.getIdentityVerifiedAt())
+                .verificationStatus(user.getVerificationStatus() != null ? user.getVerificationStatus().name() : null)
+                .deletedAt(user.getDeletedAt())
                 .build();
     }
 }

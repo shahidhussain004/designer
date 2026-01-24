@@ -10,27 +10,68 @@ interface Job {
   id: number;
   title: string;
   description: string;
-  companyName: string;
-  salary: number;
+  categoryId?: number;
+  categoryName?: string;
+  companyId?: number;
+  companyName?: string;
   jobType: string;
   location: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  isRemote?: boolean;
+  remoteType?: string;
+  salaryMinCents?: number;
+  salaryMaxCents?: number;
+  salaryCurrency?: string;
+  salaryPeriod?: string;
+  showSalary?: boolean;
   requirements?: string;
-  benefits?: string;
+  responsibilities?: string;
+  benefits?: string | Record<string, any>;
+  requiredSkills?: string | Record<string, any>;
+  preferredSkills?: string | Record<string, any>;
+  educationLevel?: string;
+  experienceLevel?: string;
+  applicationDeadline?: string;
+  startDate?: string;
+  positionsAvailable?: number;
+  visaSponsorship?: boolean;
   status: string;
-  companyId?: number;
+  viewsCount?: number;
+  applicationsCount?: number;
+  isFeatured?: boolean;
+  isUrgent?: boolean;
   createdAt: string;
   updatedAt: string;
+  publishedAt?: string;
+  closedAt?: string;
 }
 
 interface CreateJobInput {
   title: string;
   description: string;
-  companyName: string;
-  salary: number;
+  categoryId?: number;
+  companyName?: string;
   jobType: string;
   location: string;
-  requirements: string;
-  benefits: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  isRemote?: boolean;
+  remoteType?: string;
+  salaryMinCents?: number;
+  salaryMaxCents?: number;
+  salaryCurrency?: string;
+  salaryPeriod?: string;
+  showSalary?: boolean;
+  requirements?: string;
+  responsibilities?: string;
+  benefits?: string;
+  requiredSkills?: string;
+  preferredSkills?: string;
+  educationLevel?: string;
+  experienceLevel?: string;
 }
 
 type UpdateJobInput = Partial<CreateJobInput>
@@ -40,24 +81,25 @@ type UpdateJobInput = Partial<CreateJobInput>
 // ============================================================================
 
 /**
- * Fetch all jobs
+ * Fetch all jobs with optional company filter
  */
-export function useJobs() {
+export function useJobs(companyId?: string | number | null) {
   return useQuery({
-    queryKey: ['jobs'],
+    queryKey: ['jobs', companyId],
     queryFn: async ({ signal }) => {
       // Prefer the library helper `getJobs` (tests mock this). If it's not available
       // for any reason, fall back to using the axios `apiClient` so the app still works.
       try {
         if (typeof getJobs === 'function') {
-          const res = await getJobs({ page: 0, size: 10 });
+          const res = await getJobs({ page: 0, size: 10, companyId });
           return res.jobs;
         }
       } catch (err) {
         // swallow and fall back to apiClient below
       }
 
-      const { data } = await apiClient.get<Job[]>('/jobs', { signal });
+      const url = companyId ? `/jobs?companyId=${companyId}` : '/jobs';
+      const { data } = await apiClient.get<Job[]>(url, { signal });
       return Array.isArray(data) ? data : (data as any).content || [];
     },
     staleTime: 5 * 60 * 1000, // 5 minutes

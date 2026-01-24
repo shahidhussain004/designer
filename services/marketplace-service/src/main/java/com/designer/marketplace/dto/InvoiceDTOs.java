@@ -1,11 +1,10 @@
 package com.designer.marketplace.dto;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import com.designer.marketplace.entity.Invoice;
 import com.designer.marketplace.entity.Invoice.InvoiceStatus;
-import com.designer.marketplace.entity.Invoice.InvoiceType;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,41 +17,18 @@ public class InvoiceDTOs {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class InvoiceLineItem {
-        private String description;
-        private Long quantity;
-        private Long unitPrice;
-        private Long amount;
-    }
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class BillingInfo {
-        private String name;
-        private String email;
-        private String address;
-        private String city;
-        private String state;
-        private String postalCode;
-        private String country;
-        private String taxId;
-    }
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
     public static class CreateInvoiceRequest {
         private Long paymentId;
-        private Long milestoneId;
-        private InvoiceType invoiceType;
-        private List<InvoiceLineItem> lineItems;
+        private Long companyId;
+        private Long freelancerId;
+        private Long subtotalCents;
+        private Long platformFeeCents;
+        private Long taxAmountCents;
+        private Long totalCents;
+        private String currency;
         private String notes;
         private LocalDateTime dueDate;
-        private BillingInfo companyBillingInfo;
-        private BillingInfo freelancerBillingInfo;
+        private JsonNode lineItems;
     }
 
     @Data
@@ -60,11 +36,13 @@ public class InvoiceDTOs {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateInvoiceRequest {
-        private List<InvoiceLineItem> lineItems;
+        private Long subtotalCents;
+        private Long platformFeeCents;
+        private Long taxAmountCents;
+        private Long totalCents;
         private String notes;
         private LocalDateTime dueDate;
-        private BillingInfo companyBillingInfo;
-        private BillingInfo freelancerBillingInfo;
+        private JsonNode lineItems;
     }
 
     @Data
@@ -75,53 +53,40 @@ public class InvoiceDTOs {
         private Long id;
         private String invoiceNumber;
         private Long paymentId;
-        private Long milestoneId;
         private Long companyId;
         private String companyName;
-        private String companyEmail;
         private Long freelancerId;
         private String freelancerName;
-        private String freelancerEmail;
-        private Long projectId;
-        private String projectTitle;
-        private InvoiceType invoiceType;
-        private Long subtotal;
-        private Long platformFee;
-        private Long taxAmount;
-        private Long total;
+        private Long subtotalCents;
+        private Long platformFeeCents;
+        private Long taxAmountCents;
+        private Long totalCents;
         private String currency;
         private InvoiceStatus status;
-        private List<InvoiceLineItem> lineItems;
+        private JsonNode lineItems;
         private String notes;
         private String pdfUrl;
         private LocalDateTime invoiceDate;
         private LocalDateTime dueDate;
         private LocalDateTime paidAt;
         private LocalDateTime createdAt;
-        private BillingInfo companyBillingInfo;
-        private BillingInfo freelancerBillingInfo;
 
         public static InvoiceResponse fromEntity(Invoice invoice) {
             return InvoiceResponse.builder()
                     .id(invoice.getId())
                     .invoiceNumber(invoice.getInvoiceNumber())
-                    .paymentId(invoice.getPayment().getId())
-                    .milestoneId(invoice.getMilestone() != null ? invoice.getMilestone().getId() : null)
+                    .paymentId(invoice.getPayment() != null ? invoice.getPayment().getId() : null)
                     .companyId(invoice.getCompany().getId())
-                    .companyName(invoice.getCompany().getFullName())
-                    .companyEmail(invoice.getCompany().getEmail())
+                    .companyName(invoice.getCompany().getCompanyName())
                     .freelancerId(invoice.getFreelancer().getId())
-                    .freelancerName(invoice.getFreelancer().getFullName())
-                    .freelancerEmail(invoice.getFreelancer().getEmail())
-                    .projectId(invoice.getProject().getId())
-                    .projectTitle(invoice.getProject().getTitle())
-                    .invoiceType(invoice.getInvoiceType())
-                    .subtotal(invoice.getSubtotal())
-                    .platformFee(invoice.getPlatformFee())
-                    .taxAmount(invoice.getTaxAmount())
-                    .total(invoice.getTotal())
+                    .freelancerName(invoice.getFreelancer().getUser().getFullName())
+                    .subtotalCents(invoice.getSubtotalCents())
+                    .platformFeeCents(invoice.getPlatformFeeCents())
+                    .taxAmountCents(invoice.getTaxAmountCents())
+                    .totalCents(invoice.getTotalCents())
                     .currency(invoice.getCurrency())
                     .status(invoice.getStatus())
+                    .lineItems(invoice.getLineItems())
                     .notes(invoice.getNotes())
                     .pdfUrl(invoice.getPdfUrl())
                     .invoiceDate(invoice.getInvoiceDate())

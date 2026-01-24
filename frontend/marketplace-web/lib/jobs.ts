@@ -34,6 +34,7 @@ export type JobsResponse = {
 type GetJobsOptions = {
   page?: number;
   size?: number;
+  companyId?: string | number | null;
 };
 
 // API response can be either Spring Data Page format or legacy format
@@ -116,25 +117,15 @@ function normalizeJobItems(items: unknown[]): JobItem[] {
 /**
  * Fetches data from API using either fetch or axios
  */
-async function fetchFromApi(page: number, size: number): Promise<ApiResponse> {
-  // Prefer global fetch (easier to mock in tests)
-  if (typeof fetch !== 'undefined') {
-    const baseUrl = apiClient.defaults.baseURL || '';
-    const url = `${baseUrl}/jobs?page=${page}&pageSize=${size}`;
-    const response = await fetch(url);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-    
-    return await response.json();
+async function fetchFromApi(page: number, size: number, companyId?: string | number | null): Promise<ApiResponse> {
+  // Use axios client to ensure baseURL, headers and interceptors are applied
+  const params: Record<string, any> = { page, pageSize: size };
+  if (companyId !== undefined && companyId !== null && companyId !== '') {
+    params.companyId = companyId;
   }
 
-  // Fallback to axios
-  const response = await apiClient.get('/jobs', {
-    params: { page, pageSize: size },
-  });
-  
+  const response = await apiClient.get('/jobs', { params });
+
   return response.data || {};
 }
 
@@ -151,9 +142,10 @@ async function fetchFromApi(page: number, size: number): Promise<ApiResponse> {
 export async function getJobs(options?: GetJobsOptions): Promise<JobsResponse> {
   const page = options?.page ?? DEFAULT_PAGE;
   const size = options?.size ?? DEFAULT_SIZE;
+  const companyId = options?.companyId ?? null;
 
   try {
-    const apiResponse = await fetchFromApi(page, size);
+    const apiResponse = await fetchFromApi(page, size, companyId);
     const items = extractJobItems(apiResponse);
     const jobs = normalizeJobItems(items);
     const totalCount = extractTotalCount(apiResponse, jobs.length);

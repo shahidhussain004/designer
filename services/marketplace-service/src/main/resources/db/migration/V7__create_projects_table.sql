@@ -1,6 +1,7 @@
 -- =====================================================
 -- V7: Create Freelance Projects Table
 -- Description: Freelance/gig project postings by companies
+-- OPTIMIZED: json → jsonb, budget in cents, GIN indexes, partial indexes
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS projects (
@@ -12,94 +13,117 @@ CREATE TABLE IF NOT EXISTS projects (
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
     scope_of_work TEXT,
-    deliverables TEXT[],
+    deliverables TEXT[] DEFAULT '{}', -- Simple string array for deliverable items
     
-    -- Project Budget & Timeline
-    budget_min NUMERIC(12,2),
-    budget_max NUMERIC(12,2),
-    budget_type VARCHAR(50), -- HOURLY, FIXED_PRICE, NOT_SURE
-    currency VARCHAR(3) DEFAULT 'USD',
-    timeline VARCHAR(100), -- ASAP, 1-3_MONTHS, 3-6_MONTHS, 6_PLUS_MONTHS
-    estimated_duration VARCHAR(100),
+    -- Project Budget & Timeline (CHANGED: Store in cents)
+    budget_min_cents BIGINT,
+    budget_max_cents BIGINT,
+    budget_type VARCHAR(50) NOT NULL DEFAULT 'FIXED_PRICE',
+    currency VARCHAR(3) DEFAULT 'USD' NOT NULL,
+    timeline VARCHAR(100),
+    estimated_duration_days INTEGER,
     
-    -- Skills & Requirements
-    required_skills JSON DEFAULT '[]'::json,
-    preferred_skills JSON DEFAULT '[]'::json,
-    experience_level VARCHAR(50), -- ENTRY, INTERMEDIATE, SENIOR, LEAD, EXECUTIVE
+    -- Skills & Requirements (CHANGED: json → jsonb)
+    -- Format: [{"skill": "React", "level": "expert", "required": true, "years": 3}]
+    required_skills JSONB DEFAULT '[]'::jsonb NOT NULL,
+    preferred_skills JSONB DEFAULT '[]'::jsonb NOT NULL,
+    experience_level VARCHAR(50),
     
     -- Project Details
-    project_type VARCHAR(50), -- SINGLE_PROJECT, ONGOING, CONTRACT
-    priority_level VARCHAR(50), -- LOW, MEDIUM, HIGH, URGENT
-    is_featured BOOLEAN DEFAULT FALSE,
-    is_urgent BOOLEAN DEFAULT FALSE,
+    project_type VARCHAR(50) NOT NULL DEFAULT 'SINGLE_PROJECT',
+    priority_level VARCHAR(50) NOT NULL DEFAULT 'MEDIUM',
+    is_featured BOOLEAN DEFAULT FALSE NOT NULL,
+    is_urgent BOOLEAN DEFAULT FALSE NOT NULL,
     
     -- Status & Engagement
-    status VARCHAR(50) DEFAULT 'OPEN' NOT NULL,
-    visibility VARCHAR(50) DEFAULT 'PUBLIC', -- PUBLIC, PRIVATE, INVITE_ONLY
-    proposal_count INTEGER DEFAULT 0,
-    attachment_count INTEGER DEFAULT 0,
-    views_count INTEGER DEFAULT 0,
+    status VARCHAR(50) DEFAULT 'DRAFT' NOT NULL,
+    visibility VARCHAR(50) DEFAULT 'PUBLIC' NOT NULL,
+    proposal_count INTEGER DEFAULT 0 NOT NULL,
+    views_count INTEGER DEFAULT 0 NOT NULL,
     
-    -- Additional Fields (from V15)
-    budget NUMERIC(10,2),
-    experience_level_id BIGINT REFERENCES experience_levels(id) ON DELETE SET NULL,
-    duration INTEGER,
-    view_count INTEGER DEFAULT 0,
-    
-    -- Engagement & Communication
+    -- Engagement & Communication (CHANGED: json → jsonb)
+    -- Format: [{"question": "What is your experience with React?", "required": true}]
+    screening_questions JSONB DEFAULT '[]'::jsonb,
     apply_instructions TEXT,
-    screening_questions JSONB,
     
     -- Timestamps
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    published_at TIMESTAMP,
-    closed_at TIMESTAMP,
-    deleted_at TIMESTAMP,
+    created_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    published_at TIMESTAMP(6),
+    closed_at TIMESTAMP(6),
+    deleted_at TIMESTAMP(6),
     
     -- Constraints
-    CONSTRAINT chk_project_budget CHECK (budget_max IS NULL OR budget_min IS NULL OR budget_max >= budget_min),
-    CONSTRAINT chk_project_budget_type CHECK (budget_type IN ('HOURLY', 'FIXED_PRICE', 'NOT_SURE')),
-    CONSTRAINT chk_project_timeline CHECK (timeline IN ('ASAP', '1-3_MONTHS', '3-6_MONTHS', '6_PLUS_MONTHS')),
-    CONSTRAINT chk_project_status CHECK (status IN ('OPEN', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'ARCHIVED')),
-    CONSTRAINT chk_project_visibility CHECK (visibility IN ('PUBLIC', 'PRIVATE', 'INVITE_ONLY')),
-    CONSTRAINT chk_project_type CHECK (project_type IN ('SINGLE_PROJECT', 'ONGOING', 'CONTRACT')),
-    CONSTRAINT chk_priority_level CHECK (priority_level IN ('LOW', 'MEDIUM', 'HIGH', 'URGENT')),
-    CONSTRAINT chk_experience_level CHECK (experience_level IN ('ENTRY', 'INTERMEDIATE', 'SENIOR', 'LEAD', 'EXECUTIVE'))
+    CONSTRAINT projects_budget_check CHECK (budget_max_cents IS NULL OR budget_min_cents IS NULL OR budget_max_cents >= budget_min_cents),
+    CONSTRAINT projects_budget_type_check CHECK (budget_type IN ('HOURLY', 'FIXED_PRICE', 'NOT_SURE')),
+    CONSTRAINT projects_timeline_check CHECK (timeline IN ('ASAP', '1-3_MONTHS', '3-6_MONTHS', '6_PLUS_MONTHS')),
+    CONSTRAINT projects_status_check CHECK (status IN ('DRAFT', 'OPEN', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'ARCHIVED')),
+    CONSTRAINT projects_visibility_check CHECK (visibility IN ('PUBLIC', 'PRIVATE', 'INVITE_ONLY')),
+    CONSTRAINT projects_type_check CHECK (project_type IN ('SINGLE_PROJECT', 'ONGOING', 'CONTRACT')),
+    CONSTRAINT projects_priority_check CHECK (priority_level IN ('LOW', 'MEDIUM', 'HIGH', 'URGENT')),
+    CONSTRAINT projects_experience_check CHECK (experience_level IN ('ENTRY', 'INTERMEDIATE', 'SENIOR', 'LEAD', 'EXECUTIVE')),
+    CONSTRAINT projects_counters_check CHECK (proposal_count >= 0 AND views_count >= 0),
+    CONSTRAINT projects_duration_check CHECK (estimated_duration_days IS NULL OR estimated_duration_days > 0)
 );
 
--- Create indexes for performance
-CREATE INDEX IF NOT EXISTS idx_projects_company_id ON projects(company_id);
-CREATE INDEX IF NOT EXISTS idx_projects_category_id ON projects(category_id);
-CREATE INDEX IF NOT EXISTS idx_projects_status ON projects(status);
-CREATE INDEX IF NOT EXISTS idx_projects_budget_min_max ON projects(budget_min, budget_max);
-CREATE INDEX IF NOT EXISTS idx_projects_experience_level ON projects(experience_level);
-CREATE INDEX IF NOT EXISTS idx_projects_visibility ON projects(visibility);
-CREATE INDEX IF NOT EXISTS idx_projects_created_at ON projects(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_projects_is_featured ON projects(is_featured, status);
-CREATE INDEX IF NOT EXISTS idx_projects_title_desc ON projects USING GIN(to_tsvector('english', title || ' ' || COALESCE(description, '')));
-CREATE INDEX IF NOT EXISTS idx_projects_deleted_at ON projects(deleted_at);
-CREATE INDEX IF NOT EXISTS idx_projects_budget ON projects(budget);
-CREATE INDEX IF NOT EXISTS idx_projects_experience_level_id ON projects(experience_level_id);
-CREATE INDEX IF NOT EXISTS idx_projects_duration ON projects(duration);
-CREATE INDEX IF NOT EXISTS idx_projects_view_count ON projects(view_count);
+-- Performance indexes
+CREATE INDEX idx_projects_company_id ON projects(company_id) WHERE deleted_at IS NULL;
+CREATE INDEX idx_projects_category_id ON projects(category_id) WHERE deleted_at IS NULL;
 
--- Create trigger for updated_at
-CREATE OR REPLACE FUNCTION update_projects_updated_at()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = CURRENT_TIMESTAMP;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+-- Status-based partial indexes (most queries filter by status)
+CREATE INDEX idx_projects_open ON projects(created_at DESC, budget_min_cents, budget_max_cents) 
+    WHERE status = 'OPEN' AND visibility = 'PUBLIC' AND deleted_at IS NULL;
+CREATE INDEX idx_projects_featured ON projects(created_at DESC) 
+    WHERE is_featured = TRUE AND status = 'OPEN' AND deleted_at IS NULL;
 
-CREATE TRIGGER trg_projects_updated_at
-BEFORE UPDATE ON projects
-FOR EACH ROW
-EXECUTE FUNCTION update_projects_updated_at();
+-- Budget range queries
+CREATE INDEX idx_projects_budget_range ON projects(budget_min_cents, budget_max_cents, budget_type) 
+    WHERE budget_min_cents IS NOT NULL AND status = 'OPEN' AND deleted_at IS NULL;
+
+-- Experience level filtering
+CREATE INDEX idx_projects_experience ON projects(experience_level, created_at DESC) 
+    WHERE experience_level IS NOT NULL AND status = 'OPEN' AND deleted_at IS NULL;
+
+-- Project type and priority
+CREATE INDEX idx_projects_type_priority ON projects(project_type, priority_level, created_at DESC) 
+    WHERE status = 'OPEN' AND deleted_at IS NULL;
+
+-- CRITICAL: GIN indexes for JSONB skill matching
+CREATE INDEX idx_projects_required_skills_gin ON projects USING GIN(required_skills);
+CREATE INDEX idx_projects_preferred_skills_gin ON projects USING GIN(preferred_skills);
+CREATE INDEX idx_projects_screening_questions_gin ON projects USING GIN(screening_questions);
+
+-- Full-text search on title, description, and scope
+CREATE INDEX idx_projects_search ON projects USING GIN(
+    to_tsvector('english', title || ' ' || COALESCE(description, '') || ' ' || COALESCE(scope_of_work, ''))
+) WHERE deleted_at IS NULL;
+
+-- Composite index for company dashboard
+CREATE INDEX idx_projects_company_status ON projects(company_id, status, created_at DESC) WHERE deleted_at IS NULL;
+
+-- Public projects for browse page
+CREATE INDEX idx_projects_public_browse ON projects(created_at DESC) 
+    WHERE visibility = 'PUBLIC' AND status = 'OPEN' AND deleted_at IS NULL;
+
+-- Trigger for updated_at
+CREATE TRIGGER projects_updated_at 
+    BEFORE UPDATE ON projects 
+    FOR EACH ROW 
+    EXECUTE FUNCTION update_timestamp();
+
+-- Trigger to prevent negative counters (reuses function from jobs)
+CREATE TRIGGER projects_counter_check
+    BEFORE UPDATE ON projects
+    FOR EACH ROW
+    EXECUTE FUNCTION prevent_negative_counters();
 
 COMMENT ON TABLE projects IS 'Freelance and gig projects posted by companies';
 COMMENT ON COLUMN projects.budget_type IS 'Budget type: HOURLY (pay per hour), FIXED_PRICE (flat rate), NOT_SURE';
 COMMENT ON COLUMN projects.timeline IS 'Estimated project timeline for completion';
 COMMENT ON COLUMN projects.project_type IS 'Type: SINGLE_PROJECT (one-time), ONGOING (multiple milestones), CONTRACT (long-term)';
-COMMENT ON COLUMN projects.status IS 'Project status: OPEN (accepting proposals), IN_PROGRESS, COMPLETED, CANCELLED, ARCHIVED';
+COMMENT ON COLUMN projects.status IS 'Project status: DRAFT, OPEN (accepting proposals), IN_PROGRESS, COMPLETED, CANCELLED, ARCHIVED';
+COMMENT ON COLUMN projects.budget_min_cents IS 'Minimum budget in cents (e.g., $1000 = 100000)';
+COMMENT ON COLUMN projects.budget_max_cents IS 'Maximum budget in cents (e.g., $5000 = 500000)';
+COMMENT ON COLUMN projects.required_skills IS 'JSONB array: [{"skill": "React", "level": "expert", "required": true, "years": 3}]';
+COMMENT ON COLUMN projects.screening_questions IS 'JSONB array: [{"question": "What is your experience?", "required": true}]';
+COMMENT ON COLUMN projects.deliverables IS 'Text array of deliverable items';

@@ -1,6 +1,7 @@
 -- =====================================================
 -- V3: Create Job Categories Reference Table
 -- Description: Categories for traditional company job postings
+-- OPTIMIZED: Added partial indexes, better constraints
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS job_categories (
@@ -9,16 +10,23 @@ CREATE TABLE IF NOT EXISTS job_categories (
     slug VARCHAR(100) NOT NULL UNIQUE,
     description TEXT,
     icon VARCHAR(50),
-    display_order INTEGER DEFAULT 0,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    display_order INTEGER DEFAULT 0 NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE NOT NULL,
+    created_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    
+    -- Constraints
+    CONSTRAINT job_categories_display_order_check CHECK (display_order >= 0)
 );
 
--- Create indexes for fast lookups
-CREATE INDEX IF NOT EXISTS idx_job_categories_slug ON job_categories(slug);
-CREATE INDEX IF NOT EXISTS idx_job_categories_is_active ON job_categories(is_active);
-CREATE INDEX IF NOT EXISTS idx_job_categories_display_order ON job_categories(display_order);
+-- Indexes (partial indexes for active records only)
+CREATE UNIQUE INDEX idx_job_categories_slug_active ON job_categories(slug) WHERE is_active = TRUE;
+CREATE INDEX idx_job_categories_display_order ON job_categories(display_order) WHERE is_active = TRUE;
+
+-- Full-text search on name and description
+CREATE INDEX idx_job_categories_search ON job_categories USING GIN(
+    to_tsvector('english', name || ' ' || COALESCE(description, ''))
+) WHERE is_active = TRUE;
 
 -- Insert default job categories
 INSERT INTO job_categories (name, slug, description, icon, display_order) VALUES
@@ -34,19 +42,11 @@ INSERT INTO job_categories (name, slug, description, icon, display_order) VALUES
 ('Customer Support', 'customer-support', 'Customer service, support specialists, success managers', 'headphones', 10)
 ON CONFLICT (name) DO NOTHING;
 
--- Create trigger for updated_at
-CREATE OR REPLACE FUNCTION update_job_categories_updated_at()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = CURRENT_TIMESTAMP;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_job_categories_updated_at
-BEFORE UPDATE ON job_categories
-FOR EACH ROW
-EXECUTE FUNCTION update_job_categories_updated_at();
+-- Trigger for updated_at
+CREATE TRIGGER job_categories_updated_at 
+    BEFORE UPDATE ON job_categories 
+    FOR EACH ROW 
+    EXECUTE FUNCTION update_timestamp();
 
 COMMENT ON TABLE job_categories IS 'Categories for traditional company job postings';
 COMMENT ON COLUMN job_categories.slug IS 'URL-friendly identifier for the category';

@@ -9,7 +9,9 @@ import {
   categoryRoutes,
   commentRoutes,
   contentRoutes,
+  coursesRoutes,
   mediaRoutes,
+  resourcesRoutes,
   searchRoutes,
   tagRoutes,
   tutorialsRoutes,
@@ -78,6 +80,8 @@ export async function buildApp(): Promise<FastifyInstance> {
       await api.register(searchRoutes, { prefix: '/search' });
       await api.register(analyticsRoutes, { prefix: '/analytics' });
       await api.register(tutorialsRoutes, { prefix: '/tutorials' });
+      await api.register(coursesRoutes, { prefix: '/courses' });
+      await api.register(resourcesRoutes, { prefix: '/resources' });
     },
     { prefix: '/api/v1' }
   );

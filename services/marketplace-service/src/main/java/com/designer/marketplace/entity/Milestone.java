@@ -2,18 +2,23 @@ package com.designer.marketplace.entity;
 
 import java.time.LocalDateTime;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,11 +26,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Milestone entity for breaking down jobs into smaller deliverables with
- * separate payments.
+ * Milestone entity - Breaking down contracts into smaller deliverables with separate payments
+ * Maps to 'milestones' table in PostgreSQL
  */
 @Entity
-@Table(name = "milestones")
+@Table(name = "milestones", indexes = {
+        @Index(name = "idx_milestones_contract_id", columnList = "contract_id"),
+        @Index(name = "idx_milestones_status", columnList = "status"),
+        @Index(name = "idx_milestones_created_at", columnList = "created_at")
+})
+@EntityListeners(AuditingEntityListener.class)
 @Data
 @Builder
 @NoArgsConstructor
@@ -37,64 +47,40 @@ public class Milestone {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id", nullable = false)
-    private Project project;
+    @JoinColumn(name = "contract_id", nullable = false)
+    private Contract contract;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "proposal_id")
-    private Proposal proposal;
-
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String title;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "sequence_order", nullable = false)
+    @Column(name = "sequence_order")
     private Integer sequenceOrder;
 
-    /**
-     * Amount for this milestone in cents
-     */
-    @Column(nullable = false)
-    private Long amount;
+    @Column(name = "amount_cents", nullable = false)
+    private Long amountCents;
 
     @Column(length = 3)
-    @Builder.Default
     private String currency = "USD";
 
-    /**
-     * Expected completion date
-     */
     @Column(name = "due_date")
     private LocalDateTime dueDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 50)
-    @Builder.Default
-    private MilestoneStatus status = MilestoneStatus.PENDING;
+    @Column(name = "status", length = 50)
+    private MilestoneStatus status;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_id")
     private Payment payment;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "escrow_id")
-    private Escrow escrow;
 
     @Column(name = "deliverables", columnDefinition = "TEXT")
     private String deliverables;
 
     @Column(name = "revision_notes", columnDefinition = "TEXT")
     private String revisionNotes;
-
-    @Column(name = "created_at")
-    @Builder.Default
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    @Column(name = "updated_at")
-    @Builder.Default
-    private LocalDateTime updatedAt = LocalDateTime.now();
 
     @Column(name = "started_at")
     private LocalDateTime startedAt;
@@ -105,19 +91,22 @@ public class Milestone {
     @Column(name = "approved_at")
     private LocalDateTime approvedAt;
 
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     public enum MilestoneStatus {
-        PENDING, // Not started, awaiting funding
-        FUNDED, // Company has funded the milestone
-        IN_PROGRESS, // Freelancer is working on it
-        SUBMITTED, // Freelancer submitted deliverables for review
-        REVISION_REQUESTED, // Company requested changes
-        APPROVED, // Company approved, funds released
-        CANCELLED, // Milestone cancelled
-        DISPUTED // Under dispute resolution
+        PENDING,
+        FUNDED,
+        IN_PROGRESS,
+        SUBMITTED,
+        REVISION_REQUESTED,
+        APPROVED,
+        CANCELLED,
+        DISPUTED
     }
 }

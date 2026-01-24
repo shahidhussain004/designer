@@ -258,7 +258,7 @@ export default function ContractsPage() {
 
                   <div className="flex md:flex-col gap-2">
                     <button
-                      onClick={() => (window.location.href = `/dashboard/contracts/${contract.id}`)}
+                      onClick={() => (window.location.href = `/dashboards/contracts/${contract.id}`)}
                       className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm"
                     >
                       View Details
@@ -266,13 +266,13 @@ export default function ContractsPage() {
                     {contract.status === 'ACTIVE' && (
                       <>
                         <button
-                          onClick={() => (window.location.href = `/dashboard/freelancer/time-tracking?contractId=${contract.id}`)}
+                          onClick={() => (window.location.href = `/dashboards/freelancer/time-tracking?contractId=${contract.id}`)}
                           className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm"
                         >
                           Log Time
                         </button>
                         <button
-                          onClick={() => (window.location.href = `/dashboard/freelancer/time-tracking?contractId=${contract.id}`)}
+                          onClick={() => (window.location.href = `/dashboards/freelancer/time-tracking?contractId=${contract.id}`)}
                           className="px-4 py-2 bg-white border border-gray-200 text-gray-800 rounded-lg hover:bg-gray-50 transition text-sm"
                         >
                           View Time Tracking

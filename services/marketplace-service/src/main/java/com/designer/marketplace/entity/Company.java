@@ -9,6 +9,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,16 +24,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Company entity - represents company profile data
+ * Company entity - Role-specific data for COMPANY users
  * Maps to 'companies' table in PostgreSQL
- * Linked to User via user_id foreign key
  */
 @Entity
 @Table(name = "companies", indexes = {
         @Index(name = "idx_companies_user_id", columnList = "user_id"),
-        @Index(name = "idx_companies_company_name", columnList = "company_name"),
-        @Index(name = "idx_companies_created_at", columnList = "created_at DESC"),
-        @Index(name = "idx_companies_industry", columnList = "industry")
+        @Index(name = "idx_companies_industry", columnList = "industry"),
+        @Index(name = "idx_companies_size", columnList = "company_size"),
+        @Index(name = "idx_companies_created_at", columnList = "created_at")
 })
 @EntityListeners(AuditingEntityListener.class)
 @Data
@@ -47,26 +48,22 @@ public class Company {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @Column(name = "company_name", nullable = false, length = 255)
+    // Company Details
+    @Column(name = "company_name", nullable = false)
     private String companyName;
 
     @Column(name = "company_type", length = 100)
     private String companyType;
 
-    @Column(name = "industry", length = 100)
+    @Column(length = 100)
     private String industry;
 
     @Column(name = "website_url", length = 500)
     private String websiteUrl;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "company_size", length = 50)
-    private String companySize;
-
-    @Column(name = "phone", length = 20)
-    private String phone;
-
-    @Column(name = "headquarters_location", length = 255)
-    private String headquartersLocation;
+    private CompanySize companySize;
 
     @Column(name = "registration_number", length = 100)
     private String registrationNumber;
@@ -74,14 +71,9 @@ public class Company {
     @Column(name = "tax_id", length = 100)
     private String taxId;
 
-    @Column(name = "rating_avg", columnDefinition = "NUMERIC(3,1)")
-    private Double ratingAvg = 0.0;
-
-    @Column(name = "rating_count")
-    private Integer ratingCount = 0;
-
-    @Column(name = "total_projects_posted")
-    private Integer totalProjectsPosted = 0;
+    // Company Contact
+    @Column(name = "phone", length = 20)
+    private String phone;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)

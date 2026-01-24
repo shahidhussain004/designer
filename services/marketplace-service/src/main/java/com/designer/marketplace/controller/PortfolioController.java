@@ -24,6 +24,14 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * REST Controller for Portfolio operations
+ * 
+ * Endpoints:
+ * - GET /api/users/{userId}/portfolio-items - Get user's portfolio items
+ * - GET /api/portfolio-items/{itemId} - Get portfolio item by ID
+ * - POST /api/portfolio-items - Create portfolio item
+ * - PUT /api/portfolio-items/{itemId} - Update portfolio item
+ * - DELETE /api/portfolio-items/{itemId} - Delete portfolio item
+ * - PATCH /api/portfolio-items/reorder - Reorder portfolio items
  */
 @RestController
 @RequestMapping("/api")
@@ -33,7 +41,7 @@ public class PortfolioController {
     private final PortfolioService portfolioService;
     private final UserService userService;
 
-    @GetMapping("/users/{userId}/portfolio")
+    @GetMapping("/users/{userId}/portfolio-items")
     public ResponseEntity<List<PortfolioItem>> getUserPortfolio(@PathVariable Long userId) {
         Long requesterId = null;
         try {
@@ -47,7 +55,7 @@ public class PortfolioController {
         return ResponseEntity.ok(portfolio);
     }
 
-    @PostMapping("/portfolio")
+    @PostMapping("/portfolio-items")
     public ResponseEntity<PortfolioItem> createPortfolioItem(
             @RequestParam Long userId,
             @RequestBody PortfolioItem portfolioItem) {
@@ -55,7 +63,7 @@ public class PortfolioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @PutMapping("/portfolio/{itemId}")
+    @PutMapping("/portfolio-items/{itemId}")
     public ResponseEntity<PortfolioItem> updatePortfolioItem(
             @PathVariable Long itemId,
             @RequestParam Long userId,
@@ -64,7 +72,7 @@ public class PortfolioController {
         return ResponseEntity.ok(updated);
     }
 
-    @DeleteMapping("/portfolio/{itemId}")
+    @DeleteMapping("/portfolio-items/{itemId}")
     public ResponseEntity<Void> deletePortfolioItem(
             @PathVariable Long itemId,
             @RequestParam Long userId) {
@@ -72,7 +80,7 @@ public class PortfolioController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/portfolio/reorder")
+    @PatchMapping("/portfolio-items/reorder")
     public ResponseEntity<Void> reorderPortfolioItems(
             @RequestParam Long userId,
             @RequestBody Map<String, List<Long>> request) {
@@ -81,7 +89,7 @@ public class PortfolioController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/portfolio/{itemId}")
+    @GetMapping("/portfolio-items/{itemId}")
     public ResponseEntity<PortfolioItem> getPortfolioItem(@PathVariable Long itemId) {
         PortfolioItem item = portfolioService.getPortfolioItem(itemId);
         return ResponseEntity.ok(item);

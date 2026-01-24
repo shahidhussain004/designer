@@ -1,15 +1,15 @@
 package com.designer.marketplace.entity;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,20 +29,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Job entity - represents company job opportunities
+ * Job entity - Traditional company job opportunities (full-time, part-time, contract)
  * Maps to 'jobs' table in PostgreSQL
- * This is for full-time/part-time/contract positions - NOT freelance projects
+ * This is for company employment positions - NOT freelance projects
  */
 @Entity
 @Table(name = "jobs", indexes = {
-        @Index(name = "idx_jobs_company", columnList = "company_id"),
-        @Index(name = "idx_jobs_category", columnList = "category_id"),
+        @Index(name = "idx_jobs_company_id", columnList = "company_id"),
+        @Index(name = "idx_jobs_category_id", columnList = "category_id"),
         @Index(name = "idx_jobs_status", columnList = "status"),
         @Index(name = "idx_jobs_job_type", columnList = "job_type"),
-        @Index(name = "idx_jobs_location", columnList = "location"),
         @Index(name = "idx_jobs_is_remote", columnList = "is_remote"),
-        @Index(name = "idx_jobs_created", columnList = "created_at"),
-        @Index(name = "idx_jobs_published", columnList = "published_at")
+        @Index(name = "idx_jobs_created_at", columnList = "created_at")
 })
 @EntityListeners(AuditingEntityListener.class)
 @Data
@@ -62,8 +60,7 @@ public class Job {
     @JoinColumn(name = "category_id")
     private JobCategory category;
 
-    // Basic job information
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String title;
 
     @Column(nullable = false, columnDefinition = "TEXT")
@@ -75,26 +72,24 @@ public class Job {
     @Column(columnDefinition = "TEXT")
     private String requirements;
 
-    // Job details
     @Enumerated(EnumType.STRING)
     @Column(name = "job_type", nullable = false, length = 50)
-    private JobType jobType = JobType.FULL_TIME;
+    private JobType jobType;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "experience_level", length = 50)
-    private ExperienceLevel experienceLevel = ExperienceLevel.INTERMEDIATE;
+    private ExperienceLevel experienceLevel;
 
-    // Location
-    @Column
+    @Column(length = 255)
     private String location;
 
-    @Column
+    @Column(length = 100)
     private String city;
 
-    @Column
+    @Column(length = 100)
     private String state;
 
-    @Column
+    @Column(length = 100)
     private String country;
 
     @Column(name = "is_remote")
@@ -104,54 +99,50 @@ public class Job {
     @Column(name = "remote_type", length = 50)
     private RemoteType remoteType;
 
-    // Compensation
-    @Column(name = "salary_min", precision = 12, scale = 2)
-    private BigDecimal salaryMin;
+    @Column(name = "salary_min_cents")
+    private Long salaryMinCents;
 
-    @Column(name = "salary_max", precision = 12, scale = 2)
-    private BigDecimal salaryMax;
+    @Column(name = "salary_max_cents")
+    private Long salaryMaxCents;
 
     @Column(name = "salary_currency", length = 3)
     private String salaryCurrency = "USD";
 
     @Enumerated(EnumType.STRING)
     @Column(name = "salary_period", length = 20)
-    private SalaryPeriod salaryPeriod = SalaryPeriod.ANNUAL;
+    private SalaryPeriod salaryPeriod;
 
     @Column(name = "show_salary")
     private Boolean showSalary = true;
 
-    // Benefits and perks
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "json")
-    private List<String> benefits;
+    @Column(name = "benefits", columnDefinition = "jsonb")
+    private JsonNode benefits;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "json")
-    private List<String> perks;
-
-    // Skills and qualifications
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "required_skills", columnDefinition = "json")
-    private List<String> requiredSkills;
+    @Column(name = "perks", columnDefinition = "jsonb")
+    private JsonNode perks;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "preferred_skills", columnDefinition = "json")
-    private List<String> preferredSkills;
+    @Column(name = "required_skills", columnDefinition = "jsonb")
+    private JsonNode requiredSkills;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "preferred_skills", columnDefinition = "jsonb")
+    private JsonNode preferredSkills;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "education_level", length = 50)
     private EducationLevel educationLevel;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "json")
-    private List<String> certifications;
+    @Column(name = "certifications", columnDefinition = "jsonb")
+    private JsonNode certifications;
 
-    // Application details
     @Column(name = "application_deadline")
     private LocalDateTime applicationDeadline;
 
-    @Column(name = "application_email")
+    @Column(name = "application_email", length = 255)
     private String applicationEmail;
 
     @Column(name = "application_url", columnDefinition = "TEXT")
@@ -160,27 +151,6 @@ public class Job {
     @Column(name = "apply_instructions", columnDefinition = "TEXT")
     private String applyInstructions;
 
-    // Company information
-    @Column(name = "company_name")
-    private String companyName;
-
-    @Column(name = "company_description", columnDefinition = "TEXT")
-    private String companyDescription;
-
-    @Column(name = "company_logo_url", columnDefinition = "TEXT")
-    private String companyLogoUrl;
-
-    @Column(name = "company_website", columnDefinition = "TEXT")
-    private String companyWebsite;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "company_size", length = 50)
-    private CompanySize companySize;
-
-    @Column
-    private String industry;
-
-    // Company details
     @Column(name = "start_date")
     private LocalDate startDate;
 
@@ -197,10 +167,9 @@ public class Job {
     @Column(name = "visa_sponsorship")
     private Boolean visaSponsorship = false;
 
-    // Status and tracking
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private JobStatus status = JobStatus.OPEN;
+    @Column(name = "status", nullable = false, length = 50)
+    private JobStatus status;
 
     @Column(name = "views_count")
     private Integer viewsCount = 0;
@@ -214,7 +183,6 @@ public class Job {
     @Column(name = "is_urgent")
     private Boolean isUrgent = false;
 
-    // Timestamps
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -232,7 +200,6 @@ public class Job {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    // Enums
     public enum JobType {
         FULL_TIME,
         PART_TIME,
@@ -269,14 +236,6 @@ public class Job {
         BACHELOR,
         MASTER,
         PHD
-    }
-
-    public enum CompanySize {
-        STARTUP,
-        SMALL,
-        MEDIUM,
-        LARGE,
-        ENTERPRISE
     }
 
     public enum TravelRequirement {

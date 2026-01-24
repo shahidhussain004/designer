@@ -1,6 +1,6 @@
 package com.designer.marketplace.dto;
 
-import java.util.Map;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -22,25 +22,28 @@ public class CreateJobApplicationRequest {
     private Long jobId;
 
     @NotBlank(message = "Full name is required")
-    @Size(max = 255, message = "Full name must not exceed 255 characters")
+    @Size(min = 2, max = 255, message = "Full name must be between 2 and 255 characters")
     private String fullName;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Email must be valid")
+    @Size(max = 255, message = "Email must not exceed 255 characters")
     private String email;
 
-    @NotBlank(message = "Phone is required")
     @Size(max = 20, message = "Phone must not exceed 20 characters")
     private String phone;
 
-    private String resumeUrl;
-
     private String coverLetter;
+
+    private String resumeUrl;
 
     private String portfolioUrl;
 
     private String linkedinUrl;
 
-    // Custom answers to job-specific questions
-    private Map<String, Object> answers;
+    // Additional documents (array of URLs/paths)
+    private String[] additionalDocuments;
+
+    // Custom answers to job-specific screening questions (JSONB)
+    private JsonNode answers;
 }

@@ -1,6 +1,7 @@
 -- =====================================================
 -- V14: Create Portfolio & Time Tracking Tables
 -- Description: Portfolio management and time tracking for hourly contracts
+-- OPTIMIZED: json → jsonb, GIN indexes, materialized view for summaries
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS portfolio_items (
@@ -11,10 +12,11 @@ CREATE TABLE IF NOT EXISTS portfolio_items (
     title VARCHAR(255) NOT NULL,
     description TEXT,
     
-    -- Media & Links
+    -- Media & Links (CHANGED: json → jsonb)
     image_url TEXT,
     thumbnail_url TEXT,
-    images JSON DEFAULT '[]'::json, -- Array of image URLs
+    -- Format: [{"url": "https://...", "caption": "Screenshot 1", "order": 1}]
+    images JSONB DEFAULT '[]'::jsonb NOT NULL,
     
     -- External Links
     project_url TEXT,
@@ -22,30 +24,51 @@ CREATE TABLE IF NOT EXISTS portfolio_items (
     live_url TEXT,
     source_url TEXT,
     
-    -- Metadata
-    skills_demonstrated JSON DEFAULT '[]'::json,
-    tools_used JSON DEFAULT '[]'::json,
-    technologies JSON DEFAULT '[]'::json,
+    -- Metadata (CHANGED: json → jsonb)
+    -- Format: ["React", "Node.js", "PostgreSQL"]
+    skills_demonstrated JSONB DEFAULT '[]'::jsonb NOT NULL,
+    tools_used JSONB DEFAULT '[]'::jsonb NOT NULL,
+    technologies JSONB DEFAULT '[]'::jsonb NOT NULL,
     project_category VARCHAR(100),
     start_date DATE,
     end_date DATE,
     
     -- Display & Ordering
-    display_order INTEGER DEFAULT 0,
-    highlight_order INTEGER, -- For featured items
-    is_visible BOOLEAN DEFAULT TRUE,
+    display_order INTEGER DEFAULT 0 NOT NULL,
+    highlight_order INTEGER,
+    is_visible BOOLEAN DEFAULT TRUE NOT NULL,
     
     -- Timestamps
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP
+    created_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted_at TIMESTAMP(6),
+    
+    CONSTRAINT portfolio_display_order_check CHECK (display_order >= 0),
+    CONSTRAINT portfolio_dates_check CHECK (end_date IS NULL OR start_date IS NULL OR end_date >= start_date)
 );
 
--- Create indexes for portfolio_items
-CREATE INDEX IF NOT EXISTS idx_portfolio_items_user_id ON portfolio_items(user_id);
-CREATE INDEX IF NOT EXISTS idx_portfolio_items_is_visible ON portfolio_items(is_visible);
-CREATE INDEX IF NOT EXISTS idx_portfolio_items_created_at ON portfolio_items(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_portfolio_visible_order ON portfolio_items(is_visible, display_order);
+-- Indexes
+CREATE INDEX idx_portfolio_user_id ON portfolio_items(user_id) WHERE deleted_at IS NULL;
+CREATE INDEX idx_portfolio_category ON portfolio_items(project_category) WHERE project_category IS NOT NULL AND deleted_at IS NULL;
+CREATE INDEX idx_portfolio_created_at ON portfolio_items(created_at DESC) WHERE deleted_at IS NULL;
+
+-- Visible items ordered
+CREATE INDEX idx_portfolio_visible ON portfolio_items(user_id, is_visible, display_order) 
+    WHERE is_visible = TRUE AND deleted_at IS NULL;
+
+-- Featured items
+CREATE INDEX idx_portfolio_featured ON portfolio_items(user_id, highlight_order) 
+    WHERE highlight_order IS NOT NULL AND is_visible = TRUE AND deleted_at IS NULL;
+
+-- GIN indexes for skill/technology searching
+CREATE INDEX idx_portfolio_skills_gin ON portfolio_items USING GIN(skills_demonstrated);
+CREATE INDEX idx_portfolio_tools_gin ON portfolio_items USING GIN(tools_used);
+CREATE INDEX idx_portfolio_tech_gin ON portfolio_items USING GIN(technologies);
+
+-- Full-text search
+CREATE INDEX idx_portfolio_search ON portfolio_items USING GIN(
+    to_tsvector('english', title || ' ' || COALESCE(description, ''))
+) WHERE deleted_at IS NULL;
 
 CREATE TABLE IF NOT EXISTS time_entries (
     id BIGSERIAL PRIMARY KEY,
@@ -56,71 +79,110 @@ CREATE TABLE IF NOT EXISTS time_entries (
     date DATE NOT NULL,
     start_time TIME,
     end_time TIME,
-    hours_logged NUMERIC(10,2) NOT NULL,
+    hours_logged NUMERIC(5,2) NOT NULL,
     
     -- Description
     description TEXT,
     task_description TEXT,
-    work_diary JSONB, -- Detailed breakdown of work done
+    -- CHANGED: Structured work breakdown (json → jsonb)
+    -- Format: {"tasks": [{"task": "Implemented login", "hours": 3.5, "completed": true}], "notes": "..."}
+    work_diary JSONB DEFAULT '{}'::jsonb NOT NULL,
     
-    -- Screenshots & Proof of Work
-    screenshot_urls JSON DEFAULT '[]'::json,
-    file_attachments JSON DEFAULT '[]'::json,
+    -- Proof of Work (CHANGED: json → jsonb)
+    -- Format: [{"url": "https://...", "timestamp": "2024-01-15T10:30:00Z"}]
+    screenshot_urls JSONB DEFAULT '[]'::jsonb NOT NULL,
+    -- Format: [{"filename": "report.pdf", "url": "https://...", "size": 12345}]
+    file_attachments JSONB DEFAULT '[]'::jsonb NOT NULL,
     
     -- Status & Approval
-    status VARCHAR(50) DEFAULT 'SUBMITTED' NOT NULL, -- DRAFT, SUBMITTED, APPROVED, REJECTED
+    status VARCHAR(50) DEFAULT 'DRAFT' NOT NULL,
     approved_by BIGINT REFERENCES users(id) ON DELETE SET NULL,
     rejection_reason TEXT,
     
     -- Timestamps
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    approved_at TIMESTAMP,
+    created_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    approved_at TIMESTAMP(6),
     
     -- Constraints
-    CONSTRAINT chk_hours_logged CHECK (hours_logged > 0 AND hours_logged <= 24),
-    CONSTRAINT chk_time_status CHECK (status IN ('DRAFT', 'SUBMITTED', 'APPROVED', 'REJECTED')),
-    CONSTRAINT chk_time_times CHECK (start_time IS NULL OR end_time IS NULL OR end_time > start_time)
+    CONSTRAINT time_hours_check CHECK (hours_logged > 0 AND hours_logged <= 24),
+    CONSTRAINT time_status_check CHECK (status IN ('DRAFT', 'SUBMITTED', 'APPROVED', 'REJECTED')),
+    CONSTRAINT time_times_check CHECK (start_time IS NULL OR end_time IS NULL OR end_time > start_time),
+    CONSTRAINT time_approval_check CHECK (
+        (status = 'APPROVED' AND approved_by IS NOT NULL AND approved_at IS NOT NULL) OR
+        (status != 'APPROVED')
+    )
 );
 
--- Create indexes for time_entries
-CREATE INDEX IF NOT EXISTS idx_time_entries_contract_id ON time_entries(contract_id);
-CREATE INDEX IF NOT EXISTS idx_time_entries_freelancer_id ON time_entries(freelancer_id);
-CREATE INDEX IF NOT EXISTS idx_time_entries_date ON time_entries(date DESC);
-CREATE INDEX IF NOT EXISTS idx_time_entries_status ON time_entries(status);
-CREATE INDEX IF NOT EXISTS idx_time_entries_created_at ON time_entries(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_time_entries_contract_date ON time_entries(contract_id, date DESC);
+-- Indexes
+CREATE INDEX idx_time_contract_id ON time_entries(contract_id);
+CREATE INDEX idx_time_freelancer_id ON time_entries(freelancer_id);
+CREATE INDEX idx_time_date_desc ON time_entries(date DESC);
+CREATE INDEX idx_time_created_at ON time_entries(created_at DESC);
 
--- Create trigger for portfolio_items updated_at
-CREATE OR REPLACE FUNCTION update_portfolio_items_updated_at()
+-- Status-based queries
+CREATE INDEX idx_time_status ON time_entries(contract_id, status);
+CREATE INDEX idx_time_pending ON time_entries(contract_id, created_at DESC) WHERE status = 'SUBMITTED';
+
+-- Composite indexes
+CREATE INDEX idx_time_contract_date ON time_entries(contract_id, date DESC, status);
+CREATE INDEX idx_time_freelancer_date ON time_entries(freelancer_id, date DESC, status);
+
+-- Approved hours aggregation
+CREATE INDEX idx_time_approved_hours ON time_entries(contract_id, date, hours_logged) WHERE status = 'APPROVED';
+
+-- GIN indexes for JSONB
+CREATE INDEX idx_time_work_diary_gin ON time_entries USING GIN(work_diary);
+CREATE INDEX idx_time_screenshots_gin ON time_entries USING GIN(screenshot_urls);
+CREATE INDEX idx_time_attachments_gin ON time_entries USING GIN(file_attachments);
+
+-- Triggers
+CREATE TRIGGER portfolio_items_updated_at BEFORE UPDATE ON portfolio_items FOR EACH ROW EXECUTE FUNCTION update_timestamp();
+CREATE TRIGGER time_entries_updated_at BEFORE UPDATE ON time_entries FOR EACH ROW EXECUTE FUNCTION update_timestamp();
+
+-- Set approved_at timestamp when status changes to APPROVED
+CREATE OR REPLACE FUNCTION set_time_approval_timestamp()
 RETURNS TRIGGER AS $$
 BEGIN
-    NEW.updated_at = CURRENT_TIMESTAMP;
+    IF NEW.status = 'APPROVED' AND (OLD.status IS NULL OR OLD.status != 'APPROVED') THEN
+        NEW.approved_at = CURRENT_TIMESTAMP;
+    END IF;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trg_portfolio_items_updated_at
-BEFORE UPDATE ON portfolio_items
-FOR EACH ROW
-EXECUTE FUNCTION update_portfolio_items_updated_at();
+CREATE TRIGGER time_approval_timestamp
+    BEFORE UPDATE ON time_entries
+    FOR EACH ROW
+    EXECUTE FUNCTION set_time_approval_timestamp();
 
--- Create trigger for time_entries updated_at
-CREATE OR REPLACE FUNCTION update_time_entries_updated_at()
-RETURNS TRIGGER AS $$
+-- Materialized view for contract time summaries (performance optimization)
+CREATE MATERIALIZED VIEW IF NOT EXISTS contract_time_summary AS
+SELECT 
+    contract_id,
+    COUNT(*) as total_entries,
+    SUM(CASE WHEN status = 'APPROVED' THEN hours_logged ELSE 0 END) as approved_hours,
+    SUM(CASE WHEN status = 'SUBMITTED' THEN hours_logged ELSE 0 END) as pending_hours,
+    SUM(CASE WHEN status = 'REJECTED' THEN hours_logged ELSE 0 END) as rejected_hours,
+    MAX(date) as last_entry_date,
+    MIN(date) as first_entry_date
+FROM time_entries
+GROUP BY contract_id;
+
+CREATE UNIQUE INDEX idx_contract_time_summary ON contract_time_summary(contract_id);
+
+-- Function to refresh materialized view
+CREATE OR REPLACE FUNCTION refresh_contract_time_summary()
+RETURNS void AS $$
 BEGIN
-    NEW.updated_at = CURRENT_TIMESTAMP;
-    RETURN NEW;
+    REFRESH MATERIALIZED VIEW CONCURRENTLY contract_time_summary;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trg_time_entries_updated_at
-BEFORE UPDATE ON time_entries
-FOR EACH ROW
-EXECUTE FUNCTION update_time_entries_updated_at();
-
-COMMENT ON TABLE portfolio_items IS 'Freelancer portfolio showcasing past work and projects';
-COMMENT ON COLUMN portfolio_items.highlight_order IS 'Order for displaying featured items (lower = higher priority)';
-COMMENT ON TABLE time_entries IS 'Time logging for hourly contracts with approval workflow';
-COMMENT ON COLUMN time_entries.status IS 'Time entry status: DRAFT, SUBMITTED (waiting approval), APPROVED, REJECTED';
-COMMENT ON COLUMN time_entries.work_diary IS 'JSON object with detailed breakdown of work tasks completed during logged time';
+COMMENT ON TABLE portfolio_items IS 'Freelancer portfolio showcasing past work';
+COMMENT ON TABLE time_entries IS 'Hourly time tracking with approval workflow';
+COMMENT ON COLUMN portfolio_items.images IS 'JSONB array: [{"url": "...", "caption": "...", "order": 1}]';
+COMMENT ON COLUMN portfolio_items.skills_demonstrated IS 'JSONB array: ["React", "Node.js", "PostgreSQL"]';
+COMMENT ON COLUMN time_entries.work_diary IS 'JSONB object: {"tasks": [{"task": "...", "hours": 2.5, "completed": true}], "notes": "..."}';
+COMMENT ON COLUMN time_entries.screenshot_urls IS 'JSONB array: [{"url": "...", "timestamp": "..."}]';
+COMMENT ON COLUMN time_entries.file_attachments IS 'JSONB array: [{"filename": "...", "url": "...", "size": 12345}]';
