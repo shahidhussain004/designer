@@ -28,10 +28,9 @@ public class ContractService {
         // Use Hibernate.initialize to eagerly load all associations
         contracts.forEach(c -> {
             Hibernate.initialize(c.getProject());
-            Hibernate.initialize(c.getCompany());
             Hibernate.initialize(c.getFreelancer());
-            Hibernate.initialize(c.getProposal());
             if (c.getProject() != null) {
+                Hibernate.initialize(c.getProject().getCompany());
                 Hibernate.initialize(c.getProject().getProjectCategory());
             }
         });
@@ -43,10 +42,9 @@ public class ContractService {
                 .orElseThrow(() -> new RuntimeException("Contract not found: " + id));
         // Use Hibernate.initialize to eagerly load all associations
         Hibernate.initialize(contract.getProject());
-        Hibernate.initialize(contract.getCompany());
         Hibernate.initialize(contract.getFreelancer());
-        Hibernate.initialize(contract.getProposal());
         if (contract.getProject() != null) {
+            Hibernate.initialize(contract.getProject().getCompany());
             Hibernate.initialize(contract.getProject().getProjectCategory());
         }
         return contract;
@@ -57,10 +55,9 @@ public class ContractService {
         // Use Hibernate.initialize to eagerly load all associations
         contracts.forEach(c -> {
             Hibernate.initialize(c.getProject());
-            Hibernate.initialize(c.getCompany());
             Hibernate.initialize(c.getFreelancer());
-            Hibernate.initialize(c.getProposal());
             if (c.getProject() != null) {
+                Hibernate.initialize(c.getProject().getCompany());
                 Hibernate.initialize(c.getProject().getProjectCategory());
             }
         });

@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
  * Controller for job application endpoints
  */
 @RestController
-@RequestMapping("/api/job-applications")
+@RequestMapping("/job-applications")
 @RequiredArgsConstructor
 @Slf4j
 public class JobApplicationController {

@@ -32,7 +32,7 @@ export default function InvoicesPage() {
 
   useEffect(() => {
     if (!authService.isAuthenticated()) {
-      router.push('/auth/login?redirect=/dashboard/invoices');
+      router.push('/auth/login?redirect=/dashboards/invoices');
       return;
     }
     fetchData();

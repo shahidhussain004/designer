@@ -32,11 +32,11 @@ export default function DashboardPage() {
       // Role-based redirect
       console.log('[Dashboard] User role:', currentUser.role);
       if (currentUser.role === 'COMPANY') {
-        console.log('[Dashboard] Redirecting to /dashboard/company');
-        router.replace('/dashboard/company')
+        console.log('[Dashboard] Redirecting to /dashboards/company');
+        router.replace('/dashboards/company')
       } else if (currentUser.role === 'FREELANCER') {
-        console.log('[Dashboard] Redirecting to /dashboard/freelancer');
-        router.replace('/dashboard/freelancer')
+        console.log('[Dashboard] Redirecting to /dashboards/freelancer');
+        router.replace('/dashboards/freelancer')
       } else if (currentUser.role === 'ADMIN') {
         console.log('[Dashboard] Redirecting to admin app');
         window.location.href = 'http://localhost:3001'

@@ -1,25 +1,27 @@
 package com.designer.marketplace.entity;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.designer.marketplace.dto.InvoiceDTOs.BillingInfo;
-import com.designer.marketplace.dto.InvoiceDTOs.InvoiceLineItem;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,10 +29,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Invoice entity for generating payment invoices.
+ * Invoice entity - Generated invoices for payments
+ * Maps to 'invoices' table in PostgreSQL
  */
 @Entity
-@Table(name = "invoices")
+@Table(name = "invoices", indexes = {
+        @Index(name = "idx_invoices_payment_id", columnList = "payment_id"),
+        @Index(name = "idx_invoices_company_id", columnList = "company_id"),
+        @Index(name = "idx_invoices_freelancer_id", columnList = "freelancer_id"),
+        @Index(name = "idx_invoices_status", columnList = "status")
+})
+@EntityListeners(AuditingEntityListener.class)
 @Data
 @Builder
 @NoArgsConstructor
@@ -45,12 +54,8 @@ public class Invoice {
     private String invoiceNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_id", nullable = false)
+    @JoinColumn(name = "payment_id")
     private Payment payment;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "milestone_id")
-    private Milestone milestone;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", nullable = false)
@@ -60,85 +65,37 @@ public class Invoice {
     @JoinColumn(name = "freelancer_id", nullable = false)
     private Freelancer freelancer;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id", nullable = false)
-    private Project project;
+    @Column(name = "subtotal_cents", nullable = false)
+    private Long subtotalCents;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 30)
-    @Builder.Default
-    private InvoiceType invoiceType = InvoiceType.PAYMENT;
+    @Column(name = "platform_fee_cents")
+    private Long platformFeeCents;
 
-    /**
-     * Subtotal amount in cents (before fees)
-     */
-    @Column(nullable = false)
-    private Long subtotal;
+    @Column(name = "tax_amount_cents")
+    private Long taxAmountCents;
 
-    /**
-     * Platform fee amount in cents
-     */
-    @Column(name = "platform_fee")
-    @Builder.Default
-    private Long platformFee = 0L;
-
-    /**
-     * Tax amount in cents (if applicable)
-     */
-    @Column(name = "tax_amount")
-    @Builder.Default
-    private Long taxAmount = 0L;
-
-    /**
-     * Total amount in cents
-     */
-    @Column(nullable = false)
-    private Long total;
+    @Column(name = "total_cents", nullable = false)
+    private Long totalCents;
 
     @Column(length = 3)
-    @Builder.Default
     private String currency = "USD";
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 30)
-    @Builder.Default
-    private InvoiceStatus status = InvoiceStatus.DRAFT;
+    @Column(name = "status", length = 50)
+    private InvoiceStatus status;
 
-    /**
-     * Company's billing information (stored as JSON)
-     */
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "company_billing_info", columnDefinition = "json")
-    private BillingInfo companyBillingInfo;
-    /**
-     * Freelancer's billing information (stored as JSON)
-     */
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "freelancer_billing_info", columnDefinition = "json")
-    private BillingInfo freelancerBillingInfo;
-
-    /**
-     * Line items for the invoice (stored as JSON array)
-     */
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "line_items", columnDefinition = "json")
-    private List<InvoiceLineItem> lineItems;
-
-    /**
-     * Additional notes on the invoice
-     */
     @Column(columnDefinition = "TEXT")
     private String notes;
 
-    /**
-     * URL to the generated PDF invoice
-     */
     @Column(name = "pdf_url", columnDefinition = "TEXT")
     private String pdfUrl;
 
-    @Column(name = "invoice_date", nullable = false)
-    @Builder.Default
-    private LocalDateTime invoiceDate = LocalDateTime.now();
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "line_items", columnDefinition = "jsonb")
+    private JsonNode lineItems;
+
+    @Column(name = "invoice_date")
+    private LocalDateTime invoiceDate;
 
     @Column(name = "due_date")
     private LocalDateTime dueDate;
@@ -146,32 +103,20 @@ public class Invoice {
     @Column(name = "paid_at")
     private LocalDateTime paidAt;
 
-    @Column(name = "created_at")
-    @Builder.Default
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
+    @LastModifiedDate
     @Column(name = "updated_at")
-    @Builder.Default
-    private LocalDateTime updatedAt = LocalDateTime.now();
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    public enum InvoiceType {
-        PAYMENT, // Standard payment invoice
-        MILESTONE, // Milestone payment invoice
-        REFUND, // Refund credit note
-        PAYOUT // Payout statement to freelancer
-    }
+    private LocalDateTime updatedAt;
 
     public enum InvoiceStatus {
-        DRAFT, // Invoice created but not finalized
-        SENT, // Invoice sent to company
-        PAID, // Invoice has been paid
-        OVERDUE, // Payment is overdue
-        CANCELLED, // Invoice cancelled
-        REFUNDED // Invoice refunded
+        DRAFT,
+        SENT,
+        PAID,
+        OVERDUE,
+        CANCELLED,
+        REFUNDED
     }
 }

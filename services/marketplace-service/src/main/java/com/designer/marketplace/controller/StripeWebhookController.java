@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
  * Webhook controller for handling Stripe events.
  */
 @RestController
-@RequestMapping("/api/webhooks")
+@RequestMapping("/webhooks")
 @RequiredArgsConstructor
 @Slf4j
 public class StripeWebhookController {

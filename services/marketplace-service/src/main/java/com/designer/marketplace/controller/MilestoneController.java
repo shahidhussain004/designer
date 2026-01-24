@@ -29,7 +29,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/milestones")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 @Tag(name = "Milestones", description = "Milestone-based payment management")
 @SecurityRequirement(name = "bearerAuth")
@@ -37,7 +37,7 @@ public class MilestoneController {
 
     private final MilestoneService milestoneService;
 
-    @PostMapping
+    @PostMapping("/milestones")
     @Operation(summary = "Create milestones for a job")
     public ResponseEntity<List<MilestoneResponse>> createMilestones(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -46,7 +46,7 @@ public class MilestoneController {
         return ResponseEntity.ok(milestoneService.createMilestones(userId, requests));
     }
 
-    @PostMapping("/{milestoneId}/fund")
+    @PostMapping("/milestones/{milestoneId}/fund")
     @Operation(summary = "Fund a milestone")
     public ResponseEntity<MilestoneResponse> fundMilestone(
             @PathVariable Long milestoneId,
@@ -55,7 +55,7 @@ public class MilestoneController {
         return ResponseEntity.ok(milestoneService.fundMilestone(milestoneId, companyId));
     }
 
-    @PostMapping("/{milestoneId}/start")
+    @PostMapping("/milestones/{milestoneId}/start")
     @Operation(summary = "Start working on a milestone")
     public ResponseEntity<MilestoneResponse> startMilestone(
             @PathVariable Long milestoneId,
@@ -64,7 +64,7 @@ public class MilestoneController {
         return ResponseEntity.ok(milestoneService.startMilestone(milestoneId, freelancerId));
     }
 
-    @PostMapping("/{milestoneId}/submit")
+    @PostMapping("/milestones/{milestoneId}/submit")
     @Operation(summary = "Submit milestone deliverables for review")
     public ResponseEntity<MilestoneResponse> submitMilestone(
             @PathVariable Long milestoneId,
@@ -74,7 +74,7 @@ public class MilestoneController {
         return ResponseEntity.ok(milestoneService.submitMilestone(milestoneId, freelancerId, request));
     }
 
-    @PostMapping("/{milestoneId}/approve")
+    @PostMapping("/milestones/{milestoneId}/approve")
     @Operation(summary = "Approve milestone and release payment")
     public ResponseEntity<MilestoneResponse> approveMilestone(
             @PathVariable Long milestoneId,
@@ -85,7 +85,7 @@ public class MilestoneController {
                 request != null ? request : new ApproveMilestoneRequest()));
     }
 
-    @PostMapping("/{milestoneId}/request-revision")
+    @PostMapping("/milestones/{milestoneId}/request-revision")
     @Operation(summary = "Request revision for a milestone")
     public ResponseEntity<MilestoneResponse> requestRevision(
             @PathVariable Long milestoneId,
@@ -95,19 +95,19 @@ public class MilestoneController {
         return ResponseEntity.ok(milestoneService.requestRevision(milestoneId, companyId, request));
     }
 
-    @GetMapping("/job/{jobId}")
+    @GetMapping("/jobs/{jobId}/milestones")
     @Operation(summary = "Get milestones for a job")
     public ResponseEntity<List<MilestoneResponse>> getMilestonesByJob(@PathVariable Long jobId) {
         return ResponseEntity.ok(milestoneService.getMilestonesByJobId(jobId));
     }
 
-    @GetMapping("/job/{jobId}/summary")
+    @GetMapping("/jobs/{jobId}/milestones/summary")
     @Operation(summary = "Get milestone summary for a job")
     public ResponseEntity<MilestoneSummary> getMilestoneSummary(@PathVariable Long jobId) {
-        return ResponseEntity.ok(milestoneService.getMilestoneSummary(jobId));
+        return ResponseEntity.ok(milestoneService.getMilestoneSummaryByJobId(jobId));
     }
 
-    @GetMapping("/company")
+    @GetMapping("/milestones/company")
     @Operation(summary = "Get milestones for the current company")
     public ResponseEntity<Page<MilestoneResponse>> getCompanyMilestones(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -116,7 +116,7 @@ public class MilestoneController {
         return ResponseEntity.ok(milestoneService.getMilestonesByCompanyId(companyId, pageable));
     }
 
-    @GetMapping("/freelancer")
+    @GetMapping("/milestones/freelancer")
     @Operation(summary = "Get milestones for the current freelancer")
     public ResponseEntity<Page<MilestoneResponse>> getFreelancerMilestones(
             @AuthenticationPrincipal UserDetails userDetails,

@@ -66,8 +66,8 @@ export default function ContractDetailPage() {
         <div className="max-w-4xl mx-auto px-4 py-16 text-center">
           <h2 className="text-2xl font-semibold">Contract Not Found</h2>
           <p className="text-gray-600 mt-2">This contract may not exist or you do not have access to view it.</p>
-          <div className="mt-6">
-            <button onClick={() => router.push('/dashboard')} className="px-4 py-2 bg-blue-600 text-white rounded-lg">Back to Dashboard</button>
+            <div className="mt-6">
+            <button onClick={() => router.push('/dashboards')} className="px-4 py-2 bg-blue-600 text-white rounded-lg">Back to Dashboard</button>
           </div>
         </div>
       </PageLayout>
@@ -106,8 +106,8 @@ export default function ContractDetailPage() {
           <h2 className="text-xl font-semibold mb-4">Description</h2>
           <p className="text-gray-700">{contract.description}</p>
 
-          <div className="mt-6 flex gap-3">
-            <button onClick={() => router.push(`/dashboard/freelancer/time-tracking?contractId=${contract.id}`)} className="px-4 py-2 bg-blue-600 text-white rounded-lg">Log Time</button>
+            <div className="mt-6 flex gap-3">
+            <button onClick={() => router.push(`/dashboards/freelancer/time-tracking?contractId=${contract.id}`)} className="px-4 py-2 bg-blue-600 text-white rounded-lg">Log Time</button>
             <button onClick={() => router.push(`/freelancers/${contract.freelancer.id}/portfolio`)} className="px-4 py-2 bg-gray-100 text-gray-800 rounded-lg">View Freelancer</button>
           </div>
         </div>

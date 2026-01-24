@@ -1,5 +1,6 @@
 package com.designer.marketplace.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,13 +23,14 @@ public class ProjectResponse {
     private String description;
     private ProjectCategoryResponse category;
     private List<String> requiredSkills;
-    private Double budget;
+    private Double minBudget;
+    private Double maxBudget;
     private String budgetType;
-    private Integer duration;
-    private ExperienceLevelResponse experienceLevel;
+    private Integer estimatedDurationDays;
+    private String experienceLevelCode;
     private String status;
     private Boolean isFeatured;
-    private Integer viewCount;
+    private Integer viewsCount;
     private Integer proposalCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -44,7 +46,7 @@ public class ProjectResponse {
         private String fullName;
         private String profileImageUrl;
         private String location;
-        private Double ratingAvg;
+        private BigDecimal ratingAvg;
         private Integer ratingCount;
     }
 
@@ -61,8 +63,8 @@ public class ProjectResponse {
                     .fullName(project.getCompany().getFullName())
                     .profileImageUrl(project.getCompany().getProfileImageUrl())
                     .location(project.getCompany().getLocation())
-                    .ratingAvg(project.getCompany().getRatingAvg())
-                    .ratingCount(project.getCompany().getRatingCount())
+                    // .ratingAvg(project.getCompany().getRatingAvg())
+                    // .ratingCount(project.getCompany().getRatingCount())
                     .build();
         }
 
@@ -72,14 +74,15 @@ public class ProjectResponse {
                 .title(project.getTitle())
                 .description(project.getDescription())
                 .category(project.getProjectCategory() != null ? ProjectCategoryResponse.fromEntity(project.getProjectCategory()) : null)
-                .requiredSkills(project.getRequiredSkills())
-                .budget(project.getBudget())
+                .requiredSkills(project.getRequiredSkills() != null ? java.util.Arrays.asList(project.getRequiredSkills().asText().split(",")) : new java.util.ArrayList<>())
+                .minBudget(project.getBudgetMinCents() != null ? project.getBudgetMinCents().doubleValue() / 100.0 : null)
+                .maxBudget(project.getBudgetMaxCents() != null ? project.getBudgetMaxCents().doubleValue() / 100.0 : null)
                 .budgetType(project.getBudgetType() != null ? project.getBudgetType().name() : null)
-                .duration(project.getDuration())
-                .experienceLevel(project.getExperienceLevelEntity() != null ? ExperienceLevelResponse.fromEntity(project.getExperienceLevelEntity()) : null)
+                .estimatedDurationDays(project.getEstimatedDurationDays())
+                .experienceLevelCode(project.getExperienceLevel())
                 .status(project.getStatus() != null ? project.getStatus().name() : null)
                 .isFeatured(project.getIsFeatured())
-                .viewCount(project.getViewCount())
+                .viewsCount(project.getViewsCount())
                 .proposalCount(project.getProposalCount())
                 .createdAt(project.getCreatedAt())
                 .updatedAt(project.getUpdatedAt())
