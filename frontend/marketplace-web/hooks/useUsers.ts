@@ -135,8 +135,9 @@ interface PaginatedResponse<T> {
  * Normalize API response to always return an array
  */
 function normalizeArrayResponse<T>(data: T[] | PaginatedResponse<T>): T[] {
-  if (Array.isArray(data)) return data;
-  return data.content || data.data || [];
+  if (Array.isArray(data)) return data as T[];
+  // prefer `content`, fallback to `data` array
+  return (data.content as T[]) || (data.data as T[]) || [];
 }
 
 /**
@@ -202,8 +203,8 @@ export function useUsers(filters?: UsersFilters) {
       const params = buildQueryParams({
         search: filters?.search,
         role: filters?.role !== 'FREELANCER' ? filters?.role : undefined,
-        page: filters?.page,
-        limit: filters?.limit,
+        page: filters?.page ?? 0,
+        size: filters?.limit ?? 20,
       });
 
       const { data } = await apiClient.get<User[] | PaginatedResponse<User>>(
@@ -212,6 +213,28 @@ export function useUsers(filters?: UsersFilters) {
       );
 
       return normalizeArrayResponse(data);
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+/**
+ * Fetch users but return the paginated response object (for pages that need metadata)
+ */
+export function useUsersPaginated(filters?: UsersFilters) {
+  return useQuery({
+    queryKey: ['users', 'paginated', filters],
+    queryFn: async ({ signal }) => {
+      const endpoint = filters?.role === 'FREELANCER' ? '/users/freelancers' : '/users';
+      const params = buildQueryParams({
+        search: filters?.search,
+        role: filters?.role !== 'FREELANCER' ? filters?.role : undefined,
+        page: filters?.page ?? 0,
+        size: filters?.limit ?? 20,
+      });
+
+      const { data } = await apiClient.get<PaginatedResponse<User>>(endpoint, { params, signal });
+      return data;
     },
     staleTime: 5 * 60 * 1000,
   });

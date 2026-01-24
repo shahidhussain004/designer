@@ -41,13 +41,27 @@ public class PortfolioService {
     }
 
     /**
+     * Get all portfolio items for a user by their user ID
+     * Handles the mapping from user ID to freelancer ID
+     */
+    @Transactional
+    public List<PortfolioItem> getUserPortfolioByUserId(Long userId, Long requesterId) {
+        log.debug("Fetching portfolio for user: {} by requester: {}", userId, requesterId);
+        
+        // Find the freelancer profile for this user
+        Freelancer freelancer = freelancerRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Freelancer profile not found for user: " + userId));
+        
+        // Now get the portfolio for this freelancer
+        return getUserPortfolio(freelancer.getId(), requesterId);
+    }
+
+    /**
      * Get all portfolio items for a freelancer (admin/owner view)
      */
     @Transactional
     public List<PortfolioItem> getUserPortfolio(Long freelancerId, Long requesterId) {
         log.debug("Fetching portfolio for freelancer: {} by requester: {}", freelancerId, requesterId);
-
-        List<PortfolioItem> items;
 
         boolean isOwner = (requesterId != null && requesterId.equals(freelancerId));
         boolean isAdmin = false;
@@ -63,16 +77,11 @@ public class PortfolioService {
         }
 
         // If owner or admin, show all items; otherwise show only visible items
-        List<PortfolioItem> allItems = portfolioItemRepository.findAll().stream()
-                .filter(item -> item.getFreelancer() != null && item.getFreelancer().getId().equals(freelancerId))
-                .toList();
-
-        if (!isOwner && !isAdmin) {
-            items = allItems.stream()
-                    .filter(item -> true) // Filter by isVisible if field exists
-                    .toList();
+        List<PortfolioItem> items;
+        if (isOwner || isAdmin) {
+            items = portfolioItemRepository.findByUserIdOrderByDisplayOrderAsc(freelancerId);
         } else {
-            items = allItems;
+            items = portfolioItemRepository.findByUserIdAndIsVisibleOrderByDisplayOrderAsc(freelancerId, true);
         }
 
         return items;
@@ -119,7 +128,7 @@ public class PortfolioService {
         if (updates.getImageUrl() != null) existing.setImageUrl(updates.getImageUrl());
         if (updates.getProjectUrl() != null) existing.setProjectUrl(updates.getProjectUrl());
         if (updates.getTechnologies() != null) existing.setTechnologies(updates.getTechnologies());
-        if (updates.getCompletionDate() != null) existing.setCompletionDate(updates.getCompletionDate());
+        if (updates.getEndDate() != null) existing.setEndDate(updates.getEndDate());
         if (updates.getIsVisible() != null) existing.setIsVisible(updates.getIsVisible());
         
         return portfolioItemRepository.save(existing);
