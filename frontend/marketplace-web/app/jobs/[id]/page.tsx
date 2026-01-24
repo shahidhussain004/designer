@@ -159,7 +159,7 @@ export default function JobDetailsPage() {
                     <p className="text-gray-600 whitespace-pre-wrap">{job.requirements}</p>
                   ) : Array.isArray(job.requirements) ? (
                     <ul className="text-gray-600 space-y-2 list-disc list-inside">
-                      {job.requirements.map((req: any, idx: number) => (
+                      {(job.requirements as any[]).map((req: any, idx: number) => (
                         <li key={idx}>{typeof req === 'string' ? req : JSON.stringify(req)}</li>
                       ))}
                     </ul>

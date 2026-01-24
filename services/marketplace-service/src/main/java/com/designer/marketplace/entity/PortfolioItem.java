@@ -1,5 +1,6 @@
 package com.designer.marketplace.entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.JdbcTypeCode;
@@ -10,6 +11,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import jakarta.persistence.Column;
@@ -33,7 +35,7 @@ import lombok.NoArgsConstructor;
  */
 @Entity
 @Table(name = "portfolio_items", indexes = {
-        @Index(name = "idx_portfolio_items_freelancer_id", columnList = "freelancer_id"),
+    @Index(name = "idx_portfolio_items_user_id", columnList = "user_id"),
         @Index(name = "idx_portfolio_items_visible", columnList = "is_visible")
 })
 @EntityListeners(AuditingEntityListener.class)
@@ -48,8 +50,9 @@ public class PortfolioItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "freelancer_id", nullable = false)
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", nullable = false)
     private Freelancer freelancer;
 
     @Column(nullable = false, length = 255)
@@ -76,8 +79,15 @@ public class PortfolioItem {
     @Column(name = "tools_used", columnDefinition = "jsonb")
     private JsonNode toolsUsed;
 
-    @Column(name = "completion_date")
-    private LocalDateTime completionDate;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "skills_demonstrated", columnDefinition = "jsonb")
+    private JsonNode skillsDemonstrated;
+
+    @Column(name = "start_date")
+    private LocalDate startDate;
+
+    @Column(name = "end_date")
+    private LocalDate endDate;
 
     @Column(name = "display_order")
     private Integer displayOrder = 0;
