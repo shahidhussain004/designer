@@ -158,17 +158,11 @@ export function useResource(slug: string | null) {
     queryKey: ['resource', slug],
     queryFn: async ({ signal }) => {
       if (!slug) throw new Error('Resource slug is required');
-      // Fetch all content and filter by slug client-side
-      const { data } = await contentClient.get('/content', {
-        params: { limit: 1000 },
+      // Use dedicated slug endpoint - best practice for single item fetch
+      const { data } = await contentClient.get(`/content/slug/${slug}`, {
         signal,
       });
-      const contentList = (data as any).data || [];
-      const resource = contentList.find((item: any) => item.slug === slug);
-      if (!resource) {
-        throw new Error(`Content with slug '${slug}' not found`);
-      }
-      return resource;
+      return (data as any).data || data;
     },
     enabled: !!slug,
     staleTime: 5 * 60 * 1000,
