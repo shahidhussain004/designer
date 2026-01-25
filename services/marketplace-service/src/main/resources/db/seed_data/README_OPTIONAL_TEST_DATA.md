@@ -1,3 +1,0 @@
--- Seed Data: Reference/Lookup Data only (Job Categories and Experience Levels)
--- Test data is optional and can be loaded separately on demand
--- This folder focuses on reference data needed for application function
