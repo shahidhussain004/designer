@@ -4,6 +4,7 @@ import { ErrorMessage } from '@/components/ErrorMessage';
 import { CoursesSkeleton } from '@/components/Skeletons';
 import { useCourse, useCourseCurriculum, useEnrollCourse } from '@/hooks/useCourses';
 import { authService } from '@/lib/auth';
+import type { Lesson } from '@/lib/courses';
 import { createCourseCheckoutSession, formatCurrency } from '@/lib/payments';
 import { ArrowLeft, Award, BookOpen, CheckCircle, Clock, Eye, Globe, PlayCircle, Star, Users } from 'lucide-react';
 import Image from 'next/image';
@@ -14,35 +15,43 @@ import { useState } from 'react';
 export default function CourseDetailPage() {
   const router = useRouter();
   const params = useParams();
-  const courseId = params.id as string;
+  const slug = params.slug as string;
 
   const [showAllLessons, setShowAllLessons] = useState(false);
 
-  const { data: course, isLoading: courseLoading, error: courseError, refetch } = useCourse(courseId);
-  const { data: lessonsData, isLoading: lessonsLoading } = useCourseCurriculum(courseId);
+  const { data: course, isLoading: courseLoading, error: courseError, refetch } = useCourse(slug);
+  const { data: lessonsData, isLoading: lessonsLoading } = useCourseCurriculum(slug);
   const enrollMutation = useEnrollCourse();
 
-  const lessons = lessonsData || [];
+  // Handle lessons data - could be array or object with lessons property
+  const lessons = Array.isArray(lessonsData) 
+    ? lessonsData 
+    : (lessonsData?.lessons || []);
   const isLoading = courseLoading || lessonsLoading;
   const error = courseError;
 
   const handleEnroll = async () => {
     if (!authService.isAuthenticated()) {
-      router.push(`/auth/login?redirect=/courses/${courseId}`);
+      router.push(`/auth/login?redirect=/courses/${slug}`);
+      return;
+    }
+
+    if (!course) {
+      console.error('Course data not loaded');
       return;
     }
 
     try {
-      if (course && course.price > 0) {
+      if (course.price > 0) {
         const session = await createCourseCheckoutSession(
-          courseId,
-          `${window.location.origin}/courses/${courseId}/success`,
-          `${window.location.origin}/courses/${courseId}`
+          String(course.id),
+          `${window.location.origin}/courses/${slug}/success`,
+          `${window.location.origin}/courses/${slug}`
         );
         window.location.href = session.url;
       } else {
-        await enrollMutation.mutateAsync(Number(courseId));
-        router.push(`/courses/${courseId}/learn`);
+        await enrollMutation.mutateAsync(Number(course.id));
+        router.push(`/courses/${slug}/learn`);
       }
     } catch (err) {
       console.error('Error enrolling:', err);
@@ -136,7 +145,7 @@ export default function CourseDetailPage() {
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">What You&apos;ll Learn</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {course.learningOutcomes.map((outcome, index) => (
+                  {course.learningOutcomes.map((outcome: string, index: number) => (
                     <div key={index} className="flex items-start gap-3">
                       <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
                       <span className="text-gray-700">{outcome}</span>
@@ -155,7 +164,7 @@ export default function CourseDetailPage() {
                 </span>
               </div>
               <div className="divide-y divide-gray-100">
-                {displayedLessons.map((lesson, index) => (
+                {displayedLessons.map((lesson: Lesson, index: number) => (
                   <div key={lesson.id} className="py-4 flex items-center justify-between">
                     <div className="flex items-start gap-4 flex-1">
                       <span className="text-sm font-medium text-gray-400 w-8">{index + 1}</span>
@@ -196,7 +205,7 @@ export default function CourseDetailPage() {
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Prerequisites & Requirements</h2>
                 <ul className="space-y-2">
-                  {course.requirements.map((req, index) => (
+                  {course.requirements.map((req: string, index: number) => (
                     <li key={index} className="flex items-start gap-3 text-gray-700">
                       <span className="text-gray-400">•</span>
                       {req}
@@ -211,7 +220,7 @@ export default function CourseDetailPage() {
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Skills You&apos;ll Master</h2>
                 <div className="flex flex-wrap gap-2">
-                  {course.tags.map((tag, index) => (
+                  {course.tags.map((tag: string, index: number) => (
                     <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
                       {tag}
                     </span>

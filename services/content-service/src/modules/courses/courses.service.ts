@@ -3,7 +3,7 @@
  * Business logic for courses feature
  */
 
-import { prismaService } from '@infrastructure/database';
+import { prisma } from '../../infrastructure/database/prisma.service';
 
 class CoursesService {
   // =====================================================
@@ -43,20 +43,20 @@ class CoursesService {
     }
 
     const [courses, totalCount] = await Promise.all([
-      prismaService.client.course.findMany({
+      prisma.course.findMany({
         where: whereClause,
         skip,
         take: pageSize,
         orderBy:
           filters?.sortBy === 'recent'
-            ? { createdAt: 'desc' }
-            : { displayOrder: 'asc', createdAt: 'desc' },
+            ? [{ createdAt: 'desc' }]
+            : [{ displayOrder: 'asc' }, { createdAt: 'desc' }],
       }),
-      prismaService.client.course.count({ where: whereClause }),
+      prisma.course.count({ where: whereClause }),
     ]);
 
     return {
-      items: courses.map(this.formatCourse),
+      items: courses.map((course) => this.formatCourse(course)),
       totalCount,
       page,
       pageSize,
@@ -64,7 +64,7 @@ class CoursesService {
   }
 
   async getCourseBySlug(slug: string) {
-    const course = await prismaService.client.course.findUnique({
+    const course = await prisma.course.findUnique({
       where: { slug },
       include: {
         lessons: {
@@ -93,7 +93,7 @@ class CoursesService {
   }
 
   async getCourseById(id: string) {
-    const course = await prismaService.client.course.findUnique({
+    const course = await prisma.course.findUnique({
       where: { id },
       include: {
         lessons: {
@@ -122,7 +122,7 @@ class CoursesService {
   }
 
   async getCourseLessons(courseId: string) {
-    const lessons = await prismaService.client.lesson.findMany({
+    const lessons = await prisma.lesson.findMany({
       where: {
         courseId,
         isPublished: true,
@@ -142,7 +142,7 @@ class CoursesService {
   }
 
   async getLessonById(courseId: string, lessonId: string) {
-    const lesson = await prismaService.client.lesson.findFirst({
+    const lesson = await prisma.lesson.findFirst({
       where: {
         id: lessonId,
         courseId,
@@ -178,7 +178,7 @@ class CoursesService {
     category?: string;
     level?: string;
   }) {
-    const course = await prismaService.client.course.create({
+    const course = await prisma.course.create({
       data: {
         title: data.title,
         slug: data.slug,
@@ -219,7 +219,7 @@ class CoursesService {
       updateData.level = updateData.level as 'Beginner' | 'Intermediate' | 'Advanced';
     }
 
-    const course = await prismaService.client.course.update({
+    const course = await prisma.course.update({
       where: { id },
       data: updateData,
     });
@@ -228,7 +228,7 @@ class CoursesService {
   }
 
   async deleteCourse(id: string) {
-    await prismaService.client.course.delete({
+    await prisma.course.delete({
       where: { id },
     });
   }

@@ -65,6 +65,7 @@ export async function coursesRoutes(app: FastifyInstance) {
           ...result,
         });
       } catch (error) {
+        console.error('Courses API Error:', error);
         app.log.error(error);
         return reply.status(500).send({
           success: false,

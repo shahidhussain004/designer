@@ -1,8 +1,11 @@
 import lmsClient from './lms-api';
 
+const CONTENT_SERVICE_URL = process.env.NEXT_PUBLIC_CONTENT_SERVICE_URL || 'http://localhost:8083/api/v1';
+
 // Course types
 export interface Course {
   id: string;
+  slug: string;
   title: string;
   description: string;
   instructorId: string;
@@ -86,8 +89,15 @@ export async function getCourses(params?: {
   if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
 
   // Use global fetch when available (tests mock global.fetch). Fall back to axios lmsClient.
-  let data: any;
-  const url = `${lmsClient.defaults.baseURL}/courses?${queryParams.toString()}`;
+  type ApiResponse = {
+    items?: any[];
+    totalCount?: number;
+    page?: number;
+    pageSize?: number;
+  };
+  
+  let data: ApiResponse = {};
+  const url = `${CONTENT_SERVICE_URL}/courses?${queryParams.toString()}`;
   if (typeof fetch !== 'undefined') {
     const resp = await fetch(url);
     data = await resp.json();
@@ -99,6 +109,7 @@ export async function getCourses(params?: {
   // Transform LMS PagedResult { items, totalCount, page, pageSize } to expected format { courses, totalCount, page, size }
   type ApiCourse = {
     id: string;
+    slug?: string;
     title?: string;
     shortDescription?: string;
     instructorName?: string;
@@ -115,29 +126,37 @@ export async function getCourses(params?: {
   };
 
   return {
-    courses: (data.items || []).map((item: ApiCourse) => ({
-      id: item.id,
-      title: item.title || '',
-      description: item.shortDescription || '',
-      instructorId: '',
-      instructorName: item.instructorName || '',
-      price: Math.round((item.price || 0) * 100),
-      currency: item.currency || 'USD',
-      thumbnailUrl: item.thumbnailUrl,
-      category: item.category || '',
-      skillLevel: (item.level || 'Beginner') as 'Beginner' | 'Intermediate' | 'Advanced',
-      durationMinutes: item.totalDurationMinutes || 0,
-      lessonsCount: item.totalLessons || 0,
-      enrollmentsCount: item.totalEnrollments || 0,
-      rating: item.averageRating || 0,
-      reviewsCount: item.reviewCount || 0,
-      isPublished: true,
-      tags: [],
-      learningOutcomes: [],
-      requirements: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    })),
+    courses: (data.items || []).map((item: ApiCourse) => {
+      // Use slug from API if provided, otherwise generate from title
+      const slug = item.slug || (item.title 
+        ? item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+        : '');
+      
+      return {
+        id: item.id,
+        slug: slug,
+        title: item.title || '',
+        description: item.shortDescription || '',
+        instructorId: '',
+        instructorName: item.instructorName || '',
+        price: Math.round((item.price || 0) * 100),
+        currency: item.currency || 'USD',
+        thumbnailUrl: item.thumbnailUrl,
+        category: item.category || '',
+        skillLevel: (item.level || 'Beginner') as 'Beginner' | 'Intermediate' | 'Advanced',
+        durationMinutes: item.totalDurationMinutes || 0,
+        lessonsCount: item.totalLessons || 0,
+        enrollmentsCount: item.totalEnrollments || 0,
+        rating: item.averageRating || 0,
+        reviewsCount: item.reviewCount || 0,
+        isPublished: true,
+        tags: [],
+        learningOutcomes: [],
+        requirements: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+    }),
     totalCount: data.totalCount || 0,
     page: (data.page || 1) - 1,
     size: data.pageSize || 12,
@@ -147,6 +166,20 @@ export async function getCourses(params?: {
 export async function getCourseById(id: string): Promise<Course> {
   const response = await lmsClient.get(`/courses/${id}`);
   return response.data;
+}
+
+export async function getCourseBySlug(slug: string): Promise<Course> {
+  const url = `${CONTENT_SERVICE_URL}/courses/${slug}`;
+  if (typeof fetch !== 'undefined') {
+    const resp = await fetch(url);
+    if (!resp.ok) {
+      throw new Error(`Failed to fetch course: ${resp.statusText}`);
+    }
+    return resp.json();
+  } else {
+    const response = await lmsClient.get(`/courses/${slug}`);
+    return response.data;
+  }
 }
 
 export async function getCourseLessons(courseId: string): Promise<Lesson[]> {
