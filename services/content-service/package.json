@@ -19,6 +19,8 @@
     "prisma:migrate:prod": "prisma migrate deploy",
     "prisma:seed": "tsx prisma/seed.ts",
     "prisma:seed:tutorials": "tsx prisma/tutorials-seed.ts",
+    "prisma:seed:courses": "tsx prisma/courses-seed.ts",
+    "prisma:seed:all": "npm run prisma:seed && npm run prisma:seed:tutorials && npm run prisma:seed:courses",
     "prisma:studio": "prisma studio",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",

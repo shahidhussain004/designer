@@ -1,27 +1,28 @@
 'use client';
 
-import { lmsClient } from '@/lib/lms-api';
 import { getCourses } from '@/lib/courses';
+import { lmsClient } from '@/lib/lms-api';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
 // Types
 interface Course {
-  id: number;
+  id: string;
+  slug?: string;
   title: string;
   description: string;
-  instructorId: number;
+  instructorId: string;
   instructorName?: string;
   category: string;
   skillLevel: string;
   price: number;
   currency: string;
-  duration: number;
+  duration?: number;
   durationMinutes: number;
-  language: string;
+  language?: string;
   thumbnailUrl?: string;
   videoPreviewUrl?: string;
-  enrollmentCount: number;
+  enrollmentCount?: number;
   enrollmentsCount?: number;
   rating: number;
   reviewsCount?: number;
@@ -93,15 +94,28 @@ export function useCourses(filters?: CourseFilters) {
 }
 
 /**
- * Fetch single course by ID
+ * Fetch single course by ID or slug
  */
 export function useCourse(courseId: string | number | null) {
   return useQuery({
     queryKey: ['course', courseId],
     queryFn: async ({ signal }) => {
       if (!courseId) throw new Error('Course ID is required');
-      const { data } = await lmsClient.get<Course>(`/courses/${courseId}`, { signal });
-      return data;
+      
+      // If courseId looks like a slug (contains hyphens or no only digits), use content service
+      const isSlug = typeof courseId === 'string' && (courseId.includes('-') || !/^\d+$/.test(courseId));
+      
+      if (isSlug) {
+        // Use content service for slug-based lookup
+        const contentServiceUrl = process.env.NEXT_PUBLIC_CONTENT_SERVICE_URL || 'http://localhost:8083/api/v1';
+        const response = await fetch(`${contentServiceUrl}/courses/${courseId}`, { signal });
+        if (!response.ok) throw new Error('Failed to fetch course');
+        return response.json();
+      } else {
+        // Use LMS for numeric ID lookup
+        const { data } = await lmsClient.get<Course>(`/courses/${courseId}`, { signal });
+        return data;
+      }
     },
     enabled: !!courseId,
     staleTime: 5 * 60 * 1000,
@@ -130,8 +144,21 @@ export function useCourseCurriculum(courseId: string | number | null) {
     queryKey: ['course', courseId, 'curriculum'],
     queryFn: async ({ signal }) => {
       if (!courseId) throw new Error('Course ID is required');
-      const { data } = await lmsClient.get<Lesson[]>(`/courses/${courseId}/curriculum`, { signal });
-      return data;
+      
+      // If courseId looks like a slug (contains hyphens or no only digits), use content service
+      const isSlug = typeof courseId === 'string' && (courseId.includes('-') || !/^\d+$/.test(courseId));
+      
+      if (isSlug) {
+        // Use content service for slug-based lookup
+        const contentServiceUrl = process.env.NEXT_PUBLIC_CONTENT_SERVICE_URL || 'http://localhost:8083/api/v1';
+        const response = await fetch(`${contentServiceUrl}/courses/${courseId}/lessons`, { signal });
+        if (!response.ok) throw new Error('Failed to fetch lessons');
+        return response.json();
+      } else {
+        // Use LMS for numeric ID lookup
+        const { data } = await lmsClient.get<Lesson[]>(`/courses/${courseId}/curriculum`, { signal });
+        return data;
+      }
     },
     enabled: !!courseId,
     staleTime: 10 * 60 * 1000,

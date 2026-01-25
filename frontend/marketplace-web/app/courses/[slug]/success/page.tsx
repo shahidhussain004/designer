@@ -1,36 +1,42 @@
 'use client';
 
 import { PageLayout } from '@/components/ui';
-import { Course, getCourseById } from '@/lib/courses';
+import type { Course as CourseType } from '@/lib/courses';
 import { ArrowRight, BookOpen, CheckCircle, Clock, Loader2, PlayCircle } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
+interface Course extends CourseType {
+  lessonsCount: number;
+}
+
 export default function CourseEnrollmentSuccessPage() {
   const params = useParams();
-  const courseId = params.id as string;
+  const slug = params.slug as string;
 
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchCourse = useCallback(async () => {
     try {
-      const courseData = await getCourseById(courseId);
-      setCourse(courseData);
+      // Import the function here to avoid circular dependency
+      const { getCourseBySlug } = await import('@/lib/courses');
+      const courseData = await getCourseBySlug(slug);
+      setCourse(courseData as Course);
     } catch (err) {
       console.error('Error fetching course:', err);
     } finally {
       setLoading(false);
     }
-  }, [courseId]);
+  }, [slug]);
 
   useEffect(() => {
-    if (courseId) {
+    if (slug) {
       fetchCourse();
     }
-  }, [courseId, fetchCourse]);
+  }, [slug, fetchCourse]);
 
   if (loading) {
     return (
@@ -106,7 +112,7 @@ export default function CourseEnrollmentSuccessPage() {
             {/* CTA Buttons */}
             <div className="space-y-3">
               <Link 
-                href={`/courses/${courseId}/learn`}
+                href={`/courses/${slug}/learn`}
                 className="flex items-center justify-center gap-2 w-full py-3 px-6 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-semibold"
               >
                 Start Learning

@@ -279,7 +279,7 @@ interface CourseCardProps {
 
 function CourseCard({ course, getSkillLevelColor }: CourseCardProps) {
   return (
-    <Link href={`/courses/${course.id}`} className="block group">
+    <Link href={`/courses/${course.slug}`} className="block group">
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:border-primary-300 hover:shadow-lg transition-all h-full flex flex-col">
         {/* Thumbnail */}
         <div className="relative aspect-video bg-gray-100 overflow-hidden">
