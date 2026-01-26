@@ -35,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
  * - PUT /api/proposals/{id}/status - Update proposal status
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("")
 @RequiredArgsConstructor
 @Slf4j
 public class ProposalController {

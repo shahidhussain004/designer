@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
  * - GET /api/users/{reviewerId}/reviews-given - Get reviews written by user (nested)
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("")
 @RequiredArgsConstructor
 public class ReviewController {
 

@@ -227,7 +227,9 @@ const MobileMenu: React.FC<{
   user: any;
   loading: boolean;
   onLogout: () => void;
-}> = ({ isOpen, onClose, pathname, user, loading, onLogout }) => {
+  authInitialized: boolean;
+  currentUser: any;
+}> = ({ isOpen, onClose, pathname, user, loading, onLogout, authInitialized, currentUser }) => {
   if (!isOpen) return null;
 
   return (
@@ -293,13 +295,11 @@ const MobileMenu: React.FC<{
         
         {/* Mobile CTA buttons */}
         <div className="px-4 py-4 border-t border-gray-100 space-y-3">
-          {loading ? (
-            <div className="px-4 py-2 text-sm text-gray-500 text-center">Loading...</div>
-          ) : user ? (
+          {authInitialized && currentUser ? (
             <>
               <div className="px-4 py-3 text-center border-b border-gray-100 mb-2">
-                <p className="text-sm font-semibold text-gray-900">{user.fullName || user.username}</p>
-                <p className="text-xs text-gray-500">{user.email}</p>
+                <p className="text-sm font-semibold text-gray-900">{currentUser.fullName || currentUser.username}</p>
+                <p className="text-xs text-gray-500">{currentUser.email}</p>
               </div>
               <Link
                 href="/profile"
@@ -363,9 +363,34 @@ const MobileMenu: React.FC<{
 export const Navbar: React.FC<NavbarProps> = ({ className: _className }) => {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { user, loading, refreshUser } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [authInitialized, setAuthInitialized] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  // Initialize auth from storage on mount
+  useEffect(() => {
+    // Check if user is in storage immediately
+    const storedUser = authService.getCurrentUser();
+    const isAuthenticated = authService.isAuthenticated();
+    
+    if (storedUser && isAuthenticated) {
+      setCurrentUser(storedUser);
+    }
+    setAuthInitialized(true);
+  }, []);
+
+  // Update currentUser when context user changes
+  useEffect(() => {
+    if (!loading) {
+      if (user) {
+        setCurrentUser(user);
+      } else {
+        setCurrentUser(null);
+      }
+    }
+  }, [user, loading]);
 
   const handleDropdownToggle = (label: string) => {
     setOpenDropdown(openDropdown === label ? null : label);
@@ -373,6 +398,8 @@ export const Navbar: React.FC<NavbarProps> = ({ className: _className }) => {
 
   const handleLogout = () => {
     authService.logout();
+    setCurrentUser(null);
+    refreshUser();
     router.push('/');
   };
 
@@ -422,15 +449,13 @@ export const Navbar: React.FC<NavbarProps> = ({ className: _className }) => {
 
             {/* Desktop CTA */}
             <div className="hidden lg:flex lg:items-center lg:gap-3">
-              {loading ? (
-                <div className="px-4 py-2 text-sm text-gray-500">Loading...</div>
-              ) : user ? (
+              {authInitialized && currentUser ? (
                 <UserDropdown
-                  user={user}
+                  user={currentUser}
                   onLogout={handleLogout}
                   onClose={() => {}}
                 />
-              ) : (
+              ) : authInitialized ? (
                 <>
                   <Link
                     href="/auth/login"
@@ -445,7 +470,7 @@ export const Navbar: React.FC<NavbarProps> = ({ className: _className }) => {
                     Get Started
                   </Link>
                 </>
-              )}
+              ) : null}
             </div>
 
             {/* Mobile menu button */}
@@ -471,6 +496,8 @@ export const Navbar: React.FC<NavbarProps> = ({ className: _className }) => {
         user={user}
         loading={loading}
         onLogout={handleLogout}
+        authInitialized={authInitialized}
+        currentUser={currentUser}
       />
     </>
   );

@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
  * - GET /api/users/{userId}/contracts - Get contracts for user (nested)
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("")
 @RequiredArgsConstructor
 public class ContractController {
 

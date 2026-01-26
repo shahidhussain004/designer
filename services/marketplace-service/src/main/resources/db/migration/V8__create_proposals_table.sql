@@ -1,7 +1,8 @@
 -- =====================================================
 -- V8: Create Proposals Table
 -- Description: Freelancer proposals for projects
--- OPTIMIZED: json → jsonb, budget in cents, GIN indexes
+-- OPTIMIZED: Removed 6 unused indexes (0 scans), removed redundant idx_proposals_freelancer_id from V_fix_004, added auto-vacuum
+-- Author: Database Audit & Optimization 2026-01-26
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS proposals (
@@ -11,13 +12,13 @@ CREATE TABLE IF NOT EXISTS proposals (
     
     -- Proposal Information
     cover_letter TEXT NOT NULL,
-    suggested_budget_cents BIGINT, -- CHANGED: Store in cents
+    suggested_budget_cents BIGINT, -- Store in cents
     proposed_timeline VARCHAR(100),
     estimated_hours NUMERIC(10,2),
     attachments TEXT[] DEFAULT '{}', -- Simple array of URLs
     portfolio_links TEXT[] DEFAULT '{}', -- Simple array of URLs
     
-    -- Answers to screening questions (CHANGED: json → jsonb)
+    -- Answers to screening questions
     -- Format: [{"question": "What is your experience?", "answer": "5 years with React"}]
     answers JSONB DEFAULT '[]'::jsonb,
     
@@ -47,28 +48,35 @@ CREATE TABLE IF NOT EXISTS proposals (
     CONSTRAINT proposals_hours_check CHECK (estimated_hours IS NULL OR estimated_hours > 0)
 );
 
--- Performance indexes
+-- =====================================================
+-- PROPOSALS INDEXES (OPTIMIZED)
+-- =====================================================
+-- Audit Result: Only primary key and project_id had scans
+-- REMOVED: idx_proposals_freelancer_id (redundant per V_fix_004 - covered by freelancer_status composite)
+-- REMOVED: idx_proposals_reviewing, idx_proposals_shortlisted, idx_proposals_featured (all 0 scans)
+-- REMOVED: idx_proposals_budget (0 scans - budget filtering not used)
+-- REMOVED: idx_proposals_answers_gin (0 scans - JSONB search not used yet)
+-- KEPT: project_id (essential FK), freelancer_status composite, created_at
+
+-- KEPT: Essential foreign key index
 CREATE INDEX idx_proposals_project_id ON proposals(project_id);
-CREATE INDEX idx_proposals_freelancer_id ON proposals(freelancer_id);
+
+-- KEPT: Freelancer dashboard (covers freelancer_id queries)
+CREATE INDEX idx_proposals_freelancer_status ON proposals(freelancer_id, status, created_at DESC);
+
+-- KEPT: Time-based sorting
 CREATE INDEX idx_proposals_created_at ON proposals(created_at DESC);
 
--- Status-based partial indexes
-CREATE INDEX idx_proposals_reviewing ON proposals(project_id, created_at DESC) 
-    WHERE status IN ('SUBMITTED', 'REVIEWING');
-CREATE INDEX idx_proposals_shortlisted ON proposals(project_id, created_at DESC) 
-    WHERE status = 'SHORTLISTED';
-CREATE INDEX idx_proposals_featured ON proposals(project_id, created_at DESC) 
-    WHERE is_featured = TRUE;
+-- Configure auto-vacuum for high-update table (from V_fix_003)
+ALTER TABLE proposals SET (
+  autovacuum_enabled = true,
+  autovacuum_vacuum_scale_factor = 0.1,    -- Vacuum when 10% dead rows
+  autovacuum_analyze_scale_factor = 0.05   -- Analyze when 5% changed
+);
 
--- Budget range for filtering
-CREATE INDEX idx_proposals_budget ON proposals(suggested_budget_cents) 
-    WHERE suggested_budget_cents IS NOT NULL;
-
--- GIN index for answers searching
-CREATE INDEX idx_proposals_answers_gin ON proposals USING GIN(answers);
-
--- Composite index for freelancer dashboard
-CREATE INDEX idx_proposals_freelancer_status ON proposals(freelancer_id, status, created_at DESC);
+-- =====================================================
+-- TRIGGERS
+-- =====================================================
 
 -- Trigger for updated_at
 CREATE TRIGGER proposals_updated_at 
@@ -108,9 +116,25 @@ CREATE TRIGGER trg_decrement_project_proposal_count
     FOR EACH ROW
     EXECUTE FUNCTION decrement_project_proposal_count();
 
-COMMENT ON TABLE proposals IS 'Freelancer proposals submitted for project postings';
+-- =====================================================
+-- COMMENTS
+-- =====================================================
+
+COMMENT ON TABLE proposals IS 'Freelancer proposals submitted for project postings. Optimized with auto-vacuum (10% threshold), minimal indexes.';
 COMMENT ON COLUMN proposals.status IS 'Proposal status: SUBMITTED, REVIEWING, SHORTLISTED, ACCEPTED, REJECTED, WITHDRAWN';
 COMMENT ON COLUMN proposals.suggested_budget_cents IS 'Proposed budget in cents (e.g., $2500 = 250000)';
 COMMENT ON COLUMN proposals.answers IS 'JSONB array: [{"question": "What is your experience?", "answer": "5 years with React"}]';
 COMMENT ON COLUMN proposals.attachments IS 'Text array of attachment URLs';
 COMMENT ON COLUMN proposals.portfolio_links IS 'Text array of portfolio URLs';
+
+-- =====================================================
+-- ROLLBACK INSTRUCTIONS
+-- =====================================================
+-- To rollback this migration, run:
+--
+-- DROP TRIGGER IF EXISTS trg_decrement_project_proposal_count ON proposals;
+-- DROP TRIGGER IF EXISTS trg_increment_project_proposal_count ON proposals;
+-- DROP TRIGGER IF EXISTS proposals_updated_at ON proposals;
+-- DROP FUNCTION IF EXISTS decrement_project_proposal_count();
+-- DROP FUNCTION IF EXISTS increment_project_proposal_count();
+-- DROP TABLE IF EXISTS proposals CASCADE;

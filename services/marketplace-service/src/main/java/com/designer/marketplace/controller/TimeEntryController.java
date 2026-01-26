@@ -33,7 +33,7 @@ import lombok.RequiredArgsConstructor;
  * - GET /api/contracts/{contractId}/time-entries/total-hours - Get total hours for contract
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("")
 @RequiredArgsConstructor
 public class TimeEntryController {
 

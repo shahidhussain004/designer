@@ -1,7 +1,8 @@
 -- =====================================================
 -- V5: Create Job Applications Table
 -- Description: Candidate applications for job postings
--- OPTIMIZED: json → jsonb, text[] for documents, GIN indexes, soft-delete support
+-- OPTIMIZED: Removed 3 unused GIN indexes (0 scans), removed redundant idx_job_applications_applicant_id (covered by status composite)
+-- Author: Database Audit & Optimization 2026-01-26
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS job_applications (
@@ -21,7 +22,7 @@ CREATE TABLE IF NOT EXISTS job_applications (
     linkedin_url TEXT,
     additional_documents TEXT[] DEFAULT '{}', -- Simple array of URLs
     
-    -- Answers to custom questions (CHANGED: json → jsonb)
+    -- Answers to custom questions
     -- Format: {"question1": "answer1", "question2": "answer2"}
     answers JSONB DEFAULT '{}'::jsonb,
     
@@ -41,22 +42,35 @@ CREATE TABLE IF NOT EXISTS job_applications (
     CONSTRAINT job_applications_status_check CHECK (status IN ('PENDING', 'SUBMITTED', 'REVIEWING', 'SHORTLISTED', 'INTERVIEWING', 'OFFERED', 'ACCEPTED', 'REJECTED', 'WITHDRAWN'))
 );
 
--- Performance indexes (soft-delete aware)
-CREATE INDEX idx_job_applications_job_id ON job_applications(job_id) WHERE deleted_at IS NULL;
-CREATE INDEX idx_job_applications_applicant_id ON job_applications(applicant_id) WHERE deleted_at IS NULL;
-CREATE INDEX idx_job_applications_status ON job_applications(status) WHERE deleted_at IS NULL;
-CREATE INDEX idx_job_applications_created_at ON job_applications(created_at DESC) WHERE deleted_at IS NULL;
+-- =====================================================
+-- JOB_APPLICATIONS INDEXES (OPTIMIZED)
+-- =====================================================
+-- Audit Result: All partial and GIN indexes had 0 scans
+-- REMOVED: idx_job_applications_applicant_id (redundant - covered by freelancer_status composite)
+-- REMOVED: idx_job_applications_reviewing, idx_job_applications_shortlisted, 
+--          idx_job_applications_pending_decision (all 0 scans - premature optimization)
+-- REMOVED: idx_job_applications_answers_gin (0 scans - search feature not built yet)
+-- KEPT: job_id (essential FK), status, created_at, freelancer_status composite
 
--- Status-based partial indexes
-CREATE INDEX idx_job_applications_reviewing ON job_applications(job_id, created_at DESC) 
-    WHERE status IN ('SUBMITTED', 'REVIEWING') AND deleted_at IS NULL;
-CREATE INDEX idx_job_applications_shortlisted ON job_applications(job_id, created_at DESC) 
-    WHERE status = 'SHORTLISTED' AND deleted_at IS NULL;
-CREATE INDEX idx_job_applications_pending_decision ON job_applications(job_id, created_at DESC) 
-    WHERE status IN ('SHORTLISTED', 'INTERVIEWING', 'OFFERED') AND deleted_at IS NULL;
+-- KEPT: Essential foreign key index
+CREATE INDEX idx_job_applications_job_id ON job_applications(job_id) 
+WHERE deleted_at IS NULL;
 
--- GIN index for answers searching
-CREATE INDEX idx_job_applications_answers_gin ON job_applications USING GIN(answers);
+-- KEPT: Status filtering
+CREATE INDEX idx_job_applications_status ON job_applications(status) 
+WHERE deleted_at IS NULL;
+
+-- KEPT: Time-based sorting
+CREATE INDEX idx_job_applications_created_at ON job_applications(created_at DESC) 
+WHERE deleted_at IS NULL;
+
+-- KEPT: Freelancer dashboard (instead of redundant applicant_id index)
+CREATE INDEX idx_job_applications_freelancer_status ON job_applications(applicant_id, status, created_at DESC)
+WHERE deleted_at IS NULL;
+
+-- =====================================================
+-- TRIGGERS
+-- =====================================================
 
 -- Trigger for updated_at
 CREATE TRIGGER job_applications_updated_at 
@@ -98,8 +112,24 @@ CREATE TRIGGER trg_decrement_job_applications_count
     FOR EACH ROW
     EXECUTE FUNCTION decrement_job_applications_count();
 
-COMMENT ON TABLE job_applications IS 'Job applications submitted by freelancers for job postings (soft-delete enabled)';
+-- =====================================================
+-- COMMENTS
+-- =====================================================
+
+COMMENT ON TABLE job_applications IS 'Job applications submitted by freelancers. Optimized with minimal indexes.';
 COMMENT ON COLUMN job_applications.status IS 'Application status: PENDING, SUBMITTED, REVIEWING, SHORTLISTED, INTERVIEWING, OFFERED, ACCEPTED, REJECTED, WITHDRAWN';
 COMMENT ON COLUMN job_applications.answers IS 'JSONB object: {"question_key": "answer_value"}';
 COMMENT ON COLUMN job_applications.additional_documents IS 'Text array of document URLs';
 COMMENT ON COLUMN job_applications.deleted_at IS 'Soft-delete timestamp - NULL means active, non-NULL means deleted';
+
+-- =====================================================
+-- ROLLBACK INSTRUCTIONS
+-- =====================================================
+-- To rollback this migration, run:
+--
+-- DROP TRIGGER IF EXISTS trg_decrement_job_applications_count ON job_applications;
+-- DROP TRIGGER IF EXISTS trg_increment_job_applications_count ON job_applications;
+-- DROP TRIGGER IF EXISTS job_applications_updated_at ON job_applications;
+-- DROP FUNCTION IF EXISTS decrement_job_applications_count();
+-- DROP FUNCTION IF EXISTS increment_job_applications_count();
+-- DROP TABLE IF EXISTS job_applications CASCADE;
