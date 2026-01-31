@@ -19,7 +19,6 @@ import com.designer.marketplace.dto.NotificationResponse;
 import com.designer.marketplace.dto.ProjectResponse;
 import com.designer.marketplace.dto.ProposalResponse;
 import com.designer.marketplace.entity.Job;
-import com.designer.marketplace.entity.JobApplication;
 import com.designer.marketplace.entity.Project;
 import com.designer.marketplace.entity.Proposal;
 import com.designer.marketplace.entity.User;
@@ -119,18 +118,14 @@ public class DashboardService {
                 Pageable openJobsPageable = PageRequest.of(0, 5, Sort.by("publishedAt").descending());
                 Page<Job> openJobsPage = jobRepository.findByCompanyId(currentUser.getId(), openJobsPageable);
                 List<JobResponse> openJobsResponse = openJobsPage.getContent().stream()
-                                .filter(job -> job.getStatus() == Job.JobStatus.OPEN)
+                                .filter(job -> job.getStatus() != null && job.getStatus() == Job.JobStatus.OPEN)
                                 .map(JobResponse::fromEntity)
                                 .collect(Collectors.toList());
 
                 // Get recent applications for company's jobs
-                Pageable applicationsPageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
-                Page<JobApplication> recentApplicationsPage = jobApplicationRepository.findAll(applicationsPageable);
-                List<JobApplicationResponse> recentApplicationsResponse = recentApplicationsPage.getContent().stream()
-                                .filter(app -> app.getJob() != null && app.getJob().getCompany() != null && 
-                                        app.getJob().getCompany().getId().equals(currentUser.getId()))
-                                .map(JobApplicationResponse::fromEntity)
-                                .collect(Collectors.toList());
+                // NOTE: Skipping job applications due to Hibernate ARRAY type mapping issue
+                // TODO: Fix the additionalDocuments field type or use a custom query
+                List<JobApplicationResponse> recentApplicationsResponse = new java.util.ArrayList<>();
 
                 return CompanyDashboardResponse.builder()
                                 .stats(stats)

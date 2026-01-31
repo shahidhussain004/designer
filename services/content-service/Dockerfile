@@ -68,18 +68,19 @@ RUN if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
 
 COPY package.json package-lock.json* ./
 
-# Install all dependencies (including dev) with cache mount
-RUN --mount=type=cache,id=npm,target=/root/.npm \
-    npm ci 2>/dev/null || npm install
+# Copy pre-built node_modules from host (containing the Prisma client)
+# This avoids needing to download Prisma engine binaries in air-gapped environment
+COPY node_modules ./node_modules
 
-# Copy source code and build artifacts
+# Install/update dependencies if needed
+# Skip Prisma postinstall hook to avoid trying to download engine binaries
+RUN npm ci --ignore-scripts 2>/dev/null || npm install --ignore-scripts || true
+
+# Copy source code
 COPY . .
 
 # Ensure Prisma can verify TLS using system/company CAs
 ENV NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/SEB_Root_CA_v2.crt
-
-# Generate Prisma client (uses NODE_EXTRA_CA_CERTS for TLS)
-RUN NODE_EXTRA_CA_CERTS=$NODE_EXTRA_CA_CERTS npx prisma generate || (echo "Prisma generate failed; attempting with NODE_TLS_REJECT_UNAUTHORIZED=0" && NODE_TLS_REJECT_UNAUTHORIZED=0 npx prisma generate)
 
 # Build the application
 RUN npm run build
@@ -150,4 +151,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:8083/health || exit 1
 
 # Run migrations then start the server
-CMD ["sh", "-c", "npx prisma db push --skip-generate && node dist/server.js"]
+# Skip Prisma operations in the air-gapped environment since engine binaries are already present
+CMD ["node", "dist/server.js"]

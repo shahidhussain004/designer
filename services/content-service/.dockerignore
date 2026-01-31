@@ -1,10 +1,10 @@
 # Dependencies
-node_modules/
+# node_modules/  - Intentionally NOT ignored so we can copy pre-built modules with Prisma client
 .pnp
 .pnp.js
 
 # Build output
-dist/
+# dist/  - Intentionally NOT ignored so Prisma client is available during build
 build/
 
 # Environment files

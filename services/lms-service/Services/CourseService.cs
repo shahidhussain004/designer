@@ -10,7 +10,7 @@ public interface ICourseService
     Task<CourseResponse> UpdateCourseAsync(string courseId, long instructorId, UpdateCourseRequest request);
     Task<CourseResponse?> GetCourseAsync(string courseId);
     Task<CourseResponse?> GetCourseBySlugAsync(string slug);
-    Task<PagedResult<CourseSummaryResponse>> SearchCoursesAsync(string? searchTerm, string? category, string? level, int page, int pageSize);
+    Task<PagedResult<CourseSummaryResponse>> SearchCoursesAsync(string? searchTerm, string? category, string? level, decimal? minPrice, decimal? maxPrice, string? sortBy, int page, int pageSize);
     Task<PagedResult<CourseSummaryResponse>> GetCoursesByInstructorAsync(long instructorId, int page, int pageSize);
     Task<List<CourseSummaryResponse>> GetPopularCoursesAsync(int count);
     Task<bool> DeleteCourseAsync(string courseId, long instructorId);
@@ -94,7 +94,7 @@ public class CourseService : ICourseService
         return course != null ? MapToResponse(course) : null;
     }
 
-    public async Task<PagedResult<CourseSummaryResponse>> SearchCoursesAsync(string? searchTerm, string? category, string? level, int page, int pageSize)
+    public async Task<PagedResult<CourseSummaryResponse>> SearchCoursesAsync(string? searchTerm, string? category, string? level, decimal? minPrice, decimal? maxPrice, string? sortBy, int page, int pageSize)
     {
         CourseCategory? categoryEnum = null;
         CourseLevel? levelEnum = null;
@@ -125,15 +125,42 @@ public class CourseService : ICourseService
             levelEnum = null;
         }
 
-        // Convert 1-based page to 0-based skip (page 1 = skip 0, page 2 = skip pageSize)
+        // Get all matching courses (without pagination yet)
+        var allCourses = await _courseRepository.GetAllPublishedAsync(searchTerm, categoryEnum, levelEnum);
+
+        // Apply price filtering in memory
+        var filteredCoursesList = allCourses.ToList();
+        if (minPrice.HasValue)
+        {
+            filteredCoursesList = filteredCoursesList.Where(c => c.Price >= (int)minPrice.Value).ToList();
+        }
+        if (maxPrice.HasValue)
+        {
+            filteredCoursesList = filteredCoursesList.Where(c => c.Price <= (int)maxPrice.Value).ToList();
+        }
+
+        // Apply sorting
+        var sortedList = sortBy switch
+        {
+            "newest" => filteredCoursesList.OrderByDescending(c => c.CreatedAt).ToList(),
+            "price-low" => filteredCoursesList.OrderBy(c => c.Price).ToList(),
+            "price-high" => filteredCoursesList.OrderByDescending(c => c.Price).ToList(),
+            "rating" => filteredCoursesList.OrderByDescending(c => c.AverageRating).ToList(),
+            "popular" => filteredCoursesList.OrderByDescending(c => c.TotalEnrollments).ToList(),
+            _ => filteredCoursesList.OrderByDescending(c => c.TotalEnrollments).ToList() // default to popular
+        };
+
+        var allSortedCourses = sortedList;
+        var totalCount = allSortedCourses.Count;
+
+        // Now apply pagination
         int skip = Math.Max(0, page - 1) * pageSize;
-        var courses = await _courseRepository.SearchAsync(searchTerm, categoryEnum, levelEnum, CourseStatus.Published, skip, pageSize);
-        var total = await _courseRepository.CountAsync(searchTerm, categoryEnum, levelEnum, CourseStatus.Published);
+        var paginatedCourses = allSortedCourses.Skip(skip).Take(pageSize).ToList();
 
         // Return the page number as-is (it's already 1-based from the request)
         return new PagedResult<CourseSummaryResponse>(
-            courses.Select(MapToSummary).ToList(),
-            total,
+            paginatedCourses.Select(MapToSummary).ToList(),
+            totalCount,
             page,
             pageSize
         );

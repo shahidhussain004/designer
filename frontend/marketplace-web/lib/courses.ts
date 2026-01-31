@@ -1,6 +1,6 @@
 import lmsClient from './lms-api';
 
-const CONTENT_SERVICE_URL = process.env.NEXT_PUBLIC_CONTENT_SERVICE_URL || 'http://localhost:8083/api/v1';
+const LMS_SERVICE_URL = process.env.NEXT_PUBLIC_LMS_SERVICE_URL || 'http://localhost:8082/api';
 
 // Course types
 export interface Course {
@@ -84,7 +84,8 @@ export async function getCourses(params?: {
   if (params?.minPrice !== undefined) queryParams.append('minPrice', params.minPrice.toString());
   if (params?.maxPrice !== undefined) queryParams.append('maxPrice', params.maxPrice.toString());
   if (params?.search) queryParams.append('search', params.search);
-  if (params?.page !== undefined) queryParams.append('page', params.page.toString());
+  // Convert 0-based page to 1-based for backend
+  if (params?.page !== undefined) queryParams.append('page', (params.page + 1).toString());
   if (params?.size !== undefined) queryParams.append('pageSize', params.size.toString());
   if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
 
@@ -97,7 +98,7 @@ export async function getCourses(params?: {
   };
   
   let data: ApiResponse = {};
-  const url = `${CONTENT_SERVICE_URL}/courses?${queryParams.toString()}`;
+  const url = `${LMS_SERVICE_URL}/courses?${queryParams.toString()}`;
   if (typeof fetch !== 'undefined') {
     const resp = await fetch(url);
     data = await resp.json();
@@ -169,7 +170,7 @@ export async function getCourseById(id: string): Promise<Course> {
 }
 
 export async function getCourseBySlug(slug: string): Promise<Course> {
-  const url = `${CONTENT_SERVICE_URL}/courses/${slug}`;
+  const url = `${LMS_SERVICE_URL}/courses/slug/${slug}`;
   if (typeof fetch !== 'undefined') {
     const resp = await fetch(url);
     if (!resp.ok) {
@@ -177,7 +178,7 @@ export async function getCourseBySlug(slug: string): Promise<Course> {
     }
     return resp.json();
   } else {
-    const response = await lmsClient.get(`/courses/${slug}`);
+    const response = await lmsClient.get(`/courses/slug/${slug}`);
     return response.data;
   }
 }
