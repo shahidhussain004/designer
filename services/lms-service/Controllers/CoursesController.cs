@@ -27,12 +27,15 @@ public class CoursesController : ControllerBase
         [FromQuery] string? search,
         [FromQuery] string? category,
         [FromQuery] string? level,
+        [FromQuery] decimal? minPrice,
+        [FromQuery] decimal? maxPrice,
+        [FromQuery] string? sortBy,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20)
     {
-        _logger.LogInformation("GetCourses called with: search={Search}, category={Category}, level={Level}, page={Page}, pageSize={PageSize}", 
-            search, category, level, page, pageSize);
-        var result = await _courseService.SearchCoursesAsync(search, category, level, page, pageSize);
+        _logger.LogInformation("GetCourses called with: search={Search}, category={Category}, level={Level}, minPrice={MinPrice}, maxPrice={MaxPrice}, sortBy={SortBy}, page={Page}, pageSize={PageSize}", 
+            search, category, level, minPrice, maxPrice, sortBy, page, pageSize);
+        var result = await _courseService.SearchCoursesAsync(search, category, level, minPrice, maxPrice, sortBy, page, pageSize);
         _logger.LogInformation("GetCourses result: totalCount={TotalCount}, items={ItemCount}", result.TotalCount, result.Items.Count);
         return Ok(result);
     }

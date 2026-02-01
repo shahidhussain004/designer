@@ -1,6 +1,9 @@
 package com.designer.marketplace.controller;
 
 import java.util.List;
+import java.util.Map;
+
+import jakarta.validation.Valid;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.designer.marketplace.dto.CreateJobRequest;
 import com.designer.marketplace.dto.JobResponse;
 import com.designer.marketplace.entity.Job;
 import com.designer.marketplace.entity.JobCategory;
@@ -72,16 +76,6 @@ public class JobController {
     }
 
     /**
-     * Get job by ID
-     */
-    @GetMapping("/{id}")
-    @Operation(summary = "Get job by ID", description = "Retrieve a specific job posting by its ID")
-    public ResponseEntity<JobResponse> getJobById(@PathVariable Long id) {
-        JobResponse job = jobService.getJobById(id);
-        return ResponseEntity.ok(job);
-    }
-
-    /**
      * Search jobs
      */
     @GetMapping("/search")
@@ -129,8 +123,6 @@ public class JobController {
         return ResponseEntity.ok(category);
     }
 
-    
-
     /**
      * Create a new job (requires authentication as company)
      */
@@ -139,17 +131,41 @@ public class JobController {
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Create a new job", description = "Post a new company job opportunity")
     public ResponseEntity<JobResponse> createJob(
-            @RequestBody Job job,
+            @RequestBody @Valid CreateJobRequest request,
             @AuthenticationPrincipal UserPrincipal currentUser) {
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
 
-        JobResponse createdJob = jobService.createJob(currentUser.getId(), job);
+        JobResponse createdJob = jobService.createJob(currentUser.getId(), request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdJob);
+    }
+
+    /**
+     * Catch-all for /create path - prevents GET /create from matching /{id}
+     */
+    @GetMapping("/create")
+    @Operation(summary = "Create job form", description = "GET /create is not allowed - use POST /jobs instead")
+    public ResponseEntity<?> getCreateNotAllowed() {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+                .header("Allow", "POST")
+                .body(Map.of("error", "GET /create is not allowed. Use POST /jobs to create a job."));
+    }
+
+    /**
+     * Get job by ID
+     */
+    @GetMapping("/{id:\\d+}")
+    @Operation(summary = "Get job by ID", description = "Retrieve a specific job posting by its ID")
+    public ResponseEntity<JobResponse> getJobById(@PathVariable Long id) {
+        JobResponse job = jobService.getJobById(id);
+        return ResponseEntity.ok(job);
     }
 
     /**
      * Update a job
      */
-    @PutMapping("/{id}")
+    @PutMapping("/{id:\\d+}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'COMPANY')")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Update a job", description = "Update an existing company job posting")
@@ -167,7 +183,7 @@ public class JobController {
     /**
      * Publish a job
      */
-    @PostMapping("/{id}/publish")
+    @PostMapping("/{id:\\d+}/publish")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'COMPANY')")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Publish a job", description = "Change job status from draft to open")
@@ -182,7 +198,7 @@ public class JobController {
     /**
      * Close a job
      */
-    @PostMapping("/{id}/close")
+    @PostMapping("/{id:\\d+}/close")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'COMPANY')")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Close a job", description = "Close a job posting (no longer accepting applications)")
@@ -197,7 +213,7 @@ public class JobController {
     /**
      * Delete a job
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id:\\d+}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'COMPANY')")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Delete a job", description = "Permanently delete a job posting")

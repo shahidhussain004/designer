@@ -24,7 +24,8 @@ export function useCategories(activeOnly = true) {
         params: { active: activeOnly },
         signal,
       });
-      return (data as any).data || data;
+      // Handle both new format (items) and old format (data)
+      return (data as any).items || (data as any).data || data;
     },
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
@@ -38,7 +39,8 @@ export function useCategoryTree() {
     queryKey: ['categories', 'tree'],
     queryFn: async ({ signal }) => {
       const { data } = await contentClient.get('/categories/tree', { signal });
-      return (data as any).data || data;
+      // Handle both new format (items) and old format (data)
+      return (data as any).items || (data as any).data || data;
     },
     staleTime: 10 * 60 * 1000,
   });
@@ -56,7 +58,8 @@ export function useTags() {
     queryKey: ['tags'],
     queryFn: async ({ signal }) => {
       const { data } = await contentClient.get<{ data: Tag[] }>('/tags', { signal });
-      return data.data || [];
+      // Handle both new format (items) and old format (data)
+      return (data as any).items || (data as any).data || [];
     },
     staleTime: 10 * 60 * 1000,
   });
@@ -70,7 +73,8 @@ export function usePopularTags(limit = 20) {
     queryKey: ['tags', 'popular', limit],
     queryFn: async ({ signal }) => {
       const { data } = await contentClient.get(`/tags/popular/${limit}`, { signal });
-      return (data as any).data || data;
+      // Handle both new format (items) and old format (data)
+      return (data as any).items || (data as any).data || data;
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -91,7 +95,8 @@ export function useTutorials(activeOnly = true) {
         params: { active: activeOnly },
         signal,
       });
-      return (data as any).data || data;
+      // Handle both new format (items) and old format (data)
+      return (data as any).items || (data as any).data || data;
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -140,11 +145,12 @@ export function useResources(filters?: { category?: string; tag?: string }) {
   return useQuery({
     queryKey: ['resources', filters],
     queryFn: async ({ signal }) => {
-      const { data } = await contentClient.get('/content', {
+      const { data } = await contentClient.get('/resources', {
         params: filters,
         signal,
       });
-      return (data as any).data || data;
+      // Handle both new format (items) and old format (data)
+      return (data as any).items || (data as any).data || data;
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -152,13 +158,14 @@ export function useResources(filters?: { category?: string; tag?: string }) {
 
 /**
  * Fetch single resource by slug
+ * Note: Despite the function name, this fetches content (articles/blogs) shown on /resources page
  */
 export function useResource(slug: string | null) {
   return useQuery({
     queryKey: ['resource', slug],
     queryFn: async ({ signal }) => {
       if (!slug) throw new Error('Resource slug is required');
-      // Use dedicated slug endpoint - best practice for single item fetch
+      // Use content slug endpoint since resources page shows content items
       const { data } = await contentClient.get(`/content/slug/${slug}`, {
         signal,
       });
@@ -178,26 +185,33 @@ export function useResource(slug: string | null) {
  */
 export function useContent(filters?: { 
   type?: string; 
-  category?: string; 
-  tags?: string[];
+  categoryId?: string;
+  tagIds?: string[];
   page?: number;
   limit?: number;
   sortBy?: string;
   sortOrder?: string;
+  search?: string;
 }) {
   return useQuery({
     queryKey: ['content', filters],
     queryFn: async ({ signal }) => {
+      // Convert tagIds array to comma-separated string for API
+      const params = filters ? { ...filters } : {};
+      if (params.tagIds && Array.isArray(params.tagIds) && params.tagIds.length > 0) {
+        params.tagIds = params.tagIds.join(',') as any;
+      }
+      
       const { data } = await contentClient.get('/content', {
-        params: filters,
+        params,
         signal,
       });
-      // Return the full response structure with data and meta
+      // Return the full response structure with items/data and meta
       return {
-        data: (data as any).data || [],
+        data: (data as any).items || (data as any).data || [],
         meta: (data as any).meta || {
-          total: 0,
-          page: 1,
+          total: (data as any).total || 0,
+          page: (data as any).page || 1,
           limit: 10,
           totalPages: 0,
           hasNextPage: false,
@@ -221,7 +235,8 @@ export function useSearchContent(query: string, filters?: { type?: string; categ
         params: { q: query, ...filters },
         signal,
       });
-      return (data as any).data || data;
+      // Handle both new format (items) and old format (data)
+      return (data as any).items || (data as any).data || data;
     },
     enabled: query.length > 0,
     staleTime: 30 * 1000, // 30 seconds for search
@@ -241,7 +256,8 @@ export function useComments(contentId: string | number | null) {
     queryFn: async ({ signal }) => {
       if (!contentId) throw new Error('Content ID is required');
       const { data } = await contentClient.get(`/content/${contentId}/comments`, { signal });
-      return (data as any).data || data;
+      // Handle both new format (items) and old format (data)
+      return (data as any).items || (data as any).data || data;
     },
     enabled: !!contentId,
     staleTime: 2 * 60 * 1000,

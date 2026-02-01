@@ -27,6 +27,13 @@ public interface JobRepository extends JpaRepository<Job, Long>, JpaSpecificatio
     // Basic find methods
     Optional<Job> findById(Long id);
 
+    @Query("SELECT j FROM Job j " +
+            "LEFT JOIN FETCH j.company c " +
+            "LEFT JOIN FETCH c.user u " +
+            "LEFT JOIN FETCH j.category jc " +
+            "WHERE j.id = :id ")
+    Optional<Job> findByIdWithCompanyAndCategory(@Param("id") Long id);
+
     Page<Job> findByCompanyId(Long companyId, Pageable pageable);
 
     Page<Job> findByCategoryId(Long categoryId, Pageable pageable);

@@ -86,7 +86,7 @@ export default function EditCoursePage() {
     try {
       setSaving(true)
       await publishCourse(courseId)
-      router.push('/dashboards/instructor')
+      router.push('/dashboard/instructor')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to publish course')
       setSaving(false)
@@ -124,7 +124,7 @@ export default function EditCoursePage() {
         {/* Header */}
         <div className="bg-gray-900 text-white py-12">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <Link href="/dashboards/instructor" className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-4">
+            <Link href="/dashboard/instructor" className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-4">
               <ArrowLeft className="w-4 h-4" />
               Back to Dashboard
             </Link>
@@ -295,7 +295,7 @@ export default function EditCoursePage() {
                     {saving ? 'Saving...' : 'Save Changes'}
                   </button>
                   <Link
-                    href="/dashboards/instructor"
+                    href="/dashboard/instructor"
                     className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium"
                   >
                     Cancel

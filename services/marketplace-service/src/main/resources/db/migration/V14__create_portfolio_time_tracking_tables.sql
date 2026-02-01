@@ -1,7 +1,8 @@
 -- =====================================================
 -- V14: Create Portfolio & Time Tracking Tables
 -- Description: Portfolio management and time tracking for hourly contracts
--- OPTIMIZED: json → jsonb, GIN indexes, materialized view for summaries
+-- OPTIMIZED: Removed 11 unused indexes (0 scans), removed 4 JSONB GIN indexes, removed full-text search index
+-- Author: Database Audit & Optimization 2026-01-26
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS portfolio_items (
@@ -12,7 +13,7 @@ CREATE TABLE IF NOT EXISTS portfolio_items (
     title VARCHAR(255) NOT NULL,
     description TEXT,
     
-    -- Media & Links (CHANGED: json → jsonb)
+    -- Media & Links
     image_url TEXT,
     thumbnail_url TEXT,
     -- Format: [{"url": "https://...", "caption": "Screenshot 1", "order": 1}]
@@ -24,7 +25,7 @@ CREATE TABLE IF NOT EXISTS portfolio_items (
     live_url TEXT,
     source_url TEXT,
     
-    -- Metadata (CHANGED: json → jsonb)
+    -- Metadata
     -- Format: ["React", "Node.js", "PostgreSQL"]
     skills_demonstrated JSONB DEFAULT '[]'::jsonb NOT NULL,
     tools_used JSONB DEFAULT '[]'::jsonb NOT NULL,
@@ -47,28 +48,17 @@ CREATE TABLE IF NOT EXISTS portfolio_items (
     CONSTRAINT portfolio_dates_check CHECK (end_date IS NULL OR start_date IS NULL OR end_date >= start_date)
 );
 
--- Indexes
-CREATE INDEX idx_portfolio_user_id ON portfolio_items(user_id) WHERE deleted_at IS NULL;
-CREATE INDEX idx_portfolio_category ON portfolio_items(project_category) WHERE project_category IS NOT NULL AND deleted_at IS NULL;
-CREATE INDEX idx_portfolio_created_at ON portfolio_items(created_at DESC) WHERE deleted_at IS NULL;
+-- =====================================================
+-- PORTFOLIO_ITEMS INDEXES (OPTIMIZED)
+-- =====================================================
+-- Audit Result: All indexes had 0 scans (portfolio system not in use yet)
+-- REMOVED: idx_portfolio_user_id, idx_portfolio_category, idx_portfolio_created_at,
+--          idx_portfolio_visible, idx_portfolio_featured (all 0 scans)
+-- REMOVED: idx_portfolio_skills_gin, idx_portfolio_tools_gin, idx_portfolio_tech_gin (0 scans - JSONB search not used yet)
+-- REMOVED: idx_portfolio_search (0 scans - full-text search not implemented)
+-- NOTE: Will add indexes when portfolio features are actively used
 
--- Visible items ordered
-CREATE INDEX idx_portfolio_visible ON portfolio_items(user_id, is_visible, display_order) 
-    WHERE is_visible = TRUE AND deleted_at IS NULL;
-
--- Featured items
-CREATE INDEX idx_portfolio_featured ON portfolio_items(user_id, highlight_order) 
-    WHERE highlight_order IS NOT NULL AND is_visible = TRUE AND deleted_at IS NULL;
-
--- GIN indexes for skill/technology searching
-CREATE INDEX idx_portfolio_skills_gin ON portfolio_items USING GIN(skills_demonstrated);
-CREATE INDEX idx_portfolio_tools_gin ON portfolio_items USING GIN(tools_used);
-CREATE INDEX idx_portfolio_tech_gin ON portfolio_items USING GIN(technologies);
-
--- Full-text search
-CREATE INDEX idx_portfolio_search ON portfolio_items USING GIN(
-    to_tsvector('english', title || ' ' || COALESCE(description, ''))
-) WHERE deleted_at IS NULL;
+-- No indexes initially - add when portfolio features are built
 
 CREATE TABLE IF NOT EXISTS time_entries (
     id BIGSERIAL PRIMARY KEY,
@@ -84,11 +74,10 @@ CREATE TABLE IF NOT EXISTS time_entries (
     -- Description
     description TEXT,
     task_description TEXT,
-    -- CHANGED: Structured work breakdown (json → jsonb)
     -- Format: {"tasks": [{"task": "Implemented login", "hours": 3.5, "completed": true}], "notes": "..."}
     work_diary JSONB DEFAULT '{}'::jsonb NOT NULL,
     
-    -- Proof of Work (CHANGED: json → jsonb)
+    -- Proof of Work
     -- Format: [{"url": "https://...", "timestamp": "2024-01-15T10:30:00Z"}]
     screenshot_urls JSONB DEFAULT '[]'::jsonb NOT NULL,
     -- Format: [{"filename": "report.pdf", "url": "https://...", "size": 12345}]
@@ -114,29 +103,22 @@ CREATE TABLE IF NOT EXISTS time_entries (
     )
 );
 
--- Indexes
-CREATE INDEX idx_time_contract_id ON time_entries(contract_id);
-CREATE INDEX idx_time_freelancer_id ON time_entries(freelancer_id);
-CREATE INDEX idx_time_date_desc ON time_entries(date DESC);
-CREATE INDEX idx_time_created_at ON time_entries(created_at DESC);
+-- =====================================================
+-- TIME_ENTRIES INDEXES (OPTIMIZED)
+-- =====================================================
+-- Audit Result: All indexes had 0 scans (time tracking system not in use yet)
+-- REMOVED: idx_time_contract_id, idx_time_freelancer_id, idx_time_date_desc,
+--          idx_time_created_at, idx_time_status, idx_time_pending,
+--          idx_time_contract_date, idx_time_freelancer_date, idx_time_approved_hours (all 0 scans)
+-- REMOVED: idx_time_work_diary_gin, idx_time_screenshots_gin, idx_time_attachments_gin (0 scans - JSONB search not used yet)
+-- NOTE: Will add indexes when time tracking features are actively used
 
--- Status-based queries
-CREATE INDEX idx_time_status ON time_entries(contract_id, status);
-CREATE INDEX idx_time_pending ON time_entries(contract_id, created_at DESC) WHERE status = 'SUBMITTED';
+-- No indexes initially - add when time tracking features are built
 
--- Composite indexes
-CREATE INDEX idx_time_contract_date ON time_entries(contract_id, date DESC, status);
-CREATE INDEX idx_time_freelancer_date ON time_entries(freelancer_id, date DESC, status);
+-- =====================================================
+-- TRIGGERS
+-- =====================================================
 
--- Approved hours aggregation
-CREATE INDEX idx_time_approved_hours ON time_entries(contract_id, date, hours_logged) WHERE status = 'APPROVED';
-
--- GIN indexes for JSONB
-CREATE INDEX idx_time_work_diary_gin ON time_entries USING GIN(work_diary);
-CREATE INDEX idx_time_screenshots_gin ON time_entries USING GIN(screenshot_urls);
-CREATE INDEX idx_time_attachments_gin ON time_entries USING GIN(file_attachments);
-
--- Triggers
 CREATE TRIGGER portfolio_items_updated_at BEFORE UPDATE ON portfolio_items FOR EACH ROW EXECUTE FUNCTION update_timestamp();
 CREATE TRIGGER time_entries_updated_at BEFORE UPDATE ON time_entries FOR EACH ROW EXECUTE FUNCTION update_timestamp();
 
@@ -179,10 +161,28 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-COMMENT ON TABLE portfolio_items IS 'Freelancer portfolio showcasing past work';
-COMMENT ON TABLE time_entries IS 'Hourly time tracking with approval workflow';
+-- =====================================================
+-- COMMENTS
+-- =====================================================
+
+COMMENT ON TABLE portfolio_items IS 'Freelancer portfolio showcasing past work. Optimized with no indexes (portfolio not active).';
+COMMENT ON TABLE time_entries IS 'Hourly time tracking with approval workflow. Optimized with no indexes (time tracking not active).';
 COMMENT ON COLUMN portfolio_items.images IS 'JSONB array: [{"url": "...", "caption": "...", "order": 1}]';
 COMMENT ON COLUMN portfolio_items.skills_demonstrated IS 'JSONB array: ["React", "Node.js", "PostgreSQL"]';
 COMMENT ON COLUMN time_entries.work_diary IS 'JSONB object: {"tasks": [{"task": "...", "hours": 2.5, "completed": true}], "notes": "..."}';
 COMMENT ON COLUMN time_entries.screenshot_urls IS 'JSONB array: [{"url": "...", "timestamp": "..."}]';
 COMMENT ON COLUMN time_entries.file_attachments IS 'JSONB array: [{"filename": "...", "url": "...", "size": 12345}]';
+
+-- =====================================================
+-- ROLLBACK INSTRUCTIONS
+-- =====================================================
+-- To rollback this migration, run:
+--
+-- DROP FUNCTION IF EXISTS refresh_contract_time_summary();
+-- DROP MATERIALIZED VIEW IF EXISTS contract_time_summary CASCADE;
+-- DROP TRIGGER IF EXISTS time_approval_timestamp ON time_entries;
+-- DROP TRIGGER IF EXISTS time_entries_updated_at ON time_entries;
+-- DROP TRIGGER IF EXISTS portfolio_items_updated_at ON portfolio_items;
+-- DROP FUNCTION IF EXISTS set_time_approval_timestamp();
+-- DROP TABLE IF EXISTS time_entries CASCADE;
+-- DROP TABLE IF EXISTS portfolio_items CASCADE;

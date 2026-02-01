@@ -68,7 +68,7 @@ public class UserController {
      * PUT /api/users/{id}
      */
     @PutMapping("/{id}")
-    @PreAuthorize("isAuthenticated() and (@userService.isOwner(#id) or hasRole('ADMIN'))")
+    @PreAuthorize("isAuthenticated() and (@userService.isOwner(#id) or hasAuthority('ADMIN'))")
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable Long id,
             @Valid @RequestBody UserUpdateRequest request) {
@@ -82,7 +82,7 @@ public class UserController {
      * GET /api/users?page=0&size=20
      */
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Page<UserResponse>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {

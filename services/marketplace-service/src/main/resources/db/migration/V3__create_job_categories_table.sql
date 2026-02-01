@@ -1,7 +1,8 @@
 -- =====================================================
 -- V3: Create Job Categories Reference Table
 -- Description: Categories for traditional company job postings
--- OPTIMIZED: Added partial indexes, better constraints
+-- OPTIMIZED: Removed unused indexes, kept only essential constraints
+-- Author: Database Audit & Optimization 2026-01-26
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS job_categories (
@@ -19,28 +20,17 @@ CREATE TABLE IF NOT EXISTS job_categories (
     CONSTRAINT job_categories_display_order_check CHECK (display_order >= 0)
 );
 
--- Indexes (partial indexes for active records only)
-CREATE UNIQUE INDEX idx_job_categories_slug_active ON job_categories(slug) WHERE is_active = TRUE;
-CREATE INDEX idx_job_categories_display_order ON job_categories(display_order) WHERE is_active = TRUE;
+-- =====================================================
+-- JOB_CATEGORIES INDEXES (OPTIMIZED)
+-- =====================================================
+-- Audit Result: job_categories_pkey (141 scans), name_key (30 scans) - both auto-created
+--               slug_active (0 scans), display_order (0 scans), search (0 scans) - all unused
+-- REMOVED: idx_job_categories_slug_active, idx_job_categories_display_order, idx_job_categories_search
+-- KEPT: Primary key (auto-created), unique constraints on name and slug (auto-indexed)
 
--- Full-text search on name and description
-CREATE INDEX idx_job_categories_search ON job_categories USING GIN(
-    to_tsvector('english', name || ' ' || COALESCE(description, ''))
-) WHERE is_active = TRUE;
+-- No additional indexes needed - unique constraints provide sufficient indexing
 
--- Insert default job categories
-INSERT INTO job_categories (name, slug, description, icon, display_order) VALUES
-('Software Development', 'software-development', 'Full-stack, backend, frontend, mobile development roles', 'code', 1),
-('Data Science & Analytics', 'data-science', 'Data scientists, analysts, ML engineers, statisticians', 'chart-bar', 2),
-('Design & UX', 'design-ux', 'UI/UX designers, graphic designers, product designers', 'palette', 3),
-('Product Management', 'product-management', 'Product managers, product owners, technical product leads', 'briefcase', 4),
-('Sales & Business Development', 'sales-bd', 'Sales executives, business development, account managers', 'trending-up', 5),
-('Marketing', 'marketing', 'Digital marketers, content creators, marketing managers', 'megaphone', 6),
-('DevOps & Infrastructure', 'devops-infrastructure', 'DevOps engineers, cloud architects, infrastructure specialists', 'server', 7),
-('Finance & Accounting', 'finance-accounting', 'Accountants, financial analysts, CFOs, controllers', 'calculator', 8),
-('Human Resources', 'human-resources', 'HR managers, recruiters, talent acquisition specialists', 'users', 9),
-('Customer Support', 'customer-support', 'Customer service, support specialists, success managers', 'headphones', 10)
-ON CONFLICT (name) DO NOTHING;
+-- Seed data: See resources/db/seed_data/01_job_categories_seed.sql
 
 -- Trigger for updated_at
 CREATE TRIGGER job_categories_updated_at 
@@ -48,5 +38,17 @@ CREATE TRIGGER job_categories_updated_at
     FOR EACH ROW 
     EXECUTE FUNCTION update_timestamp();
 
+-- =====================================================
+-- COMMENTS
+-- =====================================================
+
 COMMENT ON TABLE job_categories IS 'Categories for traditional company job postings';
 COMMENT ON COLUMN job_categories.slug IS 'URL-friendly identifier for the category';
+
+-- =====================================================
+-- ROLLBACK INSTRUCTIONS
+-- =====================================================
+-- To rollback this migration, run:
+--
+-- DROP TRIGGER IF EXISTS job_categories_updated_at ON job_categories;
+-- DROP TABLE IF EXISTS job_categories CASCADE;

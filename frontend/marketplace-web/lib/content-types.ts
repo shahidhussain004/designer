@@ -4,8 +4,8 @@
  */
 
 // Enums
-export type ContentType = 'BLOG' | 'ARTICLE' | 'NEWS';
-export type ContentStatus = 'DRAFT' | 'REVIEW' | 'PUBLISHED' | 'ARCHIVED';
+export type ContentType = 'blog' | 'article' | 'news';
+export type ContentStatus = 'draft' | 'review' | 'published' | 'archived';
 
 // Base interfaces
 export interface BaseEntity {

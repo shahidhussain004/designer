@@ -1,28 +1,31 @@
 /**
- * Fastify application setup
+ * Fastify application setup - Refactored to use raw PostgreSQL
  */
 import { requestContext } from '@common/middleware';
 import { logger } from '@config/logger.config';
 import Fastify, { FastifyInstance } from 'fastify';
+
+// Import new controllers
 import {
-  analyticsRoutes,
-  categoryRoutes,
-  commentRoutes,
-  contentRoutes,
-  coursesRoutes,
-  mediaRoutes,
-  resourcesRoutes,
-  searchRoutes,
-  tagRoutes,
-  tutorialsRoutes,
-} from './modules';
+    analyticsController,
+    categoryController,
+    commentController,
+    contentController,
+    mediaController,
+    resourceController,
+    searchController,
+    tagController,
+    tutorialController,
+} from './controllers';
+
+// Keep existing plugins
 import {
-  corsPlugin,
-  errorHandlerPlugin,
-  healthPlugin,
-  multipartPlugin,
-  rateLimitPlugin,
-  swaggerPlugin,
+    corsPlugin,
+    errorHandlerPlugin,
+    healthPlugin,
+    multipartPlugin,
+    rateLimitPlugin,
+    swaggerPlugin,
 } from './plugins';
 
 export async function buildApp(): Promise<FastifyInstance> {
@@ -69,19 +72,29 @@ export async function buildApp(): Promise<FastifyInstance> {
     );
   });
 
-  // Register API routes
+  // Register API routes - Using new controllers
   await app.register(
     async (api) => {
-      await api.register(contentRoutes, { prefix: '/content' });
-      await api.register(categoryRoutes, { prefix: '/categories' });
-      await api.register(tagRoutes, { prefix: '/tags' });
-      await api.register(commentRoutes, { prefix: '/comments' });
-      await api.register(mediaRoutes, { prefix: '/media' });
-      await api.register(searchRoutes, { prefix: '/search' });
-      await api.register(analyticsRoutes, { prefix: '/analytics' });
-      await api.register(tutorialsRoutes, { prefix: '/tutorials' });
-      await api.register(coursesRoutes, { prefix: '/courses' });
-      await api.register(resourcesRoutes, { prefix: '/resources' });
+      // Content management
+      await api.register(contentController, { prefix: '/content' });
+      await api.register(categoryController, { prefix: '/categories' });
+      await api.register(tagController, { prefix: '/tags' });
+      await api.register(commentController, { prefix: '/comments' });
+
+      // Media management
+      await api.register(mediaController, { prefix: '/media' });
+
+      // Search
+      await api.register(searchController, { prefix: '/search' });
+
+      // Analytics
+      await api.register(analyticsController, { prefix: '/analytics' });
+
+      // Tutorials
+      await api.register(tutorialController, { prefix: '/tutorials' });
+
+      // Resources
+      await api.register(resourceController, { prefix: '/resources' });
     },
     { prefix: '/api/v1' }
   );

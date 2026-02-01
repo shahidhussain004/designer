@@ -4,6 +4,7 @@ public class MongoDbSettings
 {
     public string ConnectionString { get; set; } = null!;
     public string DatabaseName { get; set; } = null!;
+    public bool EnableMigrations { get; set; } = false;
     public string CoursesCollectionName { get; set; } = "courses";
     public string EnrollmentsCollectionName { get; set; } = "enrollments";
     public string QuizzesCollectionName { get; set; } = "quizzes";

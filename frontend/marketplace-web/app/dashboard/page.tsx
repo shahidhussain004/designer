@@ -8,12 +8,13 @@ import { useEffect } from 'react'
 
 export default function DashboardPage() {
   const router = useRouter()
-  const { user, loading } = useAuth()
+  const { user, loading, refreshUser } = useAuth()
 
   useEffect(() => {
     const checkAuth = async () => {
       console.log('[Dashboard] checkAuth called, user:', user, 'loading:', loading);
-      // Check both context state AND localStorage+token to handle race conditions
+      
+      // IMPORTANT: Try both context state AND localStorage to handle different timing scenarios
       let currentUser = user
       
       // If context doesn't have user but localStorage does, and token is valid, use localStorage
@@ -32,21 +33,36 @@ export default function DashboardPage() {
       // Role-based redirect
       console.log('[Dashboard] User role:', currentUser.role);
       if (currentUser.role === 'COMPANY') {
-        console.log('[Dashboard] Redirecting to /dashboards/company');
-        router.replace('/dashboards/company')
+        console.log('[Dashboard] Redirecting to /dashboard/company');
+        router.replace('/dashboard/company')
       } else if (currentUser.role === 'FREELANCER') {
-        console.log('[Dashboard] Redirecting to /dashboards/freelancer');
-        router.replace('/dashboards/freelancer')
+        console.log('[Dashboard] Redirecting to /dashboard/freelancer');
+        router.replace('/dashboard/freelancer')
       } else if (currentUser.role === 'ADMIN') {
         console.log('[Dashboard] Redirecting to admin app');
         window.location.href = 'http://localhost:3001'
       }
     }
     
-    // Call once after initial context load, then on context changes
+    // Check immediately if we already have user in context
+    if (user) {
+      checkAuth()
+      return
+    }
+    
+    // If not loading, also check (handles both authenticated and unauthenticated)
     if (!loading) {
       checkAuth()
+      return
     }
+    
+    // If still loading, wait a bit then check anyway (prevent infinite loading)
+    const timer = setTimeout(() => {
+      console.log('[Dashboard] Timeout waiting for auth, checking anyway');
+      checkAuth()
+    }, 3000)
+    
+    return () => clearTimeout(timer)
   }, [loading, user, router])
 
   if (loading) {

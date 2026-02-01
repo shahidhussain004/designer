@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.designer.marketplace.dto.CreateJobRequest;
 import com.designer.marketplace.dto.JobResponse;
 import com.designer.marketplace.entity.Company;
 import com.designer.marketplace.entity.Job;
@@ -48,7 +49,9 @@ public class JobService {
             String location,
             Pageable pageable) {
 
-        Job.JobStatus status = Job.JobStatus.OPEN;
+        // Only filter by OPEN status if not filtering by specific company
+        // This allows company owners to see their DRAFT jobs
+        Job.JobStatus status = (companyId == null) ? Job.JobStatus.OPEN : null;
         Job.JobType jobTypeEnum = jobType != null ? Job.JobType.valueOf(jobType) : null;
         Job.ExperienceLevel expLevelEnum = experienceLevel != null ? Job.ExperienceLevel.valueOf(experienceLevel) : null;
 
@@ -70,7 +73,7 @@ public class JobService {
      */
     @Transactional
     public JobResponse getJobById(Long id) {
-        Job job = jobRepository.findById(id)
+        Job job = jobRepository.findByIdWithCompanyAndCategory(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found with id: " + id));
 
         // Increment view count
@@ -135,17 +138,125 @@ public class JobService {
      * Create a new job (for companies)
      */
     @Transactional
-    public JobResponse createJob(Long companyId, Job job) {        
-        Company company = companyRepository.findByUserId(companyId)
-                .orElseThrow(() -> new ResourceNotFoundException("Company profile not found for user: " + companyId));
+    public JobResponse createJob(Long userId, CreateJobRequest request) {        
+        Company company = companyRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Company profile not found for user: " + userId));
 
+        // Get category if provided
+        JobCategory category = null;
+        if (request.getCategoryId() != null) {
+            category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + request.getCategoryId()));
+        }
+
+        // Convert DTO to entity
+        Job job = new Job();
         job.setCompany(company);
-        job.setStatus(Job.JobStatus.DRAFT);
+        job.setCategory(category);
+        job.setTitle(request.getTitle());
+        job.setDescription(request.getDescription());
+        job.setResponsibilities(request.getResponsibilities());
+        job.setRequirements(request.getRequirements());
+        
+        // Enums
+        try {
+            job.setJobType(Job.JobType.valueOf(request.getJobType()));
+        } catch (Exception e) {
+            job.setJobType(Job.JobType.FULL_TIME);
+        }
+        
+        if (request.getExperienceLevel() != null) {
+            try {
+                job.setExperienceLevel(Job.ExperienceLevel.valueOf(request.getExperienceLevel()));
+            } catch (Exception e) {
+                // Ignore invalid values
+            }
+        }
+        
+        // Location
+        job.setLocation(request.getLocation());
+        job.setCity(request.getCity());
+        job.setState(request.getState());
+        job.setCountry(request.getCountry());
+        job.setIsRemote(request.getIsRemote() != null ? request.getIsRemote() : false);
+        
+        if (request.getRemoteType() != null) {
+            try {
+                job.setRemoteType(Job.RemoteType.valueOf(request.getRemoteType()));
+            } catch (Exception e) {
+                // Ignore invalid values
+            }
+        }
+        
+        // Salary
+        job.setSalaryMinCents(request.getSalaryMinCents());
+        job.setSalaryMaxCents(request.getSalaryMaxCents());
+        job.setSalaryCurrency(request.getSalaryCurrency());
+        
+        if (request.getSalaryPeriod() != null) {
+            try {
+                job.setSalaryPeriod(Job.SalaryPeriod.valueOf(request.getSalaryPeriod()));
+            } catch (Exception e) {
+                // Ignore invalid values
+            }
+        }
+        
+        job.setShowSalary(request.getShowSalary() != null ? request.getShowSalary() : true);
+        
+        // JSONB fields
+        job.setBenefits(request.getBenefits());
+        job.setPerks(request.getPerks());
+        job.setRequiredSkills(request.getRequiredSkills());
+        job.setPreferredSkills(request.getPreferredSkills());
+        
+        if (request.getEducationLevel() != null) {
+            try {
+                job.setEducationLevel(Job.EducationLevel.valueOf(request.getEducationLevel()));
+            } catch (Exception e) {
+                // Ignore invalid values
+            }
+        }
+        
+        job.setCertifications(request.getCertifications());
+        
+        // Application details
+        job.setApplicationDeadline(request.getApplicationDeadline());
+        job.setApplicationEmail(request.getApplicationEmail());
+        job.setApplicationUrl(request.getApplicationUrl());
+        job.setApplyInstructions(request.getApplyInstructions());
+        job.setStartDate(request.getStartDate());
+        job.setPositionsAvailable(request.getPositionsAvailable() != null ? request.getPositionsAvailable() : 1);
+        
+        if (request.getTravelRequirement() != null) {
+            try {
+                job.setTravelRequirement(Job.TravelRequirement.valueOf(request.getTravelRequirement()));
+            } catch (Exception e) {
+                // Ignore invalid values
+            }
+        }
+        
+        job.setSecurityClearanceRequired(request.getSecurityClearanceRequired() != null ? request.getSecurityClearanceRequired() : false);
+        job.setVisaSponsorship(request.getVisaSponsorship() != null ? request.getVisaSponsorship() : false);
+        
+        // Status
+        try {
+            job.setStatus(Job.JobStatus.valueOf(request.getStatus() != null ? request.getStatus() : "DRAFT"));
+        } catch (Exception e) {
+            job.setStatus(Job.JobStatus.DRAFT);
+        }
+        
+        // Set published date if status is OPEN
+        if (job.getStatus() == Job.JobStatus.OPEN) {
+            job.setPublishedAt(java.time.LocalDateTime.now());
+        }
+        
+        job.setIsFeatured(request.getIsFeatured() != null ? request.getIsFeatured() : false);
+        job.setIsUrgent(request.getIsUrgent() != null ? request.getIsUrgent() : false);
         job.setViewsCount(0);
         job.setApplicationsCount(0);
 
         Job savedJob = jobRepository.save(job);
-        log.info("Created new job with id: {}", savedJob.getId());
+        log.info("Created new job with id: {} for company: {}", savedJob.getId(), company.getCompanyName());
 
         return JobResponse.fromEntity(savedJob);
     }

@@ -1,7 +1,8 @@
 -- =====================================================
 -- V12: Create Messaging & Communication Tables
 -- Description: Real-time messaging and communication between users
--- OPTIMIZED: Better indexes, text[] for attachments
+-- OPTIMIZED: Removed 8 unused indexes (0 scans), removed full-text search index
+-- Author: Database Audit & Optimization 2026-01-26
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS message_threads (
@@ -38,23 +39,18 @@ CREATE TABLE IF NOT EXISTS message_threads (
     CONSTRAINT message_threads_unread_check CHECK (unread_count_user1 >= 0 AND unread_count_user2 >= 0)
 );
 
--- Indexes
-CREATE INDEX idx_message_threads_user_id_1 ON message_threads(user_id_1) WHERE deleted_at IS NULL;
-CREATE INDEX idx_message_threads_user_id_2 ON message_threads(user_id_2) WHERE deleted_at IS NULL;
-CREATE INDEX idx_message_threads_project_id ON message_threads(project_id) WHERE project_id IS NOT NULL;
-CREATE INDEX idx_message_threads_job_id ON message_threads(job_id) WHERE job_id IS NOT NULL;
-CREATE INDEX idx_message_threads_contract_id ON message_threads(contract_id) WHERE contract_id IS NOT NULL;
-CREATE INDEX idx_message_threads_last_message_at ON message_threads(last_message_at DESC) WHERE deleted_at IS NULL;
+-- =====================================================
+-- MESSAGE_THREADS INDEXES (OPTIMIZED)
+-- =====================================================
+-- Audit Result: All indexes had 0 scans (messaging system not in use yet)
+-- REMOVED: idx_message_threads_user_id_1, idx_message_threads_user_id_2,
+--          idx_message_threads_project_id, idx_message_threads_job_id,
+--          idx_message_threads_contract_id, idx_message_threads_last_message_at,
+--          idx_message_threads_unread_user1, idx_message_threads_unread_user2,
+--          idx_message_threads_active (all 0 scans)
+-- NOTE: Will add indexes when messaging features are actively used
 
--- Unread threads
-CREATE INDEX idx_message_threads_unread_user1 ON message_threads(user_id_1, last_message_at DESC) 
-    WHERE unread_count_user1 > 0 AND deleted_at IS NULL;
-CREATE INDEX idx_message_threads_unread_user2 ON message_threads(user_id_2, last_message_at DESC) 
-    WHERE unread_count_user2 > 0 AND deleted_at IS NULL;
-
--- Active (non-archived) threads
-CREATE INDEX idx_message_threads_active ON message_threads(last_message_at DESC) 
-    WHERE is_archived = FALSE AND deleted_at IS NULL;
+-- No indexes initially - add when messaging features are built
 
 CREATE TABLE IF NOT EXISTS messages (
     id BIGSERIAL PRIMARY KEY,
@@ -81,19 +77,21 @@ CREATE TABLE IF NOT EXISTS messages (
     CONSTRAINT messages_edit_count_check CHECK (edit_count >= 0)
 );
 
--- Indexes
-CREATE INDEX idx_messages_thread_id ON messages(thread_id) WHERE deleted_at IS NULL;
-CREATE INDEX idx_messages_sender_id ON messages(sender_id);
-CREATE INDEX idx_messages_created_at ON messages(created_at DESC);
-CREATE INDEX idx_messages_thread_created ON messages(thread_id, created_at DESC) WHERE deleted_at IS NULL;
+-- =====================================================
+-- MESSAGES INDEXES (OPTIMIZED)
+-- =====================================================
+-- Audit Result: All indexes had 0 scans (messaging system not in use yet)
+-- REMOVED: idx_messages_thread_id, idx_messages_sender_id, idx_messages_created_at,
+--          idx_messages_thread_created, idx_messages_unread (all 0 scans)
+-- REMOVED: idx_messages_search (0 scans - full-text search not implemented)
+-- NOTE: Will add indexes when messaging features are actively used
 
--- Unread messages
-CREATE INDEX idx_messages_unread ON messages(thread_id, created_at DESC) WHERE is_read = FALSE AND deleted_at IS NULL;
+-- No indexes initially - add when messaging features are built
 
--- Full-text search on message body
-CREATE INDEX idx_messages_search ON messages USING GIN(to_tsvector('english', body)) WHERE deleted_at IS NULL;
+-- =====================================================
+-- TRIGGERS
+-- =====================================================
 
--- Triggers
 CREATE TRIGGER message_threads_updated_at BEFORE UPDATE ON message_threads FOR EACH ROW EXECUTE FUNCTION update_timestamp();
 CREATE TRIGGER messages_updated_at BEFORE UPDATE ON messages FOR EACH ROW EXECUTE FUNCTION update_timestamp();
 
@@ -144,6 +142,24 @@ CREATE TRIGGER trg_increment_unread_count
     FOR EACH ROW
     EXECUTE FUNCTION increment_unread_count();
 
-COMMENT ON TABLE message_threads IS 'Conversation threads between two users';
-COMMENT ON TABLE messages IS 'Individual messages within a thread';
+-- =====================================================
+-- COMMENTS
+-- =====================================================
+
+COMMENT ON TABLE message_threads IS 'Conversation threads between two users. Optimized with no indexes (messaging not active).';
+COMMENT ON TABLE messages IS 'Individual messages within a thread. Optimized with no indexes (messaging not active).';
 COMMENT ON COLUMN messages.attachments IS 'Text array of attachment URLs';
+
+-- =====================================================
+-- ROLLBACK INSTRUCTIONS
+-- =====================================================
+-- To rollback this migration, run:
+--
+-- DROP TRIGGER IF EXISTS trg_increment_unread_count ON messages;
+-- DROP TRIGGER IF EXISTS trg_update_thread_last_message ON messages;
+-- DROP TRIGGER IF EXISTS messages_updated_at ON messages;
+-- DROP TRIGGER IF EXISTS message_threads_updated_at ON message_threads;
+-- DROP FUNCTION IF EXISTS increment_unread_count();
+-- DROP FUNCTION IF EXISTS update_thread_last_message();
+-- DROP TABLE IF EXISTS messages CASCADE;
+-- DROP TABLE IF EXISTS message_threads CASCADE;

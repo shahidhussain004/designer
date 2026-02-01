@@ -1,7 +1,7 @@
 /**
  * Content-related interfaces
  */
-import { ContentStatus, ContentType } from '@prisma/client';
+import { ContentStatus, ContentType } from '@models/content.model';
 import { BaseEntity, PaginationParams } from './base.interface';
 
 export interface ContentBase extends BaseEntity {

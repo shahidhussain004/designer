@@ -5,7 +5,7 @@
     "moduleResolution": "NodeNext",
     "lib": ["ES2022"],
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": ".",
     "strict": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -21,9 +21,13 @@
       "@config/*": ["src/config/*"],
       "@modules/*": ["src/modules/*"],
       "@common/*": ["src/common/*"],
-      "@infrastructure/*": ["src/infrastructure/*"]
+      "@infrastructure/*": ["src/infrastructure/*"],
+      "@controllers/*": ["src/controllers/*"],
+      "@services/*": ["src/services/*"],
+      "@repositories/*": ["src/repositories/*"],
+      "@models/*": ["src/models/*"]
     }
   },
-  "include": ["src/**/*"],
-  "exclude": ["prisma/seed.ts", "node_modules", "dist", "tests"]
+  "include": ["src/**/*", "scripts/**/*"],
+  "exclude": ["node_modules", "dist", "tests"]
 }

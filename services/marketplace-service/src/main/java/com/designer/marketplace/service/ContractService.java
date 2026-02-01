@@ -27,11 +27,25 @@ public class ContractService {
         List<Contract> contracts = contractRepository.findAll();
         // Use Hibernate.initialize to eagerly load all associations
         contracts.forEach(c -> {
-            Hibernate.initialize(c.getProject());
-            Hibernate.initialize(c.getFreelancer());
+            // Initialize the Freelancer and its User relationship
+            if (c.getFreelancer() != null) {
+                Hibernate.initialize(c.getFreelancer());
+                if (c.getFreelancer().getUser() != null) {
+                    Hibernate.initialize(c.getFreelancer().getUser());
+                }
+            }
+            // Initialize the Project and its relationships
             if (c.getProject() != null) {
-                Hibernate.initialize(c.getProject().getCompany());
-                Hibernate.initialize(c.getProject().getProjectCategory());
+                Hibernate.initialize(c.getProject());
+                if (c.getProject().getCompany() != null) {
+                    Hibernate.initialize(c.getProject().getCompany());
+                    if (c.getProject().getCompany().getUser() != null) {
+                        Hibernate.initialize(c.getProject().getCompany().getUser());
+                    }
+                }
+                if (c.getProject().getProjectCategory() != null) {
+                    Hibernate.initialize(c.getProject().getProjectCategory());
+                }
             }
         });
         return contracts;

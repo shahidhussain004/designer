@@ -1,4 +1,5 @@
 using LmsService.Configuration;
+using LmsService.Migrations;
 using LmsService.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -109,10 +110,36 @@ builder.Services.AddHealthChecks();
 // Add custom services
 builder.Services.AddLmsServices(builder.Configuration);
 
+// Add Migration Runner
+builder.Services.AddScoped<MigrationRunner>();
+
 // Add Kafka consumer as hosted service
 builder.Services.AddHostedService<KafkaConsumerService>();
 
 var app = builder.Build();
+
+// Run migrations if enabled
+var mongoSettings = builder.Configuration.GetSection("MongoDbSettings").Get<MongoDbSettings>();
+if (mongoSettings?.EnableMigrations == true)
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var migrationRunner = scope.ServiceProvider.GetRequiredService<MigrationRunner>();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        
+        try
+        {
+            logger.LogInformation("🔄 EnableMigrations is true - running database migrations...");
+            await migrationRunner.MigrateAsync();
+            logger.LogInformation("✅ Database migrations completed successfully");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "❌ Database migration failed - application will start but may not function correctly");
+            // Don't throw - allow app to start even if migrations fail
+        }
+    }
+}
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())

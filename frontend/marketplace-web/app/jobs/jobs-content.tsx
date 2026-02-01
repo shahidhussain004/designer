@@ -6,7 +6,7 @@ import { PageLayout } from '@/components/ui';
 import { useJobs } from '@/hooks/useJobs';
 import { useCompanyProfile } from '@/hooks/useUsers';
 import { useAuth } from '@/lib/auth';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Grid, List } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
@@ -60,6 +60,8 @@ const statusOptions = [
   { value: 'FILLED', label: 'Filled' },
 ];
 
+const ITEMS_PER_PAGE = 10;
+
 export default function JobsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -81,6 +83,8 @@ export default function JobsContent() {
   const [filterStatus, setFilterStatus] = useState('OPEN');
   const [filterType, setFilterType] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
+  const [layoutMode, setLayoutMode] = useState<'list' | 'grid'>('list');
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filteredJobs = useMemo(() => {
     if (!jobs) return [];
@@ -95,6 +99,12 @@ export default function JobsContent() {
       return matchesStatus && matchesType && matchesSearch;
     });
   }, [jobs, filterStatus, filterType, searchQuery]);
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredJobs.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedJobs = filteredJobs.slice(startIndex, endIndex);
 
   if (isLoading) {
     return (
@@ -134,6 +144,10 @@ export default function JobsContent() {
     }
   };
 
+  const handleFilterChange = () => {
+    setCurrentPage(1); // Reset to first page when filters change
+  };
+
   return (
     <>
       {/* Page Header */}
@@ -157,8 +171,8 @@ export default function JobsContent() {
               </h1>
               <p className="text-xl text-gray-300">
                 {companyIdParam 
-                  ? `Viewing ${jobs?.length || 0} open position${(jobs?.length || 0) !== 1 ? 's' : ''} from ${company?.fullName ?? 'this company'}`
-                  : `Explore ${jobs?.length || 0} open position${(jobs?.length || 0) !== 1 ? 's' : ''} from leading companies — find the one that fits you.`
+                  ? `Viewing ${filteredJobs.length} open position${filteredJobs.length !== 1 ? 's' : ''} from ${company?.fullName ?? 'this company'}`
+                  : `Explore ${filteredJobs.length} open position${filteredJobs.length !== 1 ? 's' : ''} from leading companies — find the one that fits you.`
                 }
               </p>
             </div>
@@ -180,9 +194,9 @@ export default function JobsContent() {
       {/* Filters Section */}
       <section className="bg-white border-b border-gray-200 sticky top-0 z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col lg:flex-row gap-4">
+          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
             {/* Search */}
-            <div className="flex-1">
+            <div className="flex-1 w-full">
               <div className="relative">
                 <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -191,7 +205,10 @@ export default function JobsContent() {
                   type="text"
                   placeholder="Search jobs by title, company, or keywords..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    handleFilterChange();
+                  }}
                   className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-input-focus focus:border-transparent"
                 />
               </div>
@@ -201,7 +218,10 @@ export default function JobsContent() {
             <div className="w-full lg:w-44">
               <select
                 value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
+                onChange={(e) => {
+                  setFilterStatus(e.target.value);
+                  handleFilterChange();
+                }}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-input-focus focus:border-transparent bg-white"
               >
                 {statusOptions.map((opt) => (
@@ -214,13 +234,42 @@ export default function JobsContent() {
             <div className="w-full lg:w-44">
               <select
                 value={filterType}
-                onChange={(e) => setFilterType(e.target.value)}
+                onChange={(e) => {
+                  setFilterType(e.target.value);
+                  handleFilterChange();
+                }}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-input-focus focus:border-transparent bg-white"
               >
                 {jobTypes.map((opt) => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
               </select>
+            </div>
+
+            {/* Layout Toggle */}
+            <div className="flex gap-2 border border-gray-300 rounded-lg p-1 bg-white">
+              <button
+                onClick={() => setLayoutMode('list')}
+                className={`p-2.5 rounded transition-colors ${
+                  layoutMode === 'list'
+                    ? 'bg-primary-100 text-primary-600'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+                title="List view"
+              >
+                <List className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => setLayoutMode('grid')}
+                className={`p-2.5 rounded transition-colors ${
+                  layoutMode === 'grid'
+                    ? 'bg-primary-100 text-primary-600'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+                title="Grid view"
+              >
+                <Grid className="w-5 h-5" />
+              </button>
             </div>
           </div>
         </div>
@@ -229,13 +278,18 @@ export default function JobsContent() {
       {/* Results Section */}
       <section className="bg-gray-50 py-8 min-h-[60vh]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Results count */}
-          <div className="mb-6">
+          {/* Results count and info */}
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <p className="text-gray-600">
-              Showing <span className="font-semibold text-gray-900">{filteredJobs.length}</span> jobs
+              Showing <span className="font-semibold text-gray-900">{paginatedJobs.length}</span> of <span className="font-semibold text-gray-900">{filteredJobs.length}</span> jobs
               {filterStatus !== 'ALL' && <span> with status &ldquo;{filterStatus}&rdquo;</span>}
               {filterType !== 'ALL' && <span> of type &ldquo;{getJobTypeLabel(filterType)}&rdquo;</span>}
             </p>
+            {totalPages > 1 && (
+              <p className="text-gray-600 text-sm">
+                Page <span className="font-semibold">{currentPage}</span> of <span className="font-semibold">{totalPages}</span>
+              </p>
+            )}
           </div>
 
           {filteredJobs.length === 0 ? (
@@ -252,6 +306,7 @@ export default function JobsContent() {
                   setFilterStatus('ALL');
                   setFilterType('ALL');
                   setSearchQuery('');
+                  setCurrentPage(1);
                 }}
                 className="text-primary-600 hover:text-primary-700 font-medium"
               >
@@ -259,86 +314,239 @@ export default function JobsContent() {
               </button>
             </div>
           ) : (
-            <div className="space-y-4">
-              {filteredJobs.map((job: Job) => (
-                <Link key={job.id} href={`/jobs/${job.id}`} className="block group">
-                  <div className="bg-white rounded-xl border border-gray-200 p-6 hover:border-primary-300 hover:shadow-lg transition-all">
-                    <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                      {/* Main Info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start gap-4">
-                          {/* Company Logo Placeholder */}
-                          <div className="hidden sm:flex w-12 h-12 rounded-lg bg-gray-100 items-center justify-center flex-shrink-0">
-                            <span className="text-lg font-bold text-gray-400">
-                              {job.companyName?.charAt(0) || 'C'}
-                            </span>
+            <>
+              {layoutMode === 'list' ? (
+                // List View
+                <div className="space-y-4">
+                  {paginatedJobs.map((job: Job) => (
+                    <Link key={job.id} href={`/jobs/${job.id}`} className="block group">
+                      <div className="bg-white rounded-xl border border-gray-200 p-6 hover:border-primary-300 hover:shadow-lg transition-all">
+                        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                          {/* Main Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start gap-4">
+                              {/* Company Logo Placeholder */}
+                              <div className="hidden sm:flex w-12 h-12 rounded-lg bg-gray-100 items-center justify-center flex-shrink-0">
+                                <span className="text-lg font-bold text-gray-400">
+                                  {job.companyName?.charAt(0) || 'C'}
+                                </span>
+                              </div>
+                              
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-3 flex-wrap">
+                                  <h2 className="text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors truncate">
+                                    {job.title}
+                                  </h2>
+                                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(job.status || '')}`}>
+                                    {job.status}
+                                  </span>
+                                </div>
+                                <p className="text-gray-600 mt-1">{job.companyName || 'Company'}</p>
+                                
+                                <p className="text-gray-600 mt-3 line-clamp-2">
+                                  {job.description ? job.description.substring(0, 200) : 'No description available'}
+                                  {job.description && job.description.length > 200 && '...'}
+                                </p>
+                                
+                                {/* Meta Info */}
+                                <div className="flex flex-wrap gap-4 mt-4 text-sm">
+                                  {job.location && (
+                                    <span className="flex items-center text-gray-500">
+                                      <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                      </svg>
+                                      {job.location}
+                                    </span>
+                                  )}
+                                  {job.jobType && (
+                                    <span className="flex items-center text-gray-500">
+                                      <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                      </svg>
+                                      {getJobTypeLabel(job.jobType)}
+                                    </span>
+                                  )}
+                                  {job.createdAt && (
+                                    <span className="flex items-center text-gray-500">
+                                      <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                      </svg>
+                                      {new Date(job.createdAt).toLocaleDateString()}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
                           </div>
                           
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-3 flex-wrap">
-                              <h2 className="text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors truncate">
-                                {job.title}
-                              </h2>
-                              <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(job.status || '')}`}>
-                                {job.status}
-                              </span>
-                            </div>
-                            <p className="text-gray-600 mt-1">{job.companyName || 'Company'}</p>
-                            
-                            <p className="text-gray-600 mt-3 line-clamp-2">
-                              {job.description ? job.description.substring(0, 200) : 'No description available'}
-                              {job.description && job.description.length > 200 && '...'}
-                            </p>
-                            
-                            {/* Meta Info */}
-                            <div className="flex flex-wrap gap-4 mt-4 text-sm">
-                              {job.location && (
-                                <span className="flex items-center text-gray-500">
-                                  <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                  </svg>
-                                  {job.location}
-                                </span>
-                              )}
-                              {job.jobType && (
-                                <span className="flex items-center text-gray-500">
-                                  <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                  </svg>
-                                  {getJobTypeLabel(job.jobType)}
-                                </span>
-                              )}
-                              {job.createdAt && (
-                                <span className="flex items-center text-gray-500">
-                                  <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                  </svg>
-                                  {new Date(job.createdAt).toLocaleDateString()}
-                                </span>
-                              )}
-                            </div>
+                          {/* Action */}
+                          <div className="flex items-center lg:flex-shrink-0">
+                            <span className="text-primary-600 font-medium text-sm group-hover:translate-x-1 transition-transform inline-flex items-center">
+                              View Details
+                              <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </span>
                           </div>
                         </div>
                       </div>
-                      
-                      {/* Action */}
-                      <div className="flex items-center lg:flex-shrink-0">
-                        <span className="text-primary-600 font-medium text-sm group-hover:translate-x-1 transition-transform inline-flex items-center">
-                          View Details
-                          <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                // Grid View
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {paginatedJobs.map((job: Job) => (
+                    <Link key={job.id} href={`/jobs/${job.id}`} className="block group">
+                      <div className="bg-white rounded-xl border border-gray-200 p-6 h-full hover:border-primary-300 hover:shadow-lg transition-all flex flex-col">
+                        {/* Company Logo */}
+                        <div className="w-12 h-12 rounded-lg bg-gray-100 items-center justify-center flex mb-4">
+                          <span className="text-lg font-bold text-gray-400">
+                            {job.companyName?.charAt(0) || 'C'}
+                          </span>
+                        </div>
+
+                        {/* Status Badge */}
+                        <span className={`inline-flex w-max px-2.5 py-0.5 rounded-full text-xs font-medium mb-3 ${getStatusColor(job.status || '')}`}>
+                          {job.status}
                         </span>
+
+                        {/* Title & Company */}
+                        <h2 className="text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors mb-2 line-clamp-2">
+                          {job.title}
+                        </h2>
+                        <p className="text-gray-600 text-sm mb-4 flex-grow">{job.companyName || 'Company'}</p>
+
+                        {/* Description */}
+                        <p className="text-gray-600 text-sm mb-4 line-clamp-3 flex-grow">
+                          {job.description ? job.description.substring(0, 150) : 'No description available'}
+                          {job.description && job.description.length > 150 && '...'}
+                        </p>
+
+                        {/* Meta Info */}
+                        <div className="flex flex-col gap-2 text-sm mb-4 pt-4 border-t border-gray-100">
+                          {job.location && (
+                            <span className="flex items-center text-gray-500">
+                              <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                              </svg>
+                              {job.location}
+                            </span>
+                          )}
+                          {job.jobType && (
+                            <span className="flex items-center text-gray-500">
+                              <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                              </svg>
+                              {getJobTypeLabel(job.jobType)}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* CTA */}
+                        <div className="pt-4 border-t border-gray-100">
+                          <span className="text-primary-600 font-medium text-sm group-hover:translate-x-1 transition-transform inline-flex items-center">
+                            View Details
+                            <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </span>
+                        </div>
                       </div>
-                    </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="mt-8 flex items-center justify-between">
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Previous
+                  </button>
+
+                  {/* Page Numbers */}
+                  <div className="flex gap-2">
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let pageNum: number;
+                      if (totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (currentPage <= 3) {
+                        pageNum = i + 1;
+                      } else if (currentPage >= totalPages - 2) {
+                        pageNum = totalPages - 4 + i;
+                      } else {
+                        pageNum = currentPage - 2 + i;
+                      }
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => setCurrentPage(pageNum)}
+                          className={`px-3 py-2 rounded-lg transition-colors ${
+                            currentPage === pageNum
+                              ? 'bg-primary-600 text-white'
+                              : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
                   </div>
-                </Link>
-              ))}
-            </div>
+
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>
     </>
   );
+}
+
+interface Job {
+  id: number | string;
+  title?: string;
+  description?: string;
+  categoryId?: number;
+  categoryName?: string;
+  companyName?: string;
+  companyId?: number;
+  salaryMinCents?: number;
+  salaryMaxCents?: number;
+  salaryCurrency?: string;
+  salaryPeriod?: string;
+  showSalary?: boolean;
+  jobType?: string;
+  location?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  isRemote?: boolean;
+  requirements?: string;
+  responsibilities?: string;
+  benefits?: string;
+  requiredSkills?: string;
+  preferredSkills?: string;
+  educationLevel?: string;
+  experienceLevel?: string;
+  status?: string;
+  isFeatured?: boolean;
+  isUrgent?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  publishedAt?: string;
 }

@@ -33,9 +33,6 @@ npm-debug.log*
 coverage/
 .nyc_output/
 
-# Prisma
-prisma/migrations/dev.db
-
 # Uploads (in development)
 uploads/
 
@@ -46,3 +43,9 @@ temp/
 
 # Debug
 *.debug.log
+
+# Tests
+tests/
+__tests__/
+*.test.ts
+*.spec.ts

@@ -12,6 +12,7 @@ public interface ICourseRepository
     Task<Course?> GetBySlugAsync(string slug);
     Task<List<Course>> GetByInstructorIdAsync(long instructorId, int skip, int take);
     Task<List<Course>> SearchAsync(string? searchTerm, CourseCategory? category, CourseLevel? level, CourseStatus? status, int skip, int take);
+    Task<List<Course>> GetAllPublishedAsync(string? searchTerm, CourseCategory? category, CourseLevel? level);
     Task<long> CountAsync(string? searchTerm, CourseCategory? category, CourseLevel? level, CourseStatus? status);
     Task<Course> CreateAsync(Course course);
     Task<Course> UpdateAsync(Course course);
@@ -28,7 +29,8 @@ public class CourseRepository : ICourseRepository
     public CourseRepository(IMongoDatabase database, IOptions<MongoDbSettings> settings)
     {
         _courses = database.GetCollection<Course>(settings.Value.CoursesCollectionName);
-        CreateIndexes();
+        // Indexes are now created by migrations (V001_InitialSchema)
+        // CreateIndexes();
     }
 
     private void CreateIndexes()
@@ -120,6 +122,39 @@ public class CourseRepository : ICourseRepository
             .SortByDescending(c => c.TotalEnrollments)
             .Skip(skip)
             .Limit(take)
+            .ToListAsync();
+    }
+
+    public async Task<List<Course>> GetAllPublishedAsync(string? searchTerm, CourseCategory? category, CourseLevel? level)
+    {
+        // Build filters manually using BsonDocument for more control
+        BsonDocument filter = new BsonDocument
+        {
+            { "$or", new BsonArray
+                {
+                    new BsonDocument("status", (int)CourseStatus.Published),
+                    new BsonDocument("isPublished", true)
+                }
+            }
+        };
+        
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            filter.Add("$text", new BsonDocument("$search", searchTerm));
+        }
+        
+        if (category.HasValue)
+        {
+            filter.Add("category", (int)category.Value);
+        }
+        
+        if (level.HasValue)
+        {
+            filter.Add("level", (int)level.Value);
+        }
+
+        return await _courses
+            .Find(filter)
             .ToListAsync();
     }
 

@@ -29,7 +29,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("")
 @RequiredArgsConstructor
 @Tag(name = "Milestones", description = "Milestone-based payment management")
 @SecurityRequirement(name = "bearerAuth")

@@ -106,9 +106,9 @@ export function useCourse(courseId: string | number | null) {
       const isSlug = typeof courseId === 'string' && (courseId.includes('-') || !/^\d+$/.test(courseId));
       
       if (isSlug) {
-        // Use content service for slug-based lookup
-        const contentServiceUrl = process.env.NEXT_PUBLIC_CONTENT_SERVICE_URL || 'http://localhost:8083/api/v1';
-        const response = await fetch(`${contentServiceUrl}/courses/${courseId}`, { signal });
+        // Use LMS service for slug-based lookup
+        const lmsServiceUrl = process.env.NEXT_PUBLIC_LMS_SERVICE_URL || 'http://localhost:8082/api';
+        const response = await fetch(`${lmsServiceUrl}/courses/slug/${courseId}`, { signal });
         if (!response.ok) throw new Error('Failed to fetch course');
         return response.json();
       } else {
@@ -149,9 +149,9 @@ export function useCourseCurriculum(courseId: string | number | null) {
       const isSlug = typeof courseId === 'string' && (courseId.includes('-') || !/^\d+$/.test(courseId));
       
       if (isSlug) {
-        // Use content service for slug-based lookup
-        const contentServiceUrl = process.env.NEXT_PUBLIC_CONTENT_SERVICE_URL || 'http://localhost:8083/api/v1';
-        const response = await fetch(`${contentServiceUrl}/courses/${courseId}/lessons`, { signal });
+        // Use LMS service for slug-based lookup
+        const lmsServiceUrl = process.env.NEXT_PUBLIC_LMS_SERVICE_URL || 'http://localhost:8082/api';
+        const response = await fetch(`${lmsServiceUrl}/courses/slug/${courseId}/curriculum`, { signal });
         if (!response.ok) throw new Error('Failed to fetch lessons');
         return response.json();
       } else {

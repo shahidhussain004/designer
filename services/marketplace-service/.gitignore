@@ -35,3 +35,8 @@ build/
 ### Environment ###
 .env
 .env.local
+
+# Ignore db data seed files 
+resources/db/seed_data/
+# Ignore migration backups (created by migration tooling/backups)
+resources/db/migration/backup/
