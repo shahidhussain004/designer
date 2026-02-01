@@ -33,6 +33,12 @@ export default function SettingsPage() {
   const handlePasswordChange = async () => {
     setNotification(null)
 
+    // Validate current password is provided
+    if (!passwordData.currentPassword) {
+      setNotification({ type: 'error', message: 'Current password is required' })
+      return
+    }
+
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       setNotification({ type: 'error', message: 'Passwords do not match' })
       return
@@ -44,12 +50,27 @@ export default function SettingsPage() {
     }
 
     try {
-      // TODO: API call to change password
-      await new Promise(resolve => setTimeout(resolve, 500))
+      const response = await fetch('http://localhost:8080/api/users/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${typeof window !== 'undefined' ? localStorage.getItem('access_token') : ''}`
+        },
+        body: JSON.stringify({
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword
+        })
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.message || 'Failed to change password')
+      }
+
       setNotification({ type: 'success', message: 'Password changed successfully!' })
       setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
     } catch (err) {
-      setNotification({ type: 'error', message: 'Failed to change password' })
+      setNotification({ type: 'error', message: err instanceof Error ? err.message : 'Failed to change password' })
     }
   }
 

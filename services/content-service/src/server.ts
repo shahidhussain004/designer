@@ -1,11 +1,15 @@
 /**
- * Content Service Entry Point
+ * Content Service Entry Point - Refactored to use raw PostgreSQL
  */
+
+// Load environment variables before any other imports
+import 'dotenv/config';
+
 import { buildApp } from './app';
 import { appConfig } from './config/app.config';
+import { databaseService } from './config/db.service';
 import { logger } from './config/logger.config';
 import { redisService } from './infrastructure/cache';
-import { prismaService } from './infrastructure/database';
 import { kafkaService } from './infrastructure/messaging';
 import { storageService } from './infrastructure/storage';
 
@@ -18,7 +22,7 @@ async function bootstrap(): Promise<void> {
 
     try {
       await app.close();
-      await prismaService.disconnect();
+      await databaseService.disconnect();
       await redisService.disconnect();
       await kafkaService.disconnect();
       logger.info('Graceful shutdown completed');
@@ -48,25 +52,25 @@ async function bootstrap(): Promise<void> {
     // Initialize infrastructure
     logger.info('Connecting to infrastructure services...');
 
-    logger.debug('Before prismaService.connect');
-    // Database (required)
-    await prismaService.connect();
-    logger.debug('After prismaService.connect');
+    // Database (required) - This will also run migrations automatically
+    logger.debug('Connecting to PostgreSQL database...');
+    await databaseService.connect();
+    logger.debug('Database connected and migrations applied');
 
-    logger.debug('Before storageService.init');
     // Storage (required)
+    logger.debug('Initializing storage service...');
     await storageService.init();
-    logger.debug('After storageService.init');
+    logger.debug('Storage service initialized');
 
-    logger.debug('Before redisService.connect');
     // Redis (optional - graceful degradation)
+    logger.debug('Connecting to Redis...');
     await redisService.connect();
-    logger.debug('After redisService.connect');
+    logger.debug('Redis connected');
 
-    logger.debug('Before kafkaService.connect');
     // Kafka (optional - graceful degradation)
+    logger.debug('Connecting to Kafka...');
     await kafkaService.connect();
-    logger.debug('After kafkaService.connect');
+    logger.debug('Kafka connected');
 
     // Start server
     await app.listen({
@@ -83,10 +87,24 @@ async function bootstrap(): Promise<void> {
     );
 
     logger.info(`API Docs available at http://localhost:${appConfig.port}/docs`);
+
+    // Log migration status
+    const migrationStatus = await databaseService.getMigrationStatus();
+    logger.info(
+      {
+        appliedMigrations: migrationStatus.applied.length,
+        pendingMigrations: migrationStatus.pending.length,
+      },
+      'Database migration status'
+    );
   } catch (error) {
     logger.fatal({ error }, 'Failed to start server');
+    console.error('FATAL ERROR:', error);
     process.exit(1);
   }
 }
 
-bootstrap();
+bootstrap().catch((err) => {
+  console.error('Bootstrap error:', err);
+  process.exit(1);
+});

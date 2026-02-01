@@ -107,7 +107,7 @@ export default function ContractDetailPage() {
           <p className="text-gray-700">{contract.description}</p>
 
             <div className="mt-6 flex gap-3">
-            <button onClick={() => router.push(`/dashboards/freelancer/time-tracking?contractId=${contract.id}`)} className="px-4 py-2 bg-blue-600 text-white rounded-lg">Log Time</button>
+            <button onClick={() => router.push(`/dashboard/freelancer/time-tracking?contractId=${contract.id}`)} className="px-4 py-2 bg-blue-600 text-white rounded-lg">Log Time</button>
             <button onClick={() => router.push(`/freelancers/${contract.freelancer.id}/portfolio`)} className="px-4 py-2 bg-gray-100 text-gray-800 rounded-lg">View Freelancer</button>
           </div>
         </div>

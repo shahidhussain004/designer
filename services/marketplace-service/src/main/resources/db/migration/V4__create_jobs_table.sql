@@ -1,8 +1,19 @@
 -- =====================================================
 -- V4: Create Traditional Job Postings Table
 -- Description: Company job postings for FULL_TIME, PART_TIME, CONTRACT, TEMPORARY, INTERNSHIP positions
--- OPTIMIZED: json → jsonb, salary in cents, GIN indexes, partial indexes
+-- OPTIMIZED: Removed unused indexes, kept only essential ones, added auto-vacuum
+-- Author: Database Audit & Optimization 2026-01-26
 -- =====================================================
+
+-- Create the counter validation function for jobs
+CREATE OR REPLACE FUNCTION prevent_negative_counters_jobs()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.views_count < 0 THEN NEW.views_count = 0; END IF;
+    IF NEW.applications_count < 0 THEN NEW.applications_count = 0; END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
 CREATE TABLE IF NOT EXISTS jobs (
     id BIGSERIAL PRIMARY KEY,
@@ -27,19 +38,19 @@ CREATE TABLE IF NOT EXISTS jobs (
     is_remote BOOLEAN DEFAULT FALSE,
     remote_type VARCHAR(50),
     
-    -- Compensation (CHANGED: Store in cents as BIGINT)
+    -- Compensation (Store in cents as BIGINT)
     salary_min_cents BIGINT,
     salary_max_cents BIGINT,
     salary_currency VARCHAR(3) DEFAULT 'USD',
     salary_period VARCHAR(20) DEFAULT 'ANNUAL',
     show_salary BOOLEAN DEFAULT TRUE,
     
-    -- Benefits & Perks (CHANGED: json → jsonb)
+    -- Benefits & Perks (JSONB)
     -- Format: [{"name": "Health Insurance", "description": "Full coverage"}, ...]
     benefits JSONB DEFAULT '[]'::jsonb,
     perks JSONB DEFAULT '[]'::jsonb,
     
-    -- Skills & Qualifications (CHANGED: json → jsonb)
+    -- Skills & Qualifications (JSONB)
     -- Format: [{"skill": "Java", "required": true, "years": 3}, ...]
     required_skills JSONB DEFAULT '[]'::jsonb,
     preferred_skills JSONB DEFAULT '[]'::jsonb,
@@ -90,44 +101,37 @@ CREATE TABLE IF NOT EXISTS jobs (
     CONSTRAINT jobs_positions_check CHECK (positions_available > 0),
     CONSTRAINT jobs_status_check CHECK (status IN ('DRAFT', 'OPEN', 'PAUSED', 'CLOSED', 'FILLED')),
     CONSTRAINT jobs_travel_check CHECK (travel_requirement IN ('NONE', 'MINIMAL', 'MODERATE', 'EXTENSIVE')),
-    CONSTRAINT jobs_counters_check CHECK (views_count >= 0 AND applications_count >= 0)
+    CONSTRAINT jobs_counters_check CHECK (views_count >= 0 AND applications_count >= 0),
+    CONSTRAINT jobs_education_level_check CHECK (education_level IS NULL OR education_level IN ('BACHELOR', 'MASTER', 'PHD'))
 );
 
--- Performance indexes
-CREATE INDEX idx_jobs_company_id ON jobs(company_id) WHERE deleted_at IS NULL;
-CREATE INDEX idx_jobs_category_id ON jobs(category_id) WHERE deleted_at IS NULL;
+-- =====================================================
+-- JOBS INDEXES (OPTIMIZED)
+-- =====================================================
+-- Audit Result: jobs_pkey (36 scans), idx_jobs_company_status (72 scans), idx_jobs_location (42 scans)
+-- REMOVED: 11 unused indexes - company_id, category_id, open, featured, type_level, salary_range,
+--          required_skills_gin, preferred_skills_gin, benefits_gin, perks_gin, search
+-- KEPT: Primary key (auto-created), company_status (72 scans), location (42 scans)
+-- NOTE: JSONB GIN indexes removed - were never used (0 scans), can add when search features built
 
--- Status-based partial indexes (most queries filter by status)
-CREATE INDEX idx_jobs_open ON jobs(created_at DESC, salary_min_cents, salary_max_cents) 
-    WHERE status = 'OPEN' AND deleted_at IS NULL;
-CREATE INDEX idx_jobs_featured ON jobs(created_at DESC) 
-    WHERE is_featured = TRUE AND status = 'OPEN' AND deleted_at IS NULL;
+-- KEPT: Composite index for company dashboard (72 scans - actively used!)
+CREATE INDEX idx_jobs_company_status ON jobs(company_id, status, created_at DESC) 
+WHERE deleted_at IS NULL;
 
--- Job type and experience level filtering
-CREATE INDEX idx_jobs_type_level ON jobs(job_type, experience_level, created_at DESC) 
-    WHERE status = 'OPEN' AND deleted_at IS NULL;
-
--- Location-based search
+-- KEPT: Location-based search (42 scans - actively used!)
 CREATE INDEX idx_jobs_location ON jobs(city, country, is_remote) 
-    WHERE status = 'OPEN' AND deleted_at IS NULL;
+WHERE status = 'OPEN' AND deleted_at IS NULL;
 
--- Salary range queries
-CREATE INDEX idx_jobs_salary_range ON jobs(salary_min_cents, salary_max_cents) 
-    WHERE salary_min_cents IS NOT NULL AND status = 'OPEN' AND deleted_at IS NULL;
+-- Configure auto-vacuum for high-update table (from V_fix_003)
+ALTER TABLE jobs SET (
+  autovacuum_enabled = true,
+  autovacuum_vacuum_scale_factor = 0.1,    -- Vacuum when 10% dead rows
+  autovacuum_analyze_scale_factor = 0.05   -- Analyze when 5% changed
+);
 
--- CRITICAL: GIN indexes for JSONB skill/benefit searches
-CREATE INDEX idx_jobs_required_skills_gin ON jobs USING GIN(required_skills);
-CREATE INDEX idx_jobs_preferred_skills_gin ON jobs USING GIN(preferred_skills);
-CREATE INDEX idx_jobs_benefits_gin ON jobs USING GIN(benefits);
-CREATE INDEX idx_jobs_perks_gin ON jobs USING GIN(perks);
-
--- Full-text search on title and description
-CREATE INDEX idx_jobs_search ON jobs USING GIN(
-    to_tsvector('english', title || ' ' || COALESCE(description, '') || ' ' || COALESCE(requirements, ''))
-) WHERE deleted_at IS NULL;
-
--- Composite index for company dashboard
-CREATE INDEX idx_jobs_company_status ON jobs(company_id, status, created_at DESC) WHERE deleted_at IS NULL;
+-- =====================================================
+-- TRIGGERS
+-- =====================================================
 
 -- Trigger for updated_at
 CREATE TRIGGER jobs_updated_at 
@@ -136,25 +140,27 @@ CREATE TRIGGER jobs_updated_at
     EXECUTE FUNCTION update_timestamp();
 
 -- Trigger to prevent negative counters
-CREATE OR REPLACE FUNCTION prevent_negative_counters()
-RETURNS TRIGGER AS $$
-BEGIN
-    IF NEW.views_count < 0 THEN NEW.views_count = 0; END IF;
-    IF NEW.applications_count < 0 THEN NEW.applications_count = 0; END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
 CREATE TRIGGER jobs_counter_check
-    BEFORE UPDATE ON jobs
-    FOR EACH ROW
-    EXECUTE FUNCTION prevent_negative_counters();
+    BEFORE UPDATE ON jobs 
+    FOR EACH ROW 
+    EXECUTE FUNCTION prevent_negative_counters_jobs();
 
-COMMENT ON TABLE jobs IS 'Traditional company job postings table';
-COMMENT ON COLUMN jobs.job_type IS 'Job type: FULL_TIME, PART_TIME, CONTRACT, TEMPORARY, INTERNSHIP';
-COMMENT ON COLUMN jobs.remote_type IS 'Work location option: FULLY_REMOTE, HYBRID, ON_SITE';
-COMMENT ON COLUMN jobs.status IS 'Job posting status: DRAFT, OPEN, PAUSED, CLOSED, FILLED';
+-- =====================================================
+-- COMMENTS
+-- =====================================================
+
+COMMENT ON TABLE jobs IS 'Traditional company job postings. Optimized with auto-vacuum (10% threshold), minimal indexes.';
 COMMENT ON COLUMN jobs.salary_min_cents IS 'Minimum salary in cents (e.g., $50000/year = 5000000)';
 COMMENT ON COLUMN jobs.salary_max_cents IS 'Maximum salary in cents (e.g., $80000/year = 8000000)';
-COMMENT ON COLUMN jobs.benefits IS 'JSONB array: [{"name": "Health Insurance", "description": "Full coverage"}]';
-COMMENT ON COLUMN jobs.required_skills IS 'JSONB array: [{"skill": "Java", "required": true, "years": 3}]';
+COMMENT ON COLUMN jobs.benefits IS 'JSONB array of benefits: [{"name": "Health Insurance", "description": "..."}]';
+COMMENT ON COLUMN jobs.required_skills IS 'JSONB array of skills: [{"skill": "Java", "required": true, "years": 3}]';
+
+-- =====================================================
+-- ROLLBACK INSTRUCTIONS
+-- =====================================================
+-- To rollback this migration, run:
+--
+-- DROP TRIGGER IF EXISTS jobs_counter_check ON jobs;
+-- DROP TRIGGER IF EXISTS jobs_updated_at ON jobs;
+-- DROP TABLE IF EXISTS jobs CASCADE;
+-- DROP FUNCTION IF EXISTS prevent_negative_counters_jobs();

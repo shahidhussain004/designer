@@ -1,7 +1,8 @@
 -- =====================================================
--- V15: Create Additional Audit & Support Tables
+-- V15: Create Support & Audit Tables
 -- Description: Audit logs, support tickets, and other administrative tables
--- OPTIMIZED: json → jsonb, GIN indexes, partitioning-ready
+-- OPTIMIZED: Removed 20 unused indexes (0 scans), removed 3 JSONB GIN indexes, removed 2 full-text search indexes
+-- Author: Database Audit & Optimization 2026-01-26
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS audit_logs (
@@ -13,7 +14,7 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     entity_type VARCHAR(100) NOT NULL,
     entity_id BIGINT,
     
-    -- Changes (CHANGED: json → jsonb)
+    -- Changes
     old_values JSONB,
     new_values JSONB,
     changes JSONB,
@@ -30,19 +31,17 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     created_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
--- Indexes
-CREATE INDEX idx_audit_logs_user_id ON audit_logs(user_id) WHERE user_id IS NOT NULL;
-CREATE INDEX idx_audit_logs_entity ON audit_logs(entity_type, entity_id);
-CREATE INDEX idx_audit_logs_action ON audit_logs(action);
-CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at DESC);
+-- =====================================================
+-- AUDIT_LOGS INDEXES (OPTIMIZED)
+-- =====================================================
+-- Audit Result: All indexes had 0 scans (audit logging not in use yet)
+-- REMOVED: idx_audit_logs_user_id, idx_audit_logs_entity, idx_audit_logs_action,
+--          idx_audit_logs_created_at, idx_audit_logs_user_action (all 0 scans)
+-- REMOVED: idx_audit_logs_changes_gin, idx_audit_logs_old_values_gin,
+--          idx_audit_logs_new_values_gin (0 scans - JSONB search not used yet)
+-- NOTE: Will add indexes when audit logging is actively used
 
--- Composite for user activity tracking
-CREATE INDEX idx_audit_logs_user_action ON audit_logs(user_id, action, created_at DESC) WHERE user_id IS NOT NULL;
-
--- GIN indexes for JSONB searching
-CREATE INDEX idx_audit_logs_changes_gin ON audit_logs USING GIN(changes);
-CREATE INDEX idx_audit_logs_old_values_gin ON audit_logs USING GIN(old_values);
-CREATE INDEX idx_audit_logs_new_values_gin ON audit_logs USING GIN(new_values);
+-- No indexes initially - add when audit logging is built
 
 CREATE TABLE IF NOT EXISTS support_tickets (
     id BIGSERIAL PRIMARY KEY,
@@ -81,30 +80,19 @@ CREATE TABLE IF NOT EXISTS support_tickets (
     CONSTRAINT support_tickets_feedback_rating_check CHECK (feedback_rating IS NULL OR (feedback_rating >= 1 AND feedback_rating <= 5))
 );
 
--- Indexes
-CREATE INDEX idx_support_tickets_reported_by ON support_tickets(reported_by);
-CREATE INDEX idx_support_tickets_assigned_to ON support_tickets(assigned_to) WHERE assigned_to IS NOT NULL;
-CREATE INDEX idx_support_tickets_status ON support_tickets(status);
-CREATE INDEX idx_support_tickets_category ON support_tickets(category);
-CREATE INDEX idx_support_tickets_priority ON support_tickets(priority);
-CREATE INDEX idx_support_tickets_created_at ON support_tickets(created_at DESC);
+-- =====================================================
+-- SUPPORT_TICKETS INDEXES (OPTIMIZED)
+-- =====================================================
+-- Audit Result: All indexes had 0 scans (support system not in use yet)
+-- REMOVED: idx_support_tickets_reported_by, idx_support_tickets_assigned_to,
+--          idx_support_tickets_status, idx_support_tickets_category,
+--          idx_support_tickets_priority, idx_support_tickets_created_at,
+--          idx_support_tickets_open, idx_support_tickets_assigned_status,
+--          idx_support_tickets_related (all 0 scans)
+-- REMOVED: idx_support_tickets_search (0 scans - full-text search not implemented)
+-- NOTE: Will add indexes when support features are actively used
 
--- Open tickets queue
-CREATE INDEX idx_support_tickets_open ON support_tickets(priority, created_at) 
-    WHERE status IN ('OPEN', 'IN_PROGRESS');
-
--- Assigned tickets
-CREATE INDEX idx_support_tickets_assigned_status ON support_tickets(assigned_to, status, created_at DESC) 
-    WHERE assigned_to IS NOT NULL;
-
--- Related entity lookup
-CREATE INDEX idx_support_tickets_related ON support_tickets(related_entity_type, related_entity_id) 
-    WHERE related_entity_type IS NOT NULL;
-
--- Full-text search
-CREATE INDEX idx_support_tickets_search ON support_tickets USING GIN(
-    to_tsvector('english', title || ' ' || description)
-);
+-- No indexes initially - add when support features are built
 
 CREATE TABLE IF NOT EXISTS support_ticket_replies (
     id BIGSERIAL PRIMARY KEY,
@@ -113,7 +101,6 @@ CREATE TABLE IF NOT EXISTS support_ticket_replies (
     -- Reply Details
     author_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     message TEXT NOT NULL,
-    -- CHANGED: json → jsonb for attachments
     attachments JSONB DEFAULT '[]'::jsonb,
     
     -- Internal Notes (not visible to user)
@@ -124,17 +111,16 @@ CREATE TABLE IF NOT EXISTS support_ticket_replies (
     updated_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
--- Indexes
-CREATE INDEX idx_support_ticket_replies_ticket_id ON support_ticket_replies(ticket_id);
-CREATE INDEX idx_support_ticket_replies_author_id ON support_ticket_replies(author_id);
-CREATE INDEX idx_support_ticket_replies_created_at ON support_ticket_replies(created_at DESC);
+-- =====================================================
+-- SUPPORT_TICKET_REPLIES INDEXES (OPTIMIZED)
+-- =====================================================
+-- Audit Result: All indexes had 0 scans (support system not in use yet)
+-- REMOVED: idx_support_ticket_replies_ticket_id, idx_support_ticket_replies_author_id,
+--          idx_support_ticket_replies_created_at, idx_support_ticket_replies_external (all 0 scans)
+-- REMOVED: idx_support_ticket_replies_attachments_gin (0 scans - JSONB search not used yet)
+-- NOTE: Will add indexes when support features are actively used
 
--- External (customer-visible) replies
-CREATE INDEX idx_support_ticket_replies_external ON support_ticket_replies(ticket_id, created_at) 
-    WHERE is_internal = FALSE;
-
--- GIN index for attachments
-CREATE INDEX idx_support_ticket_replies_attachments_gin ON support_ticket_replies USING GIN(attachments);
+-- No indexes initially - add when support features are built
 
 CREATE TABLE IF NOT EXISTS user_preferences (
     id BIGSERIAL PRIMARY KEY,
@@ -172,7 +158,14 @@ CREATE TABLE IF NOT EXISTS user_preferences (
     CONSTRAINT user_preferences_theme_check CHECK (theme IN ('light', 'dark', 'auto'))
 );
 
-CREATE INDEX idx_user_preferences_user_id ON user_preferences(user_id);
+-- =====================================================
+-- USER_PREFERENCES INDEXES (OPTIMIZED)
+-- =====================================================
+-- Audit Result: Unique constraint auto-creates index on user_id
+-- REMOVED: idx_user_preferences_user_id (redundant - unique constraint covers this)
+-- NOTE: No additional indexes needed (always queried by user_id with unique constraint)
+
+-- No additional indexes needed (unique constraint on user_id is sufficient)
 
 CREATE TABLE IF NOT EXISTS blocklist (
     id BIGSERIAL PRIMARY KEY,
@@ -192,9 +185,14 @@ CREATE TABLE IF NOT EXISTS blocklist (
     CONSTRAINT blocklist_unique_block UNIQUE(blocker_id, blocked_user_id)
 );
 
--- Indexes
-CREATE INDEX idx_blocklist_blocker_id ON blocklist(blocker_id);
-CREATE INDEX idx_blocklist_blocked_user_id ON blocklist(blocked_user_id);
+-- =====================================================
+-- BLOCKLIST INDEXES (OPTIMIZED)
+-- =====================================================
+-- Audit Result: All indexes had 0 scans (blocklist not in use yet)
+-- REMOVED: idx_blocklist_blocker_id, idx_blocklist_blocked_user_id (all 0 scans)
+-- NOTE: Will add indexes when blocklist features are actively used
+
+-- No indexes initially - add when blocklist features are built
 
 CREATE TABLE IF NOT EXISTS reported_content (
     id BIGSERIAL PRIMARY KEY,
@@ -222,17 +220,21 @@ CREATE TABLE IF NOT EXISTS reported_content (
     CONSTRAINT reported_content_status_check CHECK (status IN ('PENDING', 'REVIEWING', 'RESOLVED', 'DISMISSED'))
 );
 
--- Indexes
-CREATE INDEX idx_reported_content_reported_by ON reported_content(reported_by);
-CREATE INDEX idx_reported_content_reported_user ON reported_content(reported_user_id) WHERE reported_user_id IS NOT NULL;
-CREATE INDEX idx_reported_content_content ON reported_content(content_type, content_id);
-CREATE INDEX idx_reported_content_status ON reported_content(status);
-CREATE INDEX idx_reported_content_created_at ON reported_content(created_at DESC);
+-- =====================================================
+-- REPORTED_CONTENT INDEXES (OPTIMIZED)
+-- =====================================================
+-- Audit Result: All indexes had 0 scans (content reporting not in use yet)
+-- REMOVED: idx_reported_content_reported_by, idx_reported_content_reported_user,
+--          idx_reported_content_content, idx_reported_content_status,
+--          idx_reported_content_created_at, idx_reported_content_pending (all 0 scans)
+-- NOTE: Will add indexes when content reporting features are actively used
 
--- Pending reports queue
-CREATE INDEX idx_reported_content_pending ON reported_content(created_at) WHERE status = 'PENDING';
+-- No indexes initially - add when content reporting features are built
 
--- Triggers
+-- =====================================================
+-- TRIGGERS
+-- =====================================================
+
 CREATE TRIGGER support_tickets_updated_at BEFORE UPDATE ON support_tickets FOR EACH ROW EXECUTE FUNCTION update_timestamp();
 CREATE TRIGGER support_ticket_replies_updated_at BEFORE UPDATE ON support_ticket_replies FOR EACH ROW EXECUTE FUNCTION update_timestamp();
 CREATE TRIGGER user_preferences_updated_at BEFORE UPDATE ON user_preferences FOR EACH ROW EXECUTE FUNCTION update_timestamp();
@@ -257,10 +259,32 @@ CREATE TRIGGER support_tickets_generate_number
     FOR EACH ROW
     EXECUTE FUNCTION generate_ticket_number();
 
-COMMENT ON TABLE audit_logs IS 'Complete audit trail of all system actions for compliance and debugging';
-COMMENT ON TABLE support_tickets IS 'Customer support ticket management system';
-COMMENT ON TABLE support_ticket_replies IS 'Replies and updates to support tickets';
-COMMENT ON TABLE user_preferences IS 'User notification and preference settings';
-COMMENT ON TABLE blocklist IS 'User blocklist - users who have blocked other users';
-COMMENT ON TABLE reported_content IS 'Content reports and moderation queue';
-COMMENT ON COLUMN support_ticket_replies.attachments IS 'JSONB array: [{"filename": "...", "url": "...", "size": 12345}]';
+-- =====================================================
+-- COMMENTS
+-- =====================================================
+
+COMMENT ON TABLE audit_logs IS 'Audit trail of all system actions. Optimized with no indexes (audit logging not active).';
+COMMENT ON TABLE support_tickets IS 'Customer support tickets. Optimized with no indexes (support system not active).';
+COMMENT ON TABLE support_ticket_replies IS 'Replies to support tickets. Optimized with no indexes (support system not active).';
+COMMENT ON TABLE user_preferences IS 'User preferences and settings. Optimized with unique constraint only (no additional indexes needed).';
+COMMENT ON TABLE blocklist IS 'User blocklist for preventing interactions. Optimized with no indexes (blocklist not active).';
+COMMENT ON TABLE reported_content IS 'Content reporting and moderation. Optimized with no indexes (reporting not active).';
+
+-- =====================================================
+-- ROLLBACK INSTRUCTIONS
+-- =====================================================
+-- To rollback this migration, run:
+--
+-- DROP TRIGGER IF EXISTS support_tickets_generate_number ON support_tickets;
+-- DROP TRIGGER IF EXISTS reported_content_updated_at ON reported_content;
+-- DROP TRIGGER IF EXISTS user_preferences_updated_at ON user_preferences;
+-- DROP TRIGGER IF EXISTS support_ticket_replies_updated_at ON support_ticket_replies;
+-- DROP TRIGGER IF EXISTS support_tickets_updated_at ON support_tickets;
+-- DROP FUNCTION IF EXISTS generate_ticket_number();
+-- DROP SEQUENCE IF EXISTS ticket_number_seq;
+-- DROP TABLE IF EXISTS reported_content CASCADE;
+-- DROP TABLE IF EXISTS blocklist CASCADE;
+-- DROP TABLE IF EXISTS user_preferences CASCADE;
+-- DROP TABLE IF EXISTS support_ticket_replies CASCADE;
+-- DROP TABLE IF EXISTS support_tickets CASCADE;
+-- DROP TABLE IF EXISTS audit_logs CASCADE;

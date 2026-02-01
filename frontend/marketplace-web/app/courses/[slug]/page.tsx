@@ -2,6 +2,7 @@
 
 import { ErrorMessage } from '@/components/ErrorMessage';
 import { CoursesSkeleton } from '@/components/Skeletons';
+import { PageLayout } from '@/components/ui';
 import { useCourse, useCourseCurriculum, useEnrollCourse } from '@/hooks/useCourses';
 import { authService } from '@/lib/auth';
 import type { Lesson } from '@/lib/courses';
@@ -59,27 +60,33 @@ export default function CourseDetailPage() {
   };
 
   if (isLoading) {
-    return <CoursesSkeleton />;
+    return (
+      <PageLayout>
+        <CoursesSkeleton />
+      </PageLayout>
+    );
   }
 
   if (error || !course) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          {error ? (
-            <ErrorMessage message={error.message} retry={refetch} />
-          ) : (
-            <>
-              <p className="text-6xl mb-4">😕</p>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Course Not Found</h2>
-              <p className="text-gray-600 mb-4">This course does not exist</p>
-              <Link href="/courses" className="text-primary-600 hover:text-primary-700 font-medium">
-                ← Back to Courses
-              </Link>
-            </>
-          )}
+      <PageLayout>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            {error ? (
+              <ErrorMessage message={error.message} retry={refetch} />
+            ) : (
+              <>
+                <p className="text-6xl mb-4">😕</p>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Course Not Found</h2>
+                <p className="text-gray-600 mb-4">This course does not exist</p>
+                <Link href="/courses" className="text-primary-600 hover:text-primary-700 font-medium">
+                  ← Back to Courses
+                </Link>
+              </>
+            )}
+          </div>
         </div>
-      </div>
+      </PageLayout>
     );
   }
 
@@ -88,7 +95,8 @@ export default function CourseDetailPage() {
   const totalMinutes = course.durationMinutes % 60;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <PageLayout whiteBg={false}>
+      <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
       <div className="bg-gray-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -320,5 +328,6 @@ export default function CourseDetailPage() {
         </div>
       </div>
     </div>
+    </PageLayout>
   );
 }

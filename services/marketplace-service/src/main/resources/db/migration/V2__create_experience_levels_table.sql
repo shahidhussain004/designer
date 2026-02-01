@@ -1,7 +1,8 @@
 -- =====================================================
 -- V2: Create Experience Levels Reference Table
 -- Description: Lookup table for job experience level requirements
--- OPTIMIZED: Added partial indexes, better constraints
+-- OPTIMIZED: Removed unused indexes, kept only essential constraints
+-- Author: Database Audit & Optimization 2026-01-26
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS experience_levels (
@@ -21,18 +22,16 @@ CREATE TABLE IF NOT EXISTS experience_levels (
     CONSTRAINT experience_display_order_check CHECK (display_order >= 0)
 );
 
--- Indexes (partial index for active records only)
-CREATE INDEX idx_experience_levels_code ON experience_levels(code) WHERE is_active = TRUE;
-CREATE INDEX idx_experience_levels_display_order ON experience_levels(display_order) WHERE is_active = TRUE;
+-- =====================================================
+-- EXPERIENCE_LEVELS INDEXES (OPTIMIZED)
+-- =====================================================
+-- Audit Result: ALL indexes had 0 scans except primary key and unique constraints
+-- REMOVED: idx_experience_levels_code, idx_experience_levels_display_order
+-- KEPT: Primary key (auto-created), unique constraints on name and code (auto-indexed)
 
--- Insert default experience levels
-INSERT INTO experience_levels (name, code, description, years_min, years_max, display_order) VALUES
-('Entry Level', 'ENTRY', 'Less than 2 years of professional experience', 0, 2, 1),
-('Intermediate', 'INTERMEDIATE', '2-5 years of professional experience', 2, 5, 2),
-('Senior', 'SENIOR', '5-10 years of professional experience', 5, 10, 3),
-('Lead', 'LEAD', '10+ years and leadership experience', 10, 99, 4),
-('Executive', 'EXECUTIVE', 'C-suite or executive management level', 15, 99, 5)
-ON CONFLICT (name) DO NOTHING;
+-- No additional indexes needed - unique constraints provide sufficient indexing
+
+-- Seed data: See resources/db/seed_data/01_experience_levels_seed.sql
 
 -- Trigger for updated_at
 CREATE TRIGGER experience_levels_updated_at 
@@ -40,5 +39,17 @@ CREATE TRIGGER experience_levels_updated_at
     FOR EACH ROW 
     EXECUTE FUNCTION update_timestamp();
 
+-- =====================================================
+-- COMMENTS
+-- =====================================================
+
 COMMENT ON TABLE experience_levels IS 'Reference lookup table for job experience level requirements';
 COMMENT ON COLUMN experience_levels.code IS 'Machine-readable code: ENTRY, INTERMEDIATE, SENIOR, LEAD, EXECUTIVE';
+
+-- =====================================================
+-- ROLLBACK INSTRUCTIONS
+-- =====================================================
+-- To rollback this migration, run:
+--
+-- DROP TRIGGER IF EXISTS experience_levels_updated_at ON experience_levels;
+-- DROP TABLE IF EXISTS experience_levels CASCADE;

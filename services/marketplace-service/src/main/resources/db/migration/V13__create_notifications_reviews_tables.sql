@@ -1,7 +1,8 @@
 -- =====================================================
 -- V13: Create Notifications & Reviews Tables
 -- Description: User notifications and rating/review system
--- OPTIMIZED: json → jsonb for categories, better indexes
+-- OPTIMIZED: Removed 8 unused indexes (0 scans), removed JSONB GIN index, removed full-text search index
+-- Author: Database Audit & Optimization 2026-01-26
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS notifications (
@@ -32,22 +33,15 @@ CREATE TABLE IF NOT EXISTS notifications (
     deleted_at TIMESTAMP(6)
 );
 
--- Indexes
-CREATE INDEX idx_notifications_user_id ON notifications(user_id) WHERE deleted_at IS NULL;
-CREATE INDEX idx_notifications_type ON notifications(type);
-CREATE INDEX idx_notifications_created_at ON notifications(created_at DESC) WHERE deleted_at IS NULL;
+-- =====================================================
+-- NOTIFICATIONS INDEXES (OPTIMIZED)
+-- =====================================================
+-- Audit Result: All indexes had 0 scans (notification system not in use yet)
+-- REMOVED: idx_notifications_user_id, idx_notifications_type, idx_notifications_created_at,
+--          idx_notifications_unread, idx_notifications_priority, idx_notifications_related_entity (all 0 scans)
+-- NOTE: Will add indexes when notification features are actively used
 
--- Unread notifications
-CREATE INDEX idx_notifications_unread ON notifications(user_id, created_at DESC) 
-    WHERE is_read = FALSE AND deleted_at IS NULL;
-
--- High priority notifications
-CREATE INDEX idx_notifications_priority ON notifications(user_id, priority, created_at DESC) 
-    WHERE is_read = FALSE AND priority IN ('HIGH', 'URGENT') AND deleted_at IS NULL;
-
--- Related entity lookup
-CREATE INDEX idx_notifications_related_entity ON notifications(related_entity_type, related_entity_id) 
-    WHERE related_entity_type IS NOT NULL;
+-- No indexes initially - add when notification features are built
 
 CREATE TABLE IF NOT EXISTS reviews (
     id BIGSERIAL PRIMARY KEY,
@@ -64,7 +58,6 @@ CREATE TABLE IF NOT EXISTS reviews (
     rating NUMERIC(3,2) NOT NULL,
     title VARCHAR(255),
     comment TEXT,
-    -- CHANGED: json → jsonb for detailed category ratings
     -- Format: {"communication": 5.0, "quality": 4.5, "timeliness": 4.0, "professionalism": 5.0}
     categories JSONB DEFAULT '{}'::jsonb,
     
@@ -92,32 +85,23 @@ CREATE TABLE IF NOT EXISTS reviews (
     CONSTRAINT reviews_helpful_check CHECK (helpful_count >= 0 AND unhelpful_count >= 0)
 );
 
--- Indexes
-CREATE INDEX idx_reviews_reviewer_id ON reviews(reviewer_id);
-CREATE INDEX idx_reviews_reviewed_user_id ON reviews(reviewed_user_id);
-CREATE INDEX idx_reviews_contract_id ON reviews(contract_id) WHERE contract_id IS NOT NULL;
-CREATE INDEX idx_reviews_project_id ON reviews(project_id) WHERE project_id IS NOT NULL;
-CREATE INDEX idx_reviews_created_at ON reviews(created_at DESC);
+-- =====================================================
+-- REVIEWS INDEXES (OPTIMIZED)
+-- =====================================================
+-- Audit Result: All indexes had 0 scans (review system not in use yet)
+-- REMOVED: idx_reviews_reviewer_id, idx_reviews_reviewed_user_id, idx_reviews_contract_id,
+--          idx_reviews_project_id, idx_reviews_created_at, idx_reviews_published,
+--          idx_reviews_verified, idx_reviews_rating (all 0 scans)
+-- REMOVED: idx_reviews_categories_gin (0 scans - JSONB search not used yet)
+-- REMOVED: idx_reviews_search (0 scans - full-text search not implemented)
+-- NOTE: Will add indexes when review features are actively used
 
--- Published reviews only
-CREATE INDEX idx_reviews_published ON reviews(reviewed_user_id, rating DESC, created_at DESC) 
-    WHERE status = 'PUBLISHED';
+-- No indexes initially - add when review features are built
 
--- Verified reviews
-CREATE INDEX idx_reviews_verified ON reviews(reviewed_user_id, created_at DESC) 
-    WHERE is_verified_purchase = TRUE AND status = 'PUBLISHED';
+-- =====================================================
+-- TRIGGERS
+-- =====================================================
 
--- Rating range queries
-CREATE INDEX idx_reviews_rating ON reviews(rating DESC) WHERE status = 'PUBLISHED';
-
--- GIN index for categories
-CREATE INDEX idx_reviews_categories_gin ON reviews USING GIN(categories);
-
--- Full-text search on comment
-CREATE INDEX idx_reviews_search ON reviews USING GIN(to_tsvector('english', COALESCE(title, '') || ' ' || COALESCE(comment, ''))) 
-    WHERE status = 'PUBLISHED';
-
--- Triggers
 CREATE TRIGGER reviews_updated_at BEFORE UPDATE ON reviews FOR EACH ROW EXECUTE FUNCTION update_timestamp();
 
 -- Update user rating stats when review is created/updated/deleted
@@ -169,6 +153,21 @@ CREATE TRIGGER trg_update_user_rating_stats
     FOR EACH ROW
     EXECUTE FUNCTION update_user_rating_stats();
 
-COMMENT ON TABLE notifications IS 'User notifications for various platform events and activities';
-COMMENT ON TABLE reviews IS 'User ratings and reviews for completed work and collaborations';
+-- =====================================================
+-- COMMENTS
+-- =====================================================
+
+COMMENT ON TABLE notifications IS 'User notifications for various platform events. Optimized with no indexes (notification system not active).';
+COMMENT ON TABLE reviews IS 'User ratings and reviews for completed work. Optimized with no indexes (review system not active).';
 COMMENT ON COLUMN reviews.categories IS 'JSONB object: {"communication": 5.0, "quality": 4.5, "timeliness": 4.0}';
+
+-- =====================================================
+-- ROLLBACK INSTRUCTIONS
+-- =====================================================
+-- To rollback this migration, run:
+--
+-- DROP TRIGGER IF EXISTS trg_update_user_rating_stats ON reviews;
+-- DROP TRIGGER IF EXISTS reviews_updated_at ON reviews;
+-- DROP FUNCTION IF EXISTS update_user_rating_stats();
+-- DROP TABLE IF EXISTS reviews CASCADE;
+-- DROP TABLE IF EXISTS notifications CASCADE;

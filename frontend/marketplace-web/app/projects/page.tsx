@@ -5,11 +5,13 @@ import { JobsSkeleton } from '@/components/Skeletons';
 import { PageLayout } from '@/components/ui';
 import { useExperienceLevels, useProjectCategories, useProjects } from '@/hooks/useProjects';
 import { parseCategories, parseExperienceLevels } from '@/lib/apiParsers';
+import { Grid, List } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useMemo, useState } from 'react';
 
 type ViewMode = 'list' | 'grid' | 'compact';
 type SortBy = 'recent' | 'budget-high' | 'budget-low';
+type LayoutMode = 'list' | 'grid';
 
 interface Project {
   id: string;
@@ -54,6 +56,9 @@ function ProjectsPageContent() {
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [sortBy, setSortBy] = useState<SortBy>('recent');
   const [filtersOpen, setFiltersOpen] = useState(true);
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>('grid');
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
   
   // Filter states - now using IDs
   const [categoryId, setCategoryId] = useState(searchParams.get('categoryId') || '');
@@ -93,6 +98,7 @@ function ProjectsPageContent() {
     if (maxBudget) params.append('maxBudget', maxBudget);
     if (searchQuery) params.append('search', searchQuery);
     
+    setCurrentPage(1);
     router.push(`/projects?${params.toString()}`);
   };
 
@@ -102,6 +108,7 @@ function ProjectsPageContent() {
     setMinBudget('');
     setMaxBudget('');
     setSearchQuery('');
+    setCurrentPage(1);
     router.push('/projects');
   };
 
@@ -232,6 +239,33 @@ function ProjectsPageContent() {
                 <option value="budget-high">Highest Budget</option>
                 <option value="budget-low">Lowest Budget</option>
               </select>
+
+              {/* Layout Toggle */}
+              <div className="flex gap-2 border border-gray-300 rounded-lg p-1 w-fit h-fit">
+                <button
+                  onClick={() => setLayoutMode('list')}
+                  className={`p-2 rounded transition-colors ${
+                    layoutMode === 'list'
+                      ? 'bg-primary-100 text-primary-600'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                  title="List View"
+                >
+                  <List className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => setLayoutMode('grid')}
+                  className={`p-2 rounded transition-colors ${
+                    layoutMode === 'grid'
+                      ? 'bg-primary-100 text-primary-600'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                  title="Grid View"
+                >
+                  <Grid className="w-5 h-5" />
+                </button>
+              </div>
+
               <button
                 onClick={handleApplyFilters}
                 className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
@@ -270,9 +304,144 @@ function ProjectsPageContent() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {sortedProjects.map((project) => renderProjectCard(project))}
-            </div>
+            <>
+              {/* Pagination Info */}
+              <div className="mb-6 text-sm text-gray-600">
+                Showing {sortedProjects.length > 0 ? ((currentPage - 1) * ITEMS_PER_PAGE) + 1 : 0} to {Math.min(currentPage * ITEMS_PER_PAGE, sortedProjects.length)} of {sortedProjects.length} projects
+              </div>
+
+              {/* List View */}
+              {layoutMode === 'list' && (
+                <div className="space-y-4 mb-8">
+                  {sortedProjects
+                    .slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+                    .map((project) => (
+                      <div
+                        key={project.id}
+                        className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-lg hover:border-primary-300 transition-all cursor-pointer group"
+                        onClick={() => router.push(`/projects/${project.id}`)}
+                      >
+                        <div className="flex items-start justify-between gap-6 mb-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-4 mb-2">
+                              <div>
+                                <h4 className="text-lg font-semibold group-hover:text-primary-600 transition-colors">
+                                  {project.title}
+                                </h4>
+                                <p className="text-sm text-gray-500 mt-1">
+                                  Posted by {project.company?.fullName || 'Unknown'} • {formatDate(project.createdAt)}
+                                </p>
+                              </div>
+                              <div className="flex-shrink-0">
+                                <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-primary-100 text-primary-700">
+                                  {project.category?.name ?? 'Uncategorized'}
+                                </span>
+                              </div>
+                            </div>
+                            <p className="text-gray-600 text-sm mb-4">
+                              {project.description}
+                            </p>
+                          </div>
+                          <div className="flex-shrink-0 text-right">
+                            <div className="text-2xl font-bold text-green-600 mb-2">
+                              ${project.budget?.toLocaleString() || '0'}
+                            </div>
+                            <span className={`inline-block px-3 py-1 text-xs font-medium rounded-full ${
+                              project.status === 'OPEN' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                            }`}>
+                              {project.status}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                          <span className="text-sm text-gray-500">Level: {project.experienceLevel?.name ?? 'Any'}</span>
+                          <span className="text-primary-600 font-medium text-sm group-hover:translate-x-1 transition-transform inline-flex items-center">
+                            View Details →
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              )}
+
+              {/* Grid View */}
+              {layoutMode === 'grid' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                  {sortedProjects
+                    .slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+                    .map((project) => renderProjectCard(project))}
+                </div>
+              )}
+
+              {/* Pagination Controls */}
+              {Math.ceil(sortedProjects.length / ITEMS_PER_PAGE) > 1 && (
+                <div className="mt-12 pt-8 border-t border-gray-200">
+                  <div className="flex items-center justify-center gap-2 flex-wrap">
+                    <button
+                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                      className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                      Previous
+                    </button>
+
+                    {/* Page Numbers */}
+                    {Array.from({ length: Math.ceil(sortedProjects.length / ITEMS_PER_PAGE) }).map((_, idx) => {
+                      const pageNum = idx + 1;
+                      const totalPages = Math.ceil(sortedProjects.length / ITEMS_PER_PAGE);
+                      const showPage = 
+                        pageNum === 1 || 
+                        pageNum === totalPages || 
+                        pageNum === currentPage || 
+                        (pageNum === currentPage - 1 && currentPage > 1) || 
+                        (pageNum === currentPage + 1 && currentPage < totalPages);
+                      
+                      const isEllipsis = 
+                        (pageNum === 2 && currentPage > 3) || 
+                        (pageNum === totalPages - 1 && currentPage < totalPages - 2);
+
+                      if (isEllipsis) {
+                        return (
+                          <span key={`ellipsis-${idx}`} className="px-2 py-2 text-gray-600">
+                            ...
+                          </span>
+                        );
+                      }
+
+                      if (!showPage) return null;
+
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => setCurrentPage(pageNum)}
+                          className={`w-10 h-10 rounded-lg font-medium transition-colors ${
+                            pageNum === currentPage
+                              ? 'bg-primary-600 text-white'
+                              : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+
+                    <button
+                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(sortedProjects.length / ITEMS_PER_PAGE)))}
+                      disabled={currentPage === Math.ceil(sortedProjects.length / ITEMS_PER_PAGE)}
+                      className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      Next
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

@@ -53,7 +53,7 @@ function CheckoutSuccessContent() {
           title: 'Payment Successful!',
           description: 'Your payment has been processed successfully.',
           primaryAction: { label: 'Go to Dashboard', href: '/dashboard' },
-          secondaryAction: { label: 'View Receipts', href: '/dashboards/invoices' },
+          secondaryAction: { label: 'View Receipts', href: '/dashboard/invoices' },
         };
     }
   };
@@ -131,7 +131,7 @@ function CheckoutSuccessContent() {
         {/* Receipt Link */}
         <p className="text-sm text-gray-500 mt-6">
           A receipt has been sent to your email address.
-          <Link href="/dashboards/invoices" className="text-primary-600 hover:text-primary-700 ml-1">
+          <Link href="/dashboard/invoices" className="text-primary-600 hover:text-primary-700 ml-1">
             View all invoices →
           </Link>
         </p>

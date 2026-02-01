@@ -11,9 +11,9 @@ import React, { useMemo, useState } from 'react';
 
 const CONTENT_TYPES: { value: ContentType | ''; label: string }[] = [
   { value: '', label: 'All Types' },
-  { value: 'BLOG', label: 'Blog Posts' },
-  { value: 'ARTICLE', label: 'Articles' },
-  { value: 'NEWS', label: 'News' },
+  { value: 'blog', label: 'Blog Posts' },
+  { value: 'article', label: 'Articles' },
+  { value: 'news', label: 'News' },
 ];
 
 export default function ResourcesPage() {
@@ -89,9 +89,9 @@ export default function ResourcesPage() {
 
   const getContentTypeBadge = (type: ContentType) => {
     const styles: Record<ContentType, { bg: string; text: string }> = {
-      BLOG: { bg: 'bg-blue-100', text: 'text-blue-800' },
-      ARTICLE: { bg: 'bg-green-100', text: 'text-green-800' },
-      NEWS: { bg: 'bg-amber-100', text: 'text-amber-800' },
+      blog: { bg: 'bg-blue-100', text: 'text-blue-800' },
+      article: { bg: 'bg-green-100', text: 'text-green-800' },
+      news: { bg: 'bg-amber-100', text: 'text-amber-800' },
     };
     return styles[type] || { bg: 'bg-gray-100', text: 'text-gray-800' };
   };
@@ -191,7 +191,7 @@ export default function ResourcesPage() {
               <div className="mt-4">
                 <p className="text-sm text-gray-600 mb-2">Filter by tags:</p>
                 <div className="flex flex-wrap gap-2">
-                  {tags.slice(0, 15).map((tag) => (
+                  {tags.slice(0, 15).map((tag: any) => (
                     <button
                       key={tag.id}
                       onClick={() => handleTagToggle(tag.id)}

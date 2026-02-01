@@ -28,14 +28,21 @@ interface Job {
   showSalary?: boolean;
   requirements?: string;
   responsibilities?: string;
-  benefits?: string | Record<string, any>;
-  requiredSkills?: string | Record<string, any>;
-  preferredSkills?: string | Record<string, any>;
+  benefits?: string | Record<string, unknown>;
+  perks?: string | Record<string, unknown>;
+  requiredSkills?: string | Record<string, unknown>;
+  preferredSkills?: string | Record<string, unknown>;
   educationLevel?: string;
   experienceLevel?: string;
+  certifications?: string | Record<string, unknown>;
   applicationDeadline?: string;
+  applicationEmail?: string;
+  applicationUrl?: string;
+  applyInstructions?: string;
   startDate?: string;
   positionsAvailable?: number;
+  travelRequirement?: string;
+  securityClearanceRequired?: boolean;
   visaSponsorship?: boolean;
   status: string;
   viewsCount?: number;
@@ -49,11 +56,13 @@ interface Job {
 }
 
 interface CreateJobInput {
+  categoryId: number;
   title: string;
   description: string;
-  categoryId?: number;
-  companyName?: string;
+  responsibilities?: string;
+  requirements: string;
   jobType: string;
+  experienceLevel?: string;
   location: string;
   city?: string;
   state?: string;
@@ -65,13 +74,22 @@ interface CreateJobInput {
   salaryCurrency?: string;
   salaryPeriod?: string;
   showSalary?: boolean;
-  requirements?: string;
-  responsibilities?: string;
-  benefits?: string;
-  requiredSkills?: string;
-  preferredSkills?: string;
+  benefits?: string | string[];
+  perks?: string | string[];
+  requiredSkills?: string | string[];
+  preferredSkills?: string | string[];
   educationLevel?: string;
-  experienceLevel?: string;
+  certifications?: string | string[];
+  applicationDeadline?: string;
+  applicationEmail?: string;
+  applicationUrl?: string;
+  applyInstructions?: string;
+  startDate?: string;
+  positionsAvailable?: number;
+  travelRequirement?: string;
+  securityClearanceRequired?: boolean;
+  visaSponsorship?: boolean;
+  status?: string;
 }
 
 type UpdateJobInput = Partial<CreateJobInput>
@@ -94,13 +112,13 @@ export function useJobs(companyId?: string | number | null) {
           const res = await getJobs({ page: 0, size: 10, companyId });
           return res.jobs;
         }
-      } catch (err) {
+      } catch {
         // swallow and fall back to apiClient below
       }
 
       const url = companyId ? `/jobs?companyId=${companyId}` : '/jobs';
-      const { data } = await apiClient.get<Job[]>(url, { signal });
-      return Array.isArray(data) ? data : (data as any).content || [];
+      const { data } = await apiClient.get<Job[] | { content: Job[] }>(url, { signal });
+      return Array.isArray(data) ? data : data.content || [];
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });

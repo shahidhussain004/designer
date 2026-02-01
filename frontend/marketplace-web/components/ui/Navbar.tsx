@@ -227,7 +227,9 @@ const MobileMenu: React.FC<{
   user: any;
   loading: boolean;
   onLogout: () => void;
-}> = ({ isOpen, onClose, pathname, user, loading, onLogout }) => {
+  authInitialized: boolean;
+  currentUser: any;
+}> = ({ isOpen, onClose, pathname, user, loading, onLogout, authInitialized, currentUser }) => {
   if (!isOpen) return null;
 
   return (
@@ -235,9 +237,10 @@ const MobileMenu: React.FC<{
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/50" onClick={onClose} />
       
-      {/* Menu panel */}
-      <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-white shadow-xl">
-        <div className="flex items-center justify-between px-4 py-4 border-b border-gray-100">
+      {/* Menu panel with flex layout for proper scrolling */}
+      <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-white shadow-xl flex flex-col">
+        {/* Header - Fixed */}
+        <div className="flex items-center justify-between px-4 py-4 border-b border-gray-100 flex-shrink-0">
           <Link href="/" onClick={onClose} className="flex items-center">
             <Image src="/logo-designer.png" alt="Designer" width={140} height={32} className="object-contain" />
           </Link>
@@ -251,89 +254,114 @@ const MobileMenu: React.FC<{
           </button>
         </div>
         
-        <nav className="px-4 py-6 space-y-1">
-          {navigation.map((item) => (
-            <div key={item.label}>
-              {item.children ? (
-                <div className="space-y-1">
-                  <span className="block px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+        {/* Scrollable Content Area */}
+        <div className="flex-1 overflow-y-auto">
+          <nav className="px-4 py-6 space-y-1">
+            {navigation.map((item) => (
+              <div key={item.label}>
+                {item.children ? (
+                  <div className="space-y-1">
+                    <span className="block px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                      {item.label}
+                    </span>
+                    {item.children.map((child) => (
+                      <Link
+                        key={child.href}
+                        href={child.href}
+                        onClick={onClose}
+                        className={`block px-3 py-2 text-base rounded-lg transition-colors ${
+                          pathname === child.href
+                            ? 'bg-primary-50 text-primary-600 font-medium'
+                            : 'text-gray-700 hover:bg-gray-50'
+                        }`}
+                      >
+                        {child.label}
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <Link
+                    href={item.href}
+                    onClick={onClose}
+                    className={`block px-3 py-2 text-base rounded-lg transition-colors ${
+                      pathname === item.href
+                        ? 'bg-primary-50 text-primary-600 font-medium'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
                     {item.label}
-                  </span>
-                  {item.children.map((child) => (
-                    <Link
-                      key={child.href}
-                      href={child.href}
-                      onClick={onClose}
-                      className={`block px-3 py-2 text-base rounded-lg transition-colors ${
-                        pathname === child.href
-                          ? 'bg-primary-50 text-primary-600 font-medium'
-                          : 'text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      {child.label}
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <Link
-                  href={item.href}
-                  onClick={onClose}
-                  className={`block px-3 py-2 text-base rounded-lg transition-colors ${
-                    pathname === item.href
-                      ? 'bg-primary-50 text-primary-600 font-medium'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              )}
-            </div>
-          ))}
-        </nav>
-        
-        {/* Mobile CTA buttons */}
-        <div className="px-4 py-4 border-t border-gray-100 space-y-3">
-          {loading ? (
-            <div className="px-4 py-2 text-sm text-gray-500 text-center">Loading...</div>
-          ) : user ? (
-            <>
-              <div className="px-4 py-3 text-center border-b border-gray-100 mb-2">
-                <p className="text-sm font-semibold text-gray-900">{user.fullName || user.username}</p>
-                <p className="text-xs text-gray-500">{user.email}</p>
+                  </Link>
+                )}
               </div>
-              <Link
-                href="/profile"
-                onClick={onClose}
-                className="block px-4 py-2.5 text-center text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                View Profile
-              </Link>
-              <Link
-                href="/dashboard"
-                onClick={onClose}
-                className="block px-4 py-2.5 text-center text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Dashboard
-              </Link>
-              <Link
-                href="/settings"
-                onClick={onClose}
-                className="block px-4 py-2.5 text-center text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Settings
-              </Link>
-              <button
-                onClick={() => {
-                  onLogout();
-                  onClose();
-                }}
-                className="block w-full px-4 py-2.5 text-center text-red-600 font-medium border border-red-300 rounded-lg hover:bg-red-50 transition-colors"
-              >
-                Logout
-              </button>
-            </>
+            ))}
+          </nav>
+
+          {/* User Info Section - Scrollable with navigation */}
+          {authInitialized && currentUser && (
+            <div className="px-4 py-4 border-t border-gray-100">
+              <div className="px-4 py-3 bg-gradient-to-br from-primary-50 to-primary-25 rounded-lg border border-primary-100 mb-4">
+                <p className="text-sm font-semibold text-gray-900">{currentUser.fullName || currentUser.username}</p>
+                <p className="text-xs text-gray-600 mt-1">{currentUser.email}</p>
+                {currentUser.role && (
+                  <p className="text-xs text-primary-600 font-medium mt-2 bg-white bg-opacity-60 px-2 py-1 rounded w-fit">
+                    {currentUser.role}
+                  </p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Link
+                  href="/profile"
+                  onClick={onClose}
+                  className="flex items-center gap-2 px-4 py-2.5 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  View Profile
+                </Link>
+                <Link
+                  href="/dashboard"
+                  onClick={onClose}
+                  className="flex items-center gap-2 px-4 py-2.5 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                  Dashboard
+                </Link>
+                <Link
+                  href="/settings"
+                  onClick={onClose}
+                  className="flex items-center gap-2 px-4 py-2.5 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Settings
+                </Link>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer - Fixed at Bottom */}
+        <div className="border-t border-gray-100 p-4 flex-shrink-0 bg-gray-50">
+          {authInitialized && currentUser ? (
+            <button
+              onClick={() => {
+                onLogout();
+                onClose();
+              }}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-red-600 font-medium border border-red-300 rounded-lg hover:bg-red-50 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Logout
+            </button>
           ) : (
-            <>
+            <div className="space-y-3">
               <Link
                 href="/auth/login"
                 onClick={onClose}
@@ -348,7 +376,7 @@ const MobileMenu: React.FC<{
               >
                 Get Started
               </Link>
-            </>
+            </div>
           )}
         </div>
       </div>
@@ -363,9 +391,34 @@ const MobileMenu: React.FC<{
 export const Navbar: React.FC<NavbarProps> = ({ className: _className }) => {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { user, loading, refreshUser } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [authInitialized, setAuthInitialized] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  // Initialize auth from storage on mount
+  useEffect(() => {
+    // Check if user is in storage immediately
+    const storedUser = authService.getCurrentUser();
+    const isAuthenticated = authService.isAuthenticated();
+    
+    if (storedUser && isAuthenticated) {
+      setCurrentUser(storedUser);
+    }
+    setAuthInitialized(true);
+  }, []);
+
+  // Update currentUser when context user changes
+  useEffect(() => {
+    if (!loading) {
+      if (user) {
+        setCurrentUser(user);
+      } else {
+        setCurrentUser(null);
+      }
+    }
+  }, [user, loading]);
 
   const handleDropdownToggle = (label: string) => {
     setOpenDropdown(openDropdown === label ? null : label);
@@ -373,6 +426,8 @@ export const Navbar: React.FC<NavbarProps> = ({ className: _className }) => {
 
   const handleLogout = () => {
     authService.logout();
+    setCurrentUser(null);
+    refreshUser();
     router.push('/');
   };
 
@@ -422,15 +477,13 @@ export const Navbar: React.FC<NavbarProps> = ({ className: _className }) => {
 
             {/* Desktop CTA */}
             <div className="hidden lg:flex lg:items-center lg:gap-3">
-              {loading ? (
-                <div className="px-4 py-2 text-sm text-gray-500">Loading...</div>
-              ) : user ? (
+              {authInitialized && currentUser ? (
                 <UserDropdown
-                  user={user}
+                  user={currentUser}
                   onLogout={handleLogout}
                   onClose={() => {}}
                 />
-              ) : (
+              ) : authInitialized ? (
                 <>
                   <Link
                     href="/auth/login"
@@ -445,7 +498,7 @@ export const Navbar: React.FC<NavbarProps> = ({ className: _className }) => {
                     Get Started
                   </Link>
                 </>
-              )}
+              ) : null}
             </div>
 
             {/* Mobile menu button */}
@@ -471,6 +524,8 @@ export const Navbar: React.FC<NavbarProps> = ({ className: _className }) => {
         user={user}
         loading={loading}
         onLogout={handleLogout}
+        authInitialized={authInitialized}
+        currentUser={currentUser}
       />
     </>
   );

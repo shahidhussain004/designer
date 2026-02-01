@@ -1,8 +1,8 @@
 /**
  * Health check plugin
  */
+import { databaseService } from '@config/db.service';
 import { redisService } from '@infrastructure/cache';
-import { prismaService } from '@infrastructure/database';
 import { kafkaService } from '@infrastructure/messaging';
 import { FastifyInstance } from 'fastify';
 import fp from 'fastify-plugin';
@@ -29,7 +29,7 @@ async function healthPlugin(fastify: FastifyInstance): Promise<void> {
   // Detailed readiness probe
   fastify.get('/health/ready', async (_request, reply) => {
     const [dbHealth, redisHealth, kafkaHealth] = await Promise.all([
-      prismaService.healthCheck(),
+      databaseService.healthCheck(),
       redisService.healthCheck(),
       kafkaService.healthCheck(),
     ]);

@@ -1,6 +1,7 @@
 'use client';
 
 import { LoadingSpinner } from '@/components/Skeletons';
+import { PageLayout } from '@/components/ui';
 import { useCreateProject, useExperienceLevels, useProjectCategories } from '@/hooks/useProjects';
 import { parseCategories, parseExperienceLevels } from '@/lib/apiParsers';
 import { authService } from '@/lib/auth';
@@ -27,6 +28,7 @@ export default function CreateProjectPage() {
     categoryId: 1,
     experienceLevelId: 2,
     budget: 0,
+    budgetType: 'FIXED' as const,
   });
 
   useEffect(() => {
@@ -74,7 +76,11 @@ export default function CreateProjectPage() {
   };
 
   if (loading) {
-    return <LoadingSpinner />;
+    return (
+      <PageLayout>
+        <LoadingSpinner />
+      </PageLayout>
+    );
   }
 
   const tips = [
@@ -85,7 +91,8 @@ export default function CreateProjectPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <PageLayout whiteBg={false}>
+      <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-gray-900 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -250,5 +257,6 @@ export default function CreateProjectPage() {
         </div>
       </div>
     </div>
+    </PageLayout>
   );
 }
