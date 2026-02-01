@@ -53,6 +53,7 @@ interface CreateProjectInput {
   categoryId: number;
   experienceLevelId: number;
   budget: number;
+  budgetType: 'FIXED' | 'HOURLY';
 }
 
 interface ProposalInput {

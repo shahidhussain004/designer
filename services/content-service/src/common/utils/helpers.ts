@@ -5,6 +5,47 @@ import slugify from 'slugify';
 import { PaginationMeta, PaginationParams } from '../interfaces';
 
 /**
+ * Convert camelCase to snake_case
+ * Used for converting frontend sort field names to database column names
+ */
+export function camelToSnakeCase(str: string): string {
+  return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+}
+
+/**
+ * Map of allowed sort fields (camelCase -> snake_case)
+ */
+export const SORT_FIELD_MAP: Record<string, string> = {
+  createdAt: 'created_at',
+  updatedAt: 'updated_at',
+  publishedAt: 'published_at',
+  viewCount: 'view_count',
+  likeCount: 'like_count',
+  commentCount: 'comment_count',
+  readingTime: 'reading_time',
+  title: 'title',
+  slug: 'slug',
+  id: 'id',
+};
+
+/**
+ * Normalize sort field to snake_case database column
+ */
+export function normalizeSortField(
+  field: string,
+  allowedFields: string[] = Object.keys(SORT_FIELD_MAP)
+): string {
+  // If already snake_case, return as-is
+  if (field.includes('_')) return field;
+
+  // Check if it's a known field mapping
+  if (SORT_FIELD_MAP[field]) return SORT_FIELD_MAP[field];
+
+  // Fallback: convert camelCase to snake_case
+  return camelToSnakeCase(field);
+}
+
+/**
  * Generate a URL-friendly slug from text
  */
 export function generateSlug(text: string): string {
@@ -47,7 +88,7 @@ export function normalizePagination(params: PaginationParams): Required<Paginati
   return {
     page: Math.max(1, params.page || 1),
     limit: Math.min(100, Math.max(1, params.limit || 10)),
-    sortBy: params.sortBy || 'createdAt',
+    sortBy: normalizeSortField(params.sortBy || 'created_at'),
     sortOrder: params.sortOrder || 'desc',
   };
 }

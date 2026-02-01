@@ -47,7 +47,7 @@ public class ProposalController {
      * GET /api/proposals?page=0&size=20
      */
     @GetMapping("/proposals")
-    @PreAuthorize("hasRole('FREELANCER')")
+    @PreAuthorize("hasAuthority('FREELANCER')")
     public ResponseEntity<Page<ProposalResponse>> getUserProposals(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
@@ -80,7 +80,7 @@ public class ProposalController {
      * POST /api/proposals
      */
     @PostMapping("/proposals")
-    @PreAuthorize("hasRole('FREELANCER')")
+    @PreAuthorize("hasAuthority('FREELANCER')")
     public ResponseEntity<ProposalResponse> createProposal(@Valid @RequestBody CreateProposalRequest request) {
         log.info("Creating new proposal for project: {}", request.getProjectId());
         ProposalResponse proposal = proposalService.createProposal(request);
@@ -119,7 +119,7 @@ public class ProposalController {
      * GET /api/proposals/my-proposals
      */
     @GetMapping("/proposals/my-proposals")
-    @PreAuthorize("hasRole('FREELANCER')")
+    @PreAuthorize("hasAuthority('FREELANCER')")
     public ResponseEntity<Page<ProposalResponse>> getMyProposals(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {

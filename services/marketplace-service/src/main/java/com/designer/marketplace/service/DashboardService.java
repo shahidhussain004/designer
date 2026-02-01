@@ -114,11 +114,10 @@ public class DashboardService {
                                 .map(ProposalResponse::fromEntity)
                                 .collect(Collectors.toList());
 
-                // Get open jobs posted by company
-                Pageable openJobsPageable = PageRequest.of(0, 5, Sort.by("publishedAt").descending());
+                // Get all jobs posted by company (including DRAFT)
+                Pageable openJobsPageable = PageRequest.of(0, 5, Sort.by("createdAt").descending());
                 Page<Job> openJobsPage = jobRepository.findByCompanyId(currentUser.getId(), openJobsPageable);
                 List<JobResponse> openJobsResponse = openJobsPage.getContent().stream()
-                                .filter(job -> job.getStatus() != null && job.getStatus() == Job.JobStatus.OPEN)
                                 .map(JobResponse::fromEntity)
                                 .collect(Collectors.toList());
 

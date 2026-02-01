@@ -1,10 +1,10 @@
 # Dependencies
-# node_modules/  - Intentionally NOT ignored so we can copy pre-built modules with Prisma client
+node_modules/
 .pnp
 .pnp.js
 
 # Build output
-# dist/  - Intentionally NOT ignored so Prisma client is available during build
+dist/
 build/
 
 # Environment files
@@ -33,9 +33,6 @@ npm-debug.log*
 coverage/
 .nyc_output/
 
-# Prisma
-prisma/migrations/dev.db
-
 # Uploads (in development)
 uploads/
 
@@ -46,3 +43,9 @@ temp/
 
 # Debug
 *.debug.log
+
+# Tests
+tests/
+__tests__/
+*.test.ts
+*.spec.ts

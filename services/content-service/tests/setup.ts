@@ -1,55 +1,19 @@
-import { vi, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, vi } from 'vitest';
 
-// Mock Prisma Client
-const prismaMock = {
-  content: {
-    findMany: vi.fn(),
-    findUnique: vi.fn(),
-    findFirst: vi.fn(),
-    create: vi.fn(),
-    update: vi.fn(),
-    delete: vi.fn(),
-    count: vi.fn(),
-  },
-  category: {
-    findMany: vi.fn(),
-    findUnique: vi.fn(),
-    findFirst: vi.fn(),
-    create: vi.fn(),
-    update: vi.fn(),
-    delete: vi.fn(),
-  },
-  tag: {
-    findMany: vi.fn(),
-    findUnique: vi.fn(),
-    findFirst: vi.fn(),
-    create: vi.fn(),
-    update: vi.fn(),
-    delete: vi.fn(),
-  },
-  comment: {
-    findMany: vi.fn(),
-    findUnique: vi.fn(),
-    findFirst: vi.fn(),
-    create: vi.fn(),
-    update: vi.fn(),
-    delete: vi.fn(),
-    count: vi.fn(),
-  },
-  $transaction: vi.fn((fn: (prisma: typeof prismaMock) => Promise<unknown>) =>
-    fn(prismaMock)
-  ),
+// Mock Database Service (using raw pg instead of Prisma)
+const databaseMock = {
+  connect: vi.fn(),
+  disconnect: vi.fn(),
+  healthCheck: vi.fn().mockResolvedValue(true),
+  query: vi.fn(),
+  getPool: vi.fn(),
+  getMigrationStatus: vi.fn(),
 };
 
-export { prismaMock };
+export { databaseMock };
 
-vi.mock('@infrastructure/database/prisma.service', () => ({
-  prismaService: {
-    getClient: () => prismaMock,
-    connect: vi.fn(),
-    disconnect: vi.fn(),
-    healthCheck: vi.fn().mockResolvedValue(true),
-  },
+vi.mock('@config/db.service', () => ({
+  databaseService: databaseMock,
 }));
 
 // Mock Redis
@@ -98,6 +62,7 @@ vi.mock('@infrastructure/messaging/kafka.service', () => ({
 vi.mock('@infrastructure/storage/storage.service', () => ({
   storageService: {
     initialize: vi.fn(),
+    init: vi.fn(),
     uploadImage: vi.fn(),
     deleteFile: vi.fn(),
   },

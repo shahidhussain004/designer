@@ -64,7 +64,7 @@ public class ProjectController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('COMPANY')")
+    @PreAuthorize("hasAuthority('COMPANY')")
     public ResponseEntity<ProjectResponse> createProject(@Valid @RequestBody CreateProjectRequest request) {
         log.info("Creating new project");
         ProjectResponse project = projectService.createProject(request);

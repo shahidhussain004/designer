@@ -68,19 +68,11 @@ RUN if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
 
 COPY package.json package-lock.json* ./
 
-# Copy pre-built node_modules from host (containing the Prisma client)
-# This avoids needing to download Prisma engine binaries in air-gapped environment
-COPY node_modules ./node_modules
-
-# Install/update dependencies if needed
-# Skip Prisma postinstall hook to avoid trying to download engine binaries
+# Install all dependencies including dev dependencies for building
 RUN npm ci --ignore-scripts 2>/dev/null || npm install --ignore-scripts || true
 
 # Copy source code
 COPY . .
-
-# Ensure Prisma can verify TLS using system/company CAs
-ENV NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/SEB_Root_CA_v2.crt
 
 # Build the application
 RUN npm run build
@@ -106,10 +98,9 @@ RUN if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
         echo 'deb [trusted=yes] https://repo7.sebank.se/artifactory/deb bookworm-security main' >> /etc/apt/sources.list; \
     fi 2>/dev/null || true
 
-# Install minimal runtime dependencies (openssl for Prisma, wget for health checks)
+# Install minimal runtime dependencies (wget for health checks)
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends \
-        openssl \
         wget \
         ca-certificates && \
     rm -rf /var/lib/apt/lists/*
@@ -130,10 +121,10 @@ RUN if [ "$USE_SEB_ARTIFACTORY" = "true" ]; then \
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 --ingroup nodejs contentservice
 
-# Copy necessary files from builder (use builder's node_modules which has generated Prisma client)
-COPY --from=builder --chown=contentservice:nodejs /app/node_modules ./node_modules
+# Copy necessary files from builder
+COPY --from=deps --chown=contentservice:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=contentservice:nodejs /app/dist ./dist
-COPY --from=builder --chown=contentservice:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=contentservice:nodejs /app/database ./database
 COPY --from=builder --chown=contentservice:nodejs /app/package.json ./package.json
 
 # Create uploads directory and set permissions
@@ -150,6 +141,5 @@ EXPOSE 8083
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:8083/health || exit 1
 
-# Run migrations then start the server
-# Skip Prisma operations in the air-gapped environment since engine binaries are already present
-CMD ["node", "dist/server.js"]
+# Start the server
+CMD ["node", "dist/src/server.js"]

@@ -1,5 +1,7 @@
 /**
  * Database infrastructure barrel export
+ * Uses raw pg library via databaseService
  */
 
-export { prisma, prismaService } from './prisma.service';
+export { databaseService } from '@config/db.service';
+

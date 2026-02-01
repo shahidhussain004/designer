@@ -40,7 +40,7 @@ public class DashboardController {
      * Requires COMPANY role. Will return 401 if token is expired, allowing frontend to refresh.
      */
     @GetMapping("/dashboards/company")
-    @PreAuthorize("hasRole('COMPANY')")
+    @PreAuthorize("hasAuthority('COMPANY')")
     public ResponseEntity<CompanyDashboardResponse> getCompanyDashboard() {
         log.info("Getting company dashboard");
 
@@ -63,7 +63,7 @@ public class DashboardController {
      * Requires FREELANCER role. Will return 401 if token is expired, allowing frontend to refresh.
      */
     @GetMapping("/dashboards/freelancer")
-    @PreAuthorize("hasRole('FREELANCER')")
+    @PreAuthorize("hasAuthority('FREELANCER')")
     public ResponseEntity<FreelancerDashboardResponse> getFreelancerDashboard() {
         log.info("Getting freelancer dashboard");
 
