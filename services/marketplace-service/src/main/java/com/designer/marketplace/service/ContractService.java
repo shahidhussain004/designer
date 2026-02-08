@@ -59,7 +59,13 @@ public class ContractService {
         Hibernate.initialize(contract.getFreelancer());
         if (contract.getProject() != null) {
             Hibernate.initialize(contract.getProject().getCompany());
+            if (contract.getProject().getCompany() != null) {
+                Hibernate.initialize(contract.getProject().getCompany().getUser());
+            }
             Hibernate.initialize(contract.getProject().getProjectCategory());
+        }
+        if (contract.getFreelancer() != null) {
+            Hibernate.initialize(contract.getFreelancer().getUser());
         }
         return contract;
     }
@@ -72,7 +78,13 @@ public class ContractService {
             Hibernate.initialize(c.getFreelancer());
             if (c.getProject() != null) {
                 Hibernate.initialize(c.getProject().getCompany());
+                if (c.getProject().getCompany() != null) {
+                    Hibernate.initialize(c.getProject().getCompany().getUser());
+                }
                 Hibernate.initialize(c.getProject().getProjectCategory());
+            }
+            if (c.getFreelancer() != null) {
+                Hibernate.initialize(c.getFreelancer().getUser());
             }
         });
         return contracts;

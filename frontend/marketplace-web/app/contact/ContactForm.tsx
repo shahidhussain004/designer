@@ -1,6 +1,7 @@
 "use client"
 
 import { Button, Flex, Input, Textarea } from '@/components/green'
+import { apiFetch } from '@/lib/api-fetch'
 import { useState } from 'react'
 
 export default function ContactForm() {
@@ -16,8 +17,8 @@ export default function ContactForm() {
     e.preventDefault()
     setSubmitting(true)
     try {
-          // Keeping the fetch call as is
-          const resp = await fetch('/api/contact', {
+          // Use apiFetch for automatic token refresh
+          const resp = await apiFetch('/api/contact', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, subject, message }),

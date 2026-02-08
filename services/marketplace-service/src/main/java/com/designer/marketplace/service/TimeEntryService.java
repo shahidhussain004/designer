@@ -48,7 +48,7 @@ public class TimeEntryService {
     public TimeEntry updateTimeEntry(Long id, TimeEntry updates) {
         TimeEntry existing = getTimeEntryById(id);
         if (updates.getStatus() != null) existing.setStatus(updates.getStatus());
-        if (updates.getHoursWorked() != null) existing.setHoursWorked(updates.getHoursWorked());
+        if (updates.getHoursLogged() != null) existing.setHoursLogged(updates.getHoursLogged());
         if (updates.getDescription() != null) existing.setDescription(updates.getDescription());
         return timeEntryRepository.save(existing);
     }

@@ -2,7 +2,7 @@
 
 import { ErrorMessage } from '@/components/ErrorMessage';
 import { LoadingSpinner } from '@/components/Skeletons';
-import { PageLayout } from '@/components/ui';
+import { Breadcrumb, PageLayout } from '@/components/ui';
 import { useContracts } from '@/hooks/useUsers';
 import { useAuth } from '@/lib/context/AuthContext';
 import { Calendar, CheckCircle, Clock, DollarSign, FileText, Users, XCircle } from 'lucide-react';
@@ -12,14 +12,14 @@ interface Contract {
   id: number;
   title: string;
   description: string;
-  contractType: 'FIXED_PRICE' | 'HOURLY' | 'MILESTONE_BASED';
-  totalAmount: number;
-  paymentSchedule: 'UPFRONT' | 'ON_COMPLETION' | 'MILESTONE_BASED' | 'WEEKLY' | 'MONTHLY';
+  contractType?: 'FIXED_PRICE' | 'HOURLY' | 'MILESTONE_BASED';
+  totalAmount?: number;
+  paymentSchedule?: 'UPFRONT' | 'ON_COMPLETION' | 'MILESTONE_BASED' | 'WEEKLY' | 'MONTHLY';
   status: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED' | 'DISPUTED';
   startDate: string;
   endDate?: string;
-  job: { id: number; title: string };
-  company: { id: number; username: string; fullName: string };
+  job?: { id: number; title: string };
+  company?: { id: number; username: string; fullName: string };
   freelancer: { id: number; username: string; fullName: string };
   createdAt: string;
 }
@@ -114,6 +114,17 @@ export default function ContractsPage() {
   return (
     <PageLayout>
       <div className="max-w-7xl mx-auto px-4 py-8">
+      {/* Breadcrumb */}
+      <div className="mb-4">
+        <Breadcrumb
+          items={[
+            { label: 'Dashboard', href: '/dashboard' },
+            { label: 'Freelancer', href: '/dashboard/freelancer' },
+            { label: 'Contracts', href: '/dashboard/freelancer/contracts' },
+          ]}
+        />
+      </div>
+
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">My Contracts</h1>
         <p className="text-gray-600 mt-2">Manage all your project contracts</p>
@@ -201,7 +212,7 @@ export default function ContractsPage() {
                       <h3 className="text-xl font-semibold text-gray-900 mb-1">
                         {contract.title}
                       </h3>
-                      <p className="text-sm text-gray-600">Job: {contract.job.title}</p>
+                      <p className="text-sm text-gray-600">Job: {contract.job?.title ?? '—'}</p>
                     </div>
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${getStatusColor(
@@ -219,19 +230,19 @@ export default function ContractsPage() {
                     <div>
                       <p className="text-xs text-gray-500 mb-1">Type</p>
                       <p className="text-sm font-medium text-gray-900">
-                        {contract.contractType.replace('_', ' ')}
+                        {contract.contractType?.replace('_', ' ') ?? '—'}
                       </p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 mb-1">Amount</p>
                       <p className="text-sm font-medium text-gray-900">
-                        {formatAmount(contract.totalAmount)}
+                        {formatAmount(contract.totalAmount ?? 0)}
                       </p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 mb-1">Payment</p>
                       <p className="text-sm font-medium text-gray-900">
-                        {contract.paymentSchedule.replace('_', ' ')}
+                        {contract.paymentSchedule?.replace('_', ' ') ?? '—'}
                       </p>
                     </div>
                     <div>
@@ -245,7 +256,7 @@ export default function ContractsPage() {
                   <div className="flex items-center gap-4 text-sm text-gray-600">
                     <div className="flex items-center gap-1">
                       <Users size={16} />
-                      <span>Company: {contract.company.fullName}</span>
+                      <span>Company: {contract.company?.fullName ?? '—'}</span>
                     </div>
                     {contract.endDate && (
                       <div className="flex items-center gap-1">

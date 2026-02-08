@@ -2,11 +2,12 @@
 
 import { ErrorMessage } from '@/components/ErrorMessage';
 import { LoadingSpinner } from '@/components/Skeletons';
-import { PageLayout } from '@/components/ui';
+import { Breadcrumb, PageLayout } from '@/components/ui';
 import { useActiveContracts, useCreateTimeEntry, useTimeEntries } from '@/hooks/useUsers';
 import { useAuth } from '@/lib/context/AuthContext';
 import logger from '@/lib/logger';
 import { Calendar, Check, Clock, Plus, X } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
 interface TimeEntry {
@@ -38,6 +39,8 @@ export default function TimeTrackingPage() {
   const { data: timeEntries = [], isLoading, isError, error, refetch } = useTimeEntries(user?.id ?? null);
   const { data: contracts = [] } = useActiveContracts();
   const createTimeEntryMutation = useCreateTimeEntry();
+  const searchParams = useSearchParams();
+  const contractIdFromQuery = searchParams?.get('contractId');
 
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -159,6 +162,25 @@ export default function TimeTrackingPage() {
   return (
     <PageLayout>
       <div className="max-w-7xl mx-auto px-4 py-8">
+      {/* Breadcrumb */}
+      <div className="mb-4">
+        {(() => {
+          const items: { label: string; href: string }[] = [
+            { label: 'Dashboard', href: '/dashboard' },
+            { label: 'Freelancer', href: '/dashboard/freelancer' },
+          ];
+
+          if (contractIdFromQuery) {
+            const found = contracts.find((c: any) => String(c.id) === String(contractIdFromQuery));
+            if (found) items.push({ label: `Contract: ${found.title}`, href: `/dashboard/contracts/${found.id}` });
+          }
+
+          items.push({ label: 'Time Tracking', href: '/dashboard/freelancer/time-tracking' });
+
+          return <Breadcrumb items={items} />;
+        })()}
+      </div>
+
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Time Tracking</h1>

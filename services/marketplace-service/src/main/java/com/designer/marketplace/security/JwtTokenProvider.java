@@ -1,14 +1,21 @@
 package com.designer.marketplace.security;
 
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+
+import javax.crypto.SecretKey;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.Keys;
 
 /**
  * JWT Token Provider - handles token generation and validation
@@ -81,8 +88,10 @@ public class JwtTokenProvider {
 
     /**
      * Validate JWT token
+     * @throws ExpiredJwtException if token is expired
+     * @throws JwtException for other JWT errors
      */
-    public boolean validateToken(String authToken) {
+    public boolean validateToken(String authToken) throws ExpiredJwtException, JwtException {
         try {
             SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
             Jwts.parser()
@@ -90,15 +99,18 @@ public class JwtTokenProvider {
                     .build()
                     .parseSignedClaims(authToken);
             return true;
-        } catch (MalformedJwtException ex) {
-            System.err.println("Invalid JWT token");
         } catch (ExpiredJwtException ex) {
             System.err.println("Expired JWT token");
+            throw ex; // Re-throw to allow filter to handle
+        } catch (MalformedJwtException ex) {
+            System.err.println("Invalid JWT token");
+            throw ex;
         } catch (UnsupportedJwtException ex) {
             System.err.println("Unsupported JWT token");
+            throw ex;
         } catch (IllegalArgumentException ex) {
             System.err.println("JWT claims string is empty");
+            throw new JwtException("JWT claims string is empty");
         }
-        return false;
     }
 }

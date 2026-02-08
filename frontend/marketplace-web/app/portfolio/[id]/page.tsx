@@ -2,7 +2,7 @@
 
 import { ErrorMessage } from '@/components/ErrorMessage'
 import { LoadingSpinner } from '@/components/Skeletons'
-import { PageLayout } from '@/components/ui'
+import { Breadcrumb, PageLayout } from '@/components/ui'
 import { useCreatePortfolio, useDeletePortfolio, useUpdatePortfolio, useUserPortfolio, useUserProfile } from '@/hooks/useUsers'
 import { authService } from '@/lib/auth'
 import logger from '@/lib/logger'
@@ -249,18 +249,26 @@ export default function PortfolioPage() {
         <div className="bg-gray-900 text-white py-12">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Breadcrumb Navigation */}
-            {!isOwnPortfolio && (
-              <div className="flex items-center gap-3 mb-6">
-                <Link href="/talents" className="inline-flex items-center gap-2 text-gray-400 hover:text-white">
-                  <ArrowLeft className="w-4 h-4" />
-                  Back to Talent
-                </Link>
-                <span className="text-gray-600">/</span>
-                <Link href={`/freelancers/${freelancer.id}`} className="text-gray-400 hover:text-white">
-                  View Profile
-                </Link>
-              </div>
-            )}
+            <div className="mb-6">
+              {!isOwnPortfolio && (
+                <Breadcrumb
+                  items={[
+                    { label: 'Talents', href: '/talents' },
+                    { label: freelancer?.fullName || `@${freelancer?.username}`, href: `/freelancers/${freelancer?.id}` },
+                    { label: 'Portfolio', href: `/portfolio/${portfolioUserId}` },
+                  ]}
+                />
+              )}
+              {isOwnPortfolio && (
+                <Breadcrumb
+                  items={[
+                    { label: 'Dashboard', href: '/dashboard' },
+                    { label: 'Freelancer', href: '/dashboard/freelancer' },
+                    { label: 'Portfolio', href: `/portfolio/${portfolioUserId}` },
+                  ]}
+                />
+              )}
+            </div>
 
             {/* Page Header */}
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
