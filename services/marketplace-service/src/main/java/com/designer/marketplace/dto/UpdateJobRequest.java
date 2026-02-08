@@ -70,8 +70,6 @@ public class UpdateJobRequest {
 
     private LocalDateTime applicationDeadline;
 
-    private String applicationEmail;
-
     private String applicationUrl;
 
     private String applyInstructions;

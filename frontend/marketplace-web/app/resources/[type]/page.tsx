@@ -7,20 +7,26 @@ import { useCategories, useContent, useTags } from '@/hooks/useContent';
 import type { ContentType } from '@/lib/content-types';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
 import React, { useMemo, useState } from 'react';
 
-const CONTENT_TYPES: { value: ContentType | ''; label: string }[] = [
-  { value: '', label: 'All Types' },
-  { value: 'blog', label: 'Blog Posts' },
-  { value: 'article', label: 'Articles' },
-  { value: 'news', label: 'News' },
+const CONTENT_TYPES: { value: ContentType; label: string; slug: string }[] = [
+  { value: 'blog', label: 'Blog Posts', slug: 'blogs' },
+  { value: 'article', label: 'Articles', slug: 'articles' },
+  { value: 'news', label: 'News', slug: 'news' },
 ];
 
-export default function ResourcesPage() {
-  // Filters
+export default function ResourceTypeListPage() {
+  const params = useParams();
+  const router = useRouter();
+  const typeSlug = (params?.type as string)?.toLowerCase() || '';
+
+  // Map slug to content type - keep this BEFORE hooks that depend on it
+  const typeConfig = CONTENT_TYPES.find((t) => t.slug === typeSlug);
+
+  // Filters (must be called unconditionally, before any returns)
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [selectedContentType, setSelectedContentType] = useState<ContentType | ''>('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState('publishedAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
@@ -31,45 +37,57 @@ export default function ResourcesPage() {
   const { data: categories = [] } = useCategories();
   const { data: tags = [] } = useTags();
 
-  // Fetch content with filters
+  const contentType = typeConfig?.value;
+
+  // Fetch content with filters for this type
   const filters = useMemo(() => {
+    if (!contentType) return null;
     const f: any = {
+      type: contentType,
       page,
       limit: pageSize,
       sortBy,
       sortOrder,
     };
-    
-    // Add filter params at top level - API normalizes them
-    if (selectedContentType) f.type = selectedContentType;
+
     if (selectedCategory) f.categoryId = selectedCategory;
     if (selectedTags.length > 0) f.tagIds = selectedTags;
     if (searchQuery) f.search = searchQuery;
-    
-    return f;
-  }, [page, sortBy, sortOrder, selectedContentType, selectedCategory, selectedTags, searchQuery]);
 
-  // DEBUG: log filters when they change to diagnose issues
+    return f;
+  }, [contentType, page, sortBy, sortOrder, selectedCategory, selectedTags, searchQuery]);
+
+  const { data: contentData, isLoading, error, refetch } = useContent(filters);
+
+  // DEBUG: log filters (must be before early returns)
   React.useEffect(() => {
     try {
       // eslint-disable-next-line no-console
-      console.info('[DEBUG] resources.filters', {
-        page,
-        limit: pageSize,
-        sortBy,
-        sortOrder,
-        selectedContentType,
-        selectedCategory,
-        selectedTags,
-        searchQuery,
-      });
+      console.info('[DEBUG] resources[type].filters', filters);
     } catch (e) {
       // ignore
     }
-  }, [page, pageSize, sortBy, sortOrder, selectedContentType, selectedCategory, selectedTags, searchQuery]);
+  }, [filters]);
 
-  const { data: contentData, isLoading, error, refetch } = useContent(filters);
-  
+  // Now check for invalid type after all hooks
+  if (!contentType) {
+    return (
+      <PageLayout title="Resources | Designer Marketplace">
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center max-w-md">
+            <p className="text-red-600 text-xl mb-4">Resource type not found</p>
+            <button
+              onClick={() => router.push('/resources')}
+              className="px-4 py-2 bg-primary-600 text-white rounded-lg"
+            >
+              Back to Resources
+            </button>
+          </div>
+        </div>
+      </PageLayout>
+    );
+  }
+
   const content = contentData?.data || [];
   const totalCount = contentData?.meta?.total || 0;
   const totalPages = contentData?.meta?.totalPages || 0;
@@ -91,7 +109,6 @@ export default function ResourcesPage() {
   const clearFilters = () => {
     setSearchQuery('');
     setSelectedCategory('');
-    setSelectedContentType('');
     setSelectedTags([]);
     setSortBy('publishedAt');
     setSortOrder('desc');
@@ -106,15 +123,6 @@ export default function ResourcesPage() {
     });
   };
 
-  const getTypeSlug = (contentType?: string) => {
-    const map: Record<string, string> = {
-      blog: 'blogs',
-      article: 'articles',
-      news: 'news',
-    };
-    return map[contentType?.toLowerCase() || ''] || 'articles';
-  };
-
   const getContentTypeBadge = (type: ContentType) => {
     const styles: Record<ContentType, { bg: string; text: string }> = {
       blog: { bg: 'bg-blue-100', text: 'text-blue-800' },
@@ -125,17 +133,14 @@ export default function ResourcesPage() {
   };
 
   return (
-    <PageLayout title="Resources | Designer Marketplace">
+    <PageLayout title={`${typeConfig.label} | Designer Marketplace`}>
       <div className="min-h-screen bg-gray-50">
         {/* Page Header */}
         <div className="bg-gray-900 text-white py-16 lg:py-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <h1 className="text-4xl font-bold mb-4">
-              Resources & Insights
-            </h1>
+            <h1 className="text-4xl font-bold mb-4">{typeConfig.label}</h1>
             <p className="text-gray-300 text-lg max-w-2xl">
-              Explore our collection of articles, tutorials, and industry insights
-              to help you succeed in the design marketplace.
+              Explore our collection of {typeConfig.label.toLowerCase()} to help you succeed in the design marketplace.
             </p>
           </div>
         </div>
@@ -154,20 +159,6 @@ export default function ResourcesPage() {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
                   />
                 </div>
-                <select
-                  value={selectedContentType}
-                  onChange={(e) => {
-                    setSelectedContentType(e.target.value as ContentType | '');
-                    setPage(1);
-                  }}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
-                >
-                  {CONTENT_TYPES.map((type) => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
-                </select>
                 <select
                   value={selectedCategory}
                   onChange={(e) => {
@@ -198,14 +189,14 @@ export default function ResourcesPage() {
                   <option value="viewCount-desc">Most Viewed</option>
                   <option value="likeCount-desc">Most Liked</option>
                 </select>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                 >
                   Search
                 </button>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={clearFilters}
                   className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 >
@@ -215,7 +206,7 @@ export default function ResourcesPage() {
             </form>
 
             {/* Tags Filter */}
-                  {tags.length > 0 && (
+            {tags.length > 0 && (
               <div className="mt-4">
                 <p className="text-sm text-gray-600 mb-2">Filter by tags:</p>
                 <div className="flex flex-wrap gap-2">
@@ -240,22 +231,20 @@ export default function ResourcesPage() {
           {/* Results Summary */}
           <div className="flex justify-between items-center mb-6">
             <p className="text-gray-600">
-              {isLoading ? 'Loading...' : `${totalCount} resources found`}
+              {isLoading ? 'Loading...' : `${totalCount} ${typeConfig.label.toLowerCase()} found`}
             </p>
           </div>
 
           {/* Error State */}
           {error && (
-            <ErrorMessage 
+            <ErrorMessage
               message={error instanceof Error ? error.message : 'Failed to load resources'}
               retry={refetch}
             />
           )}
 
           {/* Loading State */}
-          {isLoading && (
-            <TutorialsSkeleton />
-          )}
+          {isLoading && <TutorialsSkeleton />}
 
           {/* Content Grid */}
           {!isLoading && !error && (
@@ -263,10 +252,10 @@ export default function ResourcesPage() {
               {content.length === 0 ? (
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
                   <p className="text-gray-500 text-lg">
-                    No resources found matching your criteria.
+                    No {typeConfig.label.toLowerCase()} found matching your criteria.
                   </p>
-                  <button 
-                    onClick={clearFilters} 
+                  <button
+                    onClick={clearFilters}
                     className="mt-4 px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                   >
                     Clear Filters
@@ -274,10 +263,11 @@ export default function ResourcesPage() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {content.map((item: any) => {
-                    const contentTypeValue = item.type || item.content_type || item.resource_type || '';
-                  return (
-                    <Link key={item.id} href={`/resources/${getTypeSlug(contentTypeValue)}/${item.slug}`}>
+                  {content.map((item: any) => (
+                    <Link
+                      key={item.id}
+                      href={`/resources/${typeSlug}/${item.slug}`}
+                    >
                       <div className="h-full bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-lg hover:border-primary-300 transition-all cursor-pointer overflow-hidden group">
                         {/* Featured Image */}
                         <div className="relative h-48 bg-gray-200">
@@ -307,8 +297,12 @@ export default function ResourcesPage() {
                           )}
                           {/* Content Type Badge */}
                           <div className="absolute top-3 left-3">
-                            <span className={`inline-block px-3 py-1 text-xs font-medium rounded-full ${getContentTypeBadge(contentTypeValue).bg} ${getContentTypeBadge(contentTypeValue).text}`}>
-                              {contentTypeValue}
+                            <span
+                              className={`inline-block px-3 py-1 text-xs font-medium rounded-full ${
+                                getContentTypeBadge(item.type).bg
+                              } ${getContentTypeBadge(item.type).text}`}
+                            >
+                              {item.type}
                             </span>
                           </div>
                           {item.isFeatured && (
@@ -329,115 +323,48 @@ export default function ResourcesPage() {
                             </p>
                           )}
 
-                          <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">
+                          {/* Title */}
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
                             {item.title}
                           </h3>
 
-                          {item.excerpt && (
-                            <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                              {item.excerpt}
-                            </p>
-                          )}
+                          {/* Excerpt */}
+                          <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                            {item.excerpt || item.body?.replace(/<[^>]*>/g, '').substring(0, 100)}
+                          </p>
 
-                          <div className="border-t border-gray-200 my-4" />
-
-                          {/* Footer */}
-                          <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                              {item.author?.avatarUrl && (
-                                <Image
-                                  src={item.author.avatarUrl}
-                                  alt={item.author?.bio || 'Author'}
-                                  width={24}
-                                  height={24}
-                                  className="rounded-full"
-                                />
-                              )}
-                              <p className="text-xs text-gray-500">
-                                {item.publishedAt ? formatDate(item.publishedAt) : 'Draft'}
-                              </p>
-                            </div>
-                            <div className="flex items-center gap-3 text-gray-400">
-                              <div className="flex items-center gap-1">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                                <span className="text-xs">{item.viewCount || 0}</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                </svg>
-                                <span className="text-xs">{item.likeCount || 0}</span>
-                              </div>
-                              {item.readingTimeMinutes && (
-                                <span className="text-xs">{item.readingTimeMinutes} min read</span>
-                              )}
+                          {/* Meta */}
+                          <div className="flex items-center justify-between text-xs text-gray-500 pt-4 border-t">
+                            <span>{formatDate(item.publishedAt || item.createdAt)}</span>
+                            <div className="flex items-center gap-3">
+                              <span>👁 {item.viewCount || 0}</span>
+                              <span>❤️ {item.likeCount || 0}</span>
                             </div>
                           </div>
-
-                          {/* Tags */}
-                          {item.tags && item.tags.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mt-3">
-                              {item.tags.slice(0, 3).map((tag: any) => (
-                                <span
-                                  key={tag.id}
-                                  className="inline-block px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded"
-                                >
-                                  {tag?.name ?? 'tag'}
-                                </span>
-                              ))}
-                              {item.tags.length > 3 && (
-                                <span className="inline-block px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded">
-                                  +{item.tags.length - 3}
-                                </span>
-                              )}
-                            </div>
-                          )}
                         </div>
                       </div>
                     </Link>
-
-                  )
-                  }
-                  )}
+                  ))}
                 </div>
               )}
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex justify-center gap-2 mt-8">
+                <div className="mt-12 flex justify-center items-center gap-2">
                   <button
+                    onClick={() => setPage(Math.max(1, page - 1))}
                     disabled={page === 1}
-                    onClick={() => setPage((p) => p - 1)}
-                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Previous
                   </button>
-                  <div className="flex items-center gap-2">
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      const pageNum = page <= 3 ? i + 1 : page - 2 + i;
-                      if (pageNum > totalPages) return null;
-                      return (
-                        <button
-                          key={pageNum}
-                          onClick={() => setPage(pageNum)}
-                          className={`px-4 py-2 rounded-lg transition-colors ${
-                            page === pageNum
-                              ? 'bg-primary-600 text-white'
-                              : 'border border-gray-300 hover:bg-gray-50'
-                          }`}
-                        >
-                          {pageNum}
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <span className="px-4 py-2 text-gray-600">
+                    Page {page} of {totalPages}
+                  </span>
                   <button
+                    onClick={() => setPage(Math.min(totalPages, page + 1))}
                     disabled={page === totalPages}
-                    onClick={() => setPage((p) => p + 1)}
-                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Next
                   </button>

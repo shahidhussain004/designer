@@ -73,8 +73,14 @@ export default function TalentsContent() {
     limit: itemsPerPage
   })
 
-  // Normalize the data
-  const freelancers: Freelancer[] = (freelancersData?.content || freelancersData as any[]).map((u: any) => ({
+  // Normalize the data: ensure we have an array before mapping
+  const _rawItems: any = freelancersData && typeof freelancersData === 'object'
+    ? (freelancersData.content ?? freelancersData.items ?? freelancersData.data ?? freelancersData)
+    : []
+
+  const _items: any[] = Array.isArray(_rawItems) ? _rawItems : []
+
+  const freelancers: Freelancer[] = _items.map((u: any) => ({
     id: u.id,
     username: u.username,
     fullName: u.full_name || u.fullName || u.fullName,

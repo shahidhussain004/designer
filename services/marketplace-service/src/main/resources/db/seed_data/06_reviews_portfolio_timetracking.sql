@@ -99,7 +99,9 @@ SELECT
 FROM freelancers f
 JOIN users u ON f.user_id = u.id
 CROSS JOIN LATERAL (
-    SELECT * FROM (VALUES
+    SELECT *
+    FROM (
+        VALUES
         ('ecommerce-platform', 'E-Commerce Platform', 
          'Full-stack e-commerce platform with payment integration, inventory management, and admin dashboard. Handled 10k+ daily transactions.',
          '["React", "Node.js", "PostgreSQL", "Payment APIs"]', '["VS Code", "Figma", "Postman"]', 
@@ -119,90 +121,10 @@ CROSS JOIN LATERAL (
         ('game-backend', 'Multiplayer Game Backend',
          'Scalable backend for real-time multiplayer mobile game with matchmaking, leaderboards, and in-app purchases.',
          '["Node.js", "WebSocket", "Redis", "Game Development"]', '["VS Code", "Redis Commander"]',
-         '["Node.js", "Socket.io", "Redis", "PostgreSQL", "Docker"]', 'Gaming'),
-        ('saas-automation', 'Business Automation SaaS',
-         'Cloud-based SaaS platform for workflow automation with 500+ integrations and custom workflow builder.',
-         '["React", "Node.js", "Automation", "Cloud"]', '["VS Code", "AWS Console"]',
-         '["React", "TypeScript", "Node.js", "AWS Lambda", "PostgreSQL", "Kubernetes"]', 'SaaS'),
-        ('mobile-banking', 'Mobile Banking Application',
-         'Secure mobile banking app with biometric authentication, transaction management, and investment portfolio tracking.',
-         '["Swift", "Security", "Finance", "iOS"]', '["Xcode", "Figma"]',
-         '["Swift", "SwiftUI", "Alamofire", "CoreData", "Security Framework"]', 'Mobile Apps'),
-        ('cms-platform', 'Headless CMS Platform',
-         'Flexible headless CMS with GraphQL API, multi-language support, and SEO optimization features.',
-         '["GraphQL", "API", "CMS", "Backend"]', '["VS Code", "Postman"]',
-         '["Node.js", "GraphQL", "MongoDB", "Elasticsearch", "Docker"]', 'Web Applications'),
-        ('design-system', 'Enterprise Design System',
-         'Comprehensive design system with 200+ components, documentation, and design tokens for large teams.',
-         '["Figma", "Design", "Components", "Systems"]', '["Figma", "Adobe Illustrator"]',
-         '["Figma", "Design Tokens", "Component Library", "CSS", "Storybook"]', 'Design'),
-        ('ml-recommendation', 'ML Recommendation Engine',
-         'Machine learning recommendation engine using collaborative filtering achieving 92% accuracy.',
-         '["Python", "Machine Learning", "AI", "Analytics"]', '["Python IDE", "Jupyter"]',
-         '["Python", "TensorFlow", "Scikit-learn", "NumPy", "PostgreSQL"]', 'Data Science'),
-        ('video-platform', 'Video Streaming Platform',
-         'HLS-based video streaming platform with adaptive bitrate, live streaming, and analytics dashboard.',
-         '["Video", "Streaming", "Backend", "Real-time"]', '["VS Code", "FFmpeg"]',
-         '["Node.js", "HLS.js", "FFmpeg", "Redis", "AWS S3", "Kubernetes"]', 'Web Applications'),
-        ('chatbot-ai', 'AI-Powered Chatbot',
-         'Natural language processing chatbot handling customer support with 95% satisfaction rate.',
-         '["AI", "NLP", "Chatbot", "Customer Support"]', '["Python IDE", "Jupyter"]',
-         '["Python", "NLTK", "TensorFlow", "FastAPI", "PostgreSQL"]', 'Data Science'),
-        ('crm-system', 'Enterprise CRM System',
-         'Full-featured CRM with sales pipeline management, customer analytics, and email integration.',
-         '["React", "Node.js", "CRM", "Enterprise"]', '["VS Code", "Figma"]',
-         '["React", "TypeScript", "Node.js", "PostgreSQL", "Redis", "Docker"]', 'Web Applications'),
-        ('iot-dashboard', 'IoT Monitoring Dashboard',
-         'Real-time IoT device monitoring with alerts, historical data analysis, and predictive maintenance.',
-         '["IoT", "Real-time", "Monitoring", "Dashboard"]', '["VS Code", "MQTT"]',
-         '["React", "Node.js", "MQTT", "MongoDB", "Grafana", "Docker"]', 'IoT'),
-        ('document-processor', 'Document Processing Engine',
-         'AI-powered document processor extracting data from PDFs with 98% accuracy using OCR and ML.',
-         '["AI", "OCR", "Document", "Processing"]', '["Python IDE", "Tesseract"]',
-         '["Python", "Tesseract", "PyTorch", "FastAPI", "PostgreSQL"]', 'Data Science'),
-        ('collaboration-tool', 'Real-time Collaboration Tool',
-         'Browser-based collaboration platform with real-time editing, video conferencing, and file sharing.',
-         '["React", "WebRTC", "Real-time", "Collaboration"]', '["VS Code", "Figma"]',
-         '["React", "WebRTC", "Socket.io", "Node.js", "MongoDB", "AWS"]', 'Web Applications'),
-        ('mobile-ecommerce', 'Mobile E-commerce App',
-         'Native iOS and Android e-commerce app with AR product preview and one-click checkout.',
-         '["Swift", "Kotlin", "Mobile", "E-commerce"]', '["Xcode", "Android Studio"]',
-         '["Swift", "Kotlin", "SwiftUI", "Jetpack Compose", "Firebase", "Stripe"]', 'Mobile Apps'),
-        ('devops-platform', 'DevOps Automation Platform',
-         'CI/CD and infrastructure automation platform managing 100+ microservices.',
-         '["Kubernetes", "DevOps", "CI/CD", "Infrastructure"]', '["Terraform", "Jenkins"]',
-         '["Kubernetes", "Docker", "Terraform", "Jenkins", "Ansible", "Prometheus"]', 'DevOps'),
-        ('api-gateway', 'Microservices API Gateway',
-         'Rate-limited API gateway with authentication, request validation, and load balancing.',
-         '["API", "Gateway", "Microservices", "Backend"]', '["VS Code", "Postman"]',
-         '["Node.js", "Kong", "PostgreSQL", "Redis", "Docker", "Kubernetes"]', 'Web Applications'),
-        ('marketplace-api', 'Marketplace API & Backend',
-         'Scalable marketplace backend handling 100k+ daily users with product catalog and order management.',
-         '["Node.js", "Backend", "API", "Marketplace"]', '["VS Code", "Postman"]',
-         '["Node.js", "Express", "PostgreSQL", "Redis", "Elasticsearch", "AWS"]', 'Web Applications'),
-        ('blockchain-wallet', 'Cryptocurrency Wallet',
-         'Secure cryptocurrency wallet supporting Bitcoin, Ethereum with hardware wallet integration.',
-         '["Blockchain", "Security", "Finance", "Mobile"]', '["Xcode", "Hardhat"]',
-         '["Swift", "Web3.js", "Ethers.js", "Security Framework", "SmartContracts"]', 'Blockchain'),
-        ('analytics-platform', 'Data Analytics Platform',
-         'Self-service analytics platform with 500+ pre-built charts and real-time data processing.',
-         '["Data", "Analytics", "BI", "Real-time"]', '["Python IDE", "Tableau"]',
-         '["Python", "Spark", "PostgreSQL", "Elasticsearch", "Grafana", "Docker"]', 'Data Science'),
-        ('notification-service', 'Push Notification Service',
-         'Multi-channel notification service (email, SMS, push) with 99.99% delivery guarantee.',
-         '["Backend", "Notifications", "Service", "Infrastructure"]', '["VS Code", "Postman"]',
-         '["Node.js", "RabbitMQ", "Redis", "PostgreSQL", "Kafka", "Docker"]', 'Web Applications'),
-        ('payment-gateway', 'Payment Gateway Integration',
-         'Unified payment gateway supporting 50+ payment methods with fraud detection.',
-         '["Payment", "Finance", "Security", "API"]', '["VS Code", "Postman"]',
-         '["Node.js", "Express", "PostgreSQL", "Stripe", "PayPal", "Security"]', 'Web Applications'),
-        ('project-management', 'Project Management Tool',
-         'Agile project management platform with Kanban boards, time tracking, and team collaboration.',
-         '["React", "Node.js", "Project Management", "Collaboration"]', '["VS Code", "Figma"]',
-         '["React", "TypeScript", "Node.js", "PostgreSQL", "WebSocket", "Docker"]', 'Web Applications')
-    ) AS t(slug, title, description, skills, tools, technologies, category)
+         '["Node.js", "Socket.io", "Redis", "PostgreSQL", "Docker"]', 'Gaming')
+    ) AS v(slug, title, description, skills, tools, technologies, category)
     ORDER BY RANDOM()
-)
+) AS portfolio_data(slug, title, description, skills, tools, technologies, category)
 WHERE (
     -- Ensure all freelancers get portfolio items with matching skills
     (f.skills::text ILIKE '%React%' OR f.skills::text ILIKE '%Angular%' OR f.skills::text ILIKE '%Vue%')
@@ -306,15 +228,16 @@ WITH job_application_data AS (
         u.phone,
         u.username,
         j.title AS job_title,
-        j.company_name,
+        COALESCE(cj.company_name, '') AS company_name,
         f.experience_years,
         f.skills,
         j.created_at,
         j.category_id,
         ROW_NUMBER() OVER (PARTITION BY j.id ORDER BY f.id) AS app_rank
-    FROM jobs j
-    CROSS JOIN freelancers f
-    JOIN users u ON f.user_id = u.id
+        FROM jobs j
+        CROSS JOIN freelancers f
+        JOIN users u ON f.user_id = u.id
+        LEFT JOIN companies cj ON j.company_id = cj.id
     WHERE (
         -- Match software developers to software jobs
         (j.category_id IN (SELECT id FROM job_categories WHERE slug = 'software-development') 
@@ -348,7 +271,7 @@ SELECT
     full_name,
     email,
     phone,
-    'Dear Hiring Manager, I am writing to express my interest in the ' || job_title || ' position at ' || company_name || 
+    'Dear Hiring Manager, I am writing to express my interest in the ' || job_title || ' position at ' || COALESCE(company_name, 'your company') || 
     '. With ' || COALESCE(experience_years::TEXT, '5') || ' years of experience, I am confident in my ability to contribute to your team. ' ||
     'I have successfully delivered similar projects and am excited about the opportunity to bring my expertise to your organization.' AS cover_letter,
     'https://resumes.example.com/' || username || '-resume.pdf' AS resume_url,

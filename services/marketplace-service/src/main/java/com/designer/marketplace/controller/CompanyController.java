@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.designer.marketplace.dto.CompanyProfileResponse;
 import com.designer.marketplace.dto.JobResponse;
 import com.designer.marketplace.dto.UserResponse;
 import com.designer.marketplace.service.JobService;
@@ -34,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 public class CompanyController {
 
     private final UserService userService;
+    private final com.designer.marketplace.repository.CompanyRepository companyRepository;
     private final JobService jobService;
 
     /**
@@ -41,10 +43,51 @@ public class CompanyController {
      * GET /api/companies/{id}
      */
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getCompanyProfile(@PathVariable Long id) {
+    public ResponseEntity<CompanyProfileResponse> getCompanyProfile(@PathVariable Long id) {
         log.info("Getting company profile: {}", id);
-        UserResponse company = userService.getUserById(id);
-        return ResponseEntity.ok(company);
+
+        // Prefer company table as source of truth. Try to load Company by id.
+        return companyRepository.findByIdWithUser(id)
+                .map(c -> {
+                    CompanyProfileResponse resp = CompanyProfileResponse.builder()
+                            .id(c.getId())
+                            .companyName(c.getCompanyName())
+                            .companyType(c.getCompanyType())
+                            .industry(c.getIndustry())
+                            .websiteUrl(c.getWebsiteUrl())
+                            .companySize(c.getCompanySize() != null ? c.getCompanySize().name() : null)
+                            .registrationNumber(c.getRegistrationNumber())
+                            .taxId(c.getTaxId())
+                            .phone(c.getPhone())
+                            .headquartersLocation(c.getHeadquartersLocation())
+                            .description(c.getDescription())
+                            .logoUrl(c.getLogoUrl())
+                            .contactEmail(c.getContactEmail())
+                            .totalJobsPosted(c.getTotalJobsPosted())
+                            .createdAt(c.getCreatedAt())
+                            .updatedAt(c.getUpdatedAt())
+                            .build();
+                    if (c.getUser() != null) {
+                        resp.setUserId(c.getUser().getId());
+                        resp.setUsername(c.getUser().getUsername());
+                        resp.setFullName(c.getUser().getFullName());
+                        resp.setEmail(c.getUser().getEmail());
+                        resp.setProfileImageUrl(c.getUser().getProfileImageUrl());
+                        resp.setLocation(c.getUser().getLocation());
+                        resp.setBio(c.getUser().getBio());
+                    }
+                    return ResponseEntity.ok(resp);
+                })
+                .orElseGet(() -> {
+                    // Fallback: if no company record, return user profile for backwards compatibility
+                    log.warn("Company id {} not found in companies table, falling back to userService", id);
+                    return ResponseEntity.ok(CompanyProfileResponse.builder()
+                            .id(id)
+                            .username(userService.getUserById(id).getUsername())
+                            .fullName(userService.getUserById(id).getFullName())
+                            .email(userService.getUserById(id).getEmail())
+                            .build());
+                });
     }
 
     /**

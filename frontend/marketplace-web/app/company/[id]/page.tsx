@@ -80,8 +80,8 @@ export default function CompanyProfilePage() {
 
             {/* Company Info */}
             <div className="flex-1">
-              <h1 className="text-2xl lg:text-3xl font-bold">{profile.fullName}</h1>
-              <p className="text-blue-200 text-lg">@{profile.username}</p>
+              <h1 className="text-2xl lg:text-3xl font-bold">{(profile as any).companyName ?? profile.fullName}</h1>
+              <p className="text-blue-200 text-lg">@{(profile as any).username ?? profile.username}</p>
 
               <div className="flex flex-wrap items-center gap-4 mt-4">
                 {profile.location && (
