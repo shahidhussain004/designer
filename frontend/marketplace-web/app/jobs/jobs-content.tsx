@@ -167,11 +167,11 @@ export default function JobsContent() {
                 </div>
               )}
               <h1 className="text-3xl lg:text-4xl font-bold text-white mb-3">
-                {companyIdParam ? `Jobs at ${company?.fullName ?? 'Company'}` : 'Discover Your Next Role'}
+                {companyIdParam ? `Jobs at ${(company as any)?.companyName ?? company?.fullName ?? 'Company'}` : 'Discover Your Next Role'}
               </h1>
               <p className="text-xl text-gray-300">
                 {companyIdParam 
-                  ? `Viewing ${filteredJobs.length} open position${filteredJobs.length !== 1 ? 's' : ''} from ${company?.fullName ?? 'this company'}`
+                  ? `Viewing ${filteredJobs.length} open position${filteredJobs.length !== 1 ? 's' : ''} from ${(company as any)?.companyName ?? company?.fullName ?? 'this company'}`
                   : `Explore ${filteredJobs.length} open position${filteredJobs.length !== 1 ? 's' : ''} from leading companies — find the one that fits you.`
                 }
               </p>

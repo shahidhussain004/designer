@@ -78,8 +78,6 @@ public class CreateJobRequest {
 
     private LocalDateTime applicationDeadline;
 
-    private String applicationEmail;
-
     private String applicationUrl;
 
     private String applyInstructions;

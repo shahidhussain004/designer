@@ -239,9 +239,30 @@ All use password: **Password123!**
 - Experience-appropriate hourly rates
 
 ### ✅ Idempotency
-- All seed files use `ON CONFLICT DO NOTHING`
-- Can be run multiple times safely
-- No duplicate data insertion
+- **Conflict-safe inserts:** Most seed files use `ON CONFLICT DO NOTHING` to avoid duplicate-key errors when re-running.
+- **Run marker (`seed_runs`):** The extra seeding file `10_extra_reviews_time_entries.sql` records runs in a `seed_runs` table. This allows the script to detect previous runs and behave idempotently (it updates the run timestamp and stores notes about density settings).
+- **Deterministic cleanup:** The extra-seed implements safe cleanup for transient data (for example it deletes auto-seeded `time_entries` created by prior runs before inserting a fresh, bounded set).
+- **Duplicate-avoidance checks:** Contract insertion in the extra-seed avoids creating duplicate contracts for the same `project_id` + `freelancer_id` pair by using an `NOT EXISTS` guard.
+- **Adjustable density:** Change the `LIMIT` values in `10_extra_reviews_time_entries.sql` (contracts, reviews, time_entries) to increase or decrease seeded volume. Re-running the file will refresh the controlled data set without duplicating previously persisted business records.
+- **Safe to re-run:** General guidance — you can safely re-run the full seed sequence or individual files. If you require a complete reset, use the Cleanup section commands to truncate tables and restart sequences.
+
+Examples (extra-seed behavior):
+
+- The file `10_extra_reviews_time_entries.sql` will:
+    - create a `seed_runs` marker row for key `extra_reviews_time_entries` (or update it if present),
+    - insert contracts only when an equivalent project+freelancer contract does not already exist,
+    - insert reviews only for contracts that do not yet have a review,
+    - delete prior auto-generated time entries and insert a bounded set (by default 40) to avoid cartesian explosions.
+
+Use cases:
+
+- Re-run during iterative testing to refresh time entries without affecting historical contracts or invoices.
+- Increase `LIMIT` values for load-testing; re-run the file to apply the new density.
+
+Notes:
+
+- Always run seeds after migrations (V1–V15) to ensure columns and constraints exist.
+- For full-clean reloads, prefer the Cleanup instructions (truncate + reset sequences) to avoid incremental conflicts.
 
 ## Verification Queries
 

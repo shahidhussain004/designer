@@ -2,7 +2,6 @@ package com.designer.marketplace.entity;
 
 import java.time.LocalDateTime;
 
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -75,7 +74,20 @@ public class Company {
     @Column(name = "phone", length = 20)
     private String phone;
 
-    @CreatedDate
+    @Column(name = "headquarters_location", length = 255)
+    private String headquartersLocation;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column(name = "logo_url", length = 500)
+    private String logoUrl;
+
+    @Column(name = "contact_email", length = 255)
+    private String contactEmail;
+
+    @Column(name = "total_jobs_posted")
+    private Integer totalJobsPosted = 0;
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
