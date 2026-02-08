@@ -221,7 +221,6 @@ public class JobService {
         
         // Application details
         job.setApplicationDeadline(request.getApplicationDeadline());
-        job.setApplicationEmail(request.getApplicationEmail());
         job.setApplicationUrl(request.getApplicationUrl());
         job.setApplyInstructions(request.getApplyInstructions());
         job.setStartDate(request.getStartDate());

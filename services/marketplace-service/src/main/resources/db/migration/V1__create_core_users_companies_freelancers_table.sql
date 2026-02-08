@@ -104,8 +104,14 @@ CREATE TABLE IF NOT EXISTS companies (
     phone VARCHAR(20),
     headquarters_location VARCHAR(255),
     
+    -- Company Profile
+    description TEXT,
+    logo_url VARCHAR(500),
+    contact_email VARCHAR(255),
+    
     -- Company Metrics (denormalized for performance)
     total_projects_posted INTEGER DEFAULT 0 NOT NULL,
+    total_jobs_posted INTEGER DEFAULT 0 NOT NULL,
     total_spent_cents BIGINT DEFAULT 0 NOT NULL, -- Store in cents
     
     -- Timestamps
@@ -203,6 +209,29 @@ CREATE TRIGGER users_updated_at BEFORE UPDATE ON users FOR EACH ROW EXECUTE FUNC
 CREATE TRIGGER companies_updated_at BEFORE UPDATE ON companies FOR EACH ROW EXECUTE FUNCTION update_timestamp();
 CREATE TRIGGER freelancers_updated_at BEFORE UPDATE ON freelancers FOR EACH ROW EXECUTE FUNCTION update_timestamp();
 
+-- Create trigger to update company job count when jobs are created/deleted
+CREATE OR REPLACE FUNCTION update_company_job_count()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+        UPDATE companies
+        SET total_jobs_posted = total_jobs_posted + 1
+        WHERE id = NEW.company_id;
+    ELSIF TG_OP = 'DELETE' THEN
+        UPDATE companies
+        SET total_jobs_posted = total_jobs_posted - 1
+        WHERE id = OLD.company_id AND total_jobs_posted > 0;
+    END IF;
+    RETURN COALESCE(NEW, OLD);
+END;
+$$ LANGUAGE plpgsql;
+
+-- This trigger will be created in V4 after jobs table is created
+-- CREATE TRIGGER trg_update_company_job_count
+-- AFTER INSERT OR DELETE ON jobs
+-- FOR EACH ROW
+-- EXECUTE FUNCTION update_company_job_count();
+
 -- =====================================================
 -- COMMENTS
 -- =====================================================
@@ -215,6 +244,10 @@ COMMENT ON COLUMN users.rating_avg IS 'Average rating from reviews (denormalized
 COMMENT ON COLUMN users.rating_count IS 'Total number of reviews (denormalized for performance)';
 
 COMMENT ON COLUMN companies.total_spent_cents IS 'Total amount spent in cents (e.g., $1000.00 = 100000)';
+COMMENT ON COLUMN companies.description IS 'Company description/bio for job listings and profiles';
+COMMENT ON COLUMN companies.logo_url IS 'URL to company logo image';
+COMMENT ON COLUMN companies.contact_email IS 'Primary contact email for the company';
+COMMENT ON COLUMN companies.total_jobs_posted IS 'Denormalized count of active jobs posted by this company (updated via trigger)';
 
 COMMENT ON COLUMN freelancers.hourly_rate_cents IS 'Hourly rate in cents (e.g., $50.00/hr = 5000)';
 COMMENT ON COLUMN freelancers.total_earnings_cents IS 'Total earnings in cents (e.g., $10000.00 = 1000000)';

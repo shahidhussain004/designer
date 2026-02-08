@@ -67,7 +67,6 @@ public class JobResponse {
     
     // Application
     private LocalDateTime applicationDeadline;
-    private String applicationEmail;
     private String applicationUrl;
     private String applyInstructions;
     
@@ -102,7 +101,7 @@ public class JobResponse {
         return JobResponse.builder()
                 .id(job.getId())
                 .companyId(job.getCompany() != null ? job.getCompany().getId() : null)
-                .companyName(job.getCompany() != null ? job.getCompany().getFullName() : null)
+                .companyName(job.getCompany() != null ? job.getCompany().getCompanyName() : null)
                 .categoryId(job.getCategory() != null ? job.getCategory().getId() : null)
                 .categoryName(job.getCategory() != null ? job.getCategory().getName() : null)
                 .title(job.getTitle())
@@ -129,7 +128,6 @@ public class JobResponse {
                 .educationLevel(job.getEducationLevel() != null ? job.getEducationLevel().name() : null)
                 .certifications(job.getCertifications())
                 .applicationDeadline(job.getApplicationDeadline())
-                .applicationEmail(job.getApplicationEmail())
                 .applicationUrl(job.getApplicationUrl())
                 .applyInstructions(job.getApplyInstructions())
                 .startDate(job.getStartDate())

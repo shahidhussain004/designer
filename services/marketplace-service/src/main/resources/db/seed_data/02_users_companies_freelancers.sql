@@ -226,7 +226,7 @@ SELECT
     true,
     created_at
 FROM bulk_freelancers
-ON CONFLICT(email) DO NOTHING;
+ON CONFLICT DO NOTHING;
 
 -- Insert freelancer profiles for bulk users
 INSERT INTO freelancers (user_id, hourly_rate_cents, experience_years, headline, skills, languages, completion_rate, total_earnings_cents, total_projects_completed, created_at)
@@ -235,7 +235,7 @@ SELECT
     bf.hourly_rate_cents,
     bf.experience_years,
     SUBSTRING(bf.bio, 1, 100),
-    bf.skills,
+    '[{"skill": "General Freelancing", "years": 3}]'::jsonb,
     '[{"language": "English", "proficiency": "native"}]'::jsonb,
     bf.completion_rate,
     bf.total_earnings_cents,
@@ -263,58 +263,51 @@ ON CONFLICT DO NOTHING;
 -- BULK INSERT: 50 ADDITIONAL COMPANIES (for diverse search results)
 -- =====================================================
 INSERT INTO users (email, username, password_hash, role, full_name, phone, bio, location, email_verified, is_active, created_at)
-WITH bulk_companies AS (
-    SELECT 
-        'company' || i || '@example.com' AS email,
-        'company_' || i AS username,
-        (ARRAY['Tech', 'Cloud', 'Mobile', 'Data', 'Design', 'Consulting', 'Software', 'Digital', 'Creative', 'Innovation',
-               'Enterprise', 'Strategic', 'Advanced', 'Next Gen', 'Smart', 'Intelligent', 'Dynamic', 'Agile', 'Rapid', 'Future'])[((i - 1) % 20) + 1] || ' ' ||
-        (ARRAY['Solutions', 'Systems', 'Services', 'Labs', 'Hub', 'Group', 'Corp', 'Inc', 'Ltd', 'Pro',
-               'Co', 'Partners', 'Networks', 'Studios', 'Works', 'Ventures', 'Innovations', 'Technologies', 'Consultants', 'Experts'])[((i - 1) % 20) + 1] 
-        AS company_name,
-        (ARRAY['SMALL', 'MEDIUM', 'LARGE', 'ENTERPRISE'])[((i - 1) % 4) + 1] AS company_type,
-        (ARRAY['Technology', 'Creative Services', 'Healthcare', 'Finance', 'E-Commerce', 'Data & Analytics', 'Cloud Services', 'Gaming', 
-               'Education', 'Consulting', 'Manufacturing', 'Real Estate', 'Transportation', 'Retail', 'Media', 'Entertainment', 'SaaS', 'Startup', 'Research', 'Development'])[((i - 1) % 20) + 1] 
-        AS industry,
-        (ARRAY['New York', 'San Francisco', 'Los Angeles', 'Chicago', 'Seattle', 'Boston', 'Denver', 'Austin', 'Miami', 'Portland'])[((i - 1) % 10) + 1] ||
-        ', ' ||
-        (ARRAY['NY', 'CA', 'CA', 'IL', 'WA', 'MA', 'CO', 'TX', 'FL', 'OR'])[((i - 1) % 10) + 1] 
-        AS location,
-        '+1-555-' || LPAD((20000 + i)::text, 4, '0') AS phone,
-        NOW() - ((RANDOM() * 350)::INT || ' days')::INTERVAL AS created_at
-    FROM generate_series(1, 50) AS i
-)
-INSERT INTO users (email, username, password_hash, role, full_name, phone, bio, location, email_verified, is_active, created_at)
 SELECT 
-    email, 
-    username, 
-    '$2b$10$5AWfL5DDaqj4cKOizmnL8O4WSjOlVAWuUjkyvyUjJNhF9POur171i',
-    'COMPANY',
-    company_name,
-    phone,
-    company_name || ' is a leading provider of ' || industry || ' solutions',
-    location,
-    true,
-    true,
-    created_at
-FROM bulk_companies
-ON CONFLICT(email) DO NOTHING;
+    'company' || i || '@example.com' AS email,
+    'company_' || i AS username,
+    '$2b$10$5AWfL5DDaqj4cKOizmnL8O4WSjOlVAWuUjkyvyUjJNhF9POur171i' AS password_hash,
+    'COMPANY' AS role,
+    (ARRAY['Tech', 'Cloud', 'Mobile', 'Data', 'Design', 'Consulting', 'Software', 'Digital', 'Creative', 'Innovation',
+           'Enterprise', 'Strategic', 'Advanced', 'Next Gen', 'Smart', 'Intelligent', 'Dynamic', 'Agile', 'Rapid', 'Future'])[((i - 1) % 20) + 1] || ' ' ||
+    (ARRAY['Solutions', 'Systems', 'Services', 'Labs', 'Hub', 'Group', 'Corp', 'Inc', 'Ltd', 'Pro',
+           'Co', 'Partners', 'Networks', 'Studios', 'Works', 'Ventures', 'Innovations', 'Technologies', 'Consultants', 'Experts'])[((i - 1) % 20) + 1] 
+    AS full_name,
+    '+1-555-' || LPAD((20000 + i)::text, 4, '0') AS phone,
+    (ARRAY['Tech', 'Cloud', 'Mobile', 'Data', 'Design', 'Consulting', 'Software', 'Digital', 'Creative', 'Innovation',
+           'Enterprise', 'Strategic', 'Advanced', 'Next Gen', 'Smart', 'Intelligent', 'Dynamic', 'Agile', 'Rapid', 'Future'])[((i - 1) % 20) + 1] || ' ' ||
+    (ARRAY['Solutions', 'Systems', 'Services', 'Labs', 'Hub', 'Group', 'Corp', 'Inc', 'Ltd', 'Pro',
+           'Co', 'Partners', 'Networks', 'Studios', 'Works', 'Ventures', 'Innovations', 'Technologies', 'Consultants', 'Experts'])[((i - 1) % 20) + 1] ||
+    ' is a leading provider of ' || 
+    (ARRAY['Technology', 'Creative Services', 'Healthcare', 'Finance', 'E-Commerce', 'Data & Analytics', 'Cloud Services', 'Gaming', 
+           'Education', 'Consulting', 'Manufacturing', 'Real Estate', 'Transportation', 'Retail', 'Media', 'Entertainment', 'SaaS', 'Startup', 'Research', 'Development'])[((i - 1) % 20) + 1] ||
+    ' solutions' AS bio,
+    (ARRAY['New York', 'San Francisco', 'Los Angeles', 'Chicago', 'Seattle', 'Boston', 'Denver', 'Austin', 'Miami', 'Portland'])[((i - 1) % 10) + 1] ||
+    ', ' ||
+    (ARRAY['NY', 'CA', 'CA', 'IL', 'WA', 'MA', 'CO', 'TX', 'FL', 'OR'])[((i - 1) % 10) + 1] 
+    AS location,
+    true AS email_verified,
+    true AS is_active,
+    NOW() - ((RANDOM() * 350)::INT || ' days')::INTERVAL AS created_at
+FROM generate_series(1, 50) AS i
+ON CONFLICT DO NOTHING;
 
 -- Insert company profiles for bulk companies
 INSERT INTO companies (user_id, company_name, company_type, industry, website_url, company_size, phone, headquarters_location, total_projects_posted, total_spent_cents, created_at)
 SELECT 
     u.id,
-    bc.company_name,
-    bc.company_type,
-    bc.industry,
-    'https://www.' || bc.username || '.com',
-    bc.company_type,
-    bc.phone,
-    bc.location,
-    0, 0,
+    u.full_name AS company_name,
+    (ARRAY['SMALL', 'MEDIUM', 'LARGE', 'ENTERPRISE'])[((CAST(SUBSTRING(u.username, 9) AS INTEGER) - 1) % 4) + 1] AS company_type,
+    (ARRAY['Technology', 'Creative Services', 'Healthcare', 'Finance', 'E-Commerce', 'Data & Analytics', 'Cloud Services', 'Gaming', 
+           'Education', 'Consulting', 'Manufacturing', 'Real Estate', 'Transportation', 'Retail', 'Media', 'Entertainment', 'SaaS', 'Startup', 'Research', 'Development'])[(CAST(SUBSTRING(u.username, 9) AS INTEGER) - 1) % 20 + 1] AS industry,
+    'https://www.' || u.username || '.com' AS website_url,
+    (ARRAY['SMALL', 'MEDIUM', 'LARGE', 'ENTERPRISE'])[((CAST(SUBSTRING(u.username, 9) AS INTEGER) - 1) % 4) + 1] AS company_size,
+    u.phone,
+    u.location AS headquarters_location,
+    0 AS total_projects_posted,
+    0 AS total_spent_cents,
     u.created_at
 FROM users u
-JOIN bulk_companies bc ON u.email = bc.email
 WHERE u.role = 'COMPANY' AND u.username LIKE 'company_%'
 ON CONFLICT DO NOTHING;
 

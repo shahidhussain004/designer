@@ -207,16 +207,25 @@ export function useContent(filters?: {
         signal,
       });
       // Return the full response structure with items/data and meta
+      const items = (data as any).items || (data as any).data || [];
+      const respMeta = (data as any).meta || {};
+      const totalFromBody = (data as any).total ?? respMeta.total ?? 0;
+      const pageFromBody = respMeta.page ?? (data as any).page ?? (params.page ?? 1);
+      const limitFromBody = respMeta.limit ?? (params.limit ?? 10);
+      const totalPagesFromBody = respMeta.totalPages ?? (limitFromBody ? Math.ceil(totalFromBody / limitFromBody) : 0);
+      const hasNext = respMeta.hasNextPage ?? (pageFromBody < totalPagesFromBody);
+      const hasPrev = respMeta.hasPrevPage ?? (pageFromBody > 1);
+
       return {
-        data: (data as any).items || (data as any).data || [],
-        meta: (data as any).meta || {
-          total: (data as any).total || 0,
-          page: (data as any).page || 1,
-          limit: 10,
-          totalPages: 0,
-          hasNextPage: false,
-          hasPrevPage: false,
-        }
+        data: items,
+        meta: {
+          total: totalFromBody,
+          page: pageFromBody,
+          limit: limitFromBody,
+          totalPages: totalPagesFromBody,
+          hasNextPage: hasNext,
+          hasPrevPage: hasPrev,
+        },
       };
     },
     staleTime: 5 * 60 * 1000,

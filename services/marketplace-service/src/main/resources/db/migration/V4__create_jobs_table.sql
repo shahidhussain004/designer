@@ -64,14 +64,6 @@ CREATE TABLE IF NOT EXISTS jobs (
     application_url TEXT,
     apply_instructions TEXT,
     
-    -- Company Information
-    company_name VARCHAR(255),
-    company_description TEXT,
-    company_logo_url TEXT,
-    company_website TEXT,
-    company_size VARCHAR(50),
-    industry VARCHAR(100),
-    
     -- Special Requirements
     start_date DATE,
     travel_requirement VARCHAR(50),
@@ -144,6 +136,12 @@ CREATE TRIGGER jobs_counter_check
     BEFORE UPDATE ON jobs 
     FOR EACH ROW 
     EXECUTE FUNCTION prevent_negative_counters_jobs();
+
+-- Trigger to update company total_jobs_posted when jobs are created/deleted
+CREATE TRIGGER trg_update_company_job_count
+    AFTER INSERT OR DELETE ON jobs
+    FOR EACH ROW
+    EXECUTE FUNCTION update_company_job_count();
 
 -- =====================================================
 -- COMMENTS
