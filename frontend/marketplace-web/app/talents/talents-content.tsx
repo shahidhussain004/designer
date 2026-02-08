@@ -75,7 +75,7 @@ export default function TalentsContent() {
 
   // Normalize the data: ensure we have an array before mapping
   const _rawItems: any = freelancersData && typeof freelancersData === 'object'
-    ? (freelancersData.content ?? freelancersData.items ?? freelancersData.data ?? freelancersData)
+    ? ((freelancersData as any)?.content ?? (freelancersData as any)?.items ?? (freelancersData as any)?.data ?? freelancersData)
     : []
 
   const _items: any[] = Array.isArray(_rawItems) ? _rawItems : []

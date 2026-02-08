@@ -1,0 +1,38 @@
+{
+  "orphan_checks": {
+    "orphan_reviews": 0,
+    "orphan_time_entries": 0,
+    "orphan_job_applications": 0,
+    "orphan_portfolio_items": 0
+  },
+  "top_companies_by_jobs_posted": [
+    { "company": "FinTech Solutions LLC", "jobs_posted": 6 },
+    { "company": "Innovate Labs Inc.", "jobs_posted": 6 },
+    { "company": "Mobile First Ltd", "jobs_posted": 6 },
+    { "company": "Tech Corporation", "jobs_posted": 6 },
+    { "company": "Design Studio Creative", "jobs_posted": 6 }
+  ],
+  "top_freelancers_by_contracts_count": [
+    { "username": "freelancer_110", "contracts": 20, "total_paid": 20000.00 },
+    { "username": "freelancer_42", "contracts": 20, "total_paid": 20000.00 },
+    { "username": "bob_python", "contracts": 1, "total_paid": 82777.69 },
+    { "username": "alice_dev", "contracts": 1, "total_paid": 82377.33 }
+  ],
+  "jobs_by_category": [
+    { "category": "software-development", "count": 24 },
+    { "category": "design-creative", "count": 6 },
+    { "category": "data-science-analytics", "count": 6 },
+    { "category": "devops-infrastructure", "count": 6 }
+  ],
+  "contracts_by_status": {
+    "COMPLETED": 40,
+    "ACTIVE": 1,
+    "PENDING": 1
+  },
+  "freelancers_with_zero_portfolio_sample": [
+    "oscar_test","freelancer_34","freelancer_124","freelancer_76","freelancer_51","freelancer_91","freelancer_48","freelancer_30","freelancer_105","freelancer_36"
+  ],
+  "sample_recent_reviews": "Auto-generated review rows (see DB for fields)",
+  "sample_recent_time_entries": "Auto time entries with status = SUBMITTED",
+  "sample_recent_job_applications": "Sample cover letters and statuses (SHORTLISTED/REVIEWING)"
+}

@@ -1,6 +1,7 @@
 "use client"
 
 import { PageLayout } from '@/components/ui'
+import { apiFetch } from '@/lib/api-fetch'
 import { authService } from '@/lib/auth'
 import { Bell, CheckCircle, Key, LogOut, User, XCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -50,11 +51,10 @@ export default function SettingsPage() {
     }
 
     try {
-      const response = await fetch('http://localhost:8080/api/users/change-password', {
+      const response = await apiFetch('/api/users/change-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${typeof window !== 'undefined' ? localStorage.getItem('access_token') : ''}`
         },
         body: JSON.stringify({
           currentPassword: passwordData.currentPassword,

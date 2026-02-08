@@ -3,10 +3,15 @@ package com.designer.marketplace.entity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,7 +39,7 @@ import lombok.NoArgsConstructor;
         @Index(name = "idx_time_entries_contract_id", columnList = "contract_id"),
         @Index(name = "idx_time_entries_freelancer_id", columnList = "freelancer_id"),
         @Index(name = "idx_time_entries_status", columnList = "status"),
-        @Index(name = "idx_time_entries_work_date", columnList = "work_date")
+        @Index(name = "idx_time_entries_date", columnList = "date")
 })
 @EntityListeners(AuditingEntityListener.class)
 @Data
@@ -54,53 +59,62 @@ public class TimeEntry {
     @JoinColumn(name = "freelancer_id", nullable = false)
     private Freelancer freelancer;
 
+    @Column(name = "date", nullable = false)
+    private LocalDate date;
+
+    @Column(name = "start_time")
+    private LocalTime startTime;
+
+    @Column(name = "end_time")
+    private LocalTime endTime;
+
+    @Column(name = "hours_logged", precision = 5, scale = 2, nullable = false)
+    private BigDecimal hoursLogged;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "hours_worked", precision = 5, scale = 2)
-    private BigDecimal hoursWorked;
+    @Column(name = "task_description", columnDefinition = "TEXT")
+    private String taskDescription;
 
-    @Column(name = "rate_per_hour_cents")
-    private Long ratePerHourCents;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "work_diary", columnDefinition = "jsonb", nullable = false)
+    private JsonNode workDiary;
 
-    @Column(name = "work_date")
-    private LocalDate workDate;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "screenshot_urls", columnDefinition = "jsonb", nullable = false)
+    private JsonNode screenshotUrls;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "file_attachments", columnDefinition = "jsonb", nullable = false)
+    private JsonNode fileAttachments;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", length = 50)
+    @Column(name = "status", length = 50, nullable = false)
     private TimeEntryStatus status;
 
-    @Column(name = "approved_at")
-    private LocalDateTime approvedAt;
-
-    @Column(name = "paid_at")
-    private LocalDateTime paidAt;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "approved_by")
+    private User approvedBy;
 
     @Column(name = "rejection_reason", columnDefinition = "TEXT")
     private String rejectionReason;
+
+    @Column(name = "approved_at")
+    private LocalDateTime approvedAt;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @LastModifiedDate
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
     public enum TimeEntryStatus {
-        PENDING,
+        DRAFT,
+        SUBMITTED,
         APPROVED,
-        REJECTED,
-        PAID
-    }
-
-    /**
-     * Calculate total amount in cents
-     */
-    public Long getTotalAmountCents() {
-        if (hoursWorked != null && ratePerHourCents != null) {
-            return hoursWorked.multiply(new BigDecimal(ratePerHourCents)).longValue();
-        }
-        return 0L;
+        REJECTED
     }
 }

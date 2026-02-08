@@ -64,7 +64,7 @@ export default function FreelancerDashboardPage() {
   const { stats = {} as DashboardStats, availableJobs = [], availableProjects = [] } = data
 
   const quickLinks = [
-    { href: `/portfolio/${authService.getCurrentUser()?.id}`, icon: FolderOpen, title: 'Portfolio', subtitle: 'Manage your work' },
+    { href: '/dashboard/freelancer/portfolio', icon: FolderOpen, title: 'Portfolio', subtitle: 'Manage your work' },
     { href: '/dashboard/freelancer/reviews', icon: Star, title: 'Reviews', subtitle: 'Company feedback' },
     { href: '/dashboard/freelancer/time-tracking', icon: Clock, title: 'Time Tracking', subtitle: 'Log your hours' },
     { href: '/dashboard/freelancer/contracts', icon: FileText, title: 'Contracts', subtitle: 'Active agreements' },

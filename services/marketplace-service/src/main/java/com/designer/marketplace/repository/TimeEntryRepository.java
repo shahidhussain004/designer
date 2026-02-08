@@ -21,13 +21,13 @@ public interface TimeEntryRepository extends JpaRepository<TimeEntry, Long> {
     /**
      * Find all time entries for a contract
      */
-    @Query("SELECT t FROM TimeEntry t WHERE t.contract.id = :contractId ORDER BY t.workDate DESC")
+    @Query("SELECT t FROM TimeEntry t WHERE t.contract.id = :contractId ORDER BY t.date DESC")
     List<TimeEntry> findByContractIdOrderByWorkDateDesc(@Param("contractId") Long contractId);
 
     /**
      * Find all time entries for a freelancer
      */
-    @Query("SELECT t FROM TimeEntry t WHERE t.freelancer.id = :freelancerId ORDER BY t.workDate DESC")
+    @Query("SELECT t FROM TimeEntry t WHERE t.freelancer.id = :freelancerId ORDER BY t.date DESC")
     List<TimeEntry> findByFreelancerIdOrderByWorkDateDesc(@Param("freelancerId") Long freelancerId);
 
     /**
@@ -44,7 +44,7 @@ public interface TimeEntryRepository extends JpaRepository<TimeEntry, Long> {
     /**
      * Find time entries for a date range
      */
-    @Query("SELECT t FROM TimeEntry t WHERE t.contract.id = :contractId AND t.workDate BETWEEN :startDate AND :endDate")
+    @Query("SELECT t FROM TimeEntry t WHERE t.contract.id = :contractId AND t.date BETWEEN :startDate AND :endDate")
     List<TimeEntry> findByContractAndDateRange(
             @Param("contractId") Long contractId,
             @Param("startDate") LocalDate startDate,
@@ -52,14 +52,14 @@ public interface TimeEntryRepository extends JpaRepository<TimeEntry, Long> {
     );
 
     /**
-     * Calculate total hours for a contract
+     * Calculate total hours for a contract (approved entries)
      */
-    @Query("SELECT COALESCE(SUM(t.hoursWorked), 0) FROM TimeEntry t WHERE t.contract.id = :contractId AND t.status = 'APPROVED'")
+    @Query("SELECT COALESCE(SUM(t.hoursLogged), 0) FROM TimeEntry t WHERE t.contract.id = :contractId AND t.status = 'APPROVED'")
     BigDecimal calculateTotalHoursByContract(@Param("contractId") Long contractId);
 
     /**
-     * Calculate total amount earned for a contract
+     * Calculate total amount earned for a contract (no ratePerHourCents in new schema)
      */
-    @Query("SELECT COALESCE(SUM(t.hoursWorked * t.ratePerHourCents), 0) FROM TimeEntry t WHERE t.contract.id = :contractId AND t.status = 'PAID'")
+    @Query("SELECT COALESCE(SUM(t.hoursLogged), 0) FROM TimeEntry t WHERE t.contract.id = :contractId AND t.status = 'APPROVED'")
     BigDecimal calculateTotalEarningsByContract(@Param("contractId") Long contractId);
 }

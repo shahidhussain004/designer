@@ -2,7 +2,7 @@
 
 import { ErrorMessage } from '@/components/ErrorMessage';
 import { LoadingSpinner } from '@/components/Skeletons';
-import { PageLayout } from '@/components/ui';
+import { Breadcrumb, PageLayout } from '@/components/ui';
 import { useCreatePortfolio, useDeletePortfolio, useUpdatePortfolio, useUserPortfolio } from '@/hooks/useUsers';
 import { useAuth } from '@/lib/context/AuthContext';
 import { Edit, Eye, EyeOff, Plus, Trash2 } from 'lucide-react';
@@ -179,6 +179,17 @@ export default function PortfolioPage() {
   return (
     <PageLayout>
       <div className="max-w-7xl mx-auto px-4 py-8">
+      {/* Breadcrumb */}
+      <div className="mb-4">
+        <Breadcrumb
+          items={[
+            { label: 'Dashboard', href: '/dashboard' },
+            { label: 'Freelancer', href: '/dashboard/freelancer' },
+            { label: 'Portfolio', href: '/dashboard/freelancer/portfolio' },
+          ]}
+        />
+      </div>
+
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">My Portfolio</h1>

@@ -2,7 +2,7 @@
 
 import { ErrorMessage } from '@/components/ErrorMessage'
 import { LoadingSpinner } from '@/components/Skeletons'
-import { PageLayout } from '@/components/ui'
+import { Breadcrumb, PageLayout } from '@/components/ui'
 import { useUserPortfolio, useUserProfile } from '@/hooks/useUsers'
 import { ArrowLeft, ExternalLink } from 'lucide-react'
 import Image from 'next/image'
@@ -77,16 +77,15 @@ export default function FreelancerPortfolioPage() {
         {/* Header */}
         <div className="bg-gray-900 text-white py-12">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Breadcrumb & Navigation */}
-            <div className="flex items-center gap-3 mb-6">
-              <Link href="/talents" className="inline-flex items-center gap-2 text-gray-400 hover:text-white">
-                <ArrowLeft className="w-4 h-4" />
-                Back to Talent
-              </Link>
-              <span className="text-gray-600">/</span>
-              <Link href={`/freelancers/${freelancer.id}`} className="text-gray-400 hover:text-white">
-                View Profile
-              </Link>
+            {/* Breadcrumb */}
+            <div className="mb-6">
+              <Breadcrumb
+                items={[
+                  { label: 'Talents', href: '/talents' },
+                  { label: freelancer.fullName || `@${freelancer.username}`, href: `/freelancers/${freelancer.id}` },
+                  { label: 'Portfolio', href: `/freelancers/${freelancer.id}/portfolio` },
+                ]}
+              />
             </div>
 
             {/* Page Title */}
