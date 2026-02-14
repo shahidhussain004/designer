@@ -19,6 +19,7 @@
     "db:seed": "tsx scripts/run-seeds.ts",
     "db:reset": "tsx scripts/reset-db.ts",
     "prisma:generate": "prisma generate",
+    "prisma:migrate:prod": "prisma migrate deploy",
     "prisma:seed:tutorials": "tsx prisma/tutorials-seed.ts",
     "prisma:seed:all": "npm run prisma:seed && npm run prisma:seed:tutorials",
     "prisma:studio": "prisma studio",
