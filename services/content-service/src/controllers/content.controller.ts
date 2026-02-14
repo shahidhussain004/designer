@@ -79,7 +79,16 @@ export async function contentController(fastify: FastifyInstance) {
           sortOrder as 'asc' | 'desc'
         );
 
-        return reply.send({ success: true, ...result });
+        return reply.send({
+          success: true,
+          data: result.items,
+          meta: {
+            page: result.page,
+            pageSize: result.pageSize,
+            total: result.total,
+            pages: result.totalPages,
+          },
+        });
       } catch (error: any) {
         request.log.error(error);
         return reply.status(500).send({ success: false, error: error.message });
@@ -209,6 +218,12 @@ export async function contentController(fastify: FastifyInstance) {
   // Create content
   fastify.post<{ Body: CreateContentDTO }>('/', async (request, reply) => {
     try {
+      // Check for authentication
+      const authHeader = request.headers.authorization;
+      if (!authHeader) {
+        return reply.status(401).send({ success: false, error: 'Unauthorized' });
+      }
+
       const content = await contentService.create(request.body);
       return reply.status(201).send({ success: true, data: content });
     } catch (error: any) {

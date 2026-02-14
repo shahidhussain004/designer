@@ -187,6 +187,37 @@ export class AnalyticsService {
       views: parseInt(row.views, 10),
     }));
   }
+
+  /**
+   * Get overall analytics overview
+   */
+  async getOverview(): Promise<OverallStats> {
+    try {
+      const [contentCount, tutorialCount, commentCount] = await Promise.all([
+        query(`SELECT COUNT(*) FROM content WHERE status = 'published'`),
+        query(`SELECT COUNT(*) FROM tutorials`),
+        query(`SELECT COUNT(*) FROM comments`),
+      ]);
+
+      return {
+        total_content: parseInt(contentCount.rows[0]?.count || '0'),
+        total_tutorials: parseInt(tutorialCount.rows[0]?.count || '0'),
+        total_views: 0,
+        total_comments: parseInt(commentCount.rows[0]?.count || '0'),
+        published_content: parseInt(contentCount.rows[0]?.count || '0'),
+        draft_content: 0,
+      };
+    } catch (error) {
+      return {
+        total_content: 0,
+        total_tutorials: 0,
+        total_views: 0,
+        total_comments: 0,
+        published_content: 0,
+        draft_content: 0,
+      };
+    }
+  }
 }
 
 export const analyticsService = new AnalyticsService();
