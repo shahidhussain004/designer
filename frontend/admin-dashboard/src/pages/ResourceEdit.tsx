@@ -21,10 +21,10 @@ export default function ResourceEditPage() {
     excerpt: '',
     content: '',
     content_type: 'blog',
-    featuredImageUrl: '',
-    author: '',
+    featured_image: '',
+    author_id: '',
     status: 'draft',
-    isFeatured: false,
+    is_featured: false,
   })
   const [isSaving, setIsSaving] = useState(false)
 
@@ -72,19 +72,19 @@ export default function ResourceEditPage() {
       if ((formData as any).content) payload.body = (formData as any).content
       if (formData.content_type) payload.content_type = formData.content_type
       if (formData.status) payload.status = formData.status
-      if ((formData as any).featuredImageUrl) payload.featured_image = (formData as any).featuredImageUrl
-      // author may be object or id
-      if ((formData as any).author_id) payload.author_id = (formData as any).author_id
+      if (formData.featured_image) payload.featured_image = formData.featured_image
+      // author_id
+      if (formData.author_id) payload.author_id = formData.author_id
       else if ((formData as any).author && (formData as any).author.id) payload.author_id = (formData as any).author.id
       // category may be object or id
-      if ((formData as any).category_id) payload.category_id = (formData as any).category_id
+      if (formData.category_id) payload.category_id = formData.category_id
       else if ((formData as any).category && (formData as any).category.id) payload.category_id = (formData as any).category.id
       // tags -> tag_ids
       if ((formData as any).tags && Array.isArray((formData as any).tags)) {
         payload.tag_ids = (formData as any).tags.map((t: any) => t.id).filter(Boolean)
       }
-      if ((formData as any).isFeatured !== undefined) payload.is_featured = (formData as any).isFeatured
-      if ((formData as any).isTrending !== undefined) payload.is_trending = (formData as any).isTrending
+      if (formData.is_featured !== undefined) payload.is_featured = formData.is_featured
+      if ((formData as any).is_trending !== undefined) payload.is_trending = (formData as any).is_trending
       if ((formData as any).meta_title) payload.meta_title = (formData as any).meta_title
       if ((formData as any).meta_description) payload.meta_description = (formData as any).meta_description
       if ((formData as any).meta_keywords) payload.meta_keywords = (formData as any).meta_keywords
@@ -259,11 +259,11 @@ export default function ResourceEditPage() {
             </label>
             <input
               type="text"
-              name="author"
-              value={formData.author || ''}
+              name="author_id"
+              value={formData.author_id || ''}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Author name"
+              placeholder="Author ID"
             />
           </Card>
 
@@ -274,16 +274,16 @@ export default function ResourceEditPage() {
             </label>
             <input
               type="url"
-              name="featuredImageUrl"
-              value={formData.featuredImageUrl || ''}
+              name="featured_image"
+              value={formData.featured_image || ''}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="https://example.com/image.jpg"
             />
-            {formData.featuredImageUrl && (
+            {formData.featured_image && (
               <div className="mt-3">
                 <img
-                  src={formData.featuredImageUrl}
+                  src={formData.featured_image}
                   alt="Featured"
                   className="w-full h-32 object-cover rounded border"
                   onError={(e) => {
@@ -299,8 +299,8 @@ export default function ResourceEditPage() {
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
-                name="isFeatured"
-                checked={formData.isFeatured || false}
+                name="is_featured"
+                checked={formData.is_featured || false}
                 onChange={handleChange}
                 className="w-4 h-4 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
               />
