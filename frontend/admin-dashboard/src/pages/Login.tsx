@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -12,12 +12,87 @@ import {
 import { authApi } from '../lib/api'
 import { useAuthStore } from '../store/authStore'
 
+function getCookie(name: string): string | null {
+  const value = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith(`${name}=`))
+  return value ? decodeURIComponent(value.split('=')[1]) : null
+}
+
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
   const { login } = useAuthStore()
+  const [isAutoLoggingIn, setIsAutoLoggingIn] = useState(true)
+
+  // Check if token was passed from marketplace via cookie (preferred) or URL params (fallback)
+  React.useEffect(() => {
+    const tryAutoLogin = async () => {
+      // Preferred: token via shared cookie (SameSite=Lax, Domain=localhost)
+      let token = getCookie('admin_access_token')
+      let userFromUrl: any = null
+
+      // Fallback: URL parameters (legacy)
+      const searchParams = new URLSearchParams(window.location.search)
+      const urlToken = searchParams.get('admin_token')
+      const urlUser = searchParams.get('admin_user')
+      if (!token && urlToken) {
+        token = decodeURIComponent(urlToken)
+        if (urlUser) {
+          try {
+            userFromUrl = JSON.parse(decodeURIComponent(urlUser))
+          } catch (e) {
+            console.error('[Login] Failed to parse user from URL:', e)
+          }
+        }
+      }
+
+      if (!token) {
+        setIsAutoLoggingIn(false)
+        return
+      }
+
+      try {
+        console.log('[Login] Auto-login using shared token')
+        // Fetch fresh user info using token for security
+        const me = await authApi.me(token)
+        const user = userFromUrl || me
+
+        if (user.role !== 'ADMIN') {
+          console.warn('[Login] Auto-login blocked: role is not ADMIN')
+          setIsAutoLoggingIn(false)
+          return
+        }
+
+        login(
+          {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            fullName: user.fullName,
+            role: user.role,
+          },
+          token
+        )
+
+        console.log('[Login] Auto-login successful')
+
+        // Clean up URL
+        if (urlToken || urlUser) {
+          window.history.replaceState({}, document.title, '/login')
+        }
+
+        navigate('/dashboard')
+      } catch (e) {
+        console.error('[Login] Auto-login failed:', e)
+        setIsAutoLoggingIn(false)
+      }
+    }
+
+    void tryAutoLogin()
+  }, [login, navigate])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -51,6 +126,7 @@ export default function Login() {
       toast.error(err.response?.data?.message || 'Login failed')
     } finally {
       setIsLoading(false)
+      setIsAutoLoggingIn(false)
     }
   }
 
@@ -65,6 +141,9 @@ export default function Login() {
             </Text>
             <Text color="secondary">
               Sign in to access the admin panel
+            </Text>
+            <Text font-size="body-s" color="secondary">
+              (Auto-login available when redirected from marketplace)
             </Text>
           </Flex>
 
@@ -89,8 +168,8 @@ export default function Login() {
                 required
               />
 
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? 'Signing in...' : 'Sign in'}
+              <Button type="submit" disabled={isLoading || isAutoLoggingIn}>
+                {isLoading || isAutoLoggingIn ? 'Signing in...' : 'Sign in'}
               </Button>
             </Flex>
           </form>
@@ -104,7 +183,7 @@ export default function Login() {
                 Demo Admin Credentials
               </Text>
               <Text font-size="body-s" color="secondary">
-                Email: admin@designermarket.com
+                Email: admin@marketplace.com
               </Text>
               <Text font-size="body-s" color="secondary">
                 Password: password123

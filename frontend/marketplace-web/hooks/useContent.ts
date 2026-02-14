@@ -134,47 +134,6 @@ export function useTutorialById(id: string | number | null) {
   });
 }
 
-// ============================================================================
-// Query Hooks - Resources
-// ============================================================================
-
-/**
- * Fetch all resources
- */
-export function useResources(filters?: { category?: string; tag?: string }) {
-  return useQuery({
-    queryKey: ['resources', filters],
-    queryFn: async ({ signal }) => {
-      const { data } = await contentClient.get('/resources', {
-        params: filters,
-        signal,
-      });
-      // Handle both new format (items) and old format (data)
-      return (data as any).items || (data as any).data || data;
-    },
-    staleTime: 5 * 60 * 1000,
-  });
-}
-
-/**
- * Fetch single resource by slug
- * Note: Despite the function name, this fetches content (articles/blogs) shown on /resources page
- */
-export function useResource(slug: string | null) {
-  return useQuery({
-    queryKey: ['resource', slug],
-    queryFn: async ({ signal }) => {
-      if (!slug) throw new Error('Resource slug is required');
-      // Use content slug endpoint since resources page shows content items
-      const { data } = await contentClient.get(`/content/slug/${slug}`, {
-        signal,
-      });
-      return (data as any).data || data;
-    },
-    enabled: !!slug,
-    staleTime: 5 * 60 * 1000,
-  });
-}
 
 // ============================================================================
 // Query Hooks - Content (Generic)
@@ -231,6 +190,29 @@ export function useContent(filters?: {
     staleTime: 5 * 60 * 1000,
   });
 }
+
+
+
+/**
+ * Fetch single content by slug
+ * Note: Despite the function name, this fetches content (articles/blogs) shown on /resources page
+ */
+export function useContentSlug(slug: string | null) {
+  return useQuery({
+    queryKey: ['contentSlug', slug],
+    queryFn: async ({ signal }) => {
+      if (!slug) throw new Error('Content slug is required');
+      // Use content slug endpoint since resources page shows content items
+      const { data } = await contentClient.get(`/content/slug/${slug}`, {
+        signal,
+      });
+      return (data as any).data || data;
+    },
+    enabled: !!slug,
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
 
 /**
  * Search content

@@ -40,7 +40,15 @@ export default function DashboardPage() {
         router.replace('/dashboard/freelancer')
       } else if (currentUser.role === 'ADMIN') {
         console.log('[Dashboard] Redirecting to admin app');
-        window.location.href = 'http://localhost:3001'
+        // Pass auth token via cookie (shared across ports on localhost). More secure than URL parameters.
+        const token = localStorage.getItem('access_token');
+        if (token) {
+          // Set a short-lived cookie accessible on localhost for port 3001
+          const expires = new Date(Date.now() + 15 * 60 * 1000).toUTCString(); // 15 minutes
+          // Domain is omitted because browsers ignore Domain=localhost; this keeps it valid for both ports on localhost
+          document.cookie = `admin_access_token=${encodeURIComponent(token)}; Path=/; SameSite=Lax; Expires=${expires}`;
+        }
+        window.location.href = 'http://localhost:3001';
       }
     }
     

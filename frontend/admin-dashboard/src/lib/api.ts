@@ -40,6 +40,13 @@ export const authApi = {
     const response = await api.post('/api/auth/login', { emailOrUsername: email, password })
     return response.data
   },
+  me: async (token?: string) => {
+    // If token provided, override header for this call to avoid relying on store state during bootstrap
+    const response = await api.get('/api/users/me', {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    })
+    return response.data
+  },
 }
 
 // Admin API

@@ -5,7 +5,6 @@ export * from './category.repository';
 export * from './comment.repository';
 export * from './content.repository';
 export * from './media.repository';
-export * from './resource.repository';
 export * from './tag.repository';
 export * from './tutorial.repository';
 

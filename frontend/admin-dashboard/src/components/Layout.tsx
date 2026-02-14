@@ -1,30 +1,32 @@
-import { useState, useContext } from 'react'
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
+import {
+  ArrowRightOnRectangleIcon,
+  Bars3Icon,
+  BriefcaseIcon,
+  ChartBarIcon,
+  ExclamationTriangleIcon,
+  HomeIcon,
+  MoonIcon,
+  NewspaperIcon,
+  SunIcon,
+  UsersIcon,
+  XMarkIcon,
+} from '@heroicons/react/24/outline'
+import { useContext, useState } from 'react'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { ThemeContext } from './ThemeProvider'
 import {
-  Flex,
-  Text,
   Button,
   Divider,
+  Flex,
+  Text,
 } from './green'
-import {
-  HomeIcon,
-  UsersIcon,
-  BriefcaseIcon,
-  ExclamationTriangleIcon,
-  ChartBarIcon,
-  ArrowRightOnRectangleIcon,
-  Bars3Icon,
-  XMarkIcon,
-  SunIcon,
-  MoonIcon,
-} from '@heroicons/react/24/outline'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Users', href: '/users', icon: UsersIcon },
   { name: 'Jobs', href: '/jobs', icon: BriefcaseIcon },
+  { name: 'Resources', href: '/resources', icon: NewspaperIcon },
   { name: 'Disputes', href: '/disputes', icon: ExclamationTriangleIcon },
   { name: 'Analytics', href: '/analytics', icon: ChartBarIcon },
 ]

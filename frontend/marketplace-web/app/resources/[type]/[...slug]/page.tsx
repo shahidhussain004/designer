@@ -2,13 +2,13 @@
 
 import { ErrorMessage } from '@/components/ErrorMessage';
 import { TutorialsSkeleton } from '@/components/Skeletons';
-import { PageLayout } from '@/components/ui';
-import { useComments, useCreateComment, useIncrementViews, useLikeContent, useResource } from '@/hooks/useContent';
+import { Breadcrumb, PageLayout } from '@/components/ui';
+import { useComments, useContentSlug, useCreateComment, useLikeContent } from '@/hooks/useContent';
 import { ArrowLeft, Heart, Share2, ThumbsUp } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 export default function ResourceCatchAllPage() {
   const params = useParams();
@@ -30,21 +30,13 @@ export default function ResourceCatchAllPage() {
 
   const [newComment, setNewComment] = useState('');
 
-  const { data: content, isLoading, error, refetch } = useResource(slug || null);
+  const { data: content, isLoading, error, refetch } = useContentSlug(slug || null);
   const { data: commentsData } = useComments(content?.id || null);
   const createCommentMutation = useCreateComment();
   const likeMutation = useLikeContent();
-  const incrementViewsMutation = useIncrementViews();
 
   const comments = commentsData?.data || [];
-
-  useEffect(() => {
-    if (content?.id) {
-      // Temporarily disabled - API endpoint returning 500 error
-      // incrementViewsMutation.mutate(content.id);
-    }
-  }, [content?.id]);
-
+  
   const handleLike = async () => {
     if (!content) return;
     try { await likeMutation.mutateAsync(content.id); } catch (err) { console.error(err); }
@@ -117,33 +109,38 @@ export default function ResourceCatchAllPage() {
   return (
     <PageLayout title={`${content.title} | Resources | Designer Marketplace`}>
       <div className="min-h-screen bg-gray-50">
-        <div className="bg-white border-b">
-        <div className="max-w-4xl mx-auto px-4 py-3">
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Link href="/" className="hover:text-primary-600">Home</Link>
-            <span>/</span>
-            <Link href="/resources" className="hover:text-primary-600">Resources</Link>
-            {content?.type && (
-              <>
-                <span>/</span>
-                <Link href={`/resources/${getTypeSlug(content.type)}`} className="hover:text-primary-600">{getTypeSlug(content.type)}</Link>
-              </>
+        {/* Page Header */}
+        <div className="bg-gray-900 text-white py-16 lg:py-20">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <h1 className="text-4xl font-bold mb-4">{content.title}</h1>
+            {content.excerpt && (
+              <p className="text-gray-300 text-lg max-w-2xl">
+                {content.excerpt}
+              </p>
             )}
-            <span>/</span>
-            <span className="text-gray-900 truncate">{content.title}</span>
           </div>
         </div>
-      </div>
 
-      <article className="max-w-4xl mx-auto px-4 py-8">
-        <div className="flex items-center gap-3 mb-4">
-          <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getContentTypeBadge(content.type).bg} ${getContentTypeBadge(content.type).text}`}>{content.type}</span>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+          <div className="mb-8">
+            <Breadcrumb
+              items={[
+                { label: 'Resources', href: '/resources' },
+                { label: formatResourceType(content.content_type), href: `/resources/${getTypeSlug(content.content_type)}` },
+                { label: content.title, href: `#` },
+              ]}
+            />
+          </div>
+        </div>
+
+        <article className="max-w-4xl mx-auto px-4 py-8">
+          <div className="flex items-center gap-3 mb-4">
+            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getContentTypeBadge(content.type).bg} ${getContentTypeBadge(content.type).text}`}>{content.type}</span>
           {content.category && <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700">{content.category?.name ?? 'Uncategorized'}</span>}
           {content.isFeatured && <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-500 text-white">Featured</span>}
         </div>
 
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">{content.title}</h1>
-        {content.excerpt && <p className="text-xl text-gray-600 mb-6">{content.excerpt}</p>}
+        {/* title and excerpt shown in page header above */}
 
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
