@@ -26,9 +26,10 @@ describe('getJobs adapter', () => {
       pageSize: 10
     };
 
-    (apiClient as any).get = jest.fn().mockResolvedValueOnce({
-      data: apiResponse
-    });
+    const mockedGet = jest.fn() as jest.MockedFunction<(...args: any[]) => Promise<{ data: typeof apiResponse }>>;
+    mockedGet.mockResolvedValueOnce({ data: apiResponse });
+    const mockedApiClient = apiClient as unknown as { get: typeof mockedGet };
+    mockedApiClient.get = mockedGet;
 
     const result = await getJobs({ page: 0, size: 10 });
 
@@ -43,9 +44,10 @@ describe('getJobs adapter', () => {
 
   it('returns empty jobs array when API omits items', async () => {
     const apiResponse = { totalCount: 0, page: 0, pageSize: 10 };
-    (apiClient as any).get = jest.fn().mockResolvedValueOnce({
-      data: apiResponse
-    });
+    const mockedGet = jest.fn() as jest.MockedFunction<(...args: any[]) => Promise<{ data: typeof apiResponse }>>;
+    mockedGet.mockResolvedValueOnce({ data: apiResponse });
+    const mockedApiClient = apiClient as unknown as { get: typeof mockedGet };
+    mockedApiClient.get = mockedGet;
 
     const result = await getJobs();
 
