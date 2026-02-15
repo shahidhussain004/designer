@@ -11,15 +11,15 @@ import { useRef, useState } from 'react';
 
 interface PortfolioItem {
   id: number;
-  title: string;
-  description: string;
-  imageUrl: string;
-  projectUrl: string;
-  technologies: string[];
-  displayOrder: number;
-  isVisible: boolean;
+  title?: string;
+  description?: string;
+  imageUrl?: string;
+  projectUrl?: string;
+  technologies?: string[];
+  displayOrder?: number;
+  isVisible?: boolean;
   completionDate?: string;
-  createdAt: string;
+  createdAt?: string;
 }
 
 export default function PortfolioPage() {
@@ -50,7 +50,7 @@ export default function PortfolioPage() {
     
     const payload = {
       ...formData,
-      technologies: formData.technologies.split(',').map((t: any) => t.trim()),
+      technologies: formData.technologies.split(',').map((t: string) => t.trim()),
       displayOrder: editingItem ? editingItem.displayOrder : portfolio.length + 1,
     };
 
@@ -87,7 +87,7 @@ export default function PortfolioPage() {
     }
   };
 
-  const toggleVisibility = async (item: any) => {
+  const toggleVisibility = async (item: PortfolioItem) => {
     // if hiding, show undo banner
     if (item.isVisible) {
       setUndoItem({ ...item, isVisible: false })
@@ -103,7 +103,15 @@ export default function PortfolioPage() {
       await updatePortfolioMutation.mutateAsync({
         userId: user?.id || 0,
         itemId: item.id,
-        input: { ...item, isVisible: !item.isVisible }
+        input: {
+          title: item.title,
+          description: item.description,
+          imageUrl: item.imageUrl,
+          projectUrl: item.projectUrl,
+          technologies: item.technologies,
+          isVisible: !item.isVisible,
+          completionDate: item.completionDate
+        }
       });
     } catch (error) {
       console.error('Failed to toggle visibility:', error);
@@ -112,7 +120,7 @@ export default function PortfolioPage() {
     }
   };
 
-  const restoreVisibility = async (item: any) => {
+  const restoreVisibility = async (item: PortfolioItem) => {
     // cancel pending timer
     if (undoTimerRef.current) { window.clearTimeout(undoTimerRef.current); undoTimerRef.current = null }
     setUndoItem(null)
@@ -120,22 +128,30 @@ export default function PortfolioPage() {
       await updatePortfolioMutation.mutateAsync({
         userId: user?.id || 0,
         itemId: item.id,
-        input: { ...item, isVisible: true }
+        input: {
+          title: item.title,
+          description: item.description,
+          imageUrl: item.imageUrl,
+          projectUrl: item.projectUrl,
+          technologies: item.technologies,
+          isVisible: true,
+          completionDate: item.completionDate
+        }
       });
     } catch (err) {
       console.error('Failed to restore visibility:', err)
     }
   }
 
-  const editItem = (item: any) => {
+  const editItem = (item: PortfolioItem) => {
     setEditingItem(item);
     setFormData({
-      title: item.title,
-      description: item.description,
+      title: item.title || '',
+      description: item.description || '',
       imageUrl: item.imageUrl || '',
-      projectUrl: item.projectUrl,
-      technologies: item.technologies.join(', '),
-      isVisible: item.isVisible,
+      projectUrl: item.projectUrl || '',
+      technologies: (item.technologies || []).join(', '),
+      isVisible: item.isVisible ?? true,
       completionDate: item.completionDate || '',
     });
     setShowForm(true);

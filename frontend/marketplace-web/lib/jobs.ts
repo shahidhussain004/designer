@@ -59,11 +59,10 @@ const DEFAULT_SIZE = 10;
 /**
  * Checks if an item looks like a full job object with extended fields
  */
-function isFullJobObject(item: any): boolean {
-  return item && (
-    item.status !== undefined || 
-    item.description !== undefined
-  );
+function isFullJobObject(item: unknown): boolean {
+  if (!item || typeof item !== 'object') return false;
+  const it = item as Record<string, unknown>;
+  return it.status !== undefined || it.description !== undefined;
 }
 
 /**
@@ -106,12 +105,14 @@ function normalizeJobItems(items: unknown[]): JobItem[] {
   }
 
   // Otherwise, map to minimal JobItem structure
-  return items.map((item: any) => ({
-    id: item.id,
-    title: item.title,
-    category: item.category || null,
-    budget: item.budget ?? null,
-  }));
+  return items.map((item: unknown) => {
+    const it = item as Record<string, unknown>;
+    const id = typeof it.id === 'string' || typeof it.id === 'number' ? String(it.id) : '';
+    const title = typeof it.title === 'string' ? it.title : undefined;
+    const category = (it.category as JobCategory) ?? null;
+    const budget = typeof it.budget === 'number' ? (it.budget as number) : null;
+    return { id, title, category, budget } as JobItem;
+  });
 }
 
 /**
@@ -119,7 +120,7 @@ function normalizeJobItems(items: unknown[]): JobItem[] {
  */
 async function fetchFromApi(page: number, size: number, companyId?: string | number | null): Promise<ApiResponse> {
   // Use axios client to ensure baseURL, headers and interceptors are applied
-  const params: Record<string, any> = { page, pageSize: size };
+  const params: Record<string, unknown> = { page, pageSize: size };
   if (companyId !== undefined && companyId !== null && companyId !== '') {
     params.companyId = companyId;
   }

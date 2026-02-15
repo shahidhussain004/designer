@@ -80,7 +80,7 @@ export default function SettingsPage() {
       // TODO: API call to save notification preferences
       await new Promise(resolve => setTimeout(resolve, 500))
       setNotification({ type: 'success', message: 'Notification preferences saved!' })
-    } catch (err) {
+    } catch (_err) {
       setNotification({ type: 'error', message: 'Failed to save preferences' })
     }
   }

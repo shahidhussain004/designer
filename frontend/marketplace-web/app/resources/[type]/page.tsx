@@ -2,9 +2,10 @@
 
 import { ErrorMessage } from '@/components/ErrorMessage';
 import { TutorialsSkeleton } from '@/components/Skeletons';
-import { PageLayout } from '@/components/ui';
+import { Breadcrumb, PageLayout } from '@/components/ui';
 import { useCategories, useContent, useTags } from '@/hooks/useContent';
 import type { ContentType } from '@/lib/content-types';
+import { useAuth } from '@/lib/context/AuthContext';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -19,6 +20,8 @@ const CONTENT_TYPES: { value: ContentType; label: string; slug: string }[] = [
 export default function ResourceTypeListPage() {
   const params = useParams();
   const router = useRouter();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
   const typeSlug = (params?.type as string)?.toLowerCase() || '';
 
   // Map slug to content type - keep this BEFORE hooks that depend on it
@@ -146,6 +149,16 @@ export default function ResourceTypeListPage() {
         </div>
 
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+          {/* Breadcrumb */}
+          <div className="mb-8">
+            <Breadcrumb
+              items={[
+                { label: 'Resources', href: '/resources' },
+                { label: typeConfig.label, href: `/resources/${typeSlug}` },
+              ]}
+            />
+          </div>
+
           {/* Search and Filters */}
           <div className="sticky top-0 z-10 bg-white rounded-lg shadow-sm border border-gray-200 mb-8 p-6">
             <form onSubmit={handleSearch}>
@@ -264,86 +277,107 @@ export default function ResourceTypeListPage() {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {content.map((item: any) => (
-                    <Link
+                    <div
                       key={item.id}
-                      href={`/resources/${typeSlug}/${item.slug}`}
+                      className="h-full relative group"
                     >
-                      <div className="h-full bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-lg hover:border-primary-300 transition-all cursor-pointer overflow-hidden group">
-                        {/* Featured Image */}
-                        <div className="relative h-48 bg-gray-200">
-                          {item.featuredImageUrl ? (
-                            <Image
-                              src={item.featuredImageUrl}
-                              alt={item.title}
-                              fill
-                              className="object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
-                          ) : (
-                            <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                              <svg
-                                className="w-16 h-16"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
+                      <Link
+                        href={`/resources/${typeSlug}/${item.slug}`}
+                      >
+                        <div className="h-full bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-lg hover:border-primary-300 transition-all cursor-pointer overflow-hidden">
+                          {/* Featured Image */}
+                          <div className="relative h-48 bg-gray-200">
+                            {item.featuredImageUrl ? (
+                              <Image
+                                src={item.featuredImageUrl}
+                                alt={item.title}
+                                fill
+                                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+                            ) : (
+                              <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                                <svg
+                                  className="w-16 h-16"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={1}
+                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                  />
+                                </svg>
+                              </div>
+                            )}
+                            {/* Content Type Badge */}
+                            <div className="absolute top-3 left-3">
+                              <span
+                                className={`inline-block px-3 py-1 text-xs font-medium rounded-full ${
+                                  getContentTypeBadge(item.type).bg
+                                } ${getContentTypeBadge(item.type).text}`}
                               >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={1}
-                                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                />
-                              </svg>
-                            </div>
-                          )}
-                          {/* Content Type Badge */}
-                          <div className="absolute top-3 left-3">
-                            <span
-                              className={`inline-block px-3 py-1 text-xs font-medium rounded-full ${
-                                getContentTypeBadge(item.type).bg
-                              } ${getContentTypeBadge(item.type).text}`}
-                            >
-                              {item.type}
-                            </span>
-                          </div>
-                          {item.isFeatured && (
-                            <div className="absolute top-3 right-3">
-                              <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-amber-500 text-white">
-                                Featured
+                                {item.content_type}
                               </span>
                             </div>
-                          )}
-                        </div>
+                            {item.isFeatured && (
+                              <div className="absolute top-3 right-3">
+                                <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-amber-500 text-white">
+                                  Featured
+                                </span>
+                              </div>
+                            )}
+                          </div>
 
-                        {/* Content */}
-                        <div className="p-5">
-                          {/* Category */}
-                          {item.category && (
-                            <p className="text-xs text-primary-600 font-medium mb-2">
-                              {item.category?.name ?? 'Uncategorized'}
+                          {/* Content */}
+                          <div className="p-5">
+                            {/* Category */}
+                            {item.category && (
+                              <p className="text-xs text-primary-600 font-medium mb-2">
+                                {item.category?.name ?? 'Uncategorized'}
+                              </p>
+                            )}
+
+                            {/* Title */}
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+                              {item.title}
+                            </h3>
+
+                            {/* Excerpt */}
+                            <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                              {item.excerpt || item.body?.replace(/<[^>]*>/g, '').substring(0, 100)}
                             </p>
-                          )}
 
-                          {/* Title */}
-                          <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                            {item.title}
-                          </h3>
-
-                          {/* Excerpt */}
-                          <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                            {item.excerpt || item.body?.replace(/<[^>]*>/g, '').substring(0, 100)}
-                          </p>
-
-                          {/* Meta */}
-                          <div className="flex items-center justify-between text-xs text-gray-500 pt-4 border-t">
-                            <span>{formatDate(item.publishedAt || item.createdAt)}</span>
-                            <div className="flex items-center gap-3">
-                              <span>👁 {item.viewCount || 0}</span>
-                              <span>❤️ {item.likeCount || 0}</span>
+                            {/* Meta */}
+                            <div className="flex items-center justify-between text-xs text-gray-500 pt-4 border-t">
+                              <span>{formatDate(item.publishedAt || item.createdAt)}</span>
+                              <div className="flex items-center gap-3">
+                                <span>👁 {item.viewCount || 0}</span>
+                                <span>❤️ {item.likeCount || 0}</span>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </Link>
+                      </Link>
+
+                      {/* Admin Edit Button */}
+                      {isAdmin && (
+                        <Link href={`http://localhost:3001/admin/resources/${item.id}/edit`}>
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              // Open admin dashboard in same window
+                              window.location.href = `http://localhost:3001/admin/resources/${item.id}/edit`;
+                            }}
+                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity px-3 py-1 bg-blue-600 text-white text-xs rounded font-medium hover:bg-blue-700"
+                            title="Edit this resource"
+                          >
+                            ✎ Edit
+                          </button>
+                        </Link>
+                      )}
+                    </div>
                   ))}
                 </div>
               )}

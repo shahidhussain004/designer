@@ -52,7 +52,7 @@ func RunMigrations(db *PostgresDB) error {
 			WHERE table_name = 'message_threads'
 		)
 	`).Scan(&tableExists)
-	
+
 	if err != nil {
 		return fmt.Errorf("failed to check if message_threads table exists: %w", err)
 	}

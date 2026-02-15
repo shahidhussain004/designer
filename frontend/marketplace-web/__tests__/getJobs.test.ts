@@ -1,16 +1,14 @@
 import { jest } from '@jest/globals';
 
-// Mock environment (if the adapter uses env)
-process.env.NEXT_PUBLIC_MARKETPLACE_API = 'http://localhost:8083';
+// Mock axios client before importing getJobs
+jest.mock('../lib/api-client');
 
+import apiClient from '../lib/api-client';
 import { getJobs } from '../lib/jobs';
 
-// Provide a properly typed jest mock for global fetch
-global.fetch = jest.fn() as unknown as jest.MockedFunction<typeof fetch>;
-
 describe('getJobs adapter', () => {
-  afterEach(() => {
-    (global.fetch as jest.MockedFunction<typeof fetch>).mockReset();
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
   it('transforms API job items with category object', async () => {
@@ -24,11 +22,14 @@ describe('getJobs adapter', () => {
         }
       ],
       totalCount: 1,
-      page: 1,
+      page: 0,
       pageSize: 10
     };
 
-    (global.fetch as jest.MockedFunction<typeof fetch>).mockResolvedValueOnce({ ok: true, json: async () => apiResponse } as unknown as Response);
+    const mockedGet = jest.fn() as jest.MockedFunction<(...args: unknown[]) => Promise<{ data: typeof apiResponse }>>;
+    mockedGet.mockResolvedValueOnce({ data: apiResponse });
+    const mockedApiClient = apiClient as unknown as { get: typeof mockedGet };
+    mockedApiClient.get = mockedGet;
 
     const result = await getJobs({ page: 0, size: 10 });
 
@@ -42,8 +43,11 @@ describe('getJobs adapter', () => {
   });
 
   it('returns empty jobs array when API omits items', async () => {
-    const apiResponse = { totalCount: 0, page: 1, pageSize: 10 };
-    (global.fetch as jest.MockedFunction<typeof fetch>).mockResolvedValueOnce({ ok: true, json: async () => apiResponse } as unknown as Response);
+    const apiResponse = { totalCount: 0, page: 0, pageSize: 10 };
+    const mockedGet = jest.fn() as jest.MockedFunction<(...args: unknown[]) => Promise<{ data: typeof apiResponse }>>;
+    mockedGet.mockResolvedValueOnce({ data: apiResponse });
+    const mockedApiClient = apiClient as unknown as { get: typeof mockedGet };
+    mockedApiClient.get = mockedGet;
 
     const result = await getJobs();
 

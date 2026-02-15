@@ -130,6 +130,43 @@ export async function analyticsController(fastify: FastifyInstance) {
       return reply.status(500).send({ success: false, error: error.message });
     }
   });
+
+  // Track view with content ID in URL
+  fastify.post<{ Params: ContentIdParams }>('/view/:contentId', async (request, reply) => {
+    try {
+      const { contentId } = request.params;
+      const user_agent = request.headers['user-agent'];
+      const ip_address = request.ip;
+
+      await analyticsService.trackContentView({
+        content_id: parseInt(contentId),
+        user_agent,
+        ip_address,
+      });
+
+      return reply.send({ success: true, message: 'View tracked' });
+    } catch (error: any) {
+      request.log.error(error);
+      return reply.status(500).send({ success: false, error: error.message });
+    }
+  });
+
+  // Get analytics overview (requires admin)
+  fastify.get('/overview', async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      // Check for admin auth - for now, return 401
+      const authHeader = request.headers.authorization;
+      if (!authHeader) {
+        return reply.status(401).send({ success: false, error: 'Unauthorized' });
+      }
+
+      const overview = await analyticsService.getOverview();
+      return reply.send({ success: true, data: overview });
+    } catch (error: any) {
+      request.log.error(error);
+      return reply.status(500).send({ success: false, error: error.message });
+    }
+  });
 }
 
 export default analyticsController;

@@ -2,9 +2,9 @@ declare module 'react-markdown' {
   import type React from 'react';
   
   interface ReactMarkdownProps extends React.HTMLAttributes<HTMLDivElement> {
-    children: string;
-    components?: Record<string, React.ComponentType<any>>;
-    [key: string]: any;
+    children?: React.ReactNode;
+    components?: Record<string, React.ComponentType<unknown>>;
+    [key: string]: unknown;
   }
   
   const ReactMarkdown: React.FC<ReactMarkdownProps>;
