@@ -9,7 +9,7 @@ import logger from '@/lib/logger';
 import { Calendar, Check, Clock, Plus, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-interface TimeEntry {
+interface _TimeEntry {
   id: number;
   description: string;
   hoursWorked: number;
@@ -25,7 +25,7 @@ interface TimeEntry {
   };
 }
 
-interface Contract {
+interface _Contract {
   id: number;
   title: string;
   contractType: string;

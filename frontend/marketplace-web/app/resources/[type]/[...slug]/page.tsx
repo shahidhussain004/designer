@@ -10,6 +10,50 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
+interface Content {
+  id?: string | number;
+  title?: string;
+  excerpt?: string;
+  content?: string;
+  body?: string;
+  type?: string;
+  content_type?: string;
+  imageUrl?: string;
+  featuredImageUrl?: string;
+  author?: {
+    id?: number;
+    name?: string;
+    bio?: string;
+    avatarUrl?: string;
+  };
+  category?: {
+    id?: number;
+    name?: string;
+  };
+  isFeatured?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  publishedAt?: string | Date;
+  readingTimeMinutes?: number;
+  tags?: Array<{
+    id?: string | number;
+    name?: string;
+  }>;
+  viewCount?: number;
+  likeCount?: number;
+  shareCount?: number;
+  relatedContent?: Content[];
+}
+
+interface Comment {
+  id?: string | number;
+  authorId?: string | number;
+  body?: string;
+  createdAt?: string;
+  isEdited?: boolean;
+  likeCount?: number;
+}
+
 export default function ResourceCatchAllPage() {
   const params = useParams();
   const router = useRouter();
@@ -30,7 +74,7 @@ export default function ResourceCatchAllPage() {
 
   const [newComment, setNewComment] = useState('');
 
-  const { data: content, isLoading, error, refetch } = useContentSlug(slug || null);
+  const { data: content, isLoading, error, refetch } = useContentSlug(slug || null) as { data?: Content; isLoading: boolean; error?: Error; refetch: () => void };
   const { data: commentsData } = useComments(content?.id || null);
   const createCommentMutation = useCreateComment();
   const likeMutation = useLikeContent();
@@ -38,8 +82,8 @@ export default function ResourceCatchAllPage() {
   const comments = commentsData?.data || [];
   
   const handleLike = async () => {
-    if (!content) return;
-    try { await likeMutation.mutateAsync(content.id); } catch (err) { console.error(err); }
+    if (!content || !content.id) return;
+    try { await likeMutation.mutateAsync(typeof content.id === 'number' ? content.id : Number(content.id)); } catch (err) { console.error(err); }
   };
 
   const handleShare = async () => {
@@ -55,14 +99,13 @@ export default function ResourceCatchAllPage() {
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!content || !newComment.trim()) return;
+    if (!content || !newComment.trim() || !content.id) return;
     try {
-      await createCommentMutation.mutateAsync({ contentId: content.id, input: { contentId: content.id.toString(), body: newComment } });
+      const contentId = typeof content.id === 'number' ? content.id : Number(content.id);
+      await createCommentMutation.mutateAsync({ contentId, input: { contentId: contentId.toString(), body: newComment } });
       setNewComment('');
     } catch (err) { console.error(err); alert('Failed to submit comment.'); }
   };
-
-  const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
   const getContentTypeBadge = (t: string) => {
     const styles: Record<string, { bg: string; text: string }> = {
@@ -96,7 +139,7 @@ export default function ResourceCatchAllPage() {
   if (error || !content) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        {error ? <ErrorMessage message={error.message} retry={refetch} /> : (
+        {error ? <ErrorMessage message={error instanceof Error ? error.message : 'Error loading resource'} retry={refetch} /> : (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center max-w-md">
             <p className="text-red-600 text-xl mb-4">Resource not found</p>
             <button onClick={() => router.push('/resources')} className="px-4 py-2 bg-primary-600 text-white rounded-lg">Back to Resources</button>
@@ -127,7 +170,7 @@ export default function ResourceCatchAllPage() {
               items={[
                 { label: 'Resources', href: '/resources' },
                 { label: formatResourceType(content.content_type), href: `/resources/${getTypeSlug(content.content_type)}` },
-                { label: content.title, href: `#` },
+                { label: content.title || 'Resource', href: `#` },
               ]}
             />
           </div>
@@ -135,10 +178,10 @@ export default function ResourceCatchAllPage() {
 
         <article className="max-w-4xl mx-auto px-4 py-8">
           <div className="flex items-center gap-3 mb-4">
-            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getContentTypeBadge(content.type).bg} ${getContentTypeBadge(content.type).text}`}>{content.type}</span>
-          {content.category && <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700">{content.category?.name ?? 'Uncategorized'}</span>}
-          {content.isFeatured && <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-500 text-white">Featured</span>}
-        </div>
+            {content.type && <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getContentTypeBadge(content.type).bg} ${getContentTypeBadge(content.type).text}`}>{content.type}</span>}
+            {content.category && <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700">{content.category.name ?? 'Uncategorized'}</span>}
+            {content.isFeatured && <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-500 text-white">Featured</span>}
+          </div>
 
         {/* title and excerpt shown in page header above */}
 
@@ -147,7 +190,7 @@ export default function ResourceCatchAllPage() {
             {content.author?.avatarUrl && <Image src={content.author.avatarUrl} alt={content.author?.bio || 'Author'} width={48} height={48} className="rounded-full" />}
             <div>
               {content.author?.bio && <p className="font-medium text-gray-900">{content.author.bio}</p>}
-              <p className="text-sm text-gray-500">{content.publishedAt ? formatDate(content.publishedAt) : 'Draft'}{content.readingTimeMinutes && <span> · {content.readingTimeMinutes} min read</span>}</p>
+              <p className="text-sm text-gray-500">{content.publishedAt ? new Date(content.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Draft'}{content.readingTimeMinutes && <span> · {content.readingTimeMinutes} min read</span>}</p>
             </div>
           </div>
 
@@ -157,7 +200,7 @@ export default function ResourceCatchAllPage() {
           </div>
         </div>
 
-        {content.featuredImageUrl && <div className="relative h-96 rounded-lg overflow-hidden mb-8"><Image src={content.featuredImageUrl} alt={content.title} fill className="object-cover" /></div>}
+        {content.featuredImageUrl && <div className="relative h-96 rounded-lg overflow-hidden mb-8"><Image src={content.featuredImageUrl} alt={content.title || 'Featured'} fill className="object-cover" /></div>}
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8"><div className="prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: content.body || '' }} /></div>
 
@@ -165,7 +208,7 @@ export default function ResourceCatchAllPage() {
           <div className="mb-8">
             <p className="font-medium text-gray-900 mb-3">Tags:</p>
             <div className="flex flex-wrap gap-2">
-              {content.tags.map((tag: any) => (
+              {content.tags.map((tag) => (
                 <Link key={tag.id} href={`/resources?tag=${tag.id}`} className="hover:opacity-80"><span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-700 hover:bg-gray-200">#{tag?.name ?? 'tag'}</span></Link>
               ))}
             </div>
@@ -195,7 +238,7 @@ export default function ResourceCatchAllPage() {
           {comments.length === 0 ? (
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center"><p className="text-gray-500">No comments yet. Be the first to share your thoughts!</p></div>
           ) : (
-            <div className="space-y-4">{comments.map((comment: any) => (<div key={comment.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-5"><div className="flex gap-4"><div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0"><svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div><div className="flex-1"><div className="flex items-center gap-2 mb-2"><p className="font-medium text-gray-900">{comment.authorId || 'Anonymous'}</p><p className="text-sm text-gray-500">{formatDate(comment.createdAt)}</p>{comment.isEdited && (<span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-500 rounded">Edited</span>)}</div><p className="text-gray-700">{comment.body}</p><div className="flex items-center gap-4 mt-3 text-sm text-gray-500"><button className="hover:text-primary-600 flex items-center gap-1"><ThumbsUp className="w-4 h-4"/>Like ({comment.likeCount || 0})</button><button className="hover:text-primary-600">Reply</button></div></div></div></div>))}</div>
+            <div className="space-y-4">{comments.map((comment: Comment) => (<div key={comment.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-5"><div className="flex gap-4"><div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0"><svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div><div className="flex-1"><div className="flex items-center gap-2 mb-2"><p className="font-medium text-gray-900">{comment.authorId || 'Anonymous'}</p><p className="text-sm text-gray-500">{comment.createdAt ? new Date(comment.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Unknown date'}</p>{comment.isEdited && (<span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-500 rounded">Edited</span>)}</div><p className="text-gray-700">{comment.body}</p><div className="flex items-center gap-4 mt-3 text-sm text-gray-500"><button className="hover:text-primary-600 flex items-center gap-1"><ThumbsUp className="w-4 h-4"/>Like ({comment.likeCount || 0})</button><button className="hover:text-primary-600">Reply</button></div></div></div></div>))}</div>
           )}
         </section>
 

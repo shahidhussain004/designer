@@ -2,15 +2,15 @@
 
 import { motion, useScroll, useSpring, useTransform } from "framer-motion"
 import { ArrowDown, ArrowUpRight } from "lucide-react"
-import type React from "react"
 import { useEffect, useRef, useState } from "react"
 
-const MotionDiv = motion.div as unknown as React.ComponentType<React.ComponentProps<'div'>>
-const MotionA = motion.a as unknown as React.ComponentType<React.ComponentProps<'a'>>
-const MotionH1 = motion.h1 as unknown as React.ComponentType<React.ComponentProps<'h1'>>
-const MotionP = motion.p as unknown as React.ComponentType<React.ComponentProps<'p'>>
-const MotionImg = motion.img as unknown as React.ComponentType<React.ComponentProps<'img'>>
-const MotionSpan = motion.span as unknown as React.ComponentType<React.ComponentProps<'span'>>
+// Suppress TypeScript errors for framer-motion components - motion provides proper runtime types
+const MotionDiv = motion.div as any
+const MotionH1 = motion.h1 as any
+const MotionP = motion.p as any
+const MotionA = motion.a as any
+const MotionImg = motion.img as any
+const MotionSpan = motion.span as any
 
 export function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -62,7 +62,7 @@ export function HeroSection() {
       {/* Grid overlay */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px)] bg-[size:80px_80px] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_80%)]" />
 
-      <MotionDiv style={{ y, opacity, scale } as any} className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 py-32">
+      <MotionDiv style={{ y, opacity, scale }} className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 py-32">
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-6 items-center">
           {/* Left content */}
           <div className="lg:col-span-7 space-y-8">
