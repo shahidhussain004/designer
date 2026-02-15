@@ -39,7 +39,7 @@ apiClient.interceptors.request.use(
       // Debug: log whether Authorization header will be sent
       try {
         console.debug('[API] Request interceptor - Authorization header set?:', !!token, 'url:', config.url);
-      } catch (e) {
+      } catch (_e) {
         // ignore
       }
     }
@@ -154,7 +154,7 @@ apiClient.interceptors.response.use(
         try {
           console.warn('[API] Token refresh failed - clearing tokens and redirecting to login');
           console.trace();
-        } catch (e) {
+        } catch (_e) {
           // ignore
         }
         localStorage.removeItem('access_token');

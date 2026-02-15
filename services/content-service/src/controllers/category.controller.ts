@@ -20,7 +20,16 @@ export async function categoryController(fastify: FastifyInstance) {
         pageSize?: string;
       };
       const result = await categoryService.getAll(parseInt(page), parseInt(pageSize));
-      return reply.send({ success: true, ...result });
+      return reply.send({
+        success: true,
+        data: result.items,
+        meta: {
+          page: result.page,
+          pageSize: result.pageSize,
+          total: result.total,
+          pages: result.totalPages,
+        },
+      });
     } catch (error: any) {
       request.log.error(error);
       return reply.status(500).send({ success: false, error: error.message });

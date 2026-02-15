@@ -7,10 +7,9 @@ import { useActiveContracts, useCreateTimeEntry, useTimeEntries } from '@/hooks/
 import { useAuth } from '@/lib/context/AuthContext';
 import logger from '@/lib/logger';
 import { Calendar, Check, Clock, Plus, X } from 'lucide-react';
-import { useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-interface TimeEntry {
+interface _TimeEntry {
   id: number;
   description: string;
   hoursWorked: number;
@@ -26,7 +25,7 @@ interface TimeEntry {
   };
 }
 
-interface Contract {
+interface _Contract {
   id: number;
   title: string;
   contractType: string;
@@ -39,8 +38,18 @@ export default function TimeTrackingPage() {
   const { data: timeEntries = [], isLoading, isError, error, refetch } = useTimeEntries(user?.id ?? null);
   const { data: contracts = [] } = useActiveContracts();
   const createTimeEntryMutation = useCreateTimeEntry();
-  const searchParams = useSearchParams();
-  const contractIdFromQuery = searchParams?.get('contractId');
+  const [contractIdFromQuery, setContractIdFromQuery] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const sp = new URLSearchParams(window.location.search);
+        setContractIdFromQuery(sp.get('contractId'));
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, []);
 
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({

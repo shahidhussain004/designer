@@ -45,8 +45,10 @@ const navigation: NavItem[] = [
 // USER DROPDOWN COMPONENT
 // =============================================================================
 
+type User = { id?: number | string; fullName?: string; username?: string; email?: string; role?: string };
+
 const UserDropdown: React.FC<{
-  user: any;
+  user: User;
   onLogout: () => void;
   onClose: () => void;
 }> = ({ user, onLogout, onClose }) => {
@@ -224,11 +226,11 @@ const MobileMenu: React.FC<{
   isOpen: boolean;
   onClose: () => void;
   pathname: string;
-  user: any;
+  user: User | null;
   loading: boolean;
   onLogout: () => void;
   authInitialized: boolean;
-  currentUser: any;
+  currentUser: User | null;
 }> = ({ isOpen, onClose, pathname, user, loading, onLogout, authInitialized, currentUser }) => {
   if (!isOpen) return null;
 
@@ -395,7 +397,7 @@ export const Navbar: React.FC<NavbarProps> = ({ className: _className }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [authInitialized, setAuthInitialized] = useState(false);
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   // Initialize auth from storage on mount
   useEffect(() => {

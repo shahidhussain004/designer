@@ -12,7 +12,6 @@ TRUNCATE content.tutorial_media CASCADE;
 TRUNCATE content.tutorial_topics CASCADE;
 TRUNCATE content.tutorial_sections CASCADE;
 TRUNCATE content.tutorials CASCADE;
-TRUNCATE content.resources CASCADE;
 TRUNCATE content.content CASCADE;
 TRUNCATE content.tags CASCADE;
 TRUNCATE content.categories CASCADE;
@@ -33,7 +32,6 @@ ALTER SEQUENCE content.tutorial_topics_id_seq RESTART WITH 1;
 ALTER SEQUENCE content.tutorial_progress_id_seq RESTART WITH 1;
 ALTER SEQUENCE content.tutorial_bookmarks_id_seq RESTART WITH 1;
 ALTER SEQUENCE content.tutorial_media_id_seq RESTART WITH 1;
-ALTER SEQUENCE content.resources_id_seq RESTART WITH 1;
 ALTER SEQUENCE content.media_assets_id_seq RESTART WITH 1;
 
 -- Insert Authors (matching V001 schema: user_id, name, email, bio, avatar_url, website, social_links)
@@ -562,16 +560,6 @@ docker run -d -p 8080:80 nginx
 ```
 
 Now visit http://localhost:8080 to see your running container!', 'https://example.com/videos/first-container', 20, 2);
-
--- Insert Resources (matching V008 schema)
-INSERT INTO content.resources (slug, title, description, content, resource_type, category, tags, file_url, file_size, file_type, thumbnail_url, author_id, is_published, is_featured, download_count, view_count) VALUES
-('react-cheat-sheet', 'React Cheat Sheet', 'Quick reference for React hooks, lifecycle methods, and common patterns.', 'A comprehensive cheat sheet covering all React essentials.', 'cheatsheet', 'Programming', ARRAY['React', 'JavaScript', 'Reference'], '/downloads/react-cheatsheet.pdf', 245760, 'pdf', 'https://images.unsplash.com/photo-1633356122544-f134324a6cee', 1, true, true, 3456, 5678),
-('css-grid-templates', 'CSS Grid Template Collection', 'Ready-to-use CSS Grid layout templates for common UI patterns.', 'Collection of 20+ CSS Grid templates for various layouts.', 'template', 'Design', ARRAY['CSS', 'Grid', 'Templates'], '/downloads/css-grid-templates.zip', 1048576, 'zip', 'https://images.unsplash.com/photo-1507721999472-8ed4421c4af2', 2, true, true, 2341, 4567),
-('docker-compose-examples', 'Docker Compose Examples', 'Collection of Docker Compose files for popular tech stacks.', 'Docker Compose configurations for MERN, PERN, and more.', 'template', 'DevOps', ARRAY['Docker', 'DevOps'], '/downloads/docker-compose-examples.zip', 524288, 'zip', 'https://images.unsplash.com/photo-1605745341112-85968b19335b', 3, true, false, 1876, 3456),
-('typescript-types-guide', 'TypeScript Type Definitions Guide', 'Comprehensive guide to TypeScript types with examples.', 'Everything you need to know about TypeScript types.', 'guide', 'Programming', ARRAY['TypeScript', 'JavaScript'], '/downloads/typescript-guide.pdf', 512000, 'pdf', 'https://images.unsplash.com/photo-1555066931-4365d14bab8c', 1, true, false, 2156, 3890),
-('react-native-starter', 'React Native Starter Kit', 'Boilerplate project with navigation, state management, and common utilities.', 'A complete React Native starter kit with best practices.', 'template', 'Mobile', ARRAY['React Native', 'Mobile'], '/downloads/rn-starter.zip', 2097152, 'zip', 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c', 4, true, true, 987, 2345),
-('api-design-guide', 'REST API Design Guide', 'Best practices for designing RESTful APIs.', 'Comprehensive guide covering endpoints, versioning, error handling, and more.', 'guide', 'Programming', ARRAY['API', 'REST', 'Backend'], '/downloads/api-design-guide.pdf', 389120, 'pdf', 'https://images.unsplash.com/photo-1555066931-4365d14bab8c', 3, true, false, 1567, 2890),
-('figma-ui-kit', 'Figma UI Component Kit', 'A comprehensive UI kit for rapid prototyping in Figma.', 'Over 100 reusable components for web and mobile design.', 'template', 'Design', ARRAY['Figma', 'UI', 'Design'], '/downloads/figma-ui-kit.fig', 4194304, 'fig', 'https://images.unsplash.com/photo-1559136555-9303baea8ebd', 2, true, true, 4532, 7890);
 
 -- Insert Media Assets (matching V009 schema: original_filename, file_path are required, no thumbnail_url or size column)
 INSERT INTO content.media_assets (filename, original_filename, file_path, url, mime_type, file_size, width, height, uploaded_by, folder, alt_text) VALUES

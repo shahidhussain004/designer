@@ -22,11 +22,12 @@ interface ProtectedRouteProps {
  */
 export function ProtectedRoute({
   children,
-  requiredRole,
-  redirectTo = '/auth/login',
+  requiredRole: _requiredRole,
+  redirectTo: _redirectTo = '/auth/login',
 }: ProtectedRouteProps) {
   // Note: Full protection requires client-side checking in the component
-  // This is a placeholder for the pattern
+  // This is a placeholder for the pattern. Prefix unused props with underscore
+  // to satisfy lint rules until server-side logic is implemented.
   return <>{children}</>;
 }
 

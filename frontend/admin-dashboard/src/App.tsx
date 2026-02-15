@@ -1,12 +1,15 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
-import { useAuthStore } from './store/authStore'
+import React from 'react'
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import Layout from './components/Layout'
-import Login from './pages/Login'
-import Dashboard from './pages/Dashboard'
-import Users from './pages/Users'
-import Jobs from './pages/Jobs'
-import Disputes from './pages/Disputes'
 import Analytics from './pages/Analytics'
+import Dashboard from './pages/Dashboard'
+import Disputes from './pages/Disputes'
+import Jobs from './pages/Jobs'
+import Login from './pages/Login'
+import ResourceEdit from './pages/ResourceEdit'
+import Resources from './pages/Resources'
+import Users from './pages/Users'
+import { useAuthStore } from './store/authStore'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore()
@@ -21,6 +24,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function App() {
   return (
     <Routes>
+      <Route
+        path="/admin/*"
+        element={<AdminRedirect />}
+      />
       <Route path="/login" element={<Login />} />
       <Route
         path="/"
@@ -36,9 +43,23 @@ function App() {
         <Route path="jobs" element={<Jobs />} />
         <Route path="disputes" element={<Disputes />} />
         <Route path="analytics" element={<Analytics />} />
+        <Route path="resources" element={<Resources />} />
+        <Route path="resources/:resourceId/edit" element={<ResourceEdit />} />
       </Route>
     </Routes>
   )
+}
+
+function AdminRedirect() {
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  React.useEffect(() => {
+    const newPath = location.pathname.replace(/^\/admin/, '') || '/'
+    navigate(newPath + location.search + location.hash, { replace: true })
+  }, [location, navigate])
+
+  return null
 }
 
 export default App

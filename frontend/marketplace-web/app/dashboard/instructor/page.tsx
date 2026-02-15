@@ -46,7 +46,7 @@ export default function InstructorDashboardPage() {
     try {
       await deleteCourse(courseId)
       await loadCourses()
-    } catch (err) {
+    } catch (_err) {
       alert('Failed to delete course')
     }
   }
