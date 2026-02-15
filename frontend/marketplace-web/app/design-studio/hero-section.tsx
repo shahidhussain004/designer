@@ -5,16 +5,16 @@ import { ArrowDown, ArrowUpRight } from "lucide-react"
 import type React from "react"
 import { useEffect, useRef, useState } from "react"
 
-const MotionDiv = motion.div as unknown as React.ComponentType<React.ComponentProps<'div'> & any>
-const MotionA = motion.a as unknown as React.ComponentType<React.ComponentProps<'a'> & any>
-const MotionH1 = motion.h1 as unknown as React.ComponentType<React.ComponentProps<'h1'> & any>
-const MotionP = motion.p as unknown as React.ComponentType<React.ComponentProps<'p'> & any>
-const MotionImg = motion.img as unknown as React.ComponentType<React.ComponentProps<'img'> & any>
-const MotionSpan = motion.span as unknown as React.ComponentType<React.ComponentProps<'span'> & any>
+const MotionDiv = motion.div as unknown as React.ComponentType<React.ComponentProps<'div'>>
+const MotionA = motion.a as unknown as React.ComponentType<React.ComponentProps<'a'>>
+const MotionH1 = motion.h1 as unknown as React.ComponentType<React.ComponentProps<'h1'>>
+const MotionP = motion.p as unknown as React.ComponentType<React.ComponentProps<'p'>>
+const MotionImg = motion.img as unknown as React.ComponentType<React.ComponentProps<'img'>>
+const MotionSpan = motion.span as unknown as React.ComponentType<React.ComponentProps<'span'>>
 
 export function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [_mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
 
   const { scrollYProgress } = useScroll({
     target: containerRef as unknown as React.RefObject<HTMLElement>,
