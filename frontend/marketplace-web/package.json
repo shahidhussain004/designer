@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start -p 3002",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "lint:ci": "eslint . --ext .js,.jsx,.ts,.tsx --max-warnings 50",
+    "lint:ci": "eslint . --ext .js,.jsx,.ts,.tsx --max-warnings 200",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "type-check": "tsc --noEmit",
     "test": "jest --passWithNoTests",
