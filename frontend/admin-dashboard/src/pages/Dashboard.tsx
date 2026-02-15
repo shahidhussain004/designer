@@ -6,14 +6,12 @@ import {
   UsersIcon,
 } from '@heroicons/react/24/outline'
 import { useQuery } from '@tanstack/react-query'
-import { Link } from 'react-router-dom'
 import {
-  Badge,
   Card,
   Flex,
   Grid,
   Spinner,
-  Text,
+  Text
 } from '../components/green'
 import { adminApi } from '../lib/api'
 
@@ -89,113 +87,56 @@ export default function Dashboard() {
   return (
     <Flex flex-direction="column" gap="l">
       {/* Header */}
-      <Flex flex-direction="column" gap="xs">
-        <Text tag="h1" font-size="heading-l">
-          Dashboard
-        </Text>
-        <Text color="secondary">
-          Welcome back! Here&apos;s what&apos;s happening.
-        </Text>
+      <Flex justify-content="space-between" align-items="center">
+        <Flex flex-direction="column" gap="2xs">
+          <Text tag="h1" font-size="heading-l">
+            Dashboard
+          </Text>
+          <Text color="secondary">Overview of the platform — quick insights and actions.</Text>
+        </Flex>
+        <Flex gap="s" align-items="center">
+          <Text color="secondary">Last updated: {new Date().toLocaleString()}</Text>
+        </Flex>
       </Flex>
 
-      {/* Stats Grid */}
-      <Grid columns="1; s{2}; l{4}" gap="m">
+      {/* Clean Stats Row */}
+      <Grid columns="1" className="sm:grid-cols-2 md:grid-cols-4" gap="m">
         {statCards.map((stat) => (
-          <Card key={stat.name} padding="l">
-            <Flex flex-direction="column" gap="m">
-              <Flex align-items="center" gap="m">
-                <Flex justify-content="center" align-items="center">
-                  <stat.icon width={24} height={24} />
-                </Flex>
-                <Flex flex-direction="column" gap="2xs">
-                  <Text font-size="body-s" color="secondary">
-                    {stat.name}
-                  </Text>
-                  <Text font-size="heading-m" font-weight="book">
-                    {stat.value}
-                  </Text>
-                </Flex>
+          <Card key={stat.name} padding="m">
+            <Flex align-items="center" gap="m">
+              <div className="w-12 h-12 flex items-center justify-center rounded-full bg-indigo-50">
+                <stat.icon width={20} height={20} className="text-indigo-600" />
+              </div>
+              <Flex flex-direction="column">
+                <Text font-size="body-s" color="secondary">{stat.name}</Text>
+                <Text font-size="heading-m" font-weight="book">{stat.value}</Text>
+                <Text color="secondary" style={{ marginTop: '6px' }}>{stat.change}</Text>
               </Flex>
-              <Badge variant={getVariant(stat.changeType)}>
-                {stat.change}
-              </Badge>
             </Flex>
           </Card>
         ))}
       </Grid>
 
-      {/* Bottom Section */}
-      <Grid columns="1; l{2}" gap="l">
-        {/* Recent Activity */}
-        <Card padding="0">
+      {/* Lower Section */}
+      <Grid columns="1" gap="l">
+        <Card padding="m">
           <Flex flex-direction="column">
-            <Flex padding="m">
-              <Text font-size="heading-s">Recent Activity</Text>
-            </Flex>
-            <Flex flex-direction="column">
-              {activity?.slice(0, 5).map((item: { title: string; description: string; time: string }, index: number) => (
-                <Flex key={index} justify-content="space-between" align-items="center" padding="m">
-                  <Flex flex-direction="column" gap="2xs">
-                    <Text font-size="body-s" font-weight="book">
-                      {item.title}
-                    </Text>
-                    <Text font-size="body-s" color="secondary">
-                      {item.description}
-                    </Text>
+            <Text font-size="heading-s" className="mb-3">Recent Activity</Text>
+            <Flex flex-direction="column" gap="s">
+              {activity && activity.length > 0 ? (
+                activity.slice(0, 6).map((item: any, idx: number) => (
+                  <Flex key={idx} justify-content="space-between" align-items="center" className="border-b border-gray-100 pb-3">
+                    <Flex flex-direction="column">
+                      <Text font-size="body-s" font-weight="book">{item.title}</Text>
+                      <Text font-size="body-s" color="secondary">{item.description}</Text>
+                    </Flex>
+                    <Text color="secondary">{item.time}</Text>
                   </Flex>
-                  <Text font-size="body-s" color="secondary">
-                    {item.time}
-                  </Text>
-                </Flex>
-              )) || (
-                <Flex justify-content="center" padding="l">
-                  <Text color="secondary">No recent activity</Text>
-                </Flex>
+                ))
+              ) : (
+                <Flex justify-content="center" padding="l"><Text color="secondary">No recent activity</Text></Flex>
               )}
             </Flex>
-          </Flex>
-        </Card>
-
-        {/* Quick Actions */}
-        <Card padding="0">
-          <Flex flex-direction="column">
-            <Flex padding="m">
-              <Text font-size="heading-s">Quick Actions</Text>
-            </Flex>
-            <Grid columns="2" gap="m" padding="m">
-              <Link to="/users">
-                <Card padding="m" variant="secondary">
-                  <Flex align-items="center" justify-content="center" gap="s">
-                    <UsersIcon width={20} height={20} />
-                    <Text font-size="body-s">Manage Users</Text>
-                  </Flex>
-                </Card>
-              </Link>
-              <Link to="/jobs">
-                <Card padding="m" variant="secondary">
-                  <Flex align-items="center" justify-content="center" gap="s">
-                    <BriefcaseIcon width={20} height={20} />
-                    <Text font-size="body-s">Review Jobs</Text>
-                  </Flex>
-                </Card>
-              </Link>
-              <Link to="/disputes">
-                <Card padding="m" variant="secondary">
-                  <Flex align-items="center" justify-content="center" gap="s">
-                    <ClockIcon width={20} height={20} />
-                    <Text font-size="body-s">Handle Disputes</Text>
-                  </Flex>
-                </Card>
-              </Link>
-              <Link to="/analytics">
-                <Card padding="m" variant="secondary">
-                  <Flex align-items="center" justify-content="center" gap="s">
-                    <CurrencyDollarIcon width={20} height={20} />
-                    <Text font-size="body-s">View Analytics</Text>
-                  </Flex>
-                </Card>
-              </Link>
-            </Grid>
           </Flex>
         </Card>
       </Grid>

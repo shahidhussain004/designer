@@ -1,6 +1,5 @@
 import {
   ArrowRightOnRectangleIcon,
-  Bars3Icon,
   BriefcaseIcon,
   ChartBarIcon,
   ExclamationTriangleIcon,
@@ -9,18 +8,18 @@ import {
   NewspaperIcon,
   SunIcon,
   UsersIcon,
-  XMarkIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline'
 import { useContext, useState } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
-import { ThemeContext } from './ThemeProvider'
+import AdminFooter from './AdminFooter'
+import AdminHeader from './AdminHeader'
 import {
   Button,
-  Divider,
-  Flex,
-  Text,
+  Text
 } from './green'
+import { ThemeContext } from './ThemeProvider'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
@@ -47,141 +46,92 @@ export default function Layout() {
   const isActive = (href: string) => location.pathname === href
 
   return (
-    <Flex>
-      {/* Mobile sidebar overlay */}
-      {sidebarOpen && (
-        <div
-          onClick={() => setSidebarOpen(false)}
-          className="mobile-overlay md:hidden fixed inset-0 bg-black/40 z-40"
-        />
-      )}
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      {/* Header */}
+      <AdminHeader />
 
-      {/* Mobile sidebar */}
-      <div className="md:hidden">
-        <Flex
-          flex-direction="column">
-          <Flex justify-content="space-between" align-items="center" padding="m">
-            <Text font-size="heading-s" font-weight="book">
-                {siteTitle}
-              </Text>
-            <Button rank="tertiary" onClick={() => setSidebarOpen(false)}>
-              <XMarkIcon width={24} height={24} />
-            </Button>
-          </Flex>
-          <Flex flex-direction="column" gap="xs" padding="s" flex="1">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                onClick={() => setSidebarOpen(false)}>
-                <Flex
-                  align-items="center"
-                  gap="s"
-                  padding="s">
-                  <item.icon width={20} height={20} />
-                  <Text font-size="body-s">{item.name}</Text>
-                </Flex>
-              </Link>
-            ))}
-          </Flex>
-        </Flex>
+      <div className="flex flex-1">
+        {/* Mobile sidebar overlay */}
+        {sidebarOpen && (
+          <div
+            onClick={() => setSidebarOpen(false)}
+            className="mobile-overlay md:hidden fixed inset-0 bg-black/40 z-40"
+          />
+        )}
+
+        {/* Sidebar */}
+        <aside className={`sidebar bg-white border-r border-gray-200 transition-all ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed md:relative w-64 h-screen md:h-auto z-50 md:z-0`}>
+          <div className="flex flex-col h-full">
+            {/* Sidebar Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 md:hidden">
+              <Text className="font-bold text-lg">Menu</Text>
+              <Button rank="tertiary" onClick={() => setSidebarOpen(false)}>
+                <XMarkIcon width={24} height={24} />
+              </Button>
+            </div>
+
+            {/* Navigation */}
+            <nav className="flex-1 p-4 overflow-y-auto">
+              <div className="space-y-2">
+                {navigation.map((item) => (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    onClick={() => setSidebarOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
+                      isActive(item.href)
+                        ? 'bg-indigo-600 text-white'
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <item.icon width={20} height={20} />
+                    <Text className="font-medium">{item.name}</Text>
+                  </Link>
+                ))}
+              </div>
+            </nav>
+
+            {/* Sidebar Footer */}
+            <div className="border-t border-gray-200 p-4 space-y-3">
+              <Button
+                rank="tertiary"
+                onClick={toggleTheme}
+                className="w-full flex items-center gap-2 justify-center"
+              >
+                {theme === 'light' ? (
+                  <>
+                    <MoonIcon width={18} height={18} />
+                    <span>Dark Mode</span>
+                  </>
+                ) : (
+                  <>
+                    <SunIcon width={18} height={18} />
+                    <span>Light Mode</span>
+                  </>
+                )}
+              </Button>
+              <Button
+                rank="secondary"
+                onClick={handleLogout}
+                className="w-full flex items-center gap-2 justify-center bg-red-50 text-red-600 hover:bg-red-100"
+              >
+                <ArrowRightOnRectangleIcon width={18} height={18} />
+                <span>Logout</span>
+              </Button>
+            </div>
+          </div>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 overflow-auto">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <Outlet />
+          </div>
+        </main>
       </div>
 
-      {/* Desktop sidebar */}
-      <Flex
-        flex-direction="column" className="desktop-sidebar hidden md:flex"
-      >
-        <Flex padding="m" align-items="center">
-          <Text font-size="heading-s" font-weight="book">
-            {siteTitle}
-          </Text>
-        </Flex>
-
-        <Flex flex-direction="column" gap="xs" padding="s" flex="1">
-          {navigation.map((item) => (
-            <Link key={item.name} to={item.href}>
-              <Flex
-                align-items="center"
-                gap="s"
-                padding="s">
-                <item.icon width={20} height={20} />
-                <Text
-                  font-size="body-s"
-                  color={isActive(item.href) ? 'positive' : 'secondary'}
-                >
-                  {item.name}
-                </Text>
-              </Flex>
-            </Link>
-          ))}
-        </Flex>
-
-        <Divider />
-
-        {/* User section */}
-        <Flex flex-direction="column" gap="m" padding="m">
-          <Flex align-items="center" gap="s">
-            <Flex
-              justify-content="center"
-              align-items="center" >
-              <Text font-weight="book" color="positive">
-                {user?.fullName?.charAt(0) || 'A'}
-              </Text>
-            </Flex>
-            <Flex flex-direction="column" gap="2xs">
-              <Text font-size="body-s" font-weight="book">
-                {user?.fullName || 'Admin'}
-              </Text>
-              <Text font-size="body-s" color="secondary">
-                {user?.email}
-              </Text>
-            </Flex>
-          </Flex>
-
-          <Flex gap="s">
-            <Button rank="tertiary" onClick={toggleTheme}>
-              {theme === 'light' ? (
-                <MoonIcon width={20} height={20} />
-              ) : (
-                <SunIcon width={20} height={20} />
-              )}
-            </Button>
-            <Button rank="secondary" onClick={handleLogout}>
-              <Flex align-items="center" gap="xs">
-                <ArrowRightOnRectangleIcon />
-                <span>Logout</span>
-              </Flex>
-            </Button>
-          </Flex>
-        </Flex>
-      </Flex>
-
-      {/* Main content */}
-      <Flex flex-direction="column" flex="1" className="main-content">
-        {/* Mobile top bar */}
-        <Flex
-          justify-content="space-between"
-          align-items="center"
-          padding="m"
-          className="mobile-topbar md:hidden" >
-          <Button rank="tertiary" onClick={() => setSidebarOpen(true)}>
-            <Bars3Icon width={24} height={24} />
-          </Button>
-          <Text font-size="heading-s">{siteTitle}</Text>
-          <Button rank="tertiary" onClick={toggleTheme}>
-            {theme === 'light' ? (
-              <MoonIcon width={20} height={20} />
-            ) : (
-              <SunIcon width={20} height={20} />
-            )}
-          </Button>
-        </Flex>
-
-        {/* Page content */}
-        <Flex flex="1" padding="l">
-          <Outlet />
-        </Flex>
-      </Flex>
-    </Flex>
+      {/* Footer */}
+      <AdminFooter />
+    </div>
   )
 }

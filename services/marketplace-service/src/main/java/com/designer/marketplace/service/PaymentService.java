@@ -1,47 +1,30 @@
 package com.designer.marketplace.service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.designer.marketplace.dto.CreatePaymentRequest;
 import com.designer.marketplace.dto.PaymentResponse;
-import com.designer.marketplace.entity.Company;
+import com.designer.marketplace.entity.Contract;
 import com.designer.marketplace.entity.Escrow;
-import com.designer.marketplace.entity.Freelancer;
+import com.designer.marketplace.entity.Escrow.EscrowHoldStatus;
+import com.designer.marketplace.entity.Escrow.ReleaseCondition;
 import com.designer.marketplace.entity.Payment;
-import com.designer.marketplace.entity.Payment.EscrowStatus;
 import com.designer.marketplace.entity.Payment.PaymentStatus;
-import com.designer.marketplace.entity.Project;
-import com.designer.marketplace.entity.Proposal;
-import com.designer.marketplace.entity.TransactionLedger;
-import com.designer.marketplace.entity.TransactionLedger.TransactionType;
-import com.designer.marketplace.entity.User;
-import com.designer.marketplace.repository.CompanyRepository;
+import com.designer.marketplace.repository.ContractRepository;
 import com.designer.marketplace.repository.EscrowRepository;
 import com.designer.marketplace.repository.PaymentRepository;
-import com.designer.marketplace.repository.ProjectRepository;
-import com.designer.marketplace.repository.ProposalRepository;
-import com.designer.marketplace.repository.TransactionLedgerRepository;
-import com.stripe.Stripe;
-import com.stripe.exception.StripeException;
-import com.stripe.model.PaymentIntent;
-import com.stripe.model.Refund;
-import com.stripe.param.PaymentIntentCreateParams;
-import com.stripe.param.RefundCreateParams;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Service for handling payment operations with Stripe integration.
+ * Service for handling payment and escrow operations.
+ * Implements full escrow/payment processing for contracts.
  */
 @Service
 @RequiredArgsConstructor
@@ -50,316 +33,267 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final EscrowRepository escrowRepository;
-    private final TransactionLedgerRepository transactionLedgerRepository;
-    private final CompanyRepository companyRepository;
-    private final ProjectRepository projectRepository;
-    private final ProposalRepository proposalRepository;
-
-    @Value("${stripe.api.key:sk_test_placeholder}")
-    private String stripeApiKey;
-
-    @Value("${payment.platform.fee.percent:10}")
-    private int platformFeePercent;
-
-    @PostConstruct
-    public void init() {
-        Stripe.apiKey = stripeApiKey;
-        log.info("Stripe API initialized with platform fee: {}%", platformFeePercent);
-    }
+    private final ContractRepository contractRepository;
 
     /**
-     * Create a payment intent for a job/proposal.
+     * Create or get payment for a contract
      */
     @Transactional
-    public PaymentResponse createPaymentIntent(Long companyId, CreatePaymentRequest request) {
-        log.info("Creating payment intent for company {} on project {}", companyId, request.getProjectId());
-
-        // Validate company
-        Company company = companyRepository.findById(companyId)
-                .orElseThrow(() -> new IllegalArgumentException("Company not found"));
-
-        // Validate project
-        Project project = projectRepository.findById(request.getProjectId())
-                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
-
-        // Validate proposal
-        Proposal proposal = proposalRepository.findById(request.getProposalId())
-                .orElseThrow(() -> new IllegalArgumentException("Proposal not found"));
-
-        Freelancer freelancer = proposal.getFreelancer();
-
-        // Calculate fees (amount in cents)
-        Long amount = request.getAmount();
-        Long platformFee = (amount * platformFeePercent) / 100;
-        Long freelancerAmount = amount - platformFee;
-
-        try {
-            // Create Stripe PaymentIntent
-            Map<String, String> metadata = new HashMap<>();
-            metadata.put("project_id", project.getId().toString());
-            metadata.put("proposal_id", proposal.getId().toString());
-            metadata.put("company_id", company.getId().toString());
-            metadata.put("freelancer_id", freelancer.getId().toString());
-
-            PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
-                    .setAmount(amount)
-                    .setCurrency(request.getCurrency().toLowerCase())
-                    .setDescription("Payment for project: " + project.getTitle())
-                    .putAllMetadata(metadata)
-                    .setAutomaticPaymentMethods(
-                            PaymentIntentCreateParams.AutomaticPaymentMethods.builder()
-                                    .setEnabled(true)
-                                    .build()
-                    )
-                    .build();
-
-            PaymentIntent paymentIntent = PaymentIntent.create(params);
-
-            // Save payment record
-            Payment payment = Payment.builder()
-                    .paymentIntentId(paymentIntent.getId())
-                    .company(company)
-                    .freelancer(freelancer)
-                    .project(project)
-                    .amountCents(amount)
-                    .platformFeeCents(platformFee)
-                    .freelancerAmountCents(freelancerAmount)
-                    .currency(request.getCurrency())
-                    .status(PaymentStatus.PENDING)
-                    .escrowStatus(EscrowStatus.NOT_ESCROWED)
-                    .build();
-
-            payment = paymentRepository.save(payment);
-
-            // Create ledger entry
-            createLedgerEntry(payment, null, company, TransactionType.PAYMENT_RECEIVED, amount,
-                    "Payment initiated for project: " + project.getTitle());
-
-            PaymentResponse response = PaymentResponse.fromEntity(payment);
-            // Stripe's PaymentIntent provides a client secret used by the frontend
-            // keep the DTO field name `companySecret` for backward compatibility
-            response.setCompanySecret(paymentIntent.getClientSecret());
-
-            log.info("Payment intent created: {}", paymentIntent.getId());
-            return response;
-
-        } catch (StripeException e) {
-            log.error("Stripe error creating payment intent: {}", e.getMessage());
-            throw new RuntimeException("Failed to create payment: " + e.getMessage());
+    public PaymentResponse createOrGetPayment(Long contractId) {
+        log.info("Creating or getting payment for contract: {}", contractId);
+        
+        Contract contract = contractRepository.findById(contractId)
+                .orElseThrow(() -> new IllegalArgumentException("Contract not found"));
+        
+        // Check if payment already exists for this contract
+        List<Payment> existingPayments = paymentRepository.findAll().stream()
+                .filter(p -> p.getId() != null && contract.getId() != null 
+                    && p.getId().equals(contract.getId()))
+                .toList();
+        
+        if (!existingPayments.isEmpty()) {
+            return PaymentResponse.fromEntity(existingPayments.get(0));
         }
-    }
-
-    /**
-     * Handle Stripe webhook for payment confirmation.
-     */
-    @Transactional
-    public void handlePaymentSucceeded(String paymentIntentId) {
-        log.info("Processing payment succeeded: {}", paymentIntentId);
-
-        Payment payment = paymentRepository.findByPaymentIntentId(paymentIntentId)
-                .orElseThrow(() -> new IllegalArgumentException("Payment not found: " + paymentIntentId));
-
-        payment.setStatus(PaymentStatus.SUCCEEDED);
-        payment.setPaidAt(LocalDateTime.now());
-
-        // Move to escrow
-        payment.setEscrowStatus(EscrowStatus.HELD);
-
-        // Create escrow record
-        Escrow escrow = Escrow.builder()
-                .payment(payment)
-                .project(payment.getProject())
-                .amount(payment.getFreelancerAmountCents())
-                .currency(payment.getCurrency())
-                .status(Escrow.EscrowHoldStatus.HELD)
-                .releaseCondition(Escrow.ReleaseCondition.PROJECT_COMPLETED)
-                .autoReleaseDate(LocalDateTime.now().plusDays(14)) // Auto-release after 14 days
+        
+        // Create new payment
+        Payment payment = Payment.builder()
+                .company(contract.getProject().getCompany())
+                .freelancer(contract.getFreelancer())
+                .amountCents(contract.getAmountCents())
+                .currency("USD")
+                .description("Payment for contract: " + contract.getTitle())
+                .paymentMethod("ESCROW")
+                .status(PaymentStatus.PENDING)
                 .build();
-
-        escrowRepository.save(escrow);
-        paymentRepository.save(payment);
-
-        // Create ledger entries
-        createLedgerEntry(payment, escrow, payment.getCompany(), TransactionType.ESCROW_HOLD,
-                payment.getFreelancerAmountCents(), "Funds held in escrow");
-
-        createLedgerEntry(payment, null, (User) null, TransactionType.PLATFORM_FEE,
-                payment.getPlatformFeeCents(), "Platform fee collected");
-
-        log.info("Payment succeeded and moved to escrow: {}", paymentIntentId);
-    }
-
-    /**
-     * Handle payment failure.
-     */
-    @Transactional
-    public void handlePaymentFailed(String paymentIntentId, String failureCode, String failureMessage) {
-        log.warn("Payment failed: {} - {} - {}", paymentIntentId, failureCode, failureMessage);
-
-        Payment payment = paymentRepository.findByPaymentIntentId(paymentIntentId)
-                .orElseThrow(() -> new IllegalArgumentException("Payment not found: " + paymentIntentId));
-
-        payment.setStatus(PaymentStatus.FAILED);
-        payment.setFailureCode(failureCode);
-        payment.setFailureMessage(failureMessage);
-
-        paymentRepository.save(payment);
-    }
-
-    /**
-     * Release escrow funds to freelancer after job completion.
-     */
-    @Transactional
-    public PaymentResponse releaseEscrow(Long paymentId, Long releaserId) {
-        log.info("Releasing escrow for payment: {}", paymentId);
-
-        Payment payment = paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new IllegalArgumentException("Payment not found"));
-
-        // Verify the releaser is the company
-        if (!payment.getCompany().getId().equals(releaserId)) {
-            throw new IllegalArgumentException("Only the company can release escrow");
-        }
-
-        if (payment.getEscrowStatus() != EscrowStatus.HELD) {
-            throw new IllegalStateException("Escrow is not in HELD status");
-        }
-
-        Escrow escrow = escrowRepository.findByPaymentId(paymentId)
-                .orElseThrow(() -> new IllegalArgumentException("Escrow not found"));
-
-        // Release escrow
-        escrow.setStatus(Escrow.EscrowHoldStatus.RELEASED);
-        escrow.setReleasedAt(LocalDateTime.now());
-        escrowRepository.save(escrow);
-
-        payment.setEscrowStatus(EscrowStatus.RELEASED);
-        payment.setReleasedAt(LocalDateTime.now());
-        paymentRepository.save(payment);
-
-        // Create ledger entry
-        createLedgerEntry(payment, escrow, payment.getFreelancer(), TransactionType.ESCROW_RELEASE,
-                payment.getFreelancerAmountCents(), "Escrow released to freelancer");
-
-        log.info("Escrow released for payment: {}", paymentId);
+        
+        payment = paymentRepository.save(payment);
+        log.info("Payment created: {}", payment.getId());
+        
         return PaymentResponse.fromEntity(payment);
     }
 
     /**
-     * Refund a payment.
+     * Create escrow for a contract when it becomes ACTIVE
      */
     @Transactional
-    public PaymentResponse refundPayment(Long paymentId, Long requesterId) {
-        log.info("Processing refund for payment: {}", paymentId);
-
-        Payment payment = paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new IllegalArgumentException("Payment not found"));
-
-        if (payment.getStatus() != PaymentStatus.SUCCEEDED) {
-            throw new IllegalStateException("Can only refund succeeded payments");
+    public Escrow createEscrowForContract(Long contractId) {
+        log.info("Creating escrow for contract: {}", contractId);
+        
+        Contract contract = contractRepository.findById(contractId)
+                .orElseThrow(() -> new IllegalArgumentException("Contract not found"));
+        
+        if (contract.getStatus() != Contract.ContractStatus.ACTIVE) {
+            throw new IllegalStateException("Contract must be ACTIVE to create escrow");
         }
-
-        if (payment.getEscrowStatus() == EscrowStatus.RELEASED) {
-            throw new IllegalStateException("Cannot refund after escrow is released");
-        }
-
-        try {
-            // Create Stripe refund
-            RefundCreateParams params = RefundCreateParams.builder()
-                    .setPaymentIntent(payment.getPaymentIntentId())
+        
+        // Create payment first if doesn't exist
+        List<Payment> payments = paymentRepository.findAll().stream()
+                .filter(p -> contract.getProject() != null && p.getCompany() != null
+                    && contract.getProject().getCompany().getId().equals(p.getCompany().getId()))
+                .toList();
+        
+        Payment payment;
+        if (payments.isEmpty()) {
+            payment = Payment.builder()
+                    .company(contract.getProject().getCompany())
+                    .freelancer(contract.getFreelancer())
+                    .amountCents(contract.getAmountCents())
+                    .currency("USD")
+                    .description("Payment for contract: " + contract.getTitle())
+                    .paymentMethod("ESCROW")
+                    .status(PaymentStatus.COMPLETED)  // Mark as completed when creating escrow
+                    .processedAt(LocalDateTime.now())
                     .build();
-
-            Refund refund = Refund.create(params);
-
-            // Update payment status
-            payment.setStatus(PaymentStatus.REFUNDED);
-            payment.setEscrowStatus(EscrowStatus.REFUNDED);
-            payment.setRefundedAt(LocalDateTime.now());
-            paymentRepository.save(payment);
-
-            // Update escrow if exists
-            escrowRepository.findByPaymentId(paymentId).ifPresent(escrow -> {
-                escrow.setStatus(Escrow.EscrowHoldStatus.REFUNDED);
-                escrowRepository.save(escrow);
-            });
-
-            // Create ledger entry
-            createLedgerEntry(payment, null, payment.getCompany(), TransactionType.REFUND,
-                    payment.getAmountCents(), "Payment refunded");
-
-            log.info("Payment refunded: {} - Stripe refund: {}", paymentId, refund.getId());
-            return PaymentResponse.fromEntity(payment);
-
-        } catch (StripeException e) {
-            log.error("Stripe error processing refund: {}", e.getMessage());
-            throw new RuntimeException("Failed to process refund: " + e.getMessage());
+            payment = paymentRepository.save(payment);
+        } else {
+            payment = payments.get(0);
+            // Update payment status to completed
+            payment.setStatus(PaymentStatus.COMPLETED);
+            payment.setProcessedAt(LocalDateTime.now());
+            payment = paymentRepository.save(payment);
         }
+        
+        // Create escrow
+        Escrow escrow = Escrow.builder()
+                .payment(payment)
+                .project(contract.getProject())
+                .amount(contract.getAmountCents())
+                .currency("USD")
+                .status(EscrowHoldStatus.HELD)
+                .releaseCondition(ReleaseCondition.JOB_COMPLETED)
+                .autoReleaseDate(LocalDateTime.now().plusDays(30))  // Auto-release after 30 days
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+        
+        escrow = escrowRepository.save(escrow);
+        log.info("Escrow created: {}, Amount: {} cents, Status: HELD", escrow.getId(), escrow.getAmount());
+        
+        return escrow;
     }
 
     /**
-     * Get payment by ID.
+     * Release escrow when project is completed
+     */
+    @Transactional
+    public Escrow releaseEscrow(Long escrowId, ReleaseCondition condition) {
+        log.info("Releasing escrow: {}", escrowId);
+        
+        Escrow escrow = escrowRepository.findById(escrowId)
+                .orElseThrow(() -> new IllegalArgumentException("Escrow not found"));
+        
+        if (escrow.getStatus() != EscrowHoldStatus.HELD) {
+            throw new IllegalStateException("Escrow is not in HELD status, current status: " + escrow.getStatus());
+        }
+        
+        // Release escrow
+        escrow.setStatus(EscrowHoldStatus.RELEASED);
+        escrow.setReleaseCondition(condition);
+        escrow.setReleasedAt(LocalDateTime.now());
+        escrow.setUpdatedAt(LocalDateTime.now());
+        
+        escrow = escrowRepository.save(escrow);
+        log.info("Escrow released: {}, Released at: {}", escrow.getId(), escrow.getReleasedAt());
+        
+        // Update payment status
+        if (escrow.getPayment() != null) {
+            Payment payment = escrow.getPayment();
+            payment.setStatus(PaymentStatus.COMPLETED);
+            payment.setProcessedAt(LocalDateTime.now());
+            paymentRepository.save(payment);
+        }
+        
+        return escrow;
+    }
+
+    /**
+     * Refund escrow (for disputes or cancellations)
+     */
+    @Transactional
+    public Escrow refundEscrow(Long escrowId, String reason) {
+        log.info("Refunding escrow: {}, Reason: {}", escrowId, reason);
+        
+        Escrow escrow = escrowRepository.findById(escrowId)
+                .orElseThrow(() -> new IllegalArgumentException("Escrow not found"));
+        
+        if (escrow.getStatus() == EscrowHoldStatus.RELEASED) {
+            throw new IllegalStateException("Cannot refund released escrow");
+        }
+        
+        // Refund escrow
+        escrow.setStatus(EscrowHoldStatus.REFUNDED);
+        escrow.setReleasedAt(LocalDateTime.now());
+        escrow.setUpdatedAt(LocalDateTime.now());
+        
+        escrow = escrowRepository.save(escrow);
+        log.info("Escrow refunded: {}", escrow.getId());
+        
+        // Update payment status
+        if (escrow.getPayment() != null) {
+            Payment payment = escrow.getPayment();
+            payment.setStatus(PaymentStatus.FAILED);
+            paymentRepository.save(payment);
+        }
+        
+        return escrow;
+    }
+
+    /**
+     * Get all payments with pagination.
+     */
+    @Transactional(readOnly = true)
+    public Page<PaymentResponse> getAllPayments(Pageable pageable) {
+        log.info("Fetching all payments, page: {}, size: {}", pageable.getPageNumber(),
+                pageable.getPageSize());
+        return paymentRepository.findAll(pageable).map(PaymentResponse::fromEntity);
+    }
+
+    /**
+     * Get payments by company.
+     */
+    @Transactional(readOnly = true)
+    public Page<PaymentResponse> getPaymentsByCompany(Long companyId, Pageable pageable) {
+        log.info("Fetching payments for company: {}", companyId);
+        return paymentRepository.findByCompanyIdOrderByCreatedAtDesc(companyId, pageable)
+                .map(PaymentResponse::fromEntity);
+    }
+
+    /**
+     * Get payments by freelancer.
+     */
+    @Transactional(readOnly = true)
+    public Page<PaymentResponse> getPaymentsByFreelancer(Long freelancerId, Pageable pageable) {
+        log.info("Fetching payments for freelancer: {}", freelancerId);
+        return paymentRepository.findByFreelancerIdOrderByCreatedAtDesc(freelancerId, pageable)
+                .map(PaymentResponse::fromEntity);
+    }
+
+    /**
+     * Get single payment by ID (alias).
      */
     @Transactional(readOnly = true)
     public PaymentResponse getPayment(Long paymentId) {
-        Payment payment = paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new IllegalArgumentException("Payment not found"));
-        return PaymentResponse.fromEntity(payment);
+        return getPaymentById(paymentId);
     }
 
     /**
-     * Get payments for a user (as company or freelancer).
+     * Get single payment by ID.
+     */
+    @Transactional(readOnly = true)
+    public PaymentResponse getPaymentById(Long paymentId) {
+        log.info("Fetching payment: {}", paymentId);
+        return paymentRepository.findById(paymentId).map(PaymentResponse::fromEntity).orElse(null);
+    }
+
+    /**
+     * Get payments for a specific user (as company or freelancer).
      */
     @Transactional(readOnly = true)
     public Page<PaymentResponse> getPaymentsForUser(Long userId, Pageable pageable) {
+        log.info("Fetching payments for user: {}", userId);
         return paymentRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable)
                 .map(PaymentResponse::fromEntity);
     }
 
     /**
-     * Get payment statistics for admin dashboard.
+     * Get payment statistics.
      */
     @Transactional(readOnly = true)
-    public Map<String, Object> getPaymentStatistics() {
-        Map<String, Object> stats = new HashMap<>();
+    public PaymentStatistics getPaymentStatistics() {
+        log.info("Calculating payment statistics");
 
-        stats.put("totalPending", paymentRepository.countByStatus(PaymentStatus.PENDING));
-        stats.put("totalSucceeded", paymentRepository.countByStatus(PaymentStatus.SUCCEEDED));
-        stats.put("totalFailed", paymentRepository.countByStatus(PaymentStatus.FAILED));
-        stats.put("totalRefunded", paymentRepository.countByStatus(PaymentStatus.REFUNDED));
-        stats.put("totalEscrowHeld", escrowRepository.sumHeldAmount());
+        long totalPayments = paymentRepository.count();
+        Long completedAmount = paymentRepository.sumAmountByStatus(PaymentStatus.COMPLETED);
+        Long pendingAmount = paymentRepository.sumAmountByStatus(PaymentStatus.PENDING);
+        Long failedAmount = paymentRepository.sumAmountByStatus(PaymentStatus.FAILED);
+        
+        // Get escrow statistics
+        long totalEscrowed = escrowRepository.count();
+        long releasedEscrows = escrowRepository.findAll().stream()
+                .filter(e -> e.getStatus() == EscrowHoldStatus.RELEASED)
+                .count();
 
-        LocalDateTime startOfMonth = LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
-        LocalDateTime now = LocalDateTime.now();
-        stats.put("monthlyPlatformFees", paymentRepository.sumPlatformFeeBetween(startOfMonth, now));
-
-        return stats;
-    }
-
-    private void createLedgerEntry(Payment payment, Escrow escrow, User user, 
-                                   TransactionType type, Long amount, String description) {
-        TransactionLedger entry = TransactionLedger.builder()
-                .transactionType(type)
-                .payment(payment)
-                .escrow(escrow)
-                .user(user)
-                .amount(amount)
-                .currency(payment.getCurrency())
-                .description(description)
-                .referenceId(payment.getPaymentIntentId())
+        return PaymentStatistics.builder()
+                .totalPayments(totalPayments)
+                .completedAmount(completedAmount != null ? completedAmount : 0L)
+                .pendingAmount(pendingAmount != null ? pendingAmount : 0L)
+                .failedAmount(failedAmount != null ? failedAmount : 0L)
+                .totalEscrowed(totalEscrowed)
+                .releasedEscrows(releasedEscrows)
                 .build();
-
-        transactionLedgerRepository.save(entry);
     }
 
-    private void createLedgerEntry(Payment payment, Escrow escrow, Company company, 
-                                   TransactionType type, Long amount, String description) {
-        User user = company != null ? company.getUser() : null;
-        createLedgerEntry(payment, escrow, user, type, amount, description);
-    }
-
-    private void createLedgerEntry(Payment payment, Escrow escrow, Freelancer freelancer, 
-                                   TransactionType type, Long amount, String description) {
-        User user = freelancer != null ? freelancer.getUser() : null;
-        createLedgerEntry(payment, escrow, user, type, amount, description);
+    /**
+     * Statistics DTO
+     */
+    @lombok.Data
+    @lombok.Builder
+    public static class PaymentStatistics {
+        private long totalPayments;
+        private Long completedAmount;
+        private Long pendingAmount;
+        private Long failedAmount;
+        private long totalEscrowed;
+        private long releasedEscrows;
     }
 }

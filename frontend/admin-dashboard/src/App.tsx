@@ -6,8 +6,11 @@ import Dashboard from './pages/Dashboard'
 import Disputes from './pages/Disputes'
 import Jobs from './pages/Jobs'
 import Login from './pages/Login'
+import Notifications from './pages/Notifications'
+import Profile from './pages/Profile'
 import ResourceEdit from './pages/ResourceEdit'
 import Resources from './pages/Resources'
+import Settings from './pages/Settings'
 import Users from './pages/Users'
 import { useAuthStore } from './store/authStore'
 
@@ -40,6 +43,9 @@ function App() {
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="users" element={<Users />} />
+        <Route path="notifications" element={<Notifications />} />
+        <Route path="settings" element={<Settings />} />
+        <Route path="profile" element={<Profile />} />
         <Route path="jobs" element={<Jobs />} />
         <Route path="disputes" element={<Disputes />} />
         <Route path="analytics" element={<Analytics />} />

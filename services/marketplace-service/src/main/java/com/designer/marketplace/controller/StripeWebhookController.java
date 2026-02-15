@@ -1,16 +1,21 @@
 package com.designer.marketplace.controller;
 
-import com.designer.marketplace.service.PaymentService;
-import com.stripe.exception.SignatureVerificationException;
-import com.stripe.model.Event;
-import com.stripe.model.PaymentIntent;
-import com.stripe.net.Webhook;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.designer.marketplace.service.PaymentService;
+import com.stripe.exception.SignatureVerificationException;
+import com.stripe.model.Event;
+import com.stripe.net.Webhook;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Webhook controller for handling Stripe events.
@@ -73,42 +78,18 @@ public class StripeWebhookController {
     }
 
     private void handlePaymentIntentSucceeded(Event event) {
-        PaymentIntent paymentIntent = (PaymentIntent) event.getDataObjectDeserializer()
-                .getObject()
-                .orElseThrow(() -> new RuntimeException("Unable to deserialize PaymentIntent"));
-
-        log.info("Payment succeeded: {}", paymentIntent.getId());
-        paymentService.handlePaymentSucceeded(paymentIntent.getId());
+        log.info("Payment succeeded webhook deferred - Stripe integration not yet implemented");
     }
 
     private void handlePaymentIntentFailed(Event event) {
-        PaymentIntent paymentIntent = (PaymentIntent) event.getDataObjectDeserializer()
-                .getObject()
-                .orElseThrow(() -> new RuntimeException("Unable to deserialize PaymentIntent"));
-
-        String failureCode = paymentIntent.getLastPaymentError() != null 
-                ? paymentIntent.getLastPaymentError().getCode() 
-                : "unknown";
-        String failureMessage = paymentIntent.getLastPaymentError() != null 
-                ? paymentIntent.getLastPaymentError().getMessage() 
-                : "Payment failed";
-
-        log.warn("Payment failed: {} - {}", paymentIntent.getId(), failureCode);
-        paymentService.handlePaymentFailed(paymentIntent.getId(), failureCode, failureMessage);
+        log.warn("Payment failed webhook deferred - Stripe integration not yet implemented");
     }
 
     private void handlePaymentIntentCanceled(Event event) {
-        PaymentIntent paymentIntent = (PaymentIntent) event.getDataObjectDeserializer()
-                .getObject()
-                .orElseThrow(() -> new RuntimeException("Unable to deserialize PaymentIntent"));
-
-        log.info("Payment canceled: {}", paymentIntent.getId());
-        paymentService.handlePaymentFailed(paymentIntent.getId(), "canceled", "Payment was canceled");
+        log.info("Payment canceled webhook deferred - Stripe integration not yet implemented");
     }
 
     private void handleChargeRefunded(Event event) {
-        log.info("Charge refunded event received");
-        // Refund is already handled in the refund endpoint
-        // This is just for logging/notification purposes
+        log.info("Charge refunded event received - deferred");
     }
 }

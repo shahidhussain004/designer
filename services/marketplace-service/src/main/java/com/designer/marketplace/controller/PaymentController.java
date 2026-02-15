@@ -42,15 +42,11 @@ public class PaymentController {
 
     @PostMapping
     @Operation(summary = "Create payment intent", description = "Creates a Stripe payment intent for escrow")
-    public ResponseEntity<PaymentResponse> createPayment(
+    public ResponseEntity<?> createPayment(
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody CreatePaymentRequest request) {
-        
-        Long userId = getUserId(userDetails);
-        log.info("Creating payment for user: {}", userId);
-        
-        PaymentResponse response = paymentService.createPaymentIntent(userId, request);
-        return ResponseEntity.ok(response);
+        log.info("Payment creation endpoint deferred - Stripe integration not yet implemented");
+        return ResponseEntity.ok(Map.of("status", "deferred"));
     }
 
     @GetMapping("/{id}")
@@ -72,34 +68,73 @@ public class PaymentController {
         );
     }
 
+    @PostMapping("/contracts/{contractId}/escrow")
+    @Operation(summary = "Create escrow for contract", description = "Creates escrow when contract becomes ACTIVE")
+    public ResponseEntity<?> createEscrowForContract(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long contractId) {
+        log.info("Creating escrow for contract: {}", contractId);
+        try {
+            var escrow = paymentService.createEscrowForContract(contractId);
+            return ResponseEntity.ok(Map.of(
+                "status", "created",
+                "escrowId", escrow.getId(),
+                "amount", escrow.getAmount(),
+                "holdStatus", escrow.getStatus()
+            ));
+        } catch (Exception e) {
+            log.error("Error creating escrow for contract: {}", contractId, e);
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
     @PostMapping("/{id}/release")
     @Operation(summary = "Release escrow", description = "Company releases escrow funds to freelancer")
-    public ResponseEntity<PaymentResponse> releaseEscrow(
+    public ResponseEntity<?> releaseEscrow(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long id) {
-        
-        Long userId = getUserId(userDetails);
-        log.info("User {} releasing escrow for payment: {}", userId, id);
-        
-        return ResponseEntity.ok(paymentService.releaseEscrow(id, userId));
+        log.info("Releasing escrow: {}", id);
+        try {
+            var condition = com.designer.marketplace.entity.Escrow.ReleaseCondition.JOB_COMPLETED;
+            var escrow = paymentService.releaseEscrow(id, condition);
+            return ResponseEntity.ok(Map.of(
+                "status", "released",
+                "escrowId", escrow.getId(),
+                "releasedAt", escrow.getReleasedAt(),
+                "amount", escrow.getAmount()
+            ));
+        } catch (Exception e) {
+            log.error("Error releasing escrow: {}", id, e);
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
     @PostMapping("/{id}/refund")
     @Operation(summary = "Refund payment", description = "Request refund for a payment")
-    public ResponseEntity<PaymentResponse> refundPayment(
+    public ResponseEntity<?> refundPayment(
             @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Long id) {
-        
-        Long userId = getUserId(userDetails);
-        log.info("User {} requesting refund for payment: {}", userId, id);
-        
-        return ResponseEntity.ok(paymentService.refundPayment(id, userId));
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "User requested refund") String reason) {
+        log.info("Refunding escrow: {}, Reason: {}", id, reason);
+        try {
+            var escrow = paymentService.refundEscrow(id, reason);
+            return ResponseEntity.ok(Map.of(
+                "status", "refunded",
+                "escrowId", escrow.getId(),
+                "refundedAt", escrow.getReleasedAt(),
+                "amount", escrow.getAmount()
+            ));
+        } catch (Exception e) {
+            log.error("Error refunding escrow: {}", id, e);
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
     @GetMapping("/statistics")
     @Operation(summary = "Get payment statistics", description = "Admin endpoint for payment analytics")
-    public ResponseEntity<Map<String, Object>> getStatistics() {
-        return ResponseEntity.ok(paymentService.getPaymentStatistics());
+    public ResponseEntity<?> getStatistics() {
+        PaymentService.PaymentStatistics stats = paymentService.getPaymentStatistics();
+        return ResponseEntity.ok(stats);
     }
 
     private Long getUserId(UserDetails userDetails) {

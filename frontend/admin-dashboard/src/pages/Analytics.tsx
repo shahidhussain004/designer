@@ -1,28 +1,26 @@
-// Types handled by 'any' casts
-import { useQuery } from '@tanstack/react-query'
-import { analyticsApi } from '../lib/api'
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
+  ArrowTrendingDownIcon,
+  ArrowTrendingUpIcon,
+  BriefcaseIcon,
+  CurrencyDollarIcon,
+  UserGroupIcon,
+} from '@heroicons/react/24/outline'
+import { useQuery } from '@tanstack/react-query'
+import {
   ArcElement,
+  BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  Filler,
+  Legend,
+  LinearScale,
+  LineElement,
+  PointElement,
   Title,
   Tooltip,
-  Legend,
-  Filler,
 } from 'chart.js'
-import { Line, Bar, Doughnut } from 'react-chartjs-2'
-import {
-  Card,
-  Flex,
-  Grid,
-  Text,
-  Divider,
-  Spinner,
-} from '../components/green'
+import { Bar, Doughnut, Line } from 'react-chartjs-2'
+import { analyticsApi } from '../lib/api'
 
 ChartJS.register(
   CategoryScale,
@@ -207,115 +205,191 @@ export default function Analytics() {
 
   if (isLoading) {
     return (
-      <Flex justify-content="center" align-items="center">
-        <Spinner />
-      </Flex>
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <p className="text-gray-600 mt-4">Loading analytics...</p>
+        </div>
+      </div>
     )
   }
 
   return (
-    <Flex flex-direction="column" gap="l">
+    <div className="space-y-6">
       {/* Header */}
       <div>
-        <Text tag="h1">Analytics</Text>
-        <Text>Platform performance and insights</Text>
+        <h1 className="text-3xl font-bold text-gray-900">Analytics & Insights</h1>
+        <p className="text-gray-600 mt-1">Platform performance metrics and trends</p>
       </div>
 
-      {/* Summary Cards */}
-      <Grid columns="1; s{2}; m{4}" gap="m">
-        <Card>
-          <Flex flex-direction="column" padding="m" gap="xs">
-            <Text>Total Revenue (MTD)</Text>
-            <Text>{(revenue?.totalMTD || 30000).toLocaleString()}</Text>
-            <Text>+12% from last month</Text>
-          </Flex>
-        </Card>
-
-        <Card>
-          <Flex flex-direction="column" padding="m" gap="xs">
-            <Text>Active Users</Text>
-            <Text>{(userGrowth?.totalActive || 1250).toLocaleString()}</Text>
-            <Text>+8% from last month</Text>
-          </Flex>
-        </Card>
-
-        <Card>
-          <Flex flex-direction="column" padding="m" gap="xs">
-            <Text>Jobs Completed (MTD)</Text>
-            <Text>{jobs?.totalCompleted || 92}</Text>
-            <Text>+15% from last month</Text>
-          </Flex>
-        </Card>
-
-        <Card>
-          <Flex flex-direction="column" padding="m" gap="xs">
-            <Text>Avg Job Value</Text>
-            <Text>{(revenue?.avgJobValue || 326).toLocaleString()}</Text>
-            <Text>-2% from last month</Text>
-          </Flex>
-        </Card>
-      </Grid>
-
-      {/* Charts Grid */}
-      <Grid columns="1; l{2}" gap="l">
-        {/* User Growth Chart */}
-        <Card>
-          <Flex flex-direction="column" padding="l" gap="m">
-            <Text>User Growth</Text>
+      {/* Summary Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Total Revenue */}
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg shadow-sm p-6 border border-blue-200">
+          <div className="flex items-start justify-between">
             <div>
-              <Line data={userGrowthData} options={chartOptions} />
+              <p className="text-sm text-blue-600 font-medium">Total Revenue (MTD)</p>
+              <p className="text-2xl font-bold text-blue-900 mt-2">
+                ${(revenue?.totalMTD || 30000).toLocaleString()}
+              </p>
+              <div className="flex items-center gap-1 text-sm text-green-600 mt-3">
+                <ArrowTrendingUpIcon className="w-4 h-4" />
+                +12% from last month
+              </div>
             </div>
-          </Flex>
-        </Card>
+            <div className="p-3 bg-blue-500 bg-opacity-20 rounded-lg">
+              <CurrencyDollarIcon className="w-6 h-6 text-blue-600" />
+            </div>
+          </div>
+        </div>
+
+        {/* Active Users */}
+        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg shadow-sm p-6 border border-green-200">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm text-green-600 font-medium">Active Users</p>
+              <p className="text-2xl font-bold text-green-900 mt-2">
+                {(userGrowth?.totalActive || 1250).toLocaleString()}
+              </p>
+              <div className="flex items-center gap-1 text-sm text-green-600 mt-3">
+                <ArrowTrendingUpIcon className="w-4 h-4" />
+                +8% from last month
+              </div>
+            </div>
+            <div className="p-3 bg-green-500 bg-opacity-20 rounded-lg">
+              <UserGroupIcon className="w-6 h-6 text-green-600" />
+            </div>
+          </div>
+        </div>
+
+        {/* Jobs Completed */}
+        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg shadow-sm p-6 border border-purple-200">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm text-purple-600 font-medium">Jobs Completed (MTD)</p>
+              <p className="text-2xl font-bold text-purple-900 mt-2">
+                {jobs?.totalCompleted || 92}
+              </p>
+              <div className="flex items-center gap-1 text-sm text-green-600 mt-3">
+                <ArrowTrendingUpIcon className="w-4 h-4" />
+                +15% from last month
+              </div>
+            </div>
+            <div className="p-3 bg-purple-500 bg-opacity-20 rounded-lg">
+              <BriefcaseIcon className="w-6 h-6 text-purple-600" />
+            </div>
+          </div>
+        </div>
+
+        {/* Avg Job Value */}
+        <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg shadow-sm p-6 border border-orange-200">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm text-orange-600 font-medium">Avg Job Value</p>
+              <p className="text-2xl font-bold text-orange-900 mt-2">
+                ${(revenue?.avgJobValue || 326).toLocaleString()}
+              </p>
+              <div className="flex items-center gap-1 text-sm text-red-600 mt-3">
+                <ArrowTrendingDownIcon className="w-4 h-4" />
+                -2% from last month
+              </div>
+            </div>
+            <div className="p-3 bg-orange-500 bg-opacity-20 rounded-lg">
+              <CurrencyDollarIcon className="w-6 h-6 text-orange-600" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* User Growth Chart */}
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">User Growth Trends</h2>
+          <div style={{ height: '300px' }}>
+            <Line data={userGrowthData} options={chartOptions} />
+          </div>
+          <p className="text-xs text-gray-500 mt-4 text-center">Monthly user acquisition and active users over the past 6 months</p>
+        </div>
 
         {/* Revenue Chart */}
-        <Card>
-          <Flex flex-direction="column" padding="l" gap="m">
-            <Text>Revenue</Text>
-            <div>
-              <Bar data={revenueData} options={chartOptions} />
-            </div>
-          </Flex>
-        </Card>
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Revenue Analysis</h2>
+          <div style={{ height: '300px' }}>
+            <Bar data={revenueData} options={chartOptions} />
+          </div>
+          <p className="text-xs text-gray-500 mt-4 text-center">Total platform revenue and fees collected</p>
+        </div>
 
-        {/* Jobs Chart */}
-        <Card>
-          <Flex flex-direction="column" padding="l" gap="m">
-            <Text>Job Activity</Text>
-            <div>
-              <Line data={jobsData} options={chartOptions} />
-            </div>
-          </Flex>
-        </Card>
+        {/* Jobs Activity Chart */}
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Job Activity</h2>
+          <div style={{ height: '300px' }}>
+            <Line data={jobsData} options={chartOptions} />
+          </div>
+          <p className="text-xs text-gray-500 mt-4 text-center">Posted vs Completed jobs over the past 6 months</p>
+        </div>
 
         {/* Category Distribution */}
-        <Card>
-          <Flex flex-direction="column" padding="l" gap="m">
-            <Text>Jobs by Category</Text>
-            <div>
-              <Doughnut data={categoryData} options={doughnutOptions} />
-            </div>
-          </Flex>
-        </Card>
-      </Grid>
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Jobs by Category</h2>
+          <div style={{ height: '300px' }}>
+            <Doughnut data={categoryData} options={doughnutOptions} />
+          </div>
+          <p className="text-xs text-gray-500 mt-4 text-center">Distribution of jobs across different categories</p>
+        </div>
+      </div>
 
       {/* Top Performers Table */}
-      <Card>
-        <Flex flex-direction="column">
-          <Flex padding="l">
-            <Text>Top Freelancers</Text>
-          </Flex>
-          <Divider />
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">Top Freelancers</h2>
+          <p className="text-sm text-gray-600 mt-1">Best performing freelancers by jobs completed and earnings</p>
+        </div>
 
-          {/* Table Header */}
-          <Grid columns="2fr 1fr 1fr 1fr" gap="m" padding="m">
-            <Text>Freelancer</Text>
-            <Text>Jobs Completed</Text>
-            <Text>Total Earned</Text>
-            <Text>Rating</Text>
-          </Grid>
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-200">
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Freelancer</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Jobs Completed</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Total Earned</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Rating</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                { name: 'Alex Johnson', jobs: 45, earned: 28500, rating: 4.9 },
+                { name: 'Sarah Chen', jobs: 38, earned: 24200, rating: 4.8 },
+                { name: 'Mike Williams', jobs: 32, earned: 19800, rating: 4.9 },
+                { name: 'Emily Davis', jobs: 28, earned: 17500, rating: 4.7 },
+                { name: 'Chris Lee', jobs: 25, earned: 15200, rating: 4.8 },
+              ].map((freelancer, index) => (
+                <tr key={index} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-sm font-semibold text-indigo-600">
+                        {freelancer.name.charAt(0)}
+                      </div>
+                      <span className="font-medium text-gray-900">{freelancer.name}</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-gray-600">{freelancer.jobs}</td>
+                  <td className="px-6 py-4 font-semibold text-gray-900">${freelancer.earned.toLocaleString()}</td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-1">
+                      <span>⭐</span>
+                      <span className="font-medium text-gray-900">{freelancer.rating}</span>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-          {/* Table Body */}
+        {/* Mobile Cards View */}
+        <div className="md:hidden space-y-3 p-4">
           {[
             { name: 'Alex Johnson', jobs: 45, earned: 28500, rating: 4.9 },
             { name: 'Sarah Chen', jobs: 38, earned: 24200, rating: 4.8 },
@@ -323,23 +397,31 @@ export default function Analytics() {
             { name: 'Emily Davis', jobs: 28, earned: 17500, rating: 4.7 },
             { name: 'Chris Lee', jobs: 25, earned: 15200, rating: 4.8 },
           ].map((freelancer, index) => (
-            <div key={index}>
-              <Divider />
-              <Grid columns="2fr 1fr 1fr 1fr" gap="m" padding="m" align-items="center">
-                <Flex gap="m" align-items="center">
-                  <div>
-                    {freelancer.name.charAt(0)}
-                  </div>
-                  <Text>{freelancer.name}</Text>
-                </Flex>
-                <Text>{freelancer.jobs}</Text>
-                <Text>${freelancer.earned.toLocaleString()}</Text>
-                <Text>⭐ {freelancer.rating}</Text>
-              </Grid>
+            <div key={index} className="bg-gradient-to-r from-gray-50 to-white rounded-lg p-4 border border-gray-200">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-sm font-semibold text-indigo-600">
+                  {freelancer.name.charAt(0)}
+                </div>
+                <span className="font-semibold text-gray-900">{freelancer.name}</span>
+              </div>
+              <div className="grid grid-cols-3 gap-3 text-sm">
+                <div>
+                  <p className="text-gray-600">Jobs</p>
+                  <p className="font-semibold text-gray-900">{freelancer.jobs}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600">Earned</p>
+                  <p className="font-semibold text-gray-900">${(freelancer.earned / 1000).toFixed(1)}k</p>
+                </div>
+                <div>
+                  <p className="text-gray-600">Rating</p>
+                  <p className="font-semibold text-gray-900">⭐ {freelancer.rating}</p>
+                </div>
+              </div>
             </div>
           ))}
-        </Flex>
-      </Card>
-    </Flex>
+        </div>
+      </div>
+    </div>
   )
 }

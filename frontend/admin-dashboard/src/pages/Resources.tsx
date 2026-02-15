@@ -1,231 +1,632 @@
-import { useQuery } from '@tanstack/react-query'
-import React, { useState } from 'react'
-import toast from 'react-hot-toast'
-import { Link } from 'react-router-dom'
 import {
-    Button,
-    Card,
-    Divider,
-    Flex,
-    Spinner,
-    Text,
-} from '../components/green'
-import { resourcesApi, type Resource, type ResourceFilters } from '../lib/resourcesApi'
+    EyeIcon,
+    PencilSquareIcon,
+    PlusIcon,
+    TrashIcon,
+} from '@heroicons/react/24/outline'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
+import { resourcesApi, type Resource } from '../lib/resourcesApi'
+
+interface ResourceCategory {
+  id: string
+  name: string
+}
+
+// Resource Detail Modal
+function ResourceDetailModal({ isOpen, resource, onClose }: { isOpen: boolean; resource: Resource | null; onClose: () => void }) {
+  if (!isOpen || !resource) return null
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-96 overflow-y-auto">
+        <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+          <h2 className="text-xl font-bold text-gray-900">Resource Details</h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
+        </div>
+
+        <div className="p-6 space-y-4">
+          <div>
+            <h3 className="font-semibold text-gray-700">Title</h3>
+            <p className="text-gray-900">{resource.title}</p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-700">Excerpt</h3>
+            <p className="text-gray-900">{resource.excerpt}</p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-700">Content</h3>
+            <p className="text-gray-900 whitespace-pre-wrap line-clamp-3">{resource.content}</p>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <h3 className="font-semibold text-gray-700">Type</h3>
+              <p className="text-gray-900">{resource.content_type}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-700">Status</h3>
+              <p className="text-gray-900">{resource.status === 'published' ? 'Published' : 'Draft'}</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <h3 className="font-semibold text-gray-700">Views</h3>
+              <p className="text-gray-900">{resource.view_count || 0}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-700">Likes</h3>
+              <p className="text-gray-900">{resource.like_count || 0}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-700">Featured</h3>
+              <p className="text-gray-900">{resource.is_featured ? 'Yes' : 'No'}</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <h3 className="font-semibold text-gray-700">Created</h3>
+              <p className="text-gray-900">{new Date(resource.created_at).toLocaleString()}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-700">Updated</h3>
+              <p className="text-gray-900">{new Date(resource.updated_at).toLocaleString()}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="px-6 py-4 border-t border-gray-200 flex justify-end">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 font-medium text-sm"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Add/Edit Resource Modal
+function AddEditResourceModal({ isOpen, onClose, onSubmit, isLoading, editingResource, categories }: {
+  isOpen: boolean
+  onClose: () => void
+  onSubmit: (data: any) => void
+  isLoading: boolean
+  editingResource?: Resource | null
+  categories: ResourceCategory[]
+}) {
+  const [formData, setFormData] = useState({
+    title: editingResource?.title || '',
+    excerpt: editingResource?.excerpt || '',
+    content: editingResource?.content || '',
+    content_type: editingResource?.content_type || 'blog',
+    status: editingResource?.status || 'draft',
+    category_id: editingResource?.category_id || '',
+    is_featured: editingResource?.is_featured || false,
+  })
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!formData.title || !formData.excerpt || !formData.content) {
+      toast.error('Please fill in all required fields')
+      return
+    }
+    onSubmit(formData)
+    setFormData({
+      title: '',
+      excerpt: '',
+      content: '',
+      content_type: 'blog',
+      status: 'draft',
+      category_id: '',
+      is_featured: false,
+    })
+  }
+
+  if (!isOpen) return null
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white">
+          <h2 className="text-xl font-bold text-gray-900">{editingResource ? 'Edit Resource' : 'Add New Resource'}</h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+            <input
+              type="text"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Excerpt *</label>
+            <textarea
+              value={formData.excerpt}
+              onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500"
+              rows={2}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Content *</label>
+            <textarea
+              value={formData.content}
+              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500"
+              rows={4}
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+              <select
+                value={formData.content_type}
+                onChange={(e) => setFormData({ ...formData, content_type: e.target.value as any })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500"
+              >
+                <option value="blog">Blog</option>
+                <option value="article">Article</option>
+                <option value="news">News</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+              <select
+                value={formData.status}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500"
+              >
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+            <select
+              value={formData.category_id}
+              onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              <option value="">No category</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="featured"
+              checked={formData.is_featured}
+              onChange={(e) => setFormData({ ...formData, is_featured: e.target.checked })}
+              className="rounded border-gray-300"
+            />
+            <label htmlFor="featured" className="text-sm font-medium text-gray-700">Featured</label>
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 font-medium text-sm"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium text-sm disabled:opacity-50"
+            >
+              {isLoading ? 'Saving...' : editingResource ? 'Update' : 'Add'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
 
 export default function ResourcesPage() {
-  const [filters, setFilters] = useState<ResourceFilters>({
-    page: 1,
-    limit: 20,
-  })
+  const [page, setPage] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
-  const [typeFilter, setTypeFilter] = useState<'blog' | 'article' | 'news' | ''>('')
-  const [statusFilter, setStatusFilter] = useState<'draft' | 'published' | ''>('')
+  const [typeFilter, setTypeFilter] = useState<string>('')
+  const [statusFilter, setStatusFilter] = useState<string>('')
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [showDetailModal, setShowDetailModal] = useState(false)
+  const [editingResource, setEditingResource] = useState<Resource | null>(null)
+  const [selectedResourceDetail, setSelectedResourceDetail] = useState<Resource | null>(null)
+  const queryClient = useQueryClient()
 
-  // Fetch resources
-  const { data: resources = [], isLoading, isFetching } = useQuery({
-    queryKey: ['admin-resources', filters],
+  const { data, isLoading } = useQuery({
+    queryKey: ['admin-resources', page, searchQuery, typeFilter, statusFilter],
     queryFn: () =>
       resourcesApi.getAll({
-        ...filters,
+        page: page + 1,
+        limit: 10,
         search: searchQuery || undefined,
-        content_type: (typeFilter as any) || undefined,
-        status: (statusFilter as any) || undefined,
+        content_type: typeFilter || undefined,
+        status: statusFilter || undefined,
       }),
   })
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    setFilters({ ...filters, page: 1 })
-  }
+  const { data: categories = [] } = useQuery({
+    queryKey: ['resource-categories'],
+    queryFn: () => resourcesApi.getCategories(),
+  })
 
-  const handleDelete = async (id: string, title: string) => {
-    if (!confirm(`Are you sure you want to delete "${title}"?`)) return
+  const createResourceMutation = useMutation({
+    mutationFn: (payload: any) => resourcesApi.create(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-resources'] })
+      toast.success('Resource created successfully')
+      setShowAddModal(false)
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || 'Failed to create resource')
+    },
+  })
 
-    try {
-      await resourcesApi.delete(id)
+  const updateResourceMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: any }) => resourcesApi.update(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-resources'] })
+      toast.success('Resource updated successfully')
+      setShowAddModal(false)
+      setEditingResource(null)
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || 'Failed to update resource')
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => resourcesApi.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-resources'] })
       toast.success('Resource deleted successfully')
-      // Refetch would happen automatically via query invalidation in a production app
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || 'Failed to delete resource')
+    },
+  })
 
-      window.location.reload()
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to delete resource')
+  const getTypeBadgeColor = (type: string): string => {
+    switch (type) {
+      case 'blog':
+        return 'bg-blue-100 text-blue-800'
+      case 'article':
+        return 'bg-green-100 text-green-800'
+      case 'news':
+        return 'bg-amber-100 text-amber-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
     }
   }
 
-  const getTypeBadge = (type: string) => {
-    const styles: Record<string, { bg: string; text: string }> = {
-      blog: { bg: 'bg-blue-100', text: 'text-blue-800' },
-      article: { bg: 'bg-green-100', text: 'text-green-800' },
-      news: { bg: 'bg-amber-100', text: 'text-amber-800' },
-    }
-    return styles[type] || { bg: 'bg-gray-100', text: 'text-gray-800' }
-  }
-
-  const getStatusBadge = (status: string) => {
+  const getStatusBadgeColor = (status: string): string => {
     return status === 'published'
-      ? { bg: 'bg-green-100', text: 'text-green-800', label: 'Published' }
-      : { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Draft' }
+      ? 'bg-green-100 text-green-800'
+      : 'bg-yellow-100 text-yellow-800'
+  }
+
+  const resources = (data || []) as Resource[]
+
+  const handleAddResource = (formData: any) => {
+    createResourceMutation.mutate(formData)
+  }
+
+  const handleEditResource = (resource: Resource) => {
+    setEditingResource(resource)
+    setShowAddModal(true)
+  }
+
+  const handleSaveEdit = (formData: any) => {
+    if (editingResource) {
+      updateResourceMutation.mutate({ id: editingResource.id, payload: formData })
+    }
+  }
+
+  const handleViewResource = (resource: Resource) => {
+    setSelectedResourceDetail(resource)
+    setShowDetailModal(true)
   }
 
   return (
-    <Flex flex-direction="column" gap="l" padding="l">
+    <div className="space-y-6">
       {/* Header */}
-      <Flex justify-content="space-between" align-items="center">
-        <Text tag="h1" font-size="heading-l">
-          Resources Management
-        </Text>
-      </Flex>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Resources Management</h1>
+          <p className="text-gray-600 mt-1">Manage blog posts, articles, and news</p>
+        </div>
+        <button
+          onClick={() => {
+            setEditingResource(null)
+            setShowAddModal(true)
+          }}
+          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
+        >
+          <PlusIcon className="w-5 h-5" />
+          Add Resource
+        </button>
+      </div>
 
-      <Divider />
+      {/* Search and Filters */}
+      <div className="bg-white rounded-lg shadow-sm p-4">
+        <div className="flex gap-4 flex-wrap">
+          <div className="flex-1 min-w-60">
+            <input
+              type="text"
+              placeholder="Search resources by title or content..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value)
+                setPage(0)
+              }}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+          <select
+            value={typeFilter}
+            onChange={(e) => {
+              setTypeFilter(e.target.value)
+              setPage(0)
+            }}
+            className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            <option value="">All Types</option>
+            <option value="blog">Blog</option>
+            <option value="article">Article</option>
+            <option value="news">News</option>
+          </select>
+          <select
+            value={statusFilter}
+            onChange={(e) => {
+              setStatusFilter(e.target.value)
+              setPage(0)
+            }}
+            className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            <option value="">All Status</option>
+            <option value="draft">Draft</option>
+            <option value="published">Published</option>
+          </select>
+        </div>
+      </div>
 
-      {/* Filters */}
-      <Card padding="m" variant="secondary">
-        <form onSubmit={handleSearch}>
-          <Flex flex-direction="column" gap="m">
-            <Flex gap="m" align-items="flex-end">
-              <div style={{ flex: 1 }}>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Search
-                </label>
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search by title, content..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Type
-                </label>
-                <select
-                  value={typeFilter}
-                  onChange={(e) => setTypeFilter(e.target.value as any)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
-                >
-                  <option value="">All Types</option>
-                  <option value="blog">Blog</option>
-                  <option value="article">Article</option>
-                  <option value="news">News</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Status
-                </label>
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value as any)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
-                >
-                  <option value="">All Status</option>
-                  <option value="draft">Draft</option>
-                  <option value="published">Published</option>
-                </select>
-              </div>
-
-              <Button type="submit" disabled={isFetching}>
-                {isFetching ? 'Searching...' : 'Search'}
-              </Button>
-            </Flex>
-          </Flex>
-        </form>
-      </Card>
-
-      {/* Resources Table */}
-      {isLoading ? (
-        <Flex justify-content="center" padding="l">
-          <Spinner />
-        </Flex>
-      ) : resources.length === 0 ? (
-        <Card padding="l">
-          <Text color="secondary">No resources found matching your filters.</Text>
-        </Card>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="bg-gray-100 border-b border-gray-300">
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
-                  Title
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
-                  Type
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
-                  Status
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
-                  Author
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
-                  Views
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
-                  Created
-                </th>
-                <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">
-                  Actions
-                </th>
+      {/* Desktop Table View */}
+      <div className="hidden md:block bg-white rounded-lg shadow-sm overflow-hidden">
+        <table className="w-full">
+          <thead>
+            <tr className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white">
+              <th className="px-6 py-3 text-left text-sm font-semibold">Title</th>
+              <th className="px-6 py-3 text-left text-sm font-semibold">Type</th>
+              <th className="px-6 py-3 text-left text-sm font-semibold">Status</th>
+              <th className="px-6 py-3 text-left text-sm font-semibold">Views</th>
+              <th className="px-6 py-3 text-left text-sm font-semibold">Created</th>
+              <th className="px-6 py-3 text-left text-sm font-semibold">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {isLoading ? (
+              <tr>
+                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                  Loading resources...
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {(resources as Resource[]).map((resource) => (
-                <tr key={resource.id} className="border-b border-gray-200 hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm text-gray-900 font-medium">
-                    <div className="max-w-xs truncate">{resource.title}</div>
+            ) : resources.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                  No resources found
+                </td>
+              </tr>
+            ) : (
+              resources.map((resource) => (
+                <tr key={resource.id} className="border-t border-gray-200 hover:bg-indigo-50 transition-colors">
+                  <td className="px-6 py-4">
+                    <div className="font-medium text-gray-900 max-w-xs truncate">{resource.title}</div>
                   </td>
-                  <td className="px-4 py-3 text-sm">
-                    <span
-                      className={`inline-block px-2 py-1 text-xs rounded-full ${
-                        getTypeBadge(resource.content_type).bg
-                      } ${getTypeBadge(resource.content_type).text}`}
-                    >
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTypeBadgeColor(resource.content_type)}`}>
                       {resource.content_type}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm">
-                    <span
-                      className={`inline-block px-2 py-1 text-xs rounded-full ${
-                        getStatusBadge(resource.status).bg
-                      } ${getStatusBadge(resource.status).text}`}
-                    >
-                      {getStatusBadge(resource.status).label}
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeColor(resource.status)}`}>
+                      {resource.status === 'published' ? 'Published' : 'Draft'}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
-                    {resource.author_id || '—'}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
-                    {resource.view_count}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
+                  <td className="px-6 py-4 text-sm text-gray-600">{resource.view_count || 0}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
                     {new Date(resource.created_at).toLocaleDateString()}
                   </td>
-                  <td className="px-4 py-3">
-                    <Flex justify-content="center" gap="s">
-                      <Link to={`/admin/resources/${resource.id}/edit`}>
-                        <Button rank="secondary" size="small">
-                          Edit
-                        </Button>
-                      </Link>
+                  <td className="px-6 py-4">
+                    <div className="flex gap-2">
                       <button
-                        onClick={() => handleDelete(resource.id, resource.title)}
-                        className="px-3 py-1 text-sm bg-red-100 text-red-800 rounded hover:bg-red-200 transition"
+                        onClick={() => handleViewResource(resource)}
+                        className="inline-flex items-center gap-1 px-3 py-1 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="View"
                       >
-                        Delete
+                        <EyeIcon className="w-4 h-4" />
                       </button>
-                    </Flex>
+                      <button
+                        onClick={() => handleEditResource(resource)}
+                        className="inline-flex items-center gap-1 px-3 py-1 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                        title="Edit"
+                      >
+                        <PencilSquareIcon className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (confirm('Are you sure you want to delete this resource?')) {
+                            deleteMutation.mutate(resource.id)
+                          }
+                        }}
+                        disabled={deleteMutation.isPending}
+                        className="inline-flex items-center gap-1 px-3 py-1 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                        title="Delete"
+                      >
+                        <TrashIcon className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              ))
+            )}
+          </tbody>
+        </table>
+
+        {/* Pagination */}
+        <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between bg-gray-50">
+          <button
+            onClick={() => setPage(Math.max(0, page - 1))}
+            disabled={page === 0}
+            className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            ← Previous
+          </button>
+          <span className="text-sm text-gray-700">
+            Page {page + 1}
+          </span>
+          <button
+            onClick={() => setPage(page + 1)}
+            disabled={resources.length === 0 || resources.length < 10}
+            className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Next →
+          </button>
         </div>
-      )}
-    </Flex>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-3">
+        {isLoading ? (
+          <div className="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
+            Loading resources...
+          </div>
+        ) : resources.length === 0 ? (
+          <div className="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
+            No resources found
+          </div>
+        ) : (
+          resources.map((resource) => (
+            <div key={resource.id} className="bg-white rounded-lg shadow-sm p-4 space-y-3 border-l-4 border-indigo-600">
+              <div>
+                <h3 className="font-semibold text-gray-900 truncate">{resource.title}</h3>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div>
+                  <p className="text-gray-600">Type</p>
+                  <p className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getTypeBadgeColor(resource.content_type)}`}>
+                    {resource.content_type}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-600">Status</p>
+                  <p className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(resource.status)}`}>
+                    {resource.status === 'published' ? 'Published' : 'Draft'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-600">Views</p>
+                  <p className="font-medium text-gray-900">{resource.view_count || 0}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600">Created</p>
+                  <p className="font-medium text-gray-900">{new Date(resource.created_at).toLocaleDateString()}</p>
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-2 border-t border-gray-200">
+                <button
+                  onClick={() => handleViewResource(resource)}
+                  className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium"
+                >
+                  <EyeIcon className="w-4 h-4" />
+                  View
+                </button>
+                <button
+                  onClick={() => handleEditResource(resource)}
+                  className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors text-sm font-medium"
+                >
+                  <PencilSquareIcon className="w-4 h-4" />
+                  Edit
+                </button>
+                <button
+                  onClick={() => {
+                    if (confirm('Are you sure you want to delete this resource?')) {
+                      deleteMutation.mutate(resource.id)
+                    }
+                  }}
+                  disabled={deleteMutation.isPending}
+                  className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors text-sm font-medium disabled:opacity-50"
+                >
+                  <TrashIcon className="w-4 h-4" />
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+
+        {/* Mobile Pagination */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => setPage(Math.max(0, page - 1))}
+            disabled={page === 0}
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            ← Previous
+          </button>
+          <button
+            onClick={() => setPage(page + 1)}
+            disabled={resources.length === 0 || resources.length < 10}
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Next →
+          </button>
+        </div>
+      </div>
+
+      {/* Add/Edit Resource Modal */}
+      <AddEditResourceModal
+        isOpen={showAddModal}
+        onClose={() => {
+          setShowAddModal(false)
+          setEditingResource(null)
+        }}
+        onSubmit={editingResource ? handleSaveEdit : handleAddResource}
+        isLoading={createResourceMutation.isPending || updateResourceMutation.isPending}
+        editingResource={editingResource}
+        categories={categories}
+      />
+
+      {/* Resource Detail Modal */}
+      <ResourceDetailModal
+        isOpen={showDetailModal}
+        resource={selectedResourceDetail}
+        onClose={() => {
+          setShowDetailModal(false)
+          setSelectedResourceDetail(null)
+        }}
+      />
+    </div>
   )
 }
