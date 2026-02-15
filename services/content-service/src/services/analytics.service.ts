@@ -4,7 +4,6 @@ import { query } from '../config/database';
 export interface AnalyticsEvent {
   content_id?: number;
   tutorial_id?: number;
-  resource_id?: number;
   user_id?: number;
   ip_address?: string;
   user_agent?: string;
@@ -24,7 +23,6 @@ export interface ContentStats {
 export interface OverallStats {
   total_content: number;
   total_tutorials: number;
-  total_resources: number;
   total_views: number;
   total_comments: number;
   published_content: number;
@@ -144,7 +142,6 @@ export class AnalyticsService {
       `SELECT 
          (SELECT COUNT(*) FROM content) as total_content,
          (SELECT COUNT(*) FROM tutorials) as total_tutorials,
-         (SELECT COUNT(*) FROM resources) as total_resources,
          (SELECT COALESCE(SUM(view_count), 0) FROM content) as total_views,
          (SELECT COUNT(*) FROM comments) as total_comments,
          (SELECT COUNT(*) FROM content WHERE status = 'published') as published_content,
@@ -189,6 +186,37 @@ export class AnalyticsService {
       content_id: row.content_id,
       views: parseInt(row.views, 10),
     }));
+  }
+
+  /**
+   * Get overall analytics overview
+   */
+  async getOverview(): Promise<OverallStats> {
+    try {
+      const [contentCount, tutorialCount, commentCount] = await Promise.all([
+        query(`SELECT COUNT(*) FROM content WHERE status = 'published'`),
+        query(`SELECT COUNT(*) FROM tutorials`),
+        query(`SELECT COUNT(*) FROM comments`),
+      ]);
+
+      return {
+        total_content: parseInt(contentCount.rows[0]?.count || '0'),
+        total_tutorials: parseInt(tutorialCount.rows[0]?.count || '0'),
+        total_views: 0,
+        total_comments: parseInt(commentCount.rows[0]?.count || '0'),
+        published_content: parseInt(contentCount.rows[0]?.count || '0'),
+        draft_content: 0,
+      };
+    } catch (error) {
+      return {
+        total_content: 0,
+        total_tutorials: 0,
+        total_views: 0,
+        total_comments: 0,
+        published_content: 0,
+        draft_content: 0,
+      };
+    }
   }
 }
 

@@ -8,7 +8,7 @@ import { useAuth } from '@/lib/context/AuthContext';
 import { Calendar, CheckCircle, Clock, DollarSign, FileText, Users, XCircle } from 'lucide-react';
 import { useState } from 'react';
 
-interface Contract {
+interface FreelancerContract {
   id: number;
   title: string;
   description: string;
@@ -25,8 +25,9 @@ interface Contract {
 }
 
 export default function ContractsPage() {
-  const { user } = useAuth();
+  const { user: _user } = useAuth();
   const { data: contracts = [], isLoading, isError, error, refetch } = useContracts();
+  const localContracts = (contracts as unknown) as FreelancerContract[];
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
 
   const getStatusColor = (status: string) => {
@@ -77,17 +78,17 @@ export default function ContractsPage() {
     }).format(amount);
   };
 
-  const filteredContracts = contracts.filter((contract: any) => {
+  const filteredContracts = localContracts.filter((contract: FreelancerContract) => {
     if (filterStatus === 'ALL') return true;
     return contract.status === filterStatus;
   });
 
   const contractStats = {
-    active: contracts.filter((c: any) => c.status === 'ACTIVE').length,
-    completed: contracts.filter((c: any) => c.status === 'COMPLETED').length,
-    totalEarned: contracts
-      .filter((c: any) => c.status === 'COMPLETED')
-      .reduce((sum: number, c: any) => sum + c.totalAmount, 0),
+    active: localContracts.filter((c: FreelancerContract) => c.status === 'ACTIVE').length,
+    completed: localContracts.filter((c: FreelancerContract) => c.status === 'COMPLETED').length,
+    totalEarned: localContracts
+      .filter((c: FreelancerContract) => c.status === 'COMPLETED')
+      .reduce((sum: number, c: FreelancerContract) => sum + (c.totalAmount ?? 0), 0),
   };
 
   if (isLoading) {
@@ -203,7 +204,7 @@ export default function ContractsPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {filteredContracts.map((contract: any) => (
+          {filteredContracts.map((contract: FreelancerContract) => (
             <div key={contract.id} className="bg-white rounded-lg shadow hover:shadow-md transition p-6">
               <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                 <div className="flex-1">

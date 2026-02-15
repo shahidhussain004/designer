@@ -3,7 +3,8 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { searchService } from '../services/search.service';
 
 interface QueryParams {
-  q: string;
+  q?: string;
+  query?: string;
   types?: string;
   page?: string;
   pageSize?: string;
@@ -15,22 +16,25 @@ export async function searchController(fastify: FastifyInstance) {
     '/',
     async (request: FastifyRequest<{ Querystring: QueryParams }>, reply: FastifyReply) => {
       try {
-        const { q, types, page = '1', pageSize = '10' } = request.query;
+        // Accept both 'q' and 'query' parameter names
+        const searchQuery = request.query.q || request.query.query;
+        const { types, page = '1', pageSize = '10' } = request.query;
 
-        if (!q || q.trim().length === 0) {
-          return reply.status(400).send({ success: false, error: 'Search query is required' });
+        if (!searchQuery || searchQuery.trim().length < 2) {
+          return reply
+            .status(400)
+            .send({ success: false, error: 'Search query must be at least 2 characters' });
         }
 
         const searchTypes = types
-          ? (types.split(',').filter((t) => ['content', 'tutorial', 'resource'].includes(t)) as (
+          ? (types.split(',').filter((t) => ['content', 'tutorial'].includes(t)) as (
               | 'content'
               | 'tutorial'
-              | 'resource'
             )[])
           : undefined;
 
         const offset = (parseInt(page) - 1) * parseInt(pageSize);
-        const result = await searchService.search(q, {
+        const result = await searchService.search(searchQuery, {
           types: searchTypes,
           limit: parseInt(pageSize),
           offset,
@@ -38,7 +42,7 @@ export async function searchController(fastify: FastifyInstance) {
 
         return reply.send({
           success: true,
-          query: q,
+          query: searchQuery,
           ...result,
           page: parseInt(page),
           pageSize: parseInt(pageSize),
@@ -56,18 +60,20 @@ export async function searchController(fastify: FastifyInstance) {
     '/content',
     async (request: FastifyRequest<{ Querystring: QueryParams }>, reply: FastifyReply) => {
       try {
-        const { q, page = '1', pageSize = '10' } = request.query;
+        // Accept both 'q' and 'query' parameter names
+        const searchQuery = request.query.q || request.query.query;
+        const { page = '1', pageSize = '10' } = request.query;
 
-        if (!q || q.trim().length === 0) {
+        if (!searchQuery || searchQuery.trim().length === 0) {
           return reply.status(400).send({ success: false, error: 'Search query is required' });
         }
 
         const offset = (parseInt(page) - 1) * parseInt(pageSize);
-        const result = await searchService.searchContent(q, parseInt(pageSize), offset);
+        const result = await searchService.searchContent(searchQuery, parseInt(pageSize), offset);
 
         return reply.send({
           success: true,
-          query: q,
+          query: searchQuery,
           ...result,
           page: parseInt(page),
           pageSize: parseInt(pageSize),
@@ -110,26 +116,33 @@ export async function searchController(fastify: FastifyInstance) {
   );
 
   // Search resources only
+  // resources endpoint removed
+
+  // Get search suggestions
   fastify.get(
-    '/resources',
+    '/suggest',
     async (request: FastifyRequest<{ Querystring: QueryParams }>, reply: FastifyReply) => {
       try {
-        const { q, page = '1', pageSize = '10' } = request.query;
+        // Accept both 'q' and 'query' parameter names
+        const searchQuery = request.query.q || request.query.query;
 
-        if (!q || q.trim().length === 0) {
-          return reply.status(400).send({ success: false, error: 'Search query is required' });
+        if (!searchQuery || searchQuery.trim().length < 2) {
+          return reply
+            .status(400)
+            .send({ success: false, error: 'Query must be at least 2 characters' });
         }
 
-        const offset = (parseInt(page) - 1) * parseInt(pageSize);
-        const result = await searchService.searchResources(q, parseInt(pageSize), offset);
+        // For now, return mock suggestions based on query
+        const suggestions = [
+          { id: '1', title: 'Getting Started with Node.js', type: 'content' },
+          { id: '2', title: 'Node.js Best Practices', type: 'tutorial' },
+          { id: '3', title: 'JavaScript Fundamentals', type: 'content' },
+        ];
 
         return reply.send({
           success: true,
-          query: q,
-          ...result,
-          page: parseInt(page),
-          pageSize: parseInt(pageSize),
-          totalPages: Math.ceil(result.total / parseInt(pageSize)),
+          query: searchQuery,
+          suggestions,
         });
       } catch (error: any) {
         request.log.error(error);

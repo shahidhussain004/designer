@@ -3,11 +3,11 @@
  * Uses raw pg library with connection pooling
  */
 import {
-    closePool,
-    healthCheck as dbHealthCheck,
-    getPool,
-    initializeSchema,
-    query,
+  closePool,
+  healthCheck as dbHealthCheck,
+  getPool,
+  initializeSchema,
+  query,
 } from './database';
 import { logger } from './logger.config';
 import { getMigrationStatus, runMigrations } from './migrations';
@@ -90,5 +90,11 @@ class DatabaseService {
   }
 }
 
-export const databaseService = DatabaseService.getInstance();
-export default databaseService;
+/**
+ * Lazy getter for database service instance
+ * Returns the singleton, but defers creation until first call
+ * This allows test mocks to intercept the getInstance() call
+ */
+export function getDatabaseService(): DatabaseService {
+  return DatabaseService.getInstance();
+}

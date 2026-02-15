@@ -116,9 +116,16 @@ VITE_API_URL=http://localhost:8080/api
 
 ## Demo Credentials
 
-For testing purposes:
-- Email: admin@designermarket.com
-- Password: Admin123!
+For testing purposes, you can login in two ways:
+
+### Option 1: Auto-Login from Marketplace
+1. Go to marketplace (http://localhost:3002)
+2. Login with: admin@marketplace.com / password123
+3. You'll be automatically redirected to admin dashboard and logged in
+
+### Option 2: Direct Admin Dashboard Login
+- Email: admin@marketplace.com
+- Password: password123
 
 ## License
 

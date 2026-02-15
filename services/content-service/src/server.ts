@@ -7,7 +7,7 @@ import 'dotenv/config';
 
 import { buildApp } from './app';
 import { appConfig } from './config/app.config';
-import { databaseService } from './config/db.service';
+import { getDatabaseService } from './config/db.service';
 import { logger } from './config/logger.config';
 import { redisService } from './infrastructure/cache';
 import { kafkaService } from './infrastructure/messaging';
@@ -22,7 +22,7 @@ async function bootstrap(): Promise<void> {
 
     try {
       await app.close();
-      await databaseService.disconnect();
+      await getDatabaseService().disconnect();
       await redisService.disconnect();
       await kafkaService.disconnect();
       logger.info('Graceful shutdown completed');
@@ -54,7 +54,7 @@ async function bootstrap(): Promise<void> {
 
     // Database (required) - This will also run migrations automatically
     logger.debug('Connecting to PostgreSQL database...');
-    await databaseService.connect();
+    await getDatabaseService().connect();
     logger.debug('Database connected and migrations applied');
 
     // Storage (required)
@@ -89,7 +89,7 @@ async function bootstrap(): Promise<void> {
     logger.info(`API Docs available at http://localhost:${appConfig.port}/docs`);
 
     // Log migration status
-    const migrationStatus = await databaseService.getMigrationStatus();
+    const migrationStatus = await getDatabaseService().getMigrationStatus();
     logger.info(
       {
         appliedMigrations: migrationStatus.applied.length,

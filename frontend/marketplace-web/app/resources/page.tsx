@@ -5,6 +5,7 @@ import { TutorialsSkeleton } from '@/components/Skeletons';
 import { PageLayout } from '@/components/ui';
 import { useCategories, useContent, useTags } from '@/hooks/useContent';
 import type { ContentType } from '@/lib/content-types';
+import { useAuth } from '@/lib/context/AuthContext';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useMemo, useState } from 'react';
@@ -69,6 +70,8 @@ export default function ResourcesPage() {
   }, [page, pageSize, sortBy, sortOrder, selectedContentType, selectedCategory, selectedTags, searchQuery]);
 
   const { data: contentData, isLoading, error, refetch } = useContent(filters);
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
   
   const content = contentData?.data || [];
   const totalCount = contentData?.meta?.total || 0;
@@ -134,8 +137,7 @@ export default function ResourcesPage() {
               Resources & Insights
             </h1>
             <p className="text-gray-300 text-lg max-w-2xl">
-              Explore our collection of articles, tutorials, and industry insights
-              to help you succeed in the design marketplace.
+              Explore our collection of articles, blogs and industry news to help you succeed in the design marketplace.
             </p>
           </div>
         </div>
@@ -277,8 +279,8 @@ export default function ResourcesPage() {
                   {content.map((item: any) => {
                     const contentTypeValue = item.type || item.content_type || item.resource_type || '';
                   return (
-                    <Link key={item.id} href={`/resources/${getTypeSlug(contentTypeValue)}/${item.slug}`}>
-                      <div className="h-full bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-lg hover:border-primary-300 transition-all cursor-pointer overflow-hidden group">
+                      <Link key={item.id} href={`/resources/${getTypeSlug(contentTypeValue)}/${item.slug}`}>
+                        <div className="h-full relative bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-lg hover:border-primary-300 transition-all cursor-pointer overflow-hidden group">
                         {/* Featured Image */}
                         <div className="relative h-48 bg-gray-200">
                           {item.featuredImageUrl ? (
@@ -396,6 +398,20 @@ export default function ResourcesPage() {
                             </div>
                           )}
                         </div>
+                        {/* Admin Edit Button (visible to admins) */}
+                        {isAdmin && (
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              // Open admin dashboard in same window
+                              window.location.href = `http://localhost:3001/admin/resources/${item.id}/edit`;
+                            }}
+                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity px-3 py-1 bg-blue-600 text-white text-xs rounded font-medium hover:bg-blue-700"
+                            title="Edit this resource"
+                          >
+                            ✎ Edit
+                          </button>
+                        )}
                       </div>
                     </Link>
 

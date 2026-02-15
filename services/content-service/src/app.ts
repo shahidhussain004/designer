@@ -7,25 +7,24 @@ import Fastify, { FastifyInstance } from 'fastify';
 
 // Import new controllers
 import {
-    analyticsController,
-    categoryController,
-    commentController,
-    contentController,
-    mediaController,
-    resourceController,
-    searchController,
-    tagController,
-    tutorialController,
+  analyticsController,
+  categoryController,
+  commentController,
+  contentController,
+  mediaController,
+  searchController,
+  tagController,
+  tutorialController,
 } from './controllers';
 
 // Keep existing plugins
 import {
-    corsPlugin,
-    errorHandlerPlugin,
-    healthPlugin,
-    multipartPlugin,
-    rateLimitPlugin,
-    swaggerPlugin,
+  corsPlugin,
+  errorHandlerPlugin,
+  healthPlugin,
+  multipartPlugin,
+  rateLimitPlugin,
+  swaggerPlugin,
 } from './plugins';
 
 export async function buildApp(): Promise<FastifyInstance> {
@@ -93,8 +92,7 @@ export async function buildApp(): Promise<FastifyInstance> {
       // Tutorials
       await api.register(tutorialController, { prefix: '/tutorials' });
 
-      // Resources
-      await api.register(resourceController, { prefix: '/resources' });
+      // Resources handler removed
     },
     { prefix: '/api/v1' }
   );

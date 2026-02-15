@@ -8,7 +8,7 @@ import { useAuth } from '@/lib/context/AuthContext';
 import { Flag, MessageSquare, Star, User } from 'lucide-react';
 import { useState } from 'react';
 
-interface Review {
+interface _Review {
   id: number;
   rating: number;
   comment: string;
@@ -38,7 +38,7 @@ interface Review {
   };
 }
 
-interface Contract {
+interface _Contract {
   id: number;
   title: string;
   status: string;
@@ -162,7 +162,10 @@ export default function ReviewsPage() {
 
   const avgRating =
     receivedReviews.length > 0
-      ? (receivedReviews.reduce((sum: number, r: any) => sum + r.rating, 0) / receivedReviews.length).toFixed(
+      ? (receivedReviews.reduce((sum: number, r: unknown) => {
+          const review = r as { rating?: number };
+          return sum + (review.rating ?? 0);
+        }, 0) / receivedReviews.length).toFixed(
           1
         )
       : '0.0';
@@ -381,8 +384,10 @@ export default function ReviewsPage() {
             </div>
           )}
 
-          {(activeTab === 'received' ? receivedReviews : givenReviews).map((review: any) => (
-            <div key={review.id} className="bg-white rounded-lg shadow p-6">
+          {(activeTab === 'received' ? receivedReviews : givenReviews).map((review: unknown) => {
+            const r = review as { id: string; isAnonymous?: boolean; reviewer?: { username?: string }; reviewee?: { username?: string }; contract?: { title?: string }; createdAt?: string; rating?: number; comment?: string; categoryRatings?: Record<string, number> };
+            return (
+            <div key={r.id} className="bg-white rounded-lg shadow p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-start gap-4">
                   <div className="bg-gray-100 rounded-full p-3">
@@ -390,14 +395,14 @@ export default function ReviewsPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">
-                      {review.isAnonymous
+                      {r.isAnonymous
                         ? 'Anonymous'
                         : activeTab === 'received'
-                        ? review.reviewer?.username || 'Unknown'
-                        : review.reviewee?.username || 'Unknown'}
+                        ? r.reviewer?.username || 'Unknown'
+                        : r.reviewee?.username || 'Unknown'}
                     </h3>
-                    <p className="text-sm text-gray-600">{review.contract.title}</p>
-                    <p className="text-xs text-gray-500 mt-1">{formatDate(review.createdAt)}</p>
+                    <p className="text-sm text-gray-600">{r.contract?.title}</p>
+                    <p className="text-xs text-gray-500 mt-1">{r.createdAt ? formatDate(r.createdAt) : ''}</p>
                   </div>
                 </div>
                 <button className="text-gray-400 hover:text-red-600 transition">
@@ -407,18 +412,18 @@ export default function ReviewsPage() {
 
               <div className="mb-3">
                 <div className="flex items-center gap-2 mb-2">
-                  {renderStars(review.rating, 18)}
-                  <span className="text-sm font-medium text-gray-700">
-                    {review.rating.toFixed(1)}/5.0
+                    {renderStars(r.rating ?? 0, 18)}
+                    <span className="text-sm font-medium text-gray-700">
+                      {(r.rating ?? 0).toFixed(1)}/5.0
                   </span>
                 </div>
               </div>
 
-              <p className="text-gray-700 mb-4">{review.comment}</p>
+                <p className="text-gray-700 mb-4">{r.comment}</p>
 
-              {review.categoryRatings && (
+                {r.categoryRatings && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t">
-                  {Object.entries(review.categoryRatings).map(([category, rating]) => (
+                    {Object.entries(r.categoryRatings).map(([category, rating]) => (
                     <div key={category}>
                       <p className="text-xs text-gray-500 mb-1 capitalize">{category}</p>
                       {renderStars(rating as number, 14)}
@@ -427,7 +432,8 @@ export default function ReviewsPage() {
                 </div>
               )}
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </PageLayout>
