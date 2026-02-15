@@ -26,7 +26,7 @@ describe('getJobs adapter', () => {
       pageSize: 10
     };
 
-    const mockedGet = jest.fn() as jest.MockedFunction<(...args: any[]) => Promise<{ data: typeof apiResponse }>>;
+    const mockedGet = jest.fn() as jest.MockedFunction<(...args: unknown[]) => Promise<{ data: typeof apiResponse }>>;
     mockedGet.mockResolvedValueOnce({ data: apiResponse });
     const mockedApiClient = apiClient as unknown as { get: typeof mockedGet };
     mockedApiClient.get = mockedGet;
@@ -44,7 +44,7 @@ describe('getJobs adapter', () => {
 
   it('returns empty jobs array when API omits items', async () => {
     const apiResponse = { totalCount: 0, page: 0, pageSize: 10 };
-    const mockedGet = jest.fn() as jest.MockedFunction<(...args: any[]) => Promise<{ data: typeof apiResponse }>>;
+    const mockedGet = jest.fn() as jest.MockedFunction<(...args: unknown[]) => Promise<{ data: typeof apiResponse }>>;
     mockedGet.mockResolvedValueOnce({ data: apiResponse });
     const mockedApiClient = apiClient as unknown as { get: typeof mockedGet };
     mockedApiClient.get = mockedGet;
