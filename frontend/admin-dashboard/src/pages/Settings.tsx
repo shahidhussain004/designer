@@ -6,7 +6,7 @@ import { authApi, usersApi } from '../lib/api'
 
 export default function Settings() {
   const queryClient = useQueryClient()
-  const { data: me } = useQuery({ queryKey: ['me'], queryFn: authApi.me })
+  const { data: me } = useQuery<any>({ queryKey: ['me'], queryFn: () => authApi.me() })
 
   const [emailNotifications, setEmailNotifications] = useState({ jobAlerts: true, messages: true })
 
@@ -15,7 +15,7 @@ export default function Settings() {
   }, [me])
 
   const saveMutation = useMutation({
-    mutationFn: async (payload: any) => usersApi.update(me.id, { ...payload }),
+    mutationFn: async (payload: any) => usersApi.update(me?.id, { ...payload }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['me'] })
       toast.success('Settings saved')

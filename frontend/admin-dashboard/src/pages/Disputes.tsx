@@ -223,10 +223,10 @@ export default function Disputes() {
 
   // Calculate stats
   const stats = {
-    pending: filteredDisputes.filter(d => d.status === 'PENDING').length,
-    underReview: filteredDisputes.filter(d => d.status === 'UNDER_REVIEW').length,
-    resolved: filteredDisputes.filter(d => d.status === 'RESOLVED').length,
-    totalAmount: filteredDisputes.reduce((sum, d) => sum + d.amount, 0),
+    pending: filteredDisputes.filter((d: Dispute) => d.status === 'PENDING').length,
+    underReview: filteredDisputes.filter((d: Dispute) => d.status === 'UNDER_REVIEW').length,
+    resolved: filteredDisputes.filter((d: Dispute) => d.status === 'RESOLVED').length,
+    totalAmount: filteredDisputes.reduce((sum: number, d: Dispute) => sum + d.amount, 0),
   }
 
   return (

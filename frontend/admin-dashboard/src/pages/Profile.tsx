@@ -6,7 +6,7 @@ import { authApi, usersApi } from '../lib/api'
 
 export default function Profile() {
   const queryClient = useQueryClient()
-  const { data: me, isLoading } = useQuery({ queryKey: ['me'], queryFn: authApi.me })
+  const { data: me, isLoading } = useQuery<any>({ queryKey: ['me'], queryFn: () => authApi.me() })
   const [form, setForm] = useState({ email: '', fullName: '' })
 
   useEffect(() => {
@@ -14,7 +14,7 @@ export default function Profile() {
   }, [me])
 
   const updateMut = useMutation({
-    mutationFn: (payload: any) => usersApi.update(me.id, payload),
+    mutationFn: (payload: any) => usersApi.update(me?.id, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['me'] })
       toast.success('Profile updated')

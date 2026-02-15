@@ -31,11 +31,11 @@ const navigation = [
 ]
 
 export default function Layout() {
-  const siteTitle = 'Admin Panel'
+  
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
-  const { user, logout } = useAuthStore()
+  const { logout } = useAuthStore()
   const { theme, toggleTheme } = useContext(ThemeContext)
 
   const handleLogout = () => {

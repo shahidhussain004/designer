@@ -1,8 +1,8 @@
 import {
-    EyeIcon,
-    PencilSquareIcon,
-    PlusIcon,
-    TrashIcon,
+  EyeIcon,
+  PencilSquareIcon,
+  PlusIcon,
+  TrashIcon,
 } from '@heroicons/react/24/outline'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
@@ -245,8 +245,8 @@ function AddEditResourceModal({ isOpen, onClose, onSubmit, isLoading, editingRes
 export default function ResourcesPage() {
   const [page, setPage] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
-  const [typeFilter, setTypeFilter] = useState<string>('')
-  const [statusFilter, setStatusFilter] = useState<string>('')
+  const [typeFilter, setTypeFilter] = useState<'' | 'blog' | 'article' | 'news'>('')
+  const [statusFilter, setStatusFilter] = useState<'' | 'draft' | 'published'>('')
   const [showAddModal, setShowAddModal] = useState(false)
   const [showDetailModal, setShowDetailModal] = useState(false)
   const [editingResource, setEditingResource] = useState<Resource | null>(null)
@@ -385,7 +385,7 @@ export default function ResourcesPage() {
           <select
             value={typeFilter}
             onChange={(e) => {
-              setTypeFilter(e.target.value)
+              setTypeFilter(e.target.value as '' | 'blog' | 'article' | 'news')
               setPage(0)
             }}
             className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500"
@@ -398,7 +398,7 @@ export default function ResourcesPage() {
           <select
             value={statusFilter}
             onChange={(e) => {
-              setStatusFilter(e.target.value)
+              setStatusFilter(e.target.value as '' | 'draft' | 'published')
               setPage(0)
             }}
             className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500"

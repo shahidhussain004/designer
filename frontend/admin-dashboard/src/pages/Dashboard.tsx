@@ -65,16 +65,7 @@ export default function Dashboard() {
     },
   ]
 
-  const getVariant = (changeType: string): 'primary' | 'secondary' | 'success' | 'warning' | 'danger' => {
-    switch (changeType) {
-      case 'positive':
-        return 'success'
-      case 'negative':
-        return 'danger'
-      default:
-        return 'primary'
-    }
-  }
+  // variant mapping removed (not currently used)
 
   if (isLoading) {
     return (
