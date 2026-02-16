@@ -4,7 +4,7 @@
  * Tailwind CSS UI Components
  */
 
-import React, { forwardRef, HTMLAttributes, ButtonHTMLAttributes, InputHTMLAttributes } from 'react'
+import React, { ButtonHTMLAttributes, forwardRef, HTMLAttributes, InputHTMLAttributes } from 'react'
 
 function cn(...classes: (string | boolean | undefined)[]) {
   return classes.filter(Boolean).join(' ')
@@ -240,10 +240,10 @@ export const Text = forwardRef<HTMLElement, TextProps>(({
   children,
   font,
   color,
+  'font-size': fontSize,
+  'font-weight': fontWeight,
   ...props
 }, ref) => {
-  const fontSize = props['font-size']
-  const fontWeight = props['font-weight']
 
   const fontClasses: Record<string, string> = {
     'heading-xl': 'text-3xl font-bold',

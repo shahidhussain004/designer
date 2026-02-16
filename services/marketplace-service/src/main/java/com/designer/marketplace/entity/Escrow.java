@@ -43,7 +43,7 @@ public class Escrow {
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "amount_cents")
     private Long amount;
 
     @Column(length = 3)
@@ -58,7 +58,7 @@ public class Escrow {
     @Enumerated(EnumType.STRING)
     @Column(name = "release_condition", length = 100)
     @Builder.Default
-    private ReleaseCondition releaseCondition = ReleaseCondition.PROJECT_COMPLETED;
+    private ReleaseCondition releaseCondition = ReleaseCondition.JOB_COMPLETED;
 
     @Column(name = "auto_release_date")
     private LocalDateTime autoReleaseDate;
@@ -87,7 +87,7 @@ public class Escrow {
     }
 
     public enum ReleaseCondition {
-        PROJECT_COMPLETED,
+        JOB_COMPLETED,
         MILESTONE_COMPLETED,
         MANUAL_RELEASE,
         AUTO_RELEASE,

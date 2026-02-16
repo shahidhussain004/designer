@@ -410,13 +410,13 @@ export const Text = forwardRef<HTMLElement, TextProps>(({
   font,
   color,
   style,
+  'font-size': fontSize,
+  'font-weight': fontWeight,
+  'text-align': textAlign,
+  'margin-bottom': marginBottom,
+  'margin-top': marginTop,
   ...props
 }, ref) => {
-  const fontSize = props['font-size']
-  const fontWeight = props['font-weight']
-  const textAlign = props['text-align']
-  const marginBottom = props['margin-bottom']
-  const marginTop = props['margin-top']
 
   const fontClasses: Record<string, string> = {
     'heading-2xl': 'text-4xl font-bold',
@@ -466,7 +466,7 @@ export const Text = forwardRef<HTMLElement, TextProps>(({
       )}
       style={{
         ...style,
-        ...(marginBottom && { marginBottom: marginBottom === 'l' ? '1.5rem' : marginBottom === 'm' ? '1rem' : marginBottom === 's' ? '0.5rem' : marginBottom === 'xs' ? '0.25rem' : marginBottom }),
+        ...(marginBottom && { marginBottom: marginBottom === 'l' ? '1.5rem' : marginBottom === 'm' ? '1rem' : marginBottom === 's' ? '0.5rem' : marginBottom === 'xs' ? '0.25rem' : marginBottom } ),
         ...(marginTop && { marginTop: marginTop === 's' ? '0.5rem' : marginTop === 'xs' ? '0.25rem' : marginTop }),
       }}
     >

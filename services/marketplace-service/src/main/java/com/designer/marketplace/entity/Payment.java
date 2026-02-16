@@ -15,7 +15,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -26,16 +25,10 @@ import lombok.NoArgsConstructor;
 
 /**
  * Payment entity - Represents transactions between company and freelancer
- * Integrates with Stripe for payment processing
  * Maps to 'payments' table in PostgreSQL
  */
 @Entity
-@Table(name = "payments", indexes = {
-        @Index(name = "idx_payments_company_id", columnList = "company_id"),
-        @Index(name = "idx_payments_freelancer_id", columnList = "freelancer_id"),
-        @Index(name = "idx_payments_status", columnList = "status"),
-        @Index(name = "idx_payments_created_at", columnList = "created_at")
-})
+@Table(name = "payments")
 @EntityListeners(AuditingEntityListener.class)
 @Data
 @Builder
@@ -47,64 +40,42 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "payment_intent_id", unique = true)
-    private String paymentIntentId;
-
-    @Column(name = "stripe_charge_id")
-    private String stripeChargeId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "contract_id")
+    private Contract contract;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_id", nullable = false)
+    @JoinColumn(name = "payer_id", nullable = false)
     private Company company;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "freelancer_id", nullable = false)
+    @JoinColumn(name = "payee_id", nullable = false)
     private Freelancer freelancer;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id")
-    private Project project;
 
     @Column(name = "amount_cents", nullable = false)
     private Long amountCents;
 
-    @Column(name = "platform_fee_cents")
-    private Long platformFeeCents;
-
-    @Column(name = "freelancer_amount_cents", nullable = false)
-    private Long freelancerAmountCents;
-
     @Column(length = 3)
     private String currency = "USD";
+
+    @Column(name = "payment_method")
+    private String paymentMethod;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 50)
     private PaymentStatus status;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "escrow_status", length = 50)
-    private EscrowStatus escrowStatus;
+    @Column(name = "transaction_id", length = 255)
+    private String transactionId;
 
-    @Column(name = "stripe_payment_method")
-    private String stripePaymentMethod;
+    @Column(name = "reference_number", length = 50)
+    private String referenceNumber;
 
-    @Column(name = "stripe_receipt_url", columnDefinition = "TEXT")
-    private String stripeReceiptUrl;
-
-    @Column(name = "failure_code", length = 100)
-    private String failureCode;
-
-    @Column(name = "failure_message", columnDefinition = "TEXT")
-    private String failureMessage;
-
-    @Column(name = "paid_at")
-    private LocalDateTime paidAt;
-
-    @Column(name = "released_at")
-    private LocalDateTime releasedAt;
-
-    @Column(name = "refunded_at")
-    private LocalDateTime refundedAt;
+    @Column(name = "processed_at")
+    private LocalDateTime processedAt;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -117,17 +88,8 @@ public class Payment {
     public enum PaymentStatus {
         PENDING,
         PROCESSING,
-        SUCCEEDED,
+        COMPLETED,
         FAILED,
-        REFUNDED,
-        CANCELLED
-    }
-
-    public enum EscrowStatus {
-        NOT_ESCROWED,
-        HELD,
-        RELEASED,
-        REFUNDED,
-        DISPUTED
+        REFUNDED
     }
 }

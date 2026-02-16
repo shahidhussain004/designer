@@ -1,18 +1,12 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { disputesApi } from '../lib/api'
-import toast from 'react-hot-toast'
 import {
-  Card,
-  Flex,
-  Grid,
-  Text,
-  Button,
-  Input,
-  Divider,
-  Badge,
-  Spinner,
-} from '../components/green'
+  CheckCircleIcon,
+  ClockIcon,
+  ExclamationTriangleIcon,
+} from '@heroicons/react/24/outline'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
+import { disputesApi } from '../lib/api'
 
 interface Dispute {
   id: number
@@ -29,18 +23,135 @@ interface Dispute {
   resolution?: string
 }
 
+interface ResolutionModalProps {
+  isOpen: boolean
+  onClose: () => void
+  dispute: Dispute | null
+  onSubmit: (data: { id: number; resolution: string; refundAmount: number; favorClient: boolean }) => void
+  isLoading: boolean
+}
+
+function ResolutionModal({ isOpen, onClose, dispute, onSubmit, isLoading }: ResolutionModalProps) {
+  const [resolution, setResolution] = useState('')
+  const [refundAmount, setRefundAmount] = useState(dispute?.amount || 0)
+
+  if (!isOpen || !dispute) return null
+
+  const handleSubmit = (favorClient: boolean) => {
+    onSubmit({
+      id: dispute.id,
+      resolution,
+      refundAmount: favorClient ? refundAmount : 0,
+      favorClient,
+    })
+    setResolution('')
+    setRefundAmount(0)
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="px-6 py-4 border-b border-gray-200 sticky top-0 bg-white">
+          <h2 className="text-xl font-bold text-gray-900">Resolve Dispute - {dispute.jobTitle}</h2>
+        </div>
+
+        <div className="p-6 space-y-6">
+          {/* Dispute Details */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-600">Client</p>
+              <p className="font-medium text-gray-900">{dispute.clientName}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Freelancer</p>
+              <p className="font-medium text-gray-900">{dispute.freelancerName}</p>
+            </div>
+          </div>
+
+          <div>
+            <p className="text-sm text-gray-600">Reason</p>
+            <p className="text-gray-900 mt-1">{dispute.reason}</p>
+          </div>
+
+          <div>
+            <p className="text-sm text-gray-600">Description</p>
+            <p className="text-gray-900 mt-1">{dispute.description}</p>
+          </div>
+
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <p className="text-sm text-gray-600">Disputed Amount</p>
+            <p className="text-2xl font-bold text-blue-600 mt-1">${dispute.amount.toLocaleString()}</p>
+          </div>
+
+          {/* Resolution Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Resolution Notes</label>
+            <textarea
+              value={resolution}
+              onChange={(e) => setResolution(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500"
+              rows={4}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Refund Amount to Client</label>
+            <div className="flex items-center gap-2">
+              <span className="text-lg font-medium">$</span>
+              <input
+                type="number"
+                value={refundAmount}
+                onChange={(e) => setRefundAmount(Number(e.target.value))}
+                min={0}
+                max={dispute.amount}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+            <p className="text-sm text-gray-600 mt-2">
+              Freelancer will receive: ${(dispute.amount - refundAmount).toLocaleString()}
+            </p>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-3 pt-4 border-t border-gray-200">
+            <button
+              onClick={onClose}
+              className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 font-medium text-sm"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => handleSubmit(false)}
+              disabled={isLoading}
+              className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-sm disabled:opacity-50"
+            >
+              {isLoading ? 'Resolving...' : 'Favor Freelancer'}
+            </button>
+            <button
+              onClick={() => handleSubmit(true)}
+              disabled={isLoading}
+              className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium text-sm disabled:opacity-50"
+            >
+              {isLoading ? 'Resolving...' : `Favor Client ($${refundAmount})`}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Disputes() {
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState<string>('PENDING')
+  const [statusFilter, setStatusFilter] = useState<string>('')
   const [selectedDispute, setSelectedDispute] = useState<Dispute | null>(null)
-  const [resolution, setResolution] = useState('')
-  const [refundAmount, setRefundAmount] = useState<number>(0)
   const queryClient = useQueryClient()
 
   const { data, isLoading } = useQuery({
     queryKey: ['disputes', page, statusFilter],
-    queryFn: () => disputesApi.getAll({ page, size: 10, status: statusFilter }),
+    queryFn: () => disputesApi.getAll({ page, size: 10, status: statusFilter || undefined }),
   })
 
   const resolveMutation = useMutation({
@@ -57,10 +168,8 @@ export default function Disputes() {
     }) => disputesApi.resolve(id, resolution, refundAmount, favorClient),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['disputes'] })
-      toast.success('Dispute resolved')
+      toast.success('Dispute resolved successfully')
       setSelectedDispute(null)
-      setResolution('')
-      setRefundAmount(0)
     },
     onError: () => {
       toast.error('Failed to resolve dispute')
@@ -71,7 +180,7 @@ export default function Disputes() {
     mutationFn: (id: number) => disputesApi.escalate(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['disputes'] })
-      toast.success('Dispute escalated')
+      toast.success('Dispute escalated successfully')
     },
     onError: () => {
       toast.error('Failed to escalate dispute')
@@ -84,168 +193,123 @@ export default function Disputes() {
     dispute.freelancerName?.toLowerCase().includes(search.toLowerCase())
   ) || []
 
-  const getStatusBadgeVariant = (status: string): 'primary' | 'secondary' | 'success' | 'warning' | 'danger' => {
+  const getStatusBadgeColor = (status: string): string => {
     switch (status) {
       case 'PENDING':
-        return 'warning'
+        return 'bg-yellow-100 text-yellow-800'
       case 'UNDER_REVIEW':
-        return 'primary'
+        return 'bg-blue-100 text-blue-800'
       case 'RESOLVED':
-        return 'success'
+        return 'bg-green-100 text-green-800'
       case 'REJECTED':
-        return 'danger'
+        return 'bg-red-100 text-red-800'
       default:
-        return 'primary'
+        return 'bg-gray-100 text-gray-800'
     }
   }
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'PENDING':
-        return '⏳'
+        return <ClockIcon className="w-5 h-5" />
       case 'UNDER_REVIEW':
-        return '⚠️'
+        return <ExclamationTriangleIcon className="w-5 h-5" />
       case 'RESOLVED':
-        return '✓'
-      case 'REJECTED':
-        return '✗'
+        return <CheckCircleIcon className="w-5 h-5" />
       default:
-        return '○'
+        return null
     }
   }
 
+  // Calculate stats
+  const stats = {
+    pending: filteredDisputes.filter((d: Dispute) => d.status === 'PENDING').length,
+    underReview: filteredDisputes.filter((d: Dispute) => d.status === 'UNDER_REVIEW').length,
+    resolved: filteredDisputes.filter((d: Dispute) => d.status === 'RESOLVED').length,
+    totalAmount: filteredDisputes.reduce((sum: number, d: Dispute) => sum + d.amount, 0),
+  }
+
   return (
-    <Flex flex-direction="column" gap="l">
+    <div className="space-y-6">
       {/* Header */}
-      <Flex justify-content="space-between" align-items="center">
-        <div>
-          <Text tag="h1" style={{ fontSize: '1.5rem', fontWeight: 700 } as any}>
-            Disputes
-          </Text>
-          <Text style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>
-            Handle payment disputes and resolutions
-          </Text>
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900">Disputes Management</h1>
+        <p className="text-gray-600 mt-1">Handle payment disputes and resolutions</p>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white rounded-lg shadow-sm p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-yellow-100 rounded-lg">
+              <ClockIcon className="w-6 h-6 text-yellow-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Pending</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.pending}</p>
+            </div>
+          </div>
         </div>
-      </Flex>
 
-      {/* Stats */}
-      <Grid columns="1; s{2}; m{4}" gap="m">
-        <Card>
-          <Flex padding="m" gap="m" align-items="center">
-            <div
-              style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '50%',
-                background: 'var(--gds-color-l3-background-notice-dim)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1.5rem',
-              } as any}
-            >
-              ⏳
+        <div className="bg-white rounded-lg shadow-sm p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-blue-100 rounded-lg">
+              <ExclamationTriangleIcon className="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Pending</Text>
-              <Text style={{ fontSize: '1.5rem', fontWeight: 700 } as any}>{data?.stats?.pending || 0}</Text>
+              <p className="text-sm text-gray-600">Under Review</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.underReview}</p>
             </div>
-          </Flex>
-        </Card>
-
-        <Card>
-          <Flex padding="m" gap="m" align-items="center">
-            <div
-              style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '50%',
-                background: 'var(--gds-color-l3-background-information-dim)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1.5rem',
-              } as any}
-            >
-              ⚠️
-            </div>
-            <div>
-              <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Under Review</Text>
-              <Text style={{ fontSize: '1.5rem', fontWeight: 700 } as any}>{data?.stats?.underReview || 0}</Text>
-            </div>
-          </Flex>
-        </Card>
-
-        <Card>
-          <Flex padding="m" gap="m" align-items="center">
-            <div
-              style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '50%',
-                background: 'var(--gds-color-l3-background-positive-dim)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1.5rem',
-              } as any}
-            >
-              ✓
-            </div>
-            <div>
-              <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Resolved</Text>
-              <Text style={{ fontSize: '1.5rem', fontWeight: 700 } as any}>{data?.stats?.resolved || 0}</Text>
-            </div>
-          </Flex>
-        </Card>
-
-        <Card>
-          <Flex padding="m" gap="m" align-items="center">
-            <div
-              style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '50%',
-                background: 'var(--gds-color-l3-background-secondary)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1.5rem',
-                fontWeight: 700,
-                color: 'var(--gds-color-l3-content-positive)',
-              } as any}
-            >
-              $
-            </div>
-            <div>
-              <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Total Disputed</Text>
-              <Text style={{ fontSize: '1.5rem', fontWeight: 700 } as any}>${(data?.stats?.totalAmount || 0).toLocaleString()}</Text>
-            </div>
-          </Flex>
-        </Card>
-      </Grid>
-
-      {/* Filters */}
-      <Flex gap="m" flex-wrap="wrap">
-        <div style={{ flex: 1, minWidth: '200px' } as any}>
-          <Input
-            label=""
-            value={search}
-            onInput={(e: React.FormEvent<HTMLInputElement>) => setSearch((e.target as HTMLInputElement).value)}
-          />
+          </div>
         </div>
-        <div>
+
+        <div className="bg-white rounded-lg shadow-sm p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-green-100 rounded-lg">
+              <CheckCircleIcon className="w-6 h-6 text-green-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Resolved</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.resolved}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-indigo-100 rounded-lg">
+              <span className="text-xl font-bold text-indigo-600">$</span>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Total Disputed</p>
+              <p className="text-2xl font-bold text-gray-900">${stats.totalAmount.toLocaleString()}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Search and Filters */}
+      <div className="bg-white rounded-lg shadow-sm p-4">
+        <div className="flex gap-4 flex-wrap">
+          <div className="flex-1 min-w-60">
+            <input
+              type="text"
+              placeholder="Search disputes by job title or parties..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value)
+                setPage(0)
+              }}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
           <select
-            style={{
-              padding: '0.5rem 1rem',
-              border: '1px solid var(--gds-color-l3-border-primary)',
-              borderRadius: '4px',
-              background: 'var(--gds-color-l3-background-secondary)',
-              color: 'var(--gds-color-l3-content-primary)',
-              minHeight: '42px',
-            } as any}
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e) => {
+              setStatusFilter(e.target.value)
+              setPage(0)
+            }}
+            className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value="">All Status</option>
             <option value="PENDING">Pending</option>
@@ -254,264 +318,108 @@ export default function Disputes() {
             <option value="REJECTED">Rejected</option>
           </select>
         </div>
-      </Flex>
+      </div>
 
       {/* Disputes List */}
-      <Card>
+      <div className="space-y-3">
         {isLoading ? (
-          <Flex justify-content="center" align-items="center" padding="3xl">
-            <Spinner />
-          </Flex>
+          <div className="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
+            Loading disputes...
+          </div>
         ) : filteredDisputes.length === 0 ? (
-          <Flex justify-content="center" padding="3xl">
-            <Text style={{ color: 'var(--gds-color-l3-content-tertiary)' } as any}>No disputes found</Text>
-          </Flex>
+          <div className="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
+            No disputes found
+          </div>
         ) : (
-          <Flex flex-direction="column">
-            {filteredDisputes.map((dispute: Dispute, index: number) => (
-              <div key={dispute.id}>
-                {index > 0 && <Divider />}
-                <Flex flex-direction="column" gap="m" padding="l">
-                  <Flex justify-content="space-between" align-items="flex-start" flex-wrap="wrap" gap="m">
-                    <Flex gap="m" align-items="flex-start">
-                      <Text style={{ fontSize: '1.5rem' } as any}>{getStatusIcon(dispute.status)}</Text>
-                      <div>
-                        <Text style={{ fontSize: '1.125rem', fontWeight: 600 } as any}>{dispute.jobTitle}</Text>
-                        <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>
-                          {dispute.clientName} vs {dispute.freelancerName}
-                        </Text>
-                        <Text style={{ fontSize: '0.875rem', marginTop: '0.5rem' } as any}>
-                          Reason: {dispute.reason}
-                        </Text>
-                        <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>
-                          {dispute.description}
-                        </Text>
-                      </div>
-                    </Flex>
-                    <div style={{ textAlign: 'right' } as any}>
-                      <Text style={{ fontSize: '1.25rem', fontWeight: 700 } as any}>
-                        ${dispute.amount.toLocaleString()}
-                      </Text>
-                      <Badge variant={getStatusBadgeVariant(dispute.status)} style={{ marginTop: '0.5rem' } as any}>
-                        {dispute.status.replace('_', ' ')}
-                      </Badge>
-                      <Text style={{ fontSize: '0.75rem', color: 'var(--gds-color-l3-content-tertiary)', marginTop: '0.5rem' } as any}>
-                        Filed {new Date(dispute.createdAt).toLocaleDateString()}
-                      </Text>
-                    </div>
-                  </Flex>
-                  <Flex gap="m">
-                    <Button
-                      size="small"
-                      rank="tertiary"
-                      onClick={() => {
-                        setSelectedDispute(dispute)
-                        setRefundAmount(dispute.amount)
-                      }}
+          filteredDisputes.map((dispute: Dispute) => (
+            <div key={dispute.id} className="bg-white rounded-lg shadow-sm p-4 md:p-6 hover:shadow-md transition-shadow">
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div className="flex items-start gap-3 flex-1 min-w-0">
+                  <div className="flex-shrink-0 mt-1 text-gray-400">
+                    {getStatusIcon(dispute.status)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-gray-900 truncate">{dispute.jobTitle}</h3>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {dispute.clientName} <span className="text-gray-400">vs</span> {dispute.freelancerName}
+                    </p>
+                    <p className="text-sm text-gray-600 mt-2">{dispute.reason}</p>
+                    <p className="text-xs text-gray-500 mt-1">{dispute.description}</p>
+                    <p className="text-xs text-gray-400 mt-2">Filed {new Date(dispute.createdAt).toLocaleDateString()}</p>
+                  </div>
+                </div>
+
+                <div className="flex-shrink-0 text-right">
+                  <p className="text-xl font-bold text-indigo-600">${dispute.amount.toLocaleString()}</p>
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeColor(dispute.status)} mt-2`}>
+                    {dispute.status.replace('_', ' ')}
+                  </span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-2 mt-4 pt-4 border-t border-gray-200 flex-wrap">
+                <button
+                  onClick={() => setSelectedDispute(dispute)}
+                  className="px-3 py-2 text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors text-sm font-medium"
+                >
+                  View Details
+                </button>
+                {dispute.status === 'PENDING' && (
+                  <>
+                    <button
+                      onClick={() => escalateMutation.mutate(dispute.id)}
+                      disabled={escalateMutation.isPending}
+                      className="px-3 py-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium disabled:opacity-50"
                     >
-                      View Details
-                    </Button>
-                    {dispute.status === 'PENDING' && (
-                      <>
-                        <Button
-                          size="small"
-                          rank="tertiary"
-                          onClick={() => escalateMutation.mutate(dispute.id)}
-                          style={{ color: 'var(--gds-color-l3-content-notice)' } as any}
-                        >
-                          Escalate
-                        </Button>
-                        <Button
-                          size="small"
-                          rank="tertiary"
-                          onClick={() => {
-                            setSelectedDispute(dispute)
-                            setRefundAmount(dispute.amount)
-                          }}
-                          style={{ color: 'var(--gds-color-l3-content-positive)' } as any}
-                        >
-                          Resolve
-                        </Button>
-                      </>
-                    )}
-                  </Flex>
-                </Flex>
+                      Escalate
+                    </button>
+                    <button
+                      onClick={() => setSelectedDispute(dispute)}
+                      className="px-3 py-2 text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition-colors text-sm font-medium"
+                    >
+                      Resolve
+                    </button>
+                  </>
+                )}
               </div>
-            ))}
-
-            {/* Pagination */}
-            <Divider />
-            <Flex justify-content="space-between" align-items="center" padding="m">
-              <Button
-                rank="secondary"
-                size="small"
-                onClick={() => setPage(Math.max(0, page - 1))}
-                disabled={page === 0}
-              >
-                Previous
-              </Button>
-              <Button
-                rank="secondary"
-                size="small"
-                onClick={() => setPage(page + 1)}
-                disabled={!data?.hasNext}
-              >
-                Next
-              </Button>
-            </Flex>
-          </Flex>
+            </div>
+          ))
         )}
-      </Card>
+      </div>
 
-      {/* Resolution Modal */}
-      {selectedDispute && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 50,
-            padding: '1rem',
-          } as any}
-        >
-          <Card style={{ maxWidth: '600px', width: '100%', maxHeight: '80vh', overflow: 'auto' } as any}>
-            <Flex flex-direction="column" gap="l" padding="l">
-              {/* Modal Header */}
-              <div>
-                <Text tag="h2" style={{ fontSize: '1.25rem', fontWeight: 600 } as any}>
-                  Resolve Dispute - {selectedDispute.jobTitle}
-                </Text>
-              </div>
-
-              <Divider />
-
-              {/* Modal Content */}
-              <Grid columns="1; m{2}" gap="m">
-                <div>
-                  <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Client</Text>
-                  <Text style={{ marginTop: '0.25rem' } as any}>{selectedDispute.clientName}</Text>
-                </div>
-                <div>
-                  <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Freelancer</Text>
-                  <Text style={{ marginTop: '0.25rem' } as any}>{selectedDispute.freelancerName}</Text>
-                </div>
-              </Grid>
-
-              <div>
-                <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Dispute Reason</Text>
-                <Text style={{ marginTop: '0.25rem' } as any}>{selectedDispute.reason}</Text>
-              </div>
-
-              <div>
-                <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Description</Text>
-                <Text style={{ marginTop: '0.25rem' } as any}>{selectedDispute.description}</Text>
-              </div>
-
-              <div>
-                <Text style={{ fontSize: '0.875rem', color: 'var(--gds-color-l3-content-tertiary)' } as any}>Disputed Amount</Text>
-                <Text style={{ fontSize: '1.25rem', fontWeight: 600, marginTop: '0.25rem' } as any}>
-                  ${selectedDispute.amount.toLocaleString()}
-                </Text>
-              </div>
-
-              <Divider />
-
-              <div>
-                <Text style={{ fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' } as any}>
-                  Resolution Notes
-                </Text>
-                <textarea
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    border: '1px solid var(--gds-color-l3-border-primary)',
-                    borderRadius: '4px',
-                    minHeight: '80px',
-                    background: 'var(--gds-color-l3-background-secondary)',
-                    color: 'var(--gds-color-l3-content-primary)',
-                  } as any}
-                  value={resolution}
-                  onChange={(e) => setResolution(e.target.value)}
-                />
-              </div>
-
-              <div>
-                <Text style={{ fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' } as any}>
-                  Refund Amount (to client)
-                </Text>
-                <Flex align-items="center" gap="s">
-                  <Text>$</Text>
-                  <input
-                    type="number"
-                    style={{
-                      flex: 1,
-                      padding: '0.5rem 0.75rem',
-                      border: '1px solid var(--gds-color-l3-border-primary)',
-                      borderRadius: '4px',
-                      background: 'var(--gds-color-l3-background-secondary)',
-                      color: 'var(--gds-color-l3-content-primary)',
-                    } as any}
-                    value={refundAmount}
-                    onChange={(e) => setRefundAmount(Number(e.target.value))}
-                    min={0}
-                    max={selectedDispute.amount}
-                  />
-                </Flex>
-                <Text style={{ fontSize: '0.75rem', color: 'var(--gds-color-l3-content-tertiary)', marginTop: '0.25rem' } as any}>
-                  Remaining ${(selectedDispute.amount - refundAmount).toLocaleString()} goes to freelancer
-                </Text>
-              </div>
-
-              <Divider />
-
-              {/* Modal Footer */}
-              <Flex justify-content="flex-end" gap="m" flex-wrap="wrap">
-                <Button
-                  rank="secondary"
-                  onClick={() => {
-                    setSelectedDispute(null)
-                    setResolution('')
-                    setRefundAmount(0)
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  rank="secondary"
-                  onClick={() =>
-                    resolveMutation.mutate({
-                      id: selectedDispute.id,
-                      resolution,
-                      refundAmount: 0,
-                      favorClient: false,
-                    })
-                  }
-                  style={{ background: 'var(--gds-color-l3-background-positive)' } as any}
-                >
-                  Favor Freelancer
-                </Button>
-                <Button
-                  rank="primary"
-                  onClick={() =>
-                    resolveMutation.mutate({
-                      id: selectedDispute.id,
-                      resolution,
-                      refundAmount,
-                      favorClient: true,
-                    })
-                  }
-                >
-                  Favor Client (Refund ${refundAmount})
-                </Button>
-              </Flex>
-            </Flex>
-          </Card>
+      {/* Pagination */}
+      {filteredDisputes.length > 0 && (
+        <div className="flex gap-2">
+          <button
+            onClick={() => setPage(Math.max(0, page - 1))}
+            disabled={page === 0}
+            className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            ← Previous
+          </button>
+          <span className="px-4 py-2 text-sm text-gray-700">Page {page + 1}</span>
+          <button
+            onClick={() => setPage(page + 1)}
+            disabled={data?.last}
+            className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Next →
+          </button>
         </div>
       )}
-    </Flex>
+
+      {/* Resolution Modal */}
+      <ResolutionModal
+        isOpen={selectedDispute !== null && selectedDispute.status === 'PENDING'}
+        onClose={() => setSelectedDispute(null)}
+        dispute={selectedDispute}
+        onSubmit={(data) => {
+          resolveMutation.mutate(data)
+        }}
+        isLoading={resolveMutation.isPending}
+      />
+    </div>
   )
 }
 

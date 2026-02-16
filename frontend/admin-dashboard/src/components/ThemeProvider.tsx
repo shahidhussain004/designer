@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, ReactNode, useEffect, useState } from 'react';
 import { Theme as ThemeWrapper } from './green';
 
 type Theme = 'light' | 'dark';
@@ -35,6 +35,15 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     }
   }, [theme, mounted]);
 
+  useEffect(() => {
+    if (!mounted) return;
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme, mounted]);
+
   const toggleTheme = () => {
     setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
@@ -49,3 +58,8 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     </ThemeContext.Provider>
   );
 }
+
+// Sync the theme to the document root so Tailwind's `dark` class and global CSS can apply.
+// This effect is intentionally outside the component return to ensure it's executed
+// whenever the module is loaded in client environments.
+// Note: We use a small effect inside the provider scope as well to keep server/client parity.

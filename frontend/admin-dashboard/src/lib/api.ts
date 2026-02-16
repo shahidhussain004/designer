@@ -71,8 +71,17 @@ export const usersApi = {
     const response = await api.get(`/api/admin/users/${id}`)
     return response.data
   },
+  create: async (payload: { email: string; fullName: string; role: string }) => {
+    const response = await api.post('/api/admin/users', payload)
+    return response.data
+  },
+  update: async (id: number, payload: { email?: string; fullName?: string; role?: string }) => {
+    const response = await api.put(`/api/admin/users/${id}`, payload)
+    return response.data
+  },
   updateStatus: async (id: number, isActive: boolean) => {
-    const response = await api.put(`/api/admin/users/${id}/status`, { isActive })
+    // Backend expects `active` field; map `isActive` to `active` to ensure state changes apply
+    const response = await api.put(`/api/admin/users/${id}/status`, { active: isActive })
     return response.data
   },
   delete: async (id: number) => {
@@ -84,6 +93,22 @@ export const usersApi = {
 export const jobsApi = {
   getAll: async (params?: { page?: number; size?: number; status?: string }) => {
     const response = await api.get('/api/admin/jobs', { params })
+    return response.data
+  },
+  getById: async (id: number) => {
+    const response = await api.get(`/api/admin/jobs/${id}`)
+    return response.data
+  },
+  create: async (payload: { title: string; description: string; categoryName: string; budgetMin: number; budgetMax: number; status?: string }) => {
+    const response = await api.post('/api/jobs', payload)
+    return response.data
+  },
+  update: async (id: number, payload: { title?: string; description?: string; categoryName?: string; budgetMin?: number; budgetMax?: number; status?: string }) => {
+    const response = await api.put(`/api/jobs/${id}`, payload)
+    return response.data
+  },
+  getCategories: async () => {
+    const response = await api.get('/api/jobs/categories')
     return response.data
   },
   getPending: async () => {

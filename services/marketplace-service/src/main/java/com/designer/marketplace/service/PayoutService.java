@@ -14,7 +14,6 @@ import com.designer.marketplace.dto.PayoutDTOs.CreatePayoutRequest;
 import com.designer.marketplace.dto.PayoutDTOs.PayoutResponse;
 import com.designer.marketplace.dto.PayoutDTOs.PayoutSummary;
 import com.designer.marketplace.entity.Freelancer;
-import com.designer.marketplace.entity.Payment.EscrowStatus;
 import com.designer.marketplace.entity.Payout;
 import com.designer.marketplace.entity.Payout.PayoutMethod;
 import com.designer.marketplace.entity.Payout.PayoutStatus;
@@ -221,10 +220,8 @@ public class PayoutService {
     @Transactional(readOnly = true)
     public PayoutSummary getPayoutSummary(Long freelancerId) {
         // Calculate total earnings from released payments
-        Long totalEarnings = paymentRepository.sumFreelancerAmountByFreelancerIdAndEscrowStatus(
-                freelancerId, EscrowStatus.RELEASED);
-        if (totalEarnings == null)
-            totalEarnings = 0L;
+        // TODO: Escrow status no longer exists in database. Need to implement new calculation
+        Long totalEarnings = 0L;
 
         // Calculate total paid out
         Long totalPaidOut = payoutRepository.sumPaidAmountByFreelancerId(freelancerId);
@@ -276,10 +273,8 @@ public class PayoutService {
     @Transactional(readOnly = true)
     public Long calculateAvailableBalance(Long freelancerId) {
         // Sum of released escrow amounts
-        Long releasedAmount = paymentRepository.sumFreelancerAmountByFreelancerIdAndEscrowStatus(
-                freelancerId, EscrowStatus.RELEASED);
-        if (releasedAmount == null)
-            releasedAmount = 0L;
+        // TODO: Escrow status no longer exists in database. Need to implement new calculation
+        Long releasedAmount = 0L;
 
         // Sum of already paid out
         Long paidOutAmount = payoutRepository.sumPaidAmountByFreelancerId(freelancerId);

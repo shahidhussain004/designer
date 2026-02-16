@@ -89,6 +89,12 @@ export const resourcesApi = {
     return response.data.data
   },
 
+  // Create resource
+  create: async (data: Partial<Resource>) => {
+    const response = await apiContent.post('/content', data)
+    return response.data.data
+  },
+
   // Update resource
   update: async (id: string, data: Partial<Resource>) => {
     const response = await apiContent.patch(`/content/${id}`, data)

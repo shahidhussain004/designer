@@ -19,77 +19,32 @@ import lombok.NoArgsConstructor;
 public class PaymentResponse {
 
     private Long id;
-    private String paymentIntentId;
-    private String companySecret; // For frontend to complete payment
-    
-    // User info
     private Long companyId;
     private String companyName;
     private Long freelancerId;
     private String freelancerName;
-    
-    // Job info
-    private Long projectId;
-    private String projectTitle;
-    private Long proposalId;
-    
-    // Amount details (in cents)
     private Long amount;
-    private Long platformFee;
-    private Long freelancerAmount;
     private String currency;
-    
-    // Formatted amounts for display
-    private String formattedAmount;
-    private String formattedPlatformFee;
-    private String formattedFreelancerAmount;
-    
-    // Status
+    private String paymentMethod;
+    private String description;
     private String status;
-    private String escrowStatus;
-    
-    // Stripe metadata
-    private String receiptUrl;
-    private String failureCode;
-    private String failureMessage;
-    
-    // Timestamps
     private LocalDateTime createdAt;
-    private LocalDateTime paidAt;
-    private LocalDateTime releasedAt;
+    private LocalDateTime processedAt;
 
     public static PaymentResponse fromEntity(Payment payment) {
         return PaymentResponse.builder()
                 .id(payment.getId())
-                .paymentIntentId(payment.getPaymentIntentId())
-                .companyId(payment.getCompany().getId())
-                .companyName(payment.getCompany().getFullName())
-                .freelancerId(payment.getFreelancer().getId())
-                .freelancerName(payment.getFreelancer().getFullName())
-                .projectId(payment.getProject() != null ? payment.getProject().getId() : null)
-                .projectTitle(payment.getProject() != null ? payment.getProject().getTitle() : null)
-                .proposalId(null)
+                .companyId(payment.getCompany() != null ? payment.getCompany().getId() : null)
+                .companyName(payment.getCompany() != null ? payment.getCompany().getFullName() : null)
+                .freelancerId(payment.getFreelancer() != null ? payment.getFreelancer().getId() : null)
+                .freelancerName(payment.getFreelancer() != null ? payment.getFreelancer().getFullName() : null)
                 .amount(payment.getAmountCents())
-                .platformFee(payment.getPlatformFeeCents())
-                .freelancerAmount(payment.getFreelancerAmountCents())
                 .currency(payment.getCurrency())
-                .formattedAmount(formatCurrency(payment.getAmountCents(), payment.getCurrency()))
-                .formattedPlatformFee(formatCurrency(payment.getPlatformFeeCents(), payment.getCurrency()))
-                .formattedFreelancerAmount(formatCurrency(payment.getFreelancerAmountCents(), payment.getCurrency()))
-                .status(payment.getStatus().name())
-                .escrowStatus(payment.getEscrowStatus().name())
-                .receiptUrl(payment.getStripeReceiptUrl())
-                .failureCode(payment.getFailureCode())
-                .failureMessage(payment.getFailureMessage())
+                .paymentMethod(payment.getPaymentMethod())
+                .description(payment.getDescription())
+                .status(payment.getStatus() != null ? payment.getStatus().name() : null)
                 .createdAt(payment.getCreatedAt())
-                .paidAt(payment.getPaidAt())
-                .releasedAt(payment.getReleasedAt())
+                .processedAt(payment.getProcessedAt())
                 .build();
-    }
-
-    private static String formatCurrency(Long cents, String currency) {
-        if (cents == null) return "$0.00";
-        double dollars = cents / 100.0;
-        return String.format("$%.2f %s", dollars, currency);
     }
 }
