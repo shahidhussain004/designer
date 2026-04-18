@@ -453,7 +453,6 @@ export const Navbar: React.FC<NavbarProps> = ({ className: _className }) => {
                 width={160} 
                 height={36} 
                 className="object-contain"
-                style={{ width: 'auto', height: 'auto' }}
                 priority
               />
             </Link>
