@@ -4,7 +4,6 @@ import { motion, useScroll, useSpring, useTransform } from "framer-motion"
 import { ArrowDown, ArrowUpRight } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 
-// Suppress TypeScript errors for framer-motion components - motion provides proper runtime types
 const MotionDiv = motion.div as any
 const MotionH1 = motion.h1 as any
 const MotionP = motion.p as any
@@ -37,7 +36,6 @@ export function HeroSection() {
       mouseY.set((clientY - innerHeight / 2) / 50)
       setMousePosition({ x: clientX, y: clientY })
     }
-
     window.addEventListener("mousemove", handleMouseMove)
     return () => window.removeEventListener("mousemove", handleMouseMove)
   }, [mouseX, mouseY])
@@ -45,121 +43,254 @@ export function HeroSection() {
   return (
     <section
       ref={containerRef}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      style={{ background: "#0A0B0F" }}
     >
-      {/* Subtle animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <MotionDiv
-          style={{ x: mouseX, y: mouseY }}
-          className="absolute top-1/4 left-1/4 w-[600px] h-[600px] rounded-full bg-accent/5 blur-3xl"
-        />
-        <MotionDiv
-          style={{ x: useTransform(mouseX, (v) => -v * 0.5), y: useTransform(mouseY, (v) => -v * 0.5) }}
-          className="absolute bottom-1/4 right-1/4 w-[800px] h-[800px] rounded-full bg-muted/50 blur-3xl"
-        />
-      </div>
+      {/* Grid texture overlay */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(0,229,197,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,197,0.04) 1px, transparent 1px)",
+          backgroundSize: "60px 60px",
+        }}
+      />
 
-      {/* Grid overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px)] bg-[size:80px_80px] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_80%)]" />
+      {/* Radial vignette */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,229,197,0.06) 0%, transparent 70%)",
+        }}
+      />
 
-      <MotionDiv style={{ y, opacity, scale }} className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 py-32">
+      {/* Animated background orbs */}
+      <MotionDiv
+        style={{ x: mouseX, y: mouseY }}
+        className="absolute pointer-events-none"
+        style={{
+          top: "20%",
+          left: "10%",
+          width: "500px",
+          height: "500px",
+          borderRadius: "50%",
+          background: "rgba(0,229,197,0.03)",
+          filter: "blur(80px)",
+        }}
+      />
+      <MotionDiv
+        style={{ x: useTransform(mouseX, (v) => -v * 0.7), y: useTransform(mouseY, (v) => -v * 0.7) }}
+        className="absolute pointer-events-none"
+        style={{
+          bottom: "20%",
+          right: "10%",
+          width: "600px",
+          height: "600px",
+          borderRadius: "50%",
+          background: "rgba(99,102,241,0.04)",
+          filter: "blur(100px)",
+        }}
+      />
+
+      <MotionDiv style={{ y, opacity, scale }} className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 py-32 w-full">
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-6 items-center">
           {/* Left content */}
           <div className="lg:col-span-7 space-y-8">
-            {/* Eyebrow */}
+            {/* Eyebrow tag */}
             <MotionDiv
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}>
-              <span className="w-12 h-[1px] bg-accent" />
-              <span className="text-sm tracking-[0.2em] uppercase text-muted-foreground">Design Studio</span>
+              transition={{ duration: 0.8, delay: 0.2 }}
+              style={{ display: "flex", alignItems: "center", gap: "12px" }}
+            >
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "6px 14px",
+                  border: "1px solid rgba(0,229,197,0.3)",
+                  borderRadius: "100px",
+                  fontSize: "11px",
+                  letterSpacing: "0.15em",
+                  textTransform: "uppercase",
+                  color: "#00E5C5",
+                  background: "rgba(0,229,197,0.06)",
+                }}
+              >
+                <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#00E5C5", display: "inline-block" }} />
+                Design Studio
+              </span>
             </MotionDiv>
 
             {/* Main headline */}
-            <div className="space-y-2">
-              <MotionH1
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-medium tracking-tight leading-[0.95] text-balance"
+            <MotionH1
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                fontSize: "clamp(52px, 8vw, 96px)",
+                fontWeight: 600,
+                lineHeight: 0.92,
+                letterSpacing: "-0.03em",
+                color: "#F0F0EE",
+                margin: 0,
+              }}
+            >
+              <span style={{ display: "block" }}>Optimal</span>
+              <span style={{ display: "block", marginTop: "4px" }}>craft meets</span>
+              <span
+                style={{
+                  display: "block",
+                  marginTop: "4px",
+                  color: "#00E5C5",
+                  fontStyle: "italic",
+                  fontWeight: 300,
+                }}
               >
-                <span className="block">Optimal craft</span>
-                <span className="block mt-2">
-                  meets <span className="italic font-normal text-accent">exquisite</span>
-                </span>
-                <span className="block mt-2">design</span>
-              </MotionH1>
-            </div>
+                exquisite
+              </span>
+              <span style={{ display: "block", marginTop: "4px", color: "#F0F0EE" }}>design</span>
+            </MotionH1>
 
             {/* Description */}
             <MotionP
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5 }}
-              className="text-lg lg:text-xl text-muted-foreground max-w-xl leading-relaxed"
+              style={{
+                fontSize: "17px",
+                color: "rgba(240,240,238,0.55)",
+                maxWidth: "520px",
+                lineHeight: 1.7,
+                margin: 0,
+              }}
             >
-              Transform your vision into functional works of art with our bespoke design solutions. We craft digital
-              experiences that resonate and endure.
+              Transform your vision into functional works of art with bespoke design solutions.
+              We craft digital experiences that resonate and endure.
             </MotionP>
 
             {/* CTA Buttons */}
             <MotionDiv
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6 }}>
+              transition={{ duration: 0.8, delay: 0.6 }}
+              style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}
+            >
               <MotionA
                 href="#work"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-foreground text-background rounded-full text-sm tracking-wide font-medium transition-all duration-300 hover:bg-foreground/90"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "14px 28px",
+                  background: "#00E5C5",
+                  color: "#0A0B0F",
+                  borderRadius: "100px",
+                  fontSize: "13px",
+                  letterSpacing: "0.05em",
+                  fontWeight: 600,
+                  textDecoration: "none",
+                  border: "1px solid #00E5C5",
+                }}
               >
                 <span>View Our Work</span>
-                <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                <ArrowUpRight style={{ width: "14px", height: "14px" }} />
               </MotionA>
               <MotionA
                 href="#services"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="group inline-flex items-center justify-center gap-3 px-8 py-4 border border-border rounded-full text-sm tracking-wide font-medium transition-all duration-300 hover:bg-secondary"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "14px 28px",
+                  background: "transparent",
+                  color: "rgba(240,240,238,0.8)",
+                  borderRadius: "100px",
+                  fontSize: "13px",
+                  letterSpacing: "0.05em",
+                  fontWeight: 500,
+                  textDecoration: "none",
+                  border: "1px solid rgba(240,240,238,0.2)",
+                }}
               >
                 <span>Our Services</span>
               </MotionA>
             </MotionDiv>
           </div>
 
-          {/* Right content - Featured Image */}
+          {/* Right - Featured Image */}
           <MotionDiv
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.2, delay: 0.4 }}
             className="lg:col-span-5 relative"
           >
-            <div className="relative aspect-[4/5] rounded-2xl overflow-hidden">
+            <div
+              style={{
+                position: "relative",
+                aspectRatio: "4/5",
+                borderRadius: "16px",
+                overflow: "hidden",
+                border: "1px solid rgba(0,229,197,0.15)",
+              }}
+            >
               <MotionImg
                 src="/elegant-minimalist-interior-design-wooden-furnitur.jpg"
                 alt="Featured design work"
-                className="w-full h-full object-cover"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 whileHover={{ scale: 1.05 }}
                 transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
               />
-              {/* Overlay gradient */}
-              <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent" />
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: "linear-gradient(to top, rgba(10,11,15,0.5) 0%, transparent 60%)",
+                }}
+              />
             </div>
 
-            {/* Floating badge */}
+            {/* Floating stat badge */}
             <MotionDiv
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.8 }}
-              className="absolute -left-6 bottom-12 bg-card p-6 rounded-xl shadow-2xl border border-border/50"
+              style={{
+                position: "absolute",
+                left: "-28px",
+                bottom: "48px",
+                background: "#12141A",
+                padding: "20px 24px",
+                borderRadius: "12px",
+                border: "1px solid rgba(0,229,197,0.2)",
+                backdropFilter: "blur(12px)",
+              }}
             >
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center">
-                  <span className="text-xl font-medium text-accent">15</span>
+              <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                <div
+                  style={{
+                    width: "48px",
+                    height: "48px",
+                    borderRadius: "50%",
+                    background: "rgba(0,229,197,0.1)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "1px solid rgba(0,229,197,0.2)",
+                  }}
+                >
+                  <span style={{ fontSize: "18px", fontWeight: 700, color: "#00E5C5" }}>15</span>
                 </div>
                 <div>
-                  <p className="text-2xl font-medium text-foreground">Years</p>
-                  <p className="text-sm text-muted-foreground">of Excellence</p>
+                  <p style={{ fontSize: "20px", fontWeight: 600, color: "#F0F0EE", margin: 0, lineHeight: 1 }}>Years</p>
+                  <p style={{ fontSize: "12px", color: "rgba(240,240,238,0.4)", margin: "4px 0 0", letterSpacing: "0.08em" }}>
+                    of Excellence
+                  </p>
                 </div>
               </div>
             </MotionDiv>
@@ -171,40 +302,73 @@ export function HeroSection() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 1 }}
-          className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3"
+          style={{
+            position: "absolute",
+            bottom: "48px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "10px",
+          }}
         >
-          <span className="text-xs tracking-[0.2em] uppercase text-muted-foreground">Scroll to explore</span>
-          <MotionDiv
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-          >
-            <ArrowDown className="w-5 h-5 text-muted-foreground" />
+          <span style={{ fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(240,240,238,0.3)" }}>
+            Scroll to explore
+          </span>
+          <MotionDiv animate={{ y: [0, 8, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}>
+            <ArrowDown style={{ width: "16px", height: "16px", color: "rgba(0,229,197,0.5)" }} />
           </MotionDiv>
         </MotionDiv>
       </MotionDiv>
 
       {/* Side navigation dots */}
-      <div className="hidden xl:flex fixed right-8 top-1/2 -translate-y-1/2 flex-col gap-4 z-50">
-        {[
-          "hero",
-          "services",
-          "work",
-          "philosophy",
-          "testimonials",
-          "contact",
-        ].map((section, i) => (
+      <div
+        style={{
+          display: "none",
+          position: "fixed",
+          right: "32px",
+          top: "50%",
+          transform: "translateY(-50%)",
+          flexDirection: "column",
+          gap: "16px",
+          zIndex: 50,
+        }}
+        className="xl:flex"
+      >
+        {["hero", "services", "work", "philosophy", "testimonials", "contact"].map((section, i) => (
           <MotionA
             key={section}
             href={`#${section}`}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 1 + i * 0.1 }}
-            className="group relative flex items-center"
+            className="group"
+            style={{ position: "relative", display: "flex", alignItems: "center" }}
           >
-            <MotionSpan className="absolute right-6 px-2 py-1 bg-foreground text-background text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-              {section.charAt(0).toUpperCase() + section.slice(1)}
+            <MotionSpan
+              style={{
+                position: "absolute",
+                right: "24px",
+                padding: "4px 10px",
+                background: "#00E5C5",
+                color: "#0A0B0F",
+                fontSize: "10px",
+                fontWeight: 600,
+                letterSpacing: "0.08em",
+                borderRadius: "4px",
+                opacity: 0,
+                whiteSpace: "nowrap",
+                textTransform: "uppercase",
+              }}
+              className="group-hover:opacity-100 transition-opacity duration-300"
+            >
+              {section}
             </MotionSpan>
-            <span className="w-2 h-2 rounded-full bg-border group-hover:bg-accent transition-colors duration-300" />
+            <span
+              style={{ width: "8px", height: "8px", borderRadius: "50%", background: "rgba(240,240,238,0.2)", display: "block" }}
+              className="group-hover:bg-[#00E5C5] transition-colors duration-300"
+            />
           </MotionA>
         ))}
       </div>

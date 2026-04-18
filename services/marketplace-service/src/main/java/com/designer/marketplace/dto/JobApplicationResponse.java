@@ -1,6 +1,7 @@
 package com.designer.marketplace.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.designer.marketplace.entity.JobApplication;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -31,7 +32,7 @@ public class JobApplicationResponse {
     private String resumeUrl;
     private String portfolioUrl;
     private String linkedinUrl;
-    private String[] additionalDocuments;
+    private List<String> additionalDocuments;
     private JsonNode answers;
     private String status;
     private String companyNotes;

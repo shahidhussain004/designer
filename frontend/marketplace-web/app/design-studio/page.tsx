@@ -1,261 +1,733 @@
+"use client"
+
 import { PageLayout } from '@/components/ui';
 import { ArrowRight, Code, Layers, Lightbulb, Palette, Shield, Users, Zap } from 'lucide-react';
 import Link from 'next/link';
 
+const services = [
+  {
+    icon: Palette,
+    title: "Brand Identity",
+    description: "Crafting distinctive visual identities that capture your essence and create lasting impressions across all touchpoints.",
+    details: ["Logo Design & Concepts", "Visual Systems & Guidelines", "Brand Art Direction"],
+  },
+  {
+    icon: Code,
+    title: "Digital Experiences",
+    description: "Building immersive digital products with meticulous attention to interaction design and user experience.",
+    details: ["Web & App Design", "Interactive Prototypes", "Motion Design"],
+  },
+  {
+    icon: Lightbulb,
+    title: "Strategy & Insights",
+    description: "Developing strategic frameworks that align creative vision with business objectives for maximum impact.",
+    details: ["Research & User Analysis", "Content Strategy", "Market Positioning"],
+  },
+  {
+    icon: Layers,
+    title: "Product Design",
+    description: "Designing intuitive product experiences that balance beauty with functionality and user needs.",
+    details: ["UX & UI Design", "Design Systems", "Usability Testing"],
+  },
+];
+
+const features = [
+  {
+    icon: Users,
+    title: "Expert Team",
+    description: "Experienced designers and strategists dedicated to your project's success",
+    stat: "15+",
+    statLabel: "Specialists",
+  },
+  {
+    icon: Zap,
+    title: "Fast Turnaround",
+    description: "Efficient processes that deliver results without compromising quality",
+    stat: "2×",
+    statLabel: "Faster Delivery",
+  },
+  {
+    icon: Shield,
+    title: "Reliable Support",
+    description: "Ongoing partnership and support throughout your project lifecycle",
+    stat: "98%",
+    statLabel: "Satisfaction",
+  },
+];
+
+const processSteps = [
+  { number: "01", title: "Discovery", description: "Understanding your needs, goals, and target audience" },
+  { number: "02", title: "Strategy", description: "Developing strategy and creative direction" },
+  { number: "03", title: "Design", description: "Creating beautiful, functional designs" },
+  { number: "04", title: "Delivery", description: "Delivering polished results and ongoing support" },
+];
+
 export default function DesignStudioPage() {
   return (
     <PageLayout>
-      {/* Hero Section */}
-      <div className="bg-gradient-to-b from-gray-900 to-gray-800 text-white py-16 lg:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <h1 className="text-4xl lg:text-5xl font-bold mb-6">Design Studio</h1>
-            <p className="text-xl text-gray-300 mb-8">
-              Professional design services crafted for modern businesses. From brand identity to digital experiences, 
-              we create solutions that resonate with your audience.
+      <div style={{ background: "#0A0B0F", color: "#F0F0EE" }}>
+
+        {/* ─── HERO ─────────────────────────────────────────────────────────── */}
+        <div
+          style={{
+            position: "relative",
+            padding: "96px 0 120px",
+            overflow: "hidden",
+            background: "#0A0B0F",
+          }}
+        >
+          {/* Grid texture */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              backgroundImage:
+                "linear-gradient(rgba(196,30,58,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(196,30,58,0.04) 1px, transparent 1px)",
+              backgroundSize: "60px 60px",
+            }}
+          />
+          {/* Radial glow */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: "radial-gradient(ellipse 70% 50% at 30% 50%, rgba(196,30,58,0.07) 0%, transparent 70%)",
+            }}
+          />
+
+          <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 48px", position: "relative" }}>
+            {/* Eyebrow */}
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "32px" }}>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "6px 14px",
+                  border: "1px solid rgba(196,30,58,0.3)",
+                  borderRadius: "100px",
+                  fontSize: "11px",
+                  letterSpacing: "0.15em",
+                  textTransform: "uppercase",
+                  color: "#C41E3A",
+                  background: "rgba(196,30,58,0.06)",
+                }}
+              >
+                <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#C41E3A", display: "inline-block" }} />
+                Design Studio
+              </span>
+            </div>
+
+            <div style={{ maxWidth: "760px" }}>
+              <h1
+                style={{
+                  fontSize: "clamp(48px, 7vw, 88px)",
+                  fontWeight: 700,
+                  lineHeight: 0.92,
+                  letterSpacing: "-0.03em",
+                  color: "#F0F0EE",
+                  margin: "0 0 32px",
+                }}
+              >
+                Design{" "}
+                <span style={{ color: "#C41E3A", fontStyle: "italic", fontWeight: 300 }}>Studio</span>
+              </h1>
+              <p
+                style={{
+                  fontSize: "18px",
+                  color: "rgba(240,240,238,0.5)",
+                  lineHeight: 1.7,
+                  maxWidth: "540px",
+                  margin: "0 0 48px",
+                }}
+              >
+                Professional design services crafted for modern businesses. From brand identity to digital
+                experiences, we create solutions that resonate with your audience.
+              </p>
+
+              <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+                <button
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    padding: "14px 28px",
+                    background: "#C41E3A",
+                    color: "#FFFFFF",
+                    borderRadius: "100px",
+                    fontSize: "13px",
+                    letterSpacing: "0.05em",
+                    fontWeight: 700,
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Get Started
+                  <ArrowRight style={{ width: "14px", height: "14px" }} />
+                </button>
+                <Link
+                  href="/contact"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    padding: "14px 28px",
+                    background: "transparent",
+                    color: "rgba(240,240,238,0.8)",
+                    borderRadius: "100px",
+                    fontSize: "13px",
+                    letterSpacing: "0.05em",
+                    fontWeight: 500,
+                    textDecoration: "none",
+                    border: "1px solid rgba(240,240,238,0.2)",
+                  }}
+                >
+                  Contact Us
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ─── SERVICES ─────────────────────────────────────────────────────── */}
+        <div
+          style={{
+            position: "relative",
+            padding: "100px 0 120px",
+            background: "#0D0E14",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: 0, left: 0, right: 0,
+              height: "1px",
+              background: "linear-gradient(90deg, transparent, rgba(196,30,58,0.2), transparent)",
+            }}
+          />
+          <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 48px" }}>
+            <div style={{ textAlign: "center", marginBottom: "64px" }}>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  fontSize: "11px",
+                  letterSpacing: "0.2em",
+                  textTransform: "uppercase",
+                  color: "#C41E3A",
+                  marginBottom: "20px",
+                }}
+              >
+                <span style={{ width: "32px", height: "1px", background: "#C41E3A", display: "block" }} />
+                What We Offer
+                <span style={{ width: "32px", height: "1px", background: "#C41E3A", display: "block" }} />
+              </span>
+              <h2
+                style={{
+                  fontSize: "clamp(36px, 4vw, 56px)",
+                  fontWeight: 700,
+                  letterSpacing: "-0.03em",
+                  lineHeight: 0.95,
+                  color: "#F0F0EE",
+                  margin: "0 0 20px",
+                }}
+              >
+                Our <span style={{ color: "#C41E3A", fontStyle: "italic", fontWeight: 300 }}>Services</span>
+              </h2>
+              <p style={{ fontSize: "16px", color: "rgba(240,240,238,0.4)", maxWidth: "520px", margin: "0 auto", lineHeight: 1.7 }}>
+                Comprehensive design solutions tailored to elevate your brand and engage your audience
+              </p>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "20px" }}>
+              {services.map((service, index) => (
+                <div
+                  key={service.title}
+                  style={{
+                    position: "relative",
+                    padding: "40px",
+                    borderRadius: "12px",
+                    background: "#0A0B0F",
+                    border: "1px solid rgba(240,240,238,0.07)",
+                    overflow: "hidden",
+                    transition: "border-color 0.3s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    const el = e.currentTarget as HTMLElement;
+                    el.style.borderColor = "rgba(196,30,58,0.25)";
+                    const line = el.querySelector(".top-line") as HTMLElement;
+                    if (line) line.style.width = "100%";
+                  }}
+                  onMouseLeave={(e) => {
+                    const el = e.currentTarget as HTMLElement;
+                    el.style.borderColor = "rgba(240,240,238,0.07)";
+                    const line = el.querySelector(".top-line") as HTMLElement;
+                    if (line) line.style.width = "0%";
+                  }}
+                >
+                  <div
+                    className="top-line"
+                    style={{
+                      position: "absolute",
+                      top: 0, left: 0,
+                      height: "2px",
+                      background: "linear-gradient(90deg, #C41E3A, transparent)",
+                      width: "0%",
+                      transition: "width 0.5s cubic-bezier(0.22, 1, 0.36, 1)",
+                    }}
+                  />
+                  <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "20px" }}>
+                    <div
+                      style={{
+                        width: "48px",
+                        height: "48px",
+                        borderRadius: "10px",
+                        background: "rgba(196,30,58,0.08)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        border: "1px solid rgba(196,30,58,0.2)",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <service.icon style={{ width: "20px", height: "20px", color: "#C41E3A" }} />
+                    </div>
+                    <h3
+                      style={{
+                        fontSize: "22px",
+                        fontWeight: 600,
+                        letterSpacing: "-0.02em",
+                        color: "#F0F0EE",
+                        margin: 0,
+                      }}
+                    >
+                      {service.title}
+                    </h3>
+                  </div>
+                  <p style={{ fontSize: "14px", color: "rgba(240,240,238,0.45)", lineHeight: 1.7, marginBottom: "24px" }}>
+                    {service.description}
+                  </p>
+                  <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "10px" }}>
+                    {service.details.map((detail) => (
+                      <li
+                        key={detail}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "10px",
+                          fontSize: "13px",
+                          color: "rgba(240,240,238,0.5)",
+                          letterSpacing: "0.02em",
+                        }}
+                      >
+                        <span
+                          style={{
+                            width: "5px",
+                            height: "5px",
+                            borderRadius: "50%",
+                            background: "#C41E3A",
+                            flexShrink: 0,
+                          }}
+                        />
+                        {detail}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ─── WHY CHOOSE US ────────────────────────────────────────────────── */}
+        <div
+          style={{
+            position: "relative",
+            padding: "100px 0 120px",
+            background: "#070809",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              backgroundImage:
+                "linear-gradient(rgba(196,30,58,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(196,30,58,0.025) 1px, transparent 1px)",
+              backgroundSize: "60px 60px",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              top: 0, left: 0, right: 0,
+              height: "1px",
+              background: "linear-gradient(90deg, transparent, rgba(196,30,58,0.2), transparent)",
+            }}
+          />
+          <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 48px", position: "relative" }}>
+            <div style={{ textAlign: "center", marginBottom: "64px" }}>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  fontSize: "11px",
+                  letterSpacing: "0.2em",
+                  textTransform: "uppercase",
+                  color: "#C41E3A",
+                  marginBottom: "20px",
+                }}
+              >
+                <span style={{ width: "32px", height: "1px", background: "#C41E3A", display: "block" }} />
+                Why Us
+                <span style={{ width: "32px", height: "1px", background: "#C41E3A", display: "block" }} />
+              </span>
+              <h2
+                style={{
+                  fontSize: "clamp(36px, 4vw, 56px)",
+                  fontWeight: 700,
+                  letterSpacing: "-0.03em",
+                  lineHeight: 0.95,
+                  color: "#F0F0EE",
+                  margin: "0 0 20px",
+                }}
+              >
+                Why Choose Our{" "}
+                <span style={{ color: "#C41E3A", fontStyle: "italic", fontWeight: 300 }}>Studio</span>
+              </h2>
+              <p style={{ fontSize: "16px", color: "rgba(240,240,238,0.4)", maxWidth: "480px", margin: "0 auto", lineHeight: 1.7 }}>
+                We bring expertise, creativity, and dedication to every project
+              </p>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1px", background: "rgba(240,240,238,0.07)", borderRadius: "12px", overflow: "hidden", border: "1px solid rgba(240,240,238,0.07)" }}>
+              {features.map((feature, index) => (
+                <div
+                  key={feature.title}
+                  style={{
+                    padding: "48px 40px",
+                    background: "#0A0B0F",
+                    textAlign: "center",
+                    transition: "background 0.3s ease",
+                  }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "#0D0E14" }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "#0A0B0F" }}
+                >
+                  <div
+                    style={{
+                      width: "64px",
+                      height: "64px",
+                      borderRadius: "50%",
+                    background: "rgba(196,30,58,0.08)",
+                    border: "1px solid rgba(196,30,58,0.2)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      margin: "0 auto 24px",
+                    }}
+                  >
+                    <feature.icon style={{ width: "24px", height: "24px", color: "#C41E3A" }} />
+                  </div>
+                  <p
+                    style={{
+                      fontSize: "40px",
+                      fontWeight: 700,
+                      color: "#C41E3A",
+                      margin: "0 0 4px",
+                      letterSpacing: "-0.03em",
+                      lineHeight: 1,
+                    }}
+                  >
+                    {feature.stat}
+                  </p>
+                  <p
+                    style={{
+                      fontSize: "11px",
+                      color: "rgba(240,240,238,0.3)",
+                      letterSpacing: "0.1em",
+                      textTransform: "uppercase",
+                      margin: "0 0 20px",
+                    }}
+                  >
+                    {feature.statLabel}
+                  </p>
+                  <h3 style={{ fontSize: "18px", fontWeight: 600, color: "#F0F0EE", margin: "0 0 12px", letterSpacing: "-0.01em" }}>
+                    {feature.title}
+                  </h3>
+                  <p style={{ fontSize: "14px", color: "rgba(240,240,238,0.4)", lineHeight: 1.7, margin: 0 }}>
+                    {feature.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ─── CTA BANNER ───────────────────────────────────────────────────── */}
+        <div
+          style={{
+            position: "relative",
+            padding: "100px 0",
+            background: "#0A0B0F",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: "radial-gradient(ellipse 80% 60% at 50% 50%, rgba(196,30,58,0.07) 0%, transparent 70%)",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              top: 0, left: 0, right: 0,
+              height: "1px",
+              background: "linear-gradient(90deg, transparent, rgba(196,30,58,0.3), transparent)",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              bottom: 0, left: 0, right: 0,
+              height: "1px",
+              background: "linear-gradient(90deg, transparent, rgba(196,30,58,0.3), transparent)",
+            }}
+          />
+
+          <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 48px", textAlign: "center", position: "relative" }}>
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "6px 14px",
+                border: "1px solid rgba(196,30,58,0.3)",
+                borderRadius: "100px",
+                fontSize: "11px",
+                letterSpacing: "0.15em",
+                textTransform: "uppercase",
+                color: "#C41E3A",
+                background: "rgba(196,30,58,0.06)",
+                marginBottom: "32px",
+              }}
+            >
+              <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#C41E3A", display: "inline-block" }} />
+              Start a Project
+            </span>
+            <h2
+              style={{
+                fontSize: "clamp(36px, 5vw, 64px)",
+                fontWeight: 700,
+                letterSpacing: "-0.03em",
+                lineHeight: 0.95,
+                color: "#F0F0EE",
+                margin: "0 0 24px",
+              }}
+            >
+              Ready to Transform Your{" "}
+              <span style={{ color: "#C41E3A", fontStyle: "italic", fontWeight: 300 }}>Design?</span>
+            </h2>
+            <p style={{ fontSize: "17px", color: "rgba(240,240,238,0.45)", margin: "0 0 48px", lineHeight: 1.7 }}>
+              Lets collaborate on a project that brings your vision to life with professional design excellence.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button className="inline-flex items-center justify-center gap-2 bg-primary-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors">
-                Get Started
-                <ArrowRight className="w-4 h-4" />
+            <div style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap" }}>
+              <button
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "16px 32px",
+                  background: "#C41E3A",
+                  color: "#ffffff",
+                  borderRadius: "100px",
+                  fontSize: "13px",
+                  letterSpacing: "0.06em",
+                  fontWeight: 700,
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                Start Your Project
+                <ArrowRight style={{ width: "14px", height: "14px" }} />
               </button>
-              <Link href="/contact" className="inline-flex items-center justify-center gap-2 border border-gray-400 text-white px-8 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors">
-                Contact Us
+              <Link
+                href="/contact"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "16px 32px",
+                  background: "transparent",
+                  color: "rgba(240,240,238,0.8)",
+                  borderRadius: "100px",
+                  fontSize: "13px",
+                  letterSpacing: "0.05em",
+                  fontWeight: 500,
+                  textDecoration: "none",
+                  border: "1px solid rgba(240,240,238,0.2)",
+                }}
+              >
+                Get in Touch
               </Link>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Services Section */}
-      <div className="bg-gray-50 py-16 lg:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Our Services</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Comprehensive design solutions tailored to elevate your brand and engage your audience
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-            {/* Service Card 1 */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
-                  <Palette className="w-6 h-6 text-primary-600" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900">Brand Identity</h3>
-              </div>
-              <p className="text-gray-600 mb-4">
-                Crafting distinctive visual identities that capture your essence and create lasting impressions across all touchpoints.
-              </p>
-              <ul className="space-y-2 text-sm text-gray-500">
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-primary-600 rounded-full"></span>
-                  Logo Design & Concepts
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-primary-600 rounded-full"></span>
-                  Visual Systems & Guidelines
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-primary-600 rounded-full"></span>
-                  Brand Art Direction
-                </li>
-              </ul>
-            </div>
-
-            {/* Service Card 2 */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
-                  <Code className="w-6 h-6 text-primary-600" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900">Digital Experiences</h3>
-              </div>
-              <p className="text-gray-600 mb-4">
-                Building immersive digital products with meticulous attention to interaction design and user experience.
-              </p>
-              <ul className="space-y-2 text-sm text-gray-500">
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-primary-600 rounded-full"></span>
-                  Web & App Design
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-primary-600 rounded-full"></span>
-                  Interactive Prototypes
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-primary-600 rounded-full"></span>
-                  Motion Design
-                </li>
-              </ul>
-            </div>
-
-            {/* Service Card 3 */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
-                  <Lightbulb className="w-6 h-6 text-primary-600" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900">Strategy & Insights</h3>
-              </div>
-              <p className="text-gray-600 mb-4">
-                Developing strategic frameworks that align creative vision with business objectives for maximum impact.
-              </p>
-              <ul className="space-y-2 text-sm text-gray-500">
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-primary-600 rounded-full"></span>
-                  Research & User Analysis
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-primary-600 rounded-full"></span>
-                  Content Strategy
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-primary-600 rounded-full"></span>
-                  Market Positioning
-                </li>
-              </ul>
-            </div>
-
-            {/* Service Card 4 */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
-                  <Layers className="w-6 h-6 text-primary-600" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900">Product Design</h3>
-              </div>
-              <p className="text-gray-600 mb-4">
-                Designing intuitive product experiences that balance beauty with functionality and user needs.
-              </p>
-              <ul className="space-y-2 text-sm text-gray-500">
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-primary-600 rounded-full"></span>
-                  UX & UI Design
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-primary-600 rounded-full"></span>
-                  Design Systems
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-primary-600 rounded-full"></span>
-                  Usability Testing
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Why Choose Us Section */}
-      <div className="bg-white py-16 lg:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Why Choose Our Studio</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              We bring expertise, creativity, and dedication to every project
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Feature 1 */}
-            <div className="text-center">
-              <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 bg-primary-50 rounded-full flex items-center justify-center">
-                  <Users className="w-8 h-8 text-primary-600" />
-                </div>
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Expert Team</h3>
-              <p className="text-gray-600">
-                Experienced designers and strategists dedicated to your project&apos;s success
+        {/* ─── PROCESS ──────────────────────────────────────────────────────── */}
+        <div
+          style={{
+            position: "relative",
+            padding: "100px 0 120px",
+            background: "#0D0E14",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              backgroundImage:
+                "linear-gradient(rgba(196,30,58,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(196,30,58,0.025) 1px, transparent 1px)",
+              backgroundSize: "60px 60px",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              top: 0, left: 0, right: 0,
+              height: "1px",
+              background: "linear-gradient(90deg, transparent, rgba(196,30,58,0.2), transparent)",
+            }}
+          />
+          <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 48px", position: "relative" }}>
+            <div style={{ textAlign: "center", marginBottom: "64px" }}>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  fontSize: "11px",
+                  letterSpacing: "0.2em",
+                  textTransform: "uppercase",
+                  color: "#C41E3A",
+                  marginBottom: "20px",
+                }}
+              >
+                <span style={{ width: "32px", height: "1px", background: "#C41E3A", display: "block" }} />
+                How We Work
+                <span style={{ width: "32px", height: "1px", background: "#C41E3A", display: "block" }} />
+              </span>
+              <h2
+                style={{
+                  fontSize: "clamp(36px, 4vw, 56px)",
+                  fontWeight: 700,
+                  letterSpacing: "-0.03em",
+                  lineHeight: 0.95,
+                  color: "#F0F0EE",
+                  margin: "0 0 20px",
+                }}
+              >
+                Our Design{" "}
+                <span style={{ color: "#C41E3A", fontStyle: "italic", fontWeight: 300 }}>Process</span>
+              </h2>
+              <p style={{ fontSize: "16px", color: "rgba(240,240,238,0.4)", maxWidth: "480px", margin: "0 auto", lineHeight: 1.7 }}>
+                A collaborative approach that ensures your vision becomes reality
               </p>
             </div>
 
-            {/* Feature 2 */}
-            <div className="text-center">
-              <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 bg-primary-50 rounded-full flex items-center justify-center">
-                  <Zap className="w-8 h-8 text-primary-600" />
-                </div>
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Fast Turnaround</h3>
-              <p className="text-gray-600">
-                Efficient processes that deliver results without compromising quality
-              </p>
-            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "0", position: "relative" }}>
+              {/* Connector line */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: "40px",
+                  left: "12.5%",
+                  right: "12.5%",
+                  height: "1px",
+                  background: "linear-gradient(90deg, #C41E3A, rgba(196,30,58,0.1))",
+                  zIndex: 0,
+                }}
+              />
 
-            {/* Feature 3 */}
-            <div className="text-center">
-              <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 bg-primary-50 rounded-full flex items-center justify-center">
-                  <Shield className="w-8 h-8 text-primary-600" />
-                </div>
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Reliable Support</h3>
-              <p className="text-gray-600">
-                Ongoing partnership and support throughout your project lifecycle
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* CTA Section */}
-      <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-16 lg:py-20">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl lg:text-4xl font-bold mb-6">Ready to Transform Your Design?</h2>
-          <p className="text-lg text-primary-100 mb-8 max-w-2xl mx-auto">
-            Let&apos;s collaborate on a project that brings your vision to life with professional design excellence.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="inline-flex items-center justify-center gap-2 bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
-              Start Your Project
-              <ArrowRight className="w-4 h-4" />
-            </button>
-            <Link href="/contact" className="inline-flex items-center justify-center gap-2 border border-white text-white px-8 py-3 rounded-lg font-medium hover:bg-white/10 transition-colors">
-              Get in Touch
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Process Section */}
-      <div className="bg-gray-50 py-16 lg:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Our Design Process</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              A collaborative approach that ensures your vision becomes reality
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {['Discovery', 'Strategy', 'Design', 'Delivery'].map((step, index) => (
-              <div key={step} className="relative">
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 h-full">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-primary-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">
-                      {index + 1}
-                    </div>
-                    <h3 className="text-lg font-bold text-gray-900">{step}</h3>
+              {processSteps.map((step, index) => (
+                <div
+                  key={step.title}
+                  style={{
+                    position: "relative",
+                    zIndex: 1,
+                    padding: "0 20px",
+                    textAlign: "center",
+                  }}
+                >
+                  {/* Number circle */}
+                  <div
+                    style={{
+                      width: "80px",
+                      height: "80px",
+                      borderRadius: "50%",
+                    background: index === 0 ? "#C41E3A" : "#0A0B0F",
+                    border: `2px solid ${index === 0 ? "#C41E3A" : "rgba(196,30,58,0.3)"}`,  
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      margin: "0 auto 32px",
+                      transition: "all 0.3s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      const el = e.currentTarget as HTMLElement;
+                      el.style.background = "#C41E3A";
+                      el.style.borderColor = "#C41E3A";
+                      const num = el.querySelector("span") as HTMLElement;
+                      if (num) num.style.color = "#0A0B0F";
+                    }}
+                    onMouseLeave={(e) => {
+                      if (index !== 0) {
+                        const el = e.currentTarget as HTMLElement;
+                        el.style.background = "#0A0B0F";
+                        el.style.borderColor = "rgba(196,30,58,0.3)";
+                        const num = el.querySelector("span") as HTMLElement;
+                        if (num) num.style.color = "#C41E3A";
+                      }
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: 700,
+                        fontFamily: "monospace",
+                        color: index === 0 ? "#0A0B0F" : "#C41E3A",
+                        letterSpacing: "0.05em",
+                        transition: "color 0.3s ease",
+                      }}
+                    >
+                      {step.number}
+                    </span>
                   </div>
-                  <p className="text-gray-600 text-sm">
-                    {index === 0 && 'Understanding your needs, goals, and target audience'}
-                    {index === 1 && 'Developing strategy and creative direction'}
-                    {index === 2 && 'Creating beautiful, functional designs'}
-                    {index === 3 && 'Delivering polished results and ongoing support'}
+
+                  <h3
+                    style={{
+                      fontSize: "18px",
+                      fontWeight: 600,
+                      letterSpacing: "-0.01em",
+                      color: "#F0F0EE",
+                      margin: "0 0 12px",
+                    }}
+                  >
+                    {step.title}
+                  </h3>
+                  <p style={{ fontSize: "13px", color: "rgba(240,240,238,0.4)", lineHeight: 1.7, margin: 0 }}>
+                    {step.description}
                   </p>
                 </div>
-                {index < 3 && (
-                  <div className="hidden md:block absolute top-1/2 -right-3 w-6 h-0.5 bg-primary-200 transform -translate-y-1/2"></div>
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
+
       </div>
     </PageLayout>
-  )
+  );
 }
+

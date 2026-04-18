@@ -73,7 +73,12 @@ public class JobApplicationService {
         User currentUser = userService.getCurrentUser();
         log.info("Getting applications for user: {}", currentUser.getUsername());
 
-        Page<JobApplication> applications = applicationRepository.findByApplicantId(currentUser.getId(), pageable);
+        // Get the freelancer profile for the current user
+        Freelancer freelancer = freelancerRepository.findByUserId(currentUser.getId())
+                .orElseThrow(() -> new RuntimeException("Freelancer profile not found for user: " + currentUser.getUsername()));
+
+        // Query applications by freelancer ID (applicant)
+        Page<JobApplication> applications = applicationRepository.findByApplicantId(freelancer.getId(), pageable);
         return applications.map(JobApplicationResponse::fromEntity);
     }
 

@@ -162,7 +162,13 @@ export function useMyApplications() {
     queryKey: ['job-applications', 'my'],
     queryFn: async ({ signal }) => {
       const { data } = await apiClient.get('/job-applications/my-applications', { signal });
-      return data;
+      // Extract content array from Spring Data Page response
+      if (data?.content && Array.isArray(data.content)) {
+        console.log('✅ Applications fetched successfully:', data.content.length, 'items');
+        return data.content;
+      }
+      console.warn('⚠️ Unexpected response format:', data);
+      return [];
     },
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
@@ -250,7 +256,17 @@ export function useApplyForJob() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (applicationData: { jobId: number; coverLetter: string; resumeUrl?: string }) => {
+    mutationFn: async (applicationData: {
+      jobId: number;
+      fullName: string;
+      email: string;
+      phone?: string;
+      coverLetter?: string;
+      resumeUrl?: string;
+      linkedinUrl?: string;
+      portfolioUrl?: string;
+      answers?: Record<string, any>;
+    }) => {
       const { data } = await apiClient.post('/job-applications', applicationData);
       return data;
     },

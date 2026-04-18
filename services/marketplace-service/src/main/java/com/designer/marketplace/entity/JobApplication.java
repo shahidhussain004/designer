@@ -1,15 +1,18 @@
 package com.designer.marketplace.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.designer.marketplace.config.TextArrayType;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import jakarta.persistence.Column;
@@ -82,9 +85,9 @@ public class JobApplication {
     @Column(name = "linkedin_url", columnDefinition = "TEXT")
     private String linkedinUrl;
 
-    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Type(value = TextArrayType.class)
     @Column(name = "additional_documents", columnDefinition = "text[]")
-    private String[] additionalDocuments;
+    private List<String> additionalDocuments;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "answers", columnDefinition = "jsonb")

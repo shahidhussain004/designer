@@ -47,38 +47,82 @@ export function ServicesSection() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
   return (
-    <section id="services" ref={containerRef} className="relative py-32 lg:py-40 bg-background">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+    <section
+      id="services"
+      ref={containerRef}
+      style={{ position: "relative", padding: "120px 0 160px", background: "#0A0B0F" }}
+    >
+      {/* Subtle grid */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage:
+            "linear-gradient(rgba(0,229,197,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,197,0.025) 1px, transparent 1px)",
+          backgroundSize: "60px 60px",
+        }}
+      />
+
+      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 48px", position: "relative" }}>
         {/* Section Header */}
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 mb-20 lg:mb-32">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "64px", marginBottom: "80px" }}>
           <MotionDiv
             initial={{ opacity: 0, y: 40 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8 }}
           >
-            <span className="inline-flex items-center gap-3 text-sm tracking-[0.2em] uppercase text-muted-foreground mb-6">
-              <span className="w-8 h-[1px] bg-accent" />
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "10px",
+                fontSize: "11px",
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+                color: "#00E5C5",
+                marginBottom: "24px",
+              }}
+            >
+              <span style={{ width: "32px", height: "1px", background: "#00E5C5", display: "block" }} />
               Services
             </span>
-            <h2 className="text-4xl lg:text-5xl xl:text-6xl font-medium tracking-tight text-balance">
-              What we do <span className="italic font-normal text-accent">best</span>
+            <h2
+              style={{
+                fontSize: "clamp(40px, 5vw, 64px)",
+                fontWeight: 600,
+                letterSpacing: "-0.03em",
+                lineHeight: 0.95,
+                color: "#F0F0EE",
+                margin: 0,
+              }}
+            >
+              What we do{" "}
+              <span style={{ color: "#00E5C5", fontStyle: "italic", fontWeight: 300 }}>best</span>
             </h2>
           </MotionDiv>
           <MotionDiv
             initial={{ opacity: 0, y: 40 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="lg:pt-8"
+            style={{ paddingTop: "32px" }}
           >
-            <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
+            <p
+              style={{
+                fontSize: "17px",
+                color: "rgba(240,240,238,0.5)",
+                lineHeight: 1.7,
+                maxWidth: "480px",
+                margin: 0,
+              }}
+            >
               We offer a comprehensive suite of design services, each crafted with precision and tailored to elevate
-              your brand&apos;s unique story.
+              your brand's unique story.
             </p>
           </MotionDiv>
         </div>
 
         {/* Services Grid */}
-        <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px" }}>
           {services.map((service, index) => (
             <MotionDiv
               key={service.title}
@@ -87,62 +131,118 @@ export function ServicesSection() {
               transition={{ duration: 0.8, delay: index * 0.15 }}
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
-              className="group relative"
+              style={{ position: "relative" }}
             >
-              <div className="relative p-8 lg:p-10 rounded-2xl bg-card border border-border/50 transition-all duration-500 hover:border-accent/30 hover:shadow-xl overflow-hidden">
-                {/* Background glow on hover */}
-                <MotionDiv
-                  className="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  initial={false}
+              <div
+                style={{
+                  position: "relative",
+                  padding: "40px",
+                  borderRadius: "12px",
+                  background: hoveredIndex === index ? "#12141A" : "#0E1016",
+                  border: `1px solid ${hoveredIndex === index ? "rgba(0,229,197,0.25)" : "rgba(240,240,238,0.07)"}`,
+                  transition: "all 0.4s ease",
+                  overflow: "hidden",
+                }}
+              >
+                {/* Top cyan line on hover */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    height: "2px",
+                    background: "linear-gradient(90deg, #00E5C5, transparent)",
+                    width: hoveredIndex === index ? "100%" : "0%",
+                    transition: "width 0.5s cubic-bezier(0.22, 1, 0.36, 1)",
+                  }}
                 />
 
-                {/* Content */}
-                <div className="relative z-10">
-                  {/* Header */}
-                  <div className="flex items-start justify-between mb-6">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center group-hover:bg-accent/10 transition-colors duration-300">
-                        <service.icon className="w-5 h-5 text-foreground group-hover:text-accent transition-colors duration-300" />
-                      </div>
-                      <span className="text-sm text-muted-foreground font-mono">{service.number}</span>
-                    </div>
-                    <MotionDiv
-                      animate={{
-                        x: hoveredIndex === index ? 0 : 10,
-                        opacity: hoveredIndex === index ? 1 : 0,
+                {/* Header row */}
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "24px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                    <div
+                      style={{
+                        width: "48px",
+                        height: "48px",
+                        borderRadius: "10px",
+                        background: hoveredIndex === index ? "rgba(0,229,197,0.1)" : "rgba(240,240,238,0.05)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        border: `1px solid ${hoveredIndex === index ? "rgba(0,229,197,0.25)" : "rgba(240,240,238,0.08)"}`,
+                        transition: "all 0.3s ease",
                       }}
-                      transition={{ duration: 0.3 }}
                     >
-                      <ArrowUpRight className="w-5 h-5 text-accent" />
-                    </MotionDiv>
+                      <service.icon
+                        style={{
+                          width: "18px",
+                          height: "18px",
+                          color: hoveredIndex === index ? "#00E5C5" : "rgba(240,240,238,0.5)",
+                          transition: "color 0.3s ease",
+                        }}
+                      />
+                    </div>
+                    <span
+                      style={{
+                        fontSize: "12px",
+                        fontFamily: "monospace",
+                        color: "rgba(240,240,238,0.25)",
+                        letterSpacing: "0.08em",
+                      }}
+                    >
+                      {service.number}
+                    </span>
                   </div>
-
-                  {/* Title & Description */}
-                  <h3 className="text-2xl lg:text-3xl font-medium tracking-tight mb-4 group-hover:text-accent transition-colors duration-300">
-                    {service.title}
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed mb-6">{service.description}</p>
-
-                  {/* Details */}
-                  <div className="flex flex-wrap gap-2">
-                    {service.details.map((detail) => (
-                      <span
-                        key={detail}
-                        className="px-3 py-1.5 text-xs tracking-wide rounded-full bg-secondary text-muted-foreground group-hover:bg-accent/10 group-hover:text-foreground transition-colors duration-300"
-                      >
-                        {detail}
-                      </span>
-                    ))}
+                  <div
+                    style={{
+                      opacity: hoveredIndex === index ? 1 : 0,
+                      transform: `translateX(${hoveredIndex === index ? 0 : 8}px)`,
+                      transition: "all 0.3s ease",
+                    }}
+                  >
+                    <ArrowUpRight style={{ width: "18px", height: "18px", color: "#00E5C5" }} />
                   </div>
                 </div>
 
-                {/* Bottom line indicator */}
-                <MotionDiv
-                  className="absolute bottom-0 left-0 h-[2px] bg-accent"
-                  initial={{ width: 0 }}
-                  animate={{ width: hoveredIndex === index ? "100%" : 0 }}
-                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                />
+                {/* Title */}
+                <h3
+                  style={{
+                    fontSize: "26px",
+                    fontWeight: 600,
+                    letterSpacing: "-0.02em",
+                    color: hoveredIndex === index ? "#00E5C5" : "#F0F0EE",
+                    marginBottom: "12px",
+                    transition: "color 0.3s ease",
+                  }}
+                >
+                  {service.title}
+                </h3>
+
+                {/* Description */}
+                <p style={{ fontSize: "14px", color: "rgba(240,240,238,0.45)", lineHeight: 1.7, marginBottom: "24px" }}>
+                  {service.description}
+                </p>
+
+                {/* Tags */}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                  {service.details.map((detail) => (
+                    <span
+                      key={detail}
+                      style={{
+                        padding: "5px 12px",
+                        fontSize: "11px",
+                        letterSpacing: "0.06em",
+                        borderRadius: "100px",
+                        background: hoveredIndex === index ? "rgba(0,229,197,0.08)" : "rgba(240,240,238,0.04)",
+                        color: hoveredIndex === index ? "#00E5C5" : "rgba(240,240,238,0.35)",
+                        border: `1px solid ${hoveredIndex === index ? "rgba(0,229,197,0.2)" : "rgba(240,240,238,0.07)"}`,
+                        transition: "all 0.3s ease",
+                      }}
+                    >
+                      {detail}
+                    </span>
+                  ))}
+                </div>
               </div>
             </MotionDiv>
           ))}
