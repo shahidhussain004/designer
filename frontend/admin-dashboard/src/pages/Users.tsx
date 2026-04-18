@@ -3,14 +3,14 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import {
-    Badge,
-    Button,
-    Card,
-    Divider,
-    Flex,
-    Input,
-    Spinner,
-    Text
+  Badge,
+  Button,
+  Card,
+  Divider,
+  Flex,
+  Input,
+  Spinner,
+  Text
 } from '../components/green'
 import { usersApi } from '../lib/api'
 
@@ -400,7 +400,7 @@ export default function Users() {
       <AddUserModal
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
-        onSubmit={(data) => {
+        onSubmit={() => {
 
           toast.success('User added successfully (feature coming soon)')
           setShowAddModal(false)
