@@ -33,6 +33,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/marketplace-web/package-lock.json
 
       - name: Use stable npm version
         run: npm install -g npm@10.2.5
@@ -42,13 +44,9 @@ jobs:
           npm config delete registry || true
           npm config set registry https://registry.npmjs.org/
 
-      - name: Remove old lockfile
-        working-directory: ./frontend/marketplace-web
-        run: rm -f package-lock.json
-
       - name: Install dependencies
         working-directory: ./frontend/marketplace-web
-        run: npm install --legacy-peer-deps --no-audit --no-fund
+        run: npm ci --legacy-peer-deps --no-audit --no-fund
 
       - name: Run ESLint
         working-directory: ./frontend/marketplace-web
@@ -75,22 +73,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/marketplace-web/package-lock.json
 
       - name: Use stable npm version
         run: npm install -g npm@10.2.5
 
-      - name: Remove old lockfile
-        working-directory: ./frontend/marketplace-web
-        run: rm -f package-lock.json
-
       - name: Install dependencies
         working-directory: ./frontend/marketplace-web
-        run: npm install --legacy-peer-deps --no-audit --no-fund
+        run: npm ci --legacy-peer-deps --no-audit --no-fund
 
       - name: Build Next.js application
         working-directory: ./frontend/marketplace-web
         env:
           NEXT_PUBLIC_API_URL: http://localhost:8080
+          NEXT_TELEMETRY_DISABLED: 1
         run: npm run build
 
       - name: Upload build artifacts
@@ -118,14 +115,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-
-      - name: Remove old lockfile
-        working-directory: ./frontend/marketplace-web
-        run: rm -f package-lock.json
+          cache: npm
+          cache-dependency-path: frontend/marketplace-web/package-lock.json
 
       - name: Install dependencies
         working-directory: ./frontend/marketplace-web
-        run: npm install --legacy-peer-deps --no-audit --no-fund
+        run: npm ci --legacy-peer-deps --no-audit --no-fund
 
       - name: Run unit tests
         working-directory: ./frontend/marketplace-web
@@ -155,14 +150,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-
-      - name: Remove old lockfile
-        working-directory: ./frontend/marketplace-web
-        run: rm -f package-lock.json
+          cache: npm
+          cache-dependency-path: frontend/marketplace-web/package-lock.json
 
       - name: Install dependencies
         working-directory: ./frontend/marketplace-web
-        run: npm install --legacy-peer-deps --no-audit --no-fund
+        run: npm ci --legacy-peer-deps --no-audit --no-fund
 
       - name: Run integration tests
         working-directory: ./frontend/marketplace-web
@@ -196,8 +189,7 @@ jobs:
 
           # Copy package files
           COPY package*.json ./
-          # Remove old lockfile and install with legacy-peer-deps for compatibility
-          RUN rm -f package-lock.json && npm install --legacy-peer-deps --no-audit --no-fund
+          RUN npm ci --legacy-peer-deps --no-audit --no-fund
 
           # Copy source code
           COPY . .
@@ -301,14 +293,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-
-      - name: Remove old lockfile
-        working-directory: ./frontend/marketplace-web
-        run: rm -f package-lock.json
+          cache: npm
+          cache-dependency-path: frontend/marketplace-web/package-lock.json
 
       - name: Install dependencies
         working-directory: ./frontend/marketplace-web
-        run: npm install --legacy-peer-deps --no-audit --no-fund
+        run: npm ci --legacy-peer-deps --no-audit --no-fund
 
       - name: Build and start server
         working-directory: ./frontend/marketplace-web
