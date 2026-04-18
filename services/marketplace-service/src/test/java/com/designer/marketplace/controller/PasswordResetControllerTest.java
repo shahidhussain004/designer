@@ -26,6 +26,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ActiveProfiles("test")
 public class PasswordResetControllerTest {
 
+    private static final String API_CONTEXT_PATH = "/api";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -45,7 +47,8 @@ public class PasswordResetControllerTest {
 
     @Test
     public void testForgotPasswordEmailNotFound() throws Exception {
-        mockMvc.perform(post("/api/users/forgot-password")
+        mockMvc.perform(post(API_CONTEXT_PATH + "/users/forgot-password")
+            .contextPath(API_CONTEXT_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(forgotPasswordRequest)))
                 .andExpect(status().isOk())
@@ -57,7 +60,8 @@ public class PasswordResetControllerTest {
         ForgotPasswordRequest invalidRequest = new ForgotPasswordRequest();
         invalidRequest.setEmail("invalid-email");
 
-        mockMvc.perform(post("/api/users/forgot-password")
+        mockMvc.perform(post(API_CONTEXT_PATH + "/users/forgot-password")
+            .contextPath(API_CONTEXT_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest());
@@ -68,7 +72,8 @@ public class PasswordResetControllerTest {
         ForgotPasswordRequest emptyRequest = new ForgotPasswordRequest();
         emptyRequest.setEmail("");
 
-        mockMvc.perform(post("/api/users/forgot-password")
+        mockMvc.perform(post(API_CONTEXT_PATH + "/users/forgot-password")
+            .contextPath(API_CONTEXT_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(emptyRequest)))
                 .andExpect(status().isBadRequest());
@@ -78,7 +83,8 @@ public class PasswordResetControllerTest {
     public void testResetPasswordInvalidToken() throws Exception {
         String resetPasswordJson = "{\"token\":\"invalid-token\",\"newPassword\":\"NewPassword123\"}";
 
-        mockMvc.perform(post("/api/users/reset-password")
+        mockMvc.perform(post(API_CONTEXT_PATH + "/users/reset-password")
+            .contextPath(API_CONTEXT_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(resetPasswordJson))
                 .andExpect(status().isBadRequest())
@@ -89,7 +95,8 @@ public class PasswordResetControllerTest {
     public void testResetPasswordWeakPassword() throws Exception {
         String resetPasswordJson = "{\"token\":\"valid-token\",\"newPassword\":\"weak\"}";
 
-        mockMvc.perform(post("/api/users/reset-password")
+        mockMvc.perform(post(API_CONTEXT_PATH + "/users/reset-password")
+            .contextPath(API_CONTEXT_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(resetPasswordJson))
                 .andExpect(status().isBadRequest());
