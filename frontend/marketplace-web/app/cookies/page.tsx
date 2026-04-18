@@ -27,7 +27,7 @@ export default function CookiesPage() {
   return (
     <PageLayout>
       {/* Header */}
-      <div className="bg-gray-900 text-white py-12 lg:py-16">
+      <div className="bg-gray-900 text-white py-6 lg:py-16">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-4">
             <Cookie className="w-8 h-8 text-primary-600" />

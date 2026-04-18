@@ -151,7 +151,7 @@ export default function ProfilePage() {
     <PageLayout>
       {/* Header */}
       <div className="bg-gray-900 text-white py-12 lg:py-16">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold">My Profile</h1>
@@ -172,7 +172,7 @@ export default function ProfilePage() {
 
       {/* Content */}
       <div className="bg-gray-50 py-8">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Notification */}
           {notification && (
             <div className={`mb-6 px-4 py-3 rounded-lg flex items-center gap-2 ${

@@ -295,4 +295,25 @@ public class UserService {
 
         log.info("Password reset successfully for user: {}", user.getUsername());
     }
+
+    /**
+     * Change password for the current authenticated user.
+     */
+    @Transactional
+    public void changePassword(String currentPassword, String newPassword) {
+        User currentUser = getCurrentUser();
+
+        if (!passwordEncoder.matches(currentPassword, currentUser.getPasswordHash())) {
+            throw new IllegalArgumentException("Current password is incorrect");
+        }
+
+        if (passwordEncoder.matches(newPassword, currentUser.getPasswordHash())) {
+            throw new IllegalArgumentException("New password must be different from current password");
+        }
+
+        currentUser.setPasswordHash(passwordEncoder.encode(newPassword));
+        userRepository.save(currentUser);
+
+        log.info("Password changed successfully for user: {}", currentUser.getUsername());
+    }
 }

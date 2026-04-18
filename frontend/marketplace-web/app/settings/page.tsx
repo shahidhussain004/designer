@@ -7,16 +7,36 @@ import { Bell, CheckCircle, Key, LogOut, User, XCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
+type NotificationSettings = {
+  jobAlerts: boolean
+  proposalUpdates: boolean
+  messages: boolean
+  newsletter: boolean
+}
+
+async function getErrorMessage(response: Response, fallbackMessage: string) {
+  const contentType = response.headers.get('content-type')
+
+  if (contentType?.includes('application/json')) {
+    const error = await response.json()
+    return error.message || fallbackMessage
+  }
+
+  return fallbackMessage
+}
+
 export default function SettingsPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
+  const [passwordSaving, setPasswordSaving] = useState(false)
+  const [preferencesSaving, setPreferencesSaving] = useState(false)
   const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null)
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
   })
-  const [emailNotifications, setEmailNotifications] = useState({
+  const [emailNotifications, setEmailNotifications] = useState<NotificationSettings>({
     jobAlerts: true,
     proposalUpdates: true,
     messages: true,
@@ -24,11 +44,37 @@ export default function SettingsPage() {
   })
 
   useEffect(() => {
-    if (!authService.isAuthenticated()) {
-      router.push('/auth/login')
-      return
+    const loadSettings = async () => {
+      if (!authService.isAuthenticated()) {
+        router.push('/auth/login')
+        return
+      }
+
+      try {
+        const response = await apiFetch('/api/users/me/notifications/preferences')
+
+        if (!response.ok) {
+          throw new Error(await getErrorMessage(response, 'Failed to load notification preferences'))
+        }
+
+        const preferences = await response.json()
+        setEmailNotifications({
+          jobAlerts: Boolean(preferences.jobAlerts),
+          proposalUpdates: Boolean(preferences.proposalUpdates),
+          messages: Boolean(preferences.messages),
+          newsletter: Boolean(preferences.newsletter),
+        })
+      } catch (err) {
+        setNotification({
+          type: 'error',
+          message: err instanceof Error ? err.message : 'Failed to load notification preferences'
+        })
+      } finally {
+        setLoading(false)
+      }
     }
-    setLoading(false)
+
+    loadSettings()
   }, [router])
 
   const handlePasswordChange = async () => {
@@ -51,6 +97,7 @@ export default function SettingsPage() {
     }
 
     try {
+      setPasswordSaving(true)
       const response = await apiFetch('/api/users/change-password', {
         method: 'POST',
         headers: {
@@ -63,25 +110,46 @@ export default function SettingsPage() {
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || 'Failed to change password')
+        throw new Error(await getErrorMessage(response, 'Failed to change password'))
       }
 
       setNotification({ type: 'success', message: 'Password changed successfully!' })
       setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
     } catch (err) {
       setNotification({ type: 'error', message: err instanceof Error ? err.message : 'Failed to change password' })
+    } finally {
+      setPasswordSaving(false)
     }
   }
 
   const handleNotificationSave = async () => {
     setNotification(null)
     try {
-      // TODO: API call to save notification preferences
-      await new Promise(resolve => setTimeout(resolve, 500))
+      setPreferencesSaving(true)
+      const response = await apiFetch('/api/users/me/notifications/preferences', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(emailNotifications),
+      })
+
+      if (!response.ok) {
+        throw new Error(await getErrorMessage(response, 'Failed to save preferences'))
+      }
+
+      const preferences = await response.json()
+      setEmailNotifications({
+        jobAlerts: Boolean(preferences.jobAlerts),
+        proposalUpdates: Boolean(preferences.proposalUpdates),
+        messages: Boolean(preferences.messages),
+        newsletter: Boolean(preferences.newsletter),
+      })
       setNotification({ type: 'success', message: 'Notification preferences saved!' })
-    } catch (_err) {
-      setNotification({ type: 'error', message: 'Failed to save preferences' })
+    } catch (err) {
+      setNotification({ type: 'error', message: err instanceof Error ? err.message : 'Failed to save preferences' })
+    } finally {
+      setPreferencesSaving(false)
     }
   }
 
@@ -99,7 +167,7 @@ export default function SettingsPage() {
     <PageLayout>
       {/* Header */}
       <div className="bg-gray-900 text-white py-12 lg:py-16">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold">Settings</h1>
           <p className="text-gray-300 mt-1">Manage your account settings and preferences</p>
         </div>
@@ -107,7 +175,7 @@ export default function SettingsPage() {
 
       {/* Content */}
       <div className="bg-gray-50 py-8">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 space-y-6">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6">
           {/* Notification */}
           {notification && (
             <div className={`px-4 py-3 rounded-lg flex items-center gap-2 ${
@@ -168,9 +236,10 @@ export default function SettingsPage() {
               <div className="flex justify-end">
                 <button 
                   onClick={handlePasswordChange}
+                  disabled={passwordSaving}
                   className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
                 >
-                  Update Password
+                  {passwordSaving ? 'Updating...' : 'Update Password'}
                 </button>
               </div>
             </div>
@@ -210,9 +279,10 @@ export default function SettingsPage() {
               <div className="flex justify-end pt-4">
                 <button 
                   onClick={handleNotificationSave}
+                  disabled={preferencesSaving}
                   className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
                 >
-                  Save Preferences
+                  {preferencesSaving ? 'Saving...' : 'Save Preferences'}
                 </button>
               </div>
             </div>
