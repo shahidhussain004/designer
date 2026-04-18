@@ -81,6 +81,23 @@ spring:
       properties:
         spring.json.trusted.packages: com.designer.marketplace
 
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:your-email@gmail.com}
+    password: ${MAIL_PASSWORD:your-app-password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+    from: ${MAIL_FROM:noreply@designer-marketplace.com}
+
 server:
   port: ${SERVER_PORT:8080}
   error:
@@ -142,25 +159,6 @@ springdoc:
     enabled: true
     operations-sorter: method
     tags-sorter: alpha
-
-# Email Configuration
-spring:
-  mail:
-    host: ${MAIL_HOST:smtp.gmail.com}
-    port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME:your-email@gmail.com}
-    password: ${MAIL_PASSWORD:your-app-password}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-            required: true
-          connectiontimeout: 5000
-          timeout: 5000
-          writetimeout: 5000
-    from: ${MAIL_FROM:noreply@designer-marketplace.com}
 
 # Application Configuration
 app:
