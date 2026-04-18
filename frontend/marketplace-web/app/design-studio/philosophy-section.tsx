@@ -1,6 +1,5 @@
 "use client"
 
-
 import { motion, useInView, useScroll, useTransform } from "framer-motion"
 import type React from "react"
 import { useRef } from "react"
@@ -23,6 +22,13 @@ const principles = [
   },
 ]
 
+const stats = [
+  { value: "150+", label: "Projects Delivered" },
+  { value: "12", label: "Design Awards" },
+  { value: "98%", label: "Client Satisfaction" },
+  { value: "15", label: "Years Experience" },
+]
+
 export function PhilosophySection() {
   const containerRef = useRef<HTMLDivElement>(null)
   const isInView = useInView(containerRef as unknown as React.RefObject<HTMLElement>, { once: true, margin: "-100px" })
@@ -32,7 +38,7 @@ export function PhilosophySection() {
     offset: ["start end", "end start"],
   })
 
-  const y = useTransform(scrollYProgress, [0, 1], [100, -100])
+  const y = useTransform(scrollYProgress, [0, 1], [60, -60])
 
   const MotionDiv = motion.div as unknown as React.ComponentType<React.ComponentProps<'div'> & any>
 
@@ -40,82 +46,220 @@ export function PhilosophySection() {
     <section
       id="philosophy"
       ref={containerRef}
-      className="relative py-32 lg:py-40 bg-foreground text-background overflow-hidden"
+      style={{ position: "relative", padding: "120px 0 160px", background: "#070809", overflow: "hidden" }}
     >
-      {/* Background pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
+      {/* Grid texture */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage:
+            "linear-gradient(rgba(0,229,197,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,197,0.03) 1px, transparent 1px)",
+          backgroundSize: "60px 60px",
+        }}
+      />
 
-      <div className="relative max-w-7xl mx-auto px-6 lg:px-12">
-        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+      {/* Top separator */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "1px",
+          background: "linear-gradient(90deg, transparent, rgba(0,229,197,0.25), transparent)",
+        }}
+      />
+
+      {/* Ambient glow */}
+      <div
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "800px",
+          height: "400px",
+          background: "radial-gradient(ellipse, rgba(0,229,197,0.04) 0%, transparent 70%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 48px", position: "relative" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "96px", alignItems: "center" }}>
           {/* Left - Quote */}
           <MotionDiv
             initial={{ opacity: 0, x: -60 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 1 }}
           >
-            <span className="inline-flex items-center gap-3 text-sm tracking-[0.2em] uppercase text-background/60 mb-8">
-              <span className="w-8 h-[1px] bg-accent" />
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "10px",
+                fontSize: "11px",
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+                color: "#00E5C5",
+                marginBottom: "32px",
+              }}
+            >
+              <span style={{ width: "32px", height: "1px", background: "#00E5C5", display: "block" }} />
               Our Philosophy
             </span>
-            <blockquote className="text-3xl lg:text-4xl xl:text-5xl font-medium tracking-tight leading-tight">
-              <span className="text-accent">&ldquo;</span>
+
+            <blockquote
+              style={{
+                fontSize: "clamp(28px, 3.5vw, 44px)",
+                fontWeight: 500,
+                letterSpacing: "-0.02em",
+                lineHeight: 1.2,
+                color: "#F0F0EE",
+                margin: 0,
+              }}
+            >
+              <span style={{ color: "#00E5C5", fontSize: "1.4em", lineHeight: 1 }}>&ldquo;</span>
               Design is not just what it looks like. Design is{" "}
-              <span className="italic font-normal text-accent">how it works</span>
-              <span className="text-accent">&rdquo;</span>
+              <em style={{ color: "#00E5C5", fontStyle: "italic", fontWeight: 300 }}>how it works</em>
+              <span style={{ color: "#00E5C5", fontSize: "1.4em", lineHeight: 1 }}>&rdquo;</span>
             </blockquote>
-            <MotionDiv style={{ y }} className="mt-12 flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-background/10 overflow-hidden">
-                <img src="/minimalist-professional-portrait.png" alt="Founder" className="w-full h-full object-cover" />
+
+            <MotionDiv
+              style={{ y, marginTop: "48px", display: "flex", alignItems: "center", gap: "16px" }}
+            >
+              <div
+                style={{
+                  width: "56px",
+                  height: "56px",
+                  borderRadius: "50%",
+                  overflow: "hidden",
+                  border: "2px solid rgba(0,229,197,0.25)",
+                }}
+              >
+                <img
+                  src="/minimalist-professional-portrait.png"
+                  alt="Founder"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
               </div>
               <div>
-                <p className="font-medium text-background">Alexander Chen</p>
-                <p className="text-sm text-background/60">Founder & Creative Director</p>
+                <p style={{ fontWeight: 600, color: "#F0F0EE", margin: "0 0 4px", fontSize: "15px" }}>
+                  Alexander Chen
+                </p>
+                <p style={{ fontSize: "12px", color: "rgba(240,240,238,0.4)", margin: 0, letterSpacing: "0.05em" }}>
+                  Founder & Creative Director
+                </p>
               </div>
             </MotionDiv>
           </MotionDiv>
 
           {/* Right - Principles */}
-          <div className="space-y-8">
-            {principles.map((principle, index) => {
-              return (
-                <MotionDiv
-                  key={principle.number}
-                  initial={{ opacity: 0, x: 60 }}
-                  animate={isInView ? { opacity: 1, x: 0 } : {}}
-                  transition={{ duration: 0.8, delay: index * 0.2 }}
-                  className="group"
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            {principles.map((principle, index) => (
+              <MotionDiv
+                key={principle.number}
+                initial={{ opacity: 0, x: 60 }}
+                animate={isInView ? { opacity: 1, x: 0 } : {}}
+                transition={{ duration: 0.8, delay: index * 0.2 }}
+                className="group"
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "24px",
+                    padding: "28px",
+                    borderRadius: "10px",
+                    border: "1px solid rgba(240,240,238,0.06)",
+                    background: "rgba(240,240,238,0.02)",
+                    transition: "all 0.3s ease",
+                    cursor: "default",
+                  }}
+                  onMouseEnter={(e) => {
+                    const el = e.currentTarget as HTMLElement
+                    el.style.background = "rgba(0,229,197,0.04)"
+                    el.style.borderColor = "rgba(0,229,197,0.18)"
+                  }}
+                  onMouseLeave={(e) => {
+                    const el = e.currentTarget as HTMLElement
+                    el.style.background = "rgba(240,240,238,0.02)"
+                    el.style.borderColor = "rgba(240,240,238,0.06)"
+                  }}
                 >
-                  <div className="flex gap-6 p-6 rounded-xl transition-colors duration-300 hover:bg-background/5">
-                    <span className="text-sm font-mono text-accent">{principle.number}</span>
-                    <div>
-                      <h3 className="text-xl lg:text-2xl font-medium mb-2 group-hover:text-accent transition-colors duration-300">
-                        {principle.title}
-                      </h3>
-                      <p className="text-background/60 leading-relaxed">{principle.description}</p>
-                    </div>
+                  <span
+                    style={{
+                      fontSize: "11px",
+                      fontFamily: "monospace",
+                      color: "#00E5C5",
+                      letterSpacing: "0.1em",
+                      flexShrink: 0,
+                      marginTop: "3px",
+                    }}
+                  >
+                    {principle.number}
+                  </span>
+                  <div>
+                    <h3
+                      style={{
+                        fontSize: "20px",
+                        fontWeight: 600,
+                        letterSpacing: "-0.02em",
+                        color: "#F0F0EE",
+                        margin: "0 0 8px",
+                      }}
+                    >
+                      {principle.title}
+                    </h3>
+                    <p style={{ fontSize: "14px", color: "rgba(240,240,238,0.4)", lineHeight: 1.7, margin: 0 }}>
+                      {principle.description}
+                    </p>
                   </div>
-                </MotionDiv>
-              )
-            })}
+                </div>
+              </MotionDiv>
+            ))}
           </div>
         </div>
 
-        {/* Stats */}
+        {/* Stats row */}
         <MotionDiv
           initial={{ opacity: 0, y: 60 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="mt-24 lg:mt-32 grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12"
+          style={{
+            marginTop: "96px",
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr)",
+            gap: "1px",
+            background: "rgba(240,240,238,0.07)",
+            borderRadius: "12px",
+            overflow: "hidden",
+            border: "1px solid rgba(240,240,238,0.07)",
+          }}
         >
-          {[
-            { value: "150+", label: "Projects Delivered" },
-            { value: "12", label: "Design Awards" },
-            { value: "98%", label: "Client Satisfaction" },
-            { value: "15", label: "Years Experience" },
-          ].map((stat, index) => (
-            <div key={index} className="text-center lg:text-left">
-              <p className="text-4xl lg:text-5xl font-medium text-accent mb-2">{stat.value}</p>
-              <p className="text-sm text-background/60 tracking-wide">{stat.label}</p>
+          {stats.map((stat, index) => (
+            <div
+              key={index}
+              style={{
+                padding: "40px 32px",
+                background: "#0A0B0F",
+                textAlign: "center",
+              }}
+            >
+              <p
+                style={{
+                  fontSize: "48px",
+                  fontWeight: 700,
+                  color: "#00E5C5",
+                  margin: "0 0 8px",
+                  letterSpacing: "-0.03em",
+                  lineHeight: 1,
+                }}
+              >
+                {stat.value}
+              </p>
+              <p style={{ fontSize: "12px", color: "rgba(240,240,238,0.35)", margin: 0, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                {stat.label}
+              </p>
             </div>
           ))}
         </MotionDiv>

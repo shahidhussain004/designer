@@ -3,7 +3,7 @@
 import { ErrorMessage } from '@/components/ErrorMessage';
 import { JobDetailsSkeleton } from '@/components/Skeletons';
 import { PageLayout } from '@/components/ui';
-import { useApplyForJob, useJob } from '@/hooks/useJobs';
+import { useJob } from '@/hooks/useJobs';
 import { useAuth } from '@/lib/auth';
 import {
   AlertCircle,
@@ -17,9 +17,7 @@ import {
   DollarSign,
   ExternalLink,
   Eye,
-  FileText,
   Globe,
-  GraduationCap,
   Mail,
   MapPin,
   Plane,
@@ -28,12 +26,10 @@ import {
   Star,
   Target,
   Users,
-  XCircle,
   Zap
 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import React, { useState } from 'react';
 
 export default function JobDetailsPage() {
   const params = useParams();
@@ -42,51 +38,6 @@ export default function JobDetailsPage() {
 
   // Fetch job details
   const { data: job, isLoading: jobLoading, error: jobError, refetch } = useJob(jobId);
-
-  // Application mutation
-  const applyForJob = useApplyForJob();
-
-  const [applicationOpen, setApplicationOpen] = useState(false);
-  const [applicationData, setApplicationData] = useState({
-    jobId: 0,
-    coverLetter: '',
-    resumeUrl: ''
-  });
-  const [fieldErrors, setFieldErrors] = useState<{ coverLetter?: string; resumeUrl?: string }>({});
-
-  const handleApplicationSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!user || user.role !== 'FREELANCER') {
-      return;
-    }
-
-    setFieldErrors({});
-
-    const newFieldErrors: { coverLetter?: string; resumeUrl?: string } = {};
-
-    if (!applicationData.coverLetter || applicationData.coverLetter.trim().length === 0) {
-      newFieldErrors.coverLetter = 'Cover letter is required';
-    }
-
-    if (Object.keys(newFieldErrors).length > 0) {
-      setFieldErrors(newFieldErrors);
-      return;
-    }
-
-    try {
-      await applyForJob.mutateAsync({
-        jobId: job!.id,
-        coverLetter: applicationData.coverLetter,
-        resumeUrl: applicationData.resumeUrl,
-      });
-
-      setApplicationOpen(false);
-      setApplicationData({ jobId: job!.id, coverLetter: '', resumeUrl: '' });
-    } catch {
-      // Error is handled by mutation
-    }
-  };
 
   if (jobLoading) {
     return (
@@ -156,24 +107,6 @@ export default function JobDetailsPage() {
 
   return (
     <PageLayout>
-      {/* Success/Error Alerts */}
-      {applyForJob.isSuccess && (
-        <div className="bg-green-50 border-b border-green-200 px-4 py-3" role="alert">
-          <div className="mx-auto max-w-7xl flex items-center gap-2 text-green-700">
-            <CheckCircle className="w-5 h-5" aria-hidden="true" />
-            <span>Application submitted successfully! The company will review your application.</span>
-          </div>
-        </div>
-      )}
-
-      {applyForJob.error && (
-        <div className="bg-red-50 border-b border-red-200 px-4 py-3" role="alert">
-          <div className="mx-auto max-w-7xl flex items-center gap-2 text-red-700">
-            <XCircle className="w-5 h-5" aria-hidden="true" />
-            <span>{applyForJob.error instanceof Error ? applyForJob.error.message : 'Failed to submit application'}</span>
-          </div>
-        </div>
-      )}
 
       {/* Hero Header */}
       <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white py-12 lg:py-16">
@@ -288,61 +221,49 @@ export default function JobDetailsPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
 
             {/* Left Column - Main Content */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-2 space-y-8">
 
               {/* Job Description */}
-              <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8" aria-labelledby="description-heading">
-                <h2 id="description-heading" className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <FileText className="w-6 h-6 text-primary-600" aria-hidden="true" />
-                  Job Description
-                </h2>
-                <div className="prose prose-gray max-w-none">
-                  <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{job.description}</p>
+              <section aria-labelledby="description-heading">
+                <h2 id="description-heading" className="text-xl font-semibold text-gray-900 mb-4">Overview</h2>
+                <div className="text-gray-700 leading-8 whitespace-pre-wrap">
+                  {job.description}
                 </div>
               </section>
 
               {/* Responsibilities */}
               {job.responsibilities && (
-                <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8" aria-labelledby="responsibilities-heading">
-                  <h2 id="responsibilities-heading" className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <Target className="w-6 h-6 text-primary-600" aria-hidden="true" />
-                    Key Responsibilities
-                  </h2>
-                  <div className="prose prose-gray max-w-none">
-                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{job.responsibilities}</p>
+                <section aria-labelledby="responsibilities-heading">
+                  <h2 id="responsibilities-heading" className="text-xl font-semibold text-gray-900 mb-4">What you&apos;ll be doing</h2>
+                  <div className="text-gray-700 leading-8 whitespace-pre-wrap">
+                    {job.responsibilities}
                   </div>
                 </section>
               )}
 
               {/* Requirements */}
               {job.requirements && (
-                <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8" aria-labelledby="requirements-heading">
-                  <h2 id="requirements-heading" className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <CheckCircle className="w-6 h-6 text-primary-600" aria-hidden="true" />
-                    Requirements
-                  </h2>
-                  <div className="prose prose-gray max-w-none">
-                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{job.requirements}</p>
+                <section aria-labelledby="requirements-heading">
+                  <h2 id="requirements-heading" className="text-xl font-semibold text-gray-900 mb-4">What we&apos;re looking for</h2>
+                  <div className="text-gray-700 leading-8 whitespace-pre-wrap">
+                    {job.requirements}
                   </div>
                 </section>
               )}
 
               {/* Skills Required */}
               {(job.requiredSkills || job.preferredSkills) && (
-                <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8" aria-labelledby="skills-heading">
-                  <h2 id="skills-heading" className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <Award className="w-6 h-6 text-primary-600" aria-hidden="true" />
-                    Skills & Qualifications
-                  </h2>
+                <section aria-labelledby="skills-heading">
+                  <h2 id="skills-heading" className="text-xl font-semibold text-gray-900 mb-4">Skills & Experience</h2>
 
                   {job.requiredSkills && parseJsonArray(job.requiredSkills).length > 0 && (
                     <div className="mb-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Required Skills</h3>
+                      <h3 className="text-sm font-semibold text-gray-700 text-uppercase tracking-wide mb-3">Required</h3>
                       <div className="flex flex-wrap gap-2">
                         {parseJsonArray(job.requiredSkills).map((skill: string, idx: number) => (
                           <span
                             key={idx}
-                            className="inline-flex items-center px-3 py-1.5 rounded-lg bg-primary-50 text-primary-700 border border-primary-200 text-sm font-medium"
+                            className="inline-flex items-center px-3 py-1.5 rounded-full bg-gray-100 text-gray-800 text-sm font-medium"
                           >
                             {skill}
                           </span>
@@ -353,12 +274,12 @@ export default function JobDetailsPage() {
 
                   {job.preferredSkills && parseJsonArray(job.preferredSkills).length > 0 && (
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Preferred Skills</h3>
+                      <h3 className="text-sm font-semibold text-gray-700 text-uppercase tracking-wide mb-3">Nice to have</h3>
                       <div className="flex flex-wrap gap-2">
                         {parseJsonArray(job.preferredSkills).map((skill: string, idx: number) => (
                           <span
                             key={idx}
-                            className="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-50 text-gray-700 border border-gray-200 text-sm"
+                            className="inline-flex items-center px-3 py-1.5 rounded-full bg-gray-50 text-gray-700 text-sm"
                           >
                             {skill}
                           </span>
@@ -371,19 +292,15 @@ export default function JobDetailsPage() {
 
               {/* Benefits & Perks */}
               {(job.benefits || job.perks) && (
-                <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8" aria-labelledby="benefits-heading">
-                  <h2 id="benefits-heading" className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <Star className="w-6 h-6 text-primary-600" aria-hidden="true" />
-                    Benefits & Perks
-                  </h2>
+                <section aria-labelledby="benefits-heading">
+                  <h2 id="benefits-heading" className="text-xl font-semibold text-gray-900 mb-4">Benefits</h2>
 
                   {job.benefits && parseJsonArray(job.benefits).length > 0 && (
                     <div className="mb-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Benefits</h3>
-                      <ul className="space-y-2">
+                      <ul className="space-y-3">
                         {parseJsonArray(job.benefits).map((benefit: string, idx: number) => (
-                          <li key={idx} className="flex items-start gap-2 text-gray-700">
-                            <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" aria-hidden="true" />
+                          <li key={idx} className="flex items-start gap-3 text-gray-700">
+                            <CheckCircle className="w-5 h-5 text-primary-600 mt-0.5 flex-shrink-0" aria-hidden="true" />
                             <span>{benefit}</span>
                           </li>
                         ))}
@@ -393,11 +310,10 @@ export default function JobDetailsPage() {
 
                   {job.perks && parseJsonArray(job.perks).length > 0 && (
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Additional Perks</h3>
-                      <ul className="space-y-2">
+                      <ul className="space-y-3">
                         {parseJsonArray(job.perks).map((perk: string, idx: number) => (
-                          <li key={idx} className="flex items-start gap-2 text-gray-700">
-                            <Star className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" aria-hidden="true" />
+                          <li key={idx} className="flex items-start gap-3 text-gray-700">
+                            <CheckCircle className="w-5 h-5 text-primary-600 mt-0.5 flex-shrink-0" aria-hidden="true" />
                             <span>{perk}</span>
                           </li>
                         ))}
@@ -409,27 +325,24 @@ export default function JobDetailsPage() {
 
               {/* Education & Certifications */}
               {(job.educationLevel || (job.certifications && parseJsonArray(job.certifications).length > 0)) && (
-                <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8" aria-labelledby="education-heading">
-                  <h2 id="education-heading" className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <GraduationCap className="w-6 h-6 text-primary-600" aria-hidden="true" />
-                    Education & Certifications
-                  </h2>
+                <section aria-labelledby="education-heading">
+                  <h2 id="education-heading" className="text-xl font-semibold text-gray-900 mb-4">Education & Certifications</h2>
 
                   {job.educationLevel && (
-                    <div className="mb-4">
-                      <p className="text-sm text-gray-600 mb-1">Minimum Education Level</p>
-                      <p className="text-lg font-semibold text-gray-900">{formatExperienceLevel(job.educationLevel)}</p>
+                    <div className="mb-4 pb-4 border-b border-gray-200">
+                      <p className="text-sm text-gray-600 mb-1">Minimum Education</p>
+                      <p className="font-semibold text-gray-900">{formatExperienceLevel(job.educationLevel)}</p>
                     </div>
                   )}
 
                   {job.certifications && parseJsonArray(job.certifications).length > 0 && (
                     <div>
-                      <p className="text-sm text-gray-600 mb-3">Preferred Certifications</p>
+                      <p className="text-sm text-gray-600 mb-3">Certifications</p>
                       <div className="flex flex-wrap gap-2">
                         {parseJsonArray(job.certifications).map((cert: string, idx: number) => (
                           <span
                             key={idx}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 text-sm font-medium"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 text-gray-800 text-sm font-medium"
                           >
                             <Award className="w-4 h-4" aria-hidden="true" />
                             {cert}
@@ -443,43 +356,36 @@ export default function JobDetailsPage() {
 
               {/* Application Instructions */}
               {job.applyInstructions && (
-                <section className="bg-blue-50 rounded-xl border border-blue-200 p-6 lg:p-8" aria-labelledby="instructions-heading">
-                  <h2 id="instructions-heading" className="text-xl font-bold text-blue-900 mb-3 flex items-center gap-2">
-                    <AlertCircle className="w-5 h-5" aria-hidden="true" />
-                    Application Instructions
-                  </h2>
-                  <p className="text-blue-800 leading-relaxed whitespace-pre-wrap">{job.applyInstructions}</p>
+                <section aria-labelledby="instructions-heading">
+                  <h2 id="instructions-heading" className="text-xl font-semibold text-gray-900 mb-4">How to Apply</h2>
+                  <div className="text-gray-700 leading-8 whitespace-pre-wrap">
+                    {job.applyInstructions}
+                  </div>
                 </section>
               )}
 
               {/* Company Info */}
               {job.companyName && (
-                <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8" aria-labelledby="company-heading">
-                  <h2 id="company-heading" className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <Building2 className="w-6 h-6 text-primary-600" aria-hidden="true" />
-                    About the Company
-                  </h2>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 bg-gradient-to-br from-primary-100 to-primary-200 rounded-xl flex items-center justify-center">
-                        <Building2 className="w-8 h-8 text-primary-600" aria-hidden="true" />
-                      </div>
-                      <div>
-                        <p className="text-xl font-bold text-gray-900">{job.companyName}</p>
+                <section aria-labelledby="company-heading">
+                  <h2 id="company-heading" className="text-xl font-semibold text-gray-900 mb-4">About the Company</h2>
+                  <div className="bg-gray-50 rounded-lg p-6">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <p className="text-lg font-semibold text-gray-900">{job.companyName}</p>
                         {job.categoryName && (
-                          <p className="text-sm text-gray-600 mt-1">{job.categoryName}</p>
+                          <p className="text-sm text-gray-600 mt-2">{job.categoryName}</p>
                         )}
                       </div>
+                      {job.companyId && (
+                        <Link
+                          href={`/company/${job.companyId}`}
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-primary-600 hover:bg-primary-50 font-medium transition-colors text-sm"
+                        >
+                          View Profile
+                          <ExternalLink className="w-4 h-4" aria-hidden="true" />
+                        </Link>
+                      )}
                     </div>
-                    {job.companyId && (
-                      <Link
-                        href={`/company/${job.companyId}`}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-50 text-primary-700 hover:bg-primary-100 border border-primary-200 font-medium transition-colors"
-                      >
-                        View Profile
-                        <ExternalLink className="w-4 h-4" aria-hidden="true" />
-                      </Link>
-                    )}
                   </div>
                 </section>
               )}
@@ -488,110 +394,61 @@ export default function JobDetailsPage() {
             {/* Right Sidebar */}
             <div className="space-y-6">
 
-              {/* Apply Now Card */}
-              <div className="bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl shadow-lg border border-primary-400 p-6 text-white sticky top-6">
-                <div className="mb-4">
-                  <p className="text-primary-100 text-sm mb-2 flex items-center gap-1.5">
-                    <DollarSign className="w-4 h-4" aria-hidden="true" />
-                    Salary Range
-                  </p>
-                  <p className="text-2xl lg:text-3xl font-bold">
-                    {formatSalary()}
-                  </p>
-                </div>
-
-                {user && user.role === 'FREELANCER' && user.id !== job.companyId && job.status === 'OPEN' && (
-                  <button
-                    onClick={() => setApplicationOpen(!applicationOpen)}
-                    className={`w-full py-3 px-4 rounded-lg font-semibold transition-all transform hover:scale-105 ${
-                      applicationOpen
-                        ? 'bg-white/20 text-white hover:bg-white/30'
-                        : 'bg-white text-primary-600 hover:bg-primary-50'
-                    }`}
-                    aria-expanded={applicationOpen}
+              {/* Apply Section */}
+              {!user ? (
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
+                  <AlertCircle className="w-12 h-12 mx-auto mb-4 text-gray-400" aria-hidden="true" />
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">Sign in to apply for this job</h3>
+                  <p className="text-gray-600 mb-6">You need to be logged in to submit an application.</p>
+                  <Link
+                    href="/login"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary-600 text-white hover:bg-primary-700 font-semibold transition-colors"
                   >
-                    {applicationOpen ? 'Cancel Application' : 'Apply Now'}
-                  </button>
-                )}
-
-                {job.status !== 'OPEN' && (
-                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-center">
-                    <AlertCircle className="w-6 h-6 mx-auto mb-2" aria-hidden="true" />
-                    <p className="text-sm font-medium">This position is {job.status.toLowerCase()}</p>
-                  </div>
-                )}
-              </div>
-
-              {/* Application Form */}
-              {applicationOpen && (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 animate-in slide-in-from-top">
-                  <form onSubmit={handleApplicationSubmit}>
-                    <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                      <Send className="w-5 h-5 text-primary-600" aria-hidden="true" />
-                      Submit Your Application
-                    </h3>
-
-                    <div className="space-y-4">
-                      <div>
-                        <label htmlFor="coverLetter" className="block text-sm font-medium text-gray-700 mb-2">
-                          Cover Letter <span className="text-red-500" aria-label="required">*</span>
-                        </label>
-                        <textarea
-                          id="coverLetter"
-                          placeholder="Tell the company why you're the perfect fit for this role..."
-                          value={applicationData.coverLetter}
-                          onChange={(e) => setApplicationData({ ...applicationData, coverLetter: e.target.value })}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent min-h-[150px] resize-y"
-                          aria-invalid={!!fieldErrors.coverLetter}
-                          aria-describedby={fieldErrors.coverLetter ? "coverLetter-error" : undefined}
-                        />
-                        {fieldErrors.coverLetter && (
-                          <p id="coverLetter-error" className="text-sm text-red-600 mt-1" role="alert">
-                            {fieldErrors.coverLetter}
-                          </p>
-                        )}
-                      </div>
-
-                      <div>
-                        <label htmlFor="resumeUrl" className="block text-sm font-medium text-gray-700 mb-2">
-                          Resume URL
-                        </label>
-                        <input
-                          id="resumeUrl"
-                          type="url"
-                          placeholder="https://example.com/resume.pdf"
-                          value={applicationData.resumeUrl}
-                          onChange={(e) => setApplicationData({ ...applicationData, resumeUrl: e.target.value })}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                        />
-                      </div>
-
-                      <button
-                        type="submit"
-                        disabled={applyForJob.isPending}
-                        className="w-full bg-primary-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
-                      >
-                        {applyForJob.isPending ? (
-                          <>
-                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            Submitting...
-                          </>
-                        ) : (
-                          <>
-                            <Send className="w-5 h-5" aria-hidden="true" />
-                            Submit Application
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </form>
+                    Sign In
+                  </Link>
                 </div>
+              ) : user.role !== 'FREELANCER' ? (
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
+                  <AlertCircle className="w-12 h-12 mx-auto mb-4 text-gray-400" aria-hidden="true" />
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">Cannot Apply</h3>
+                  <p className="text-gray-600">Only freelancers can apply for jobs. Please create a freelancer profile to proceed.</p>
+                </div>
+              ) : user.id === job.companyId ? (
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
+                  <AlertCircle className="w-12 h-12 mx-auto mb-4 text-gray-400" aria-hidden="true" />
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">You Posted This Job</h3>
+                  <p className="text-gray-600">You cannot apply to your own job posting.</p>
+                </div>
+              ) : job.status !== 'OPEN' ? (
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
+                  <AlertCircle className="w-12 h-12 mx-auto mb-4 text-gray-400" aria-hidden="true" />
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">Position Not Available</h3>
+                  <p className="text-gray-600 mb-4">This position is {job.status.toLowerCase()}.</p>
+                </div>
+              ) : (
+                <Link href={`/jobs/${jobId}/apply`} className="block">
+                  <button
+                    className="w-full py-3 px-4 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 bg-primary-600 text-white hover:bg-primary-700"
+                  >
+                    <Send className="w-5 h-5" aria-hidden="true" />
+                    Apply for this Job
+                  </button>
+                </Link>
               )}
 
               {/* Job Overview */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h3 className="text-lg font-bold text-gray-900 mb-4">Job Overview</h3>
                 <dl className="space-y-4">
+                  {/* Salary Range */}
+                  <div>
+                    <dt className="text-sm text-gray-600 mb-1 flex items-center gap-1.5">
+                      <DollarSign className="w-4 h-4 text-gray-400" aria-hidden="true" />
+                      Salary Range
+                    </dt>
+                    <dd className="font-semibold text-gray-900 text-lg">{formatSalary()}</dd>
+                  </div>
+
                   {job.jobType && (
                     <div>
                       <dt className="text-sm text-gray-600 mb-1 flex items-center gap-1.5">
@@ -797,6 +654,36 @@ export default function JobDetailsPage() {
               </div>
             </div>
 
+          </div>
+
+          {/* Bottom Apply Button */}
+          <div className="mt-12 pt-8 border-t border-gray-200">
+            <div className="flex flex-col gap-4">
+              {user && user.role === 'FREELANCER' && user.id !== job.companyId && job.status === 'OPEN' && (
+                <Link href={`/jobs/${jobId}/apply`} className="block">
+                  <button
+                    className="w-full md:w-1/3 mx-auto py-4 px-6 rounded-lg font-semibold transition-all bg-primary-600 text-white hover:bg-primary-700 flex items-center justify-center gap-2"
+                  >
+                    <Send className="w-5 h-5" aria-hidden="true" />
+                    Apply for this Job
+                  </button>
+                </Link>
+              )}
+              {(!user || user.role !== 'FREELANCER' || user.id === job.companyId || job.status !== 'OPEN') && (
+                <div className="w-full md:w-1/3 mx-auto p-4 bg-gray-50 rounded-lg text-center border border-gray-200">
+                  <AlertCircle className="w-5 h-5 mx-auto mb-2 text-gray-500" aria-hidden="true" />
+                  {!user ? (
+                    <p className="text-sm font-medium text-gray-600">Sign in to apply for this job</p>
+                  ) : user.id === job.companyId ? (
+                    <p className="text-sm font-medium text-gray-600">You cannot apply to your own job posting</p>
+                  ) : user.role !== 'FREELANCER' ? (
+                    <p className="text-sm font-medium text-gray-600">Only freelancers can apply for jobs</p>
+                  ) : (
+                    <p className="text-sm font-medium text-gray-600">This position is {job.status.toLowerCase()}</p>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

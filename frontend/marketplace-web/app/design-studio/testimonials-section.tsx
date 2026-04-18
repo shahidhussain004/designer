@@ -16,6 +16,7 @@ const testimonials = [
     author: "Sarah Mitchell",
     role: "CEO, Horizon Ventures",
     image: "/professional-woman-portrait-business.png",
+    metric: { value: "3×", label: "Brand Recognition" },
   },
   {
     id: 2,
@@ -24,6 +25,7 @@ const testimonials = [
     author: "Michael Torres",
     role: "Founder, Meridian Finance",
     image: "/professional-man-portrait-business-executive.jpg",
+    metric: { value: "89%", label: "User Satisfaction" },
   },
   {
     id: 3,
@@ -32,6 +34,7 @@ const testimonials = [
     author: "Emma Nakamura",
     role: "Creative Director, Atlas Architecture",
     image: "/creative-professional-woman.png",
+    metric: { value: "300%", label: "Engagement Increase" },
   },
 ]
 
@@ -40,48 +43,95 @@ export function TestimonialsSection() {
   const isInView = useInView(containerRef as unknown as React.RefObject<HTMLElement>, { once: true, margin: "-100px" })
   const [activeIndex, setActiveIndex] = useState(0)
 
-  const nextTestimonial = () => {
-    setActiveIndex((prev) => (prev + 1) % testimonials.length)
-  }
-
-  const prevTestimonial = () => {
-    setActiveIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length)
-  }
+  const nextTestimonial = () => setActiveIndex((prev) => (prev + 1) % testimonials.length)
+  const prevTestimonial = () => setActiveIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length)
 
   return (
-    <section id="testimonials" ref={containerRef} className="relative py-32 lg:py-40 bg-background">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+    <section
+      id="testimonials"
+      ref={containerRef}
+      style={{ position: "relative", padding: "120px 0 160px", background: "#0A0B0F" }}
+    >
+      {/* Grid */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage:
+            "linear-gradient(rgba(0,229,197,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,197,0.025) 1px, transparent 1px)",
+          backgroundSize: "60px 60px",
+        }}
+      />
+
+      {/* Top separator */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "1px",
+          background: "linear-gradient(90deg, transparent, rgba(0,229,197,0.2), transparent)",
+        }}
+      />
+
+      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 48px", position: "relative" }}>
         {/* Section Header */}
         <MotionDiv
           initial={{ opacity: 0, y: 40 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
-          className="text-center mb-16 lg:mb-24"
+          style={{ textAlign: "center", marginBottom: "80px" }}
         >
-          <span className="inline-flex items-center gap-3 text-sm tracking-[0.2em] uppercase text-muted-foreground mb-6">
-            <span className="w-8 h-[1px] bg-accent" />
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "10px",
+              fontSize: "11px",
+              letterSpacing: "0.2em",
+              textTransform: "uppercase",
+              color: "#00E5C5",
+              marginBottom: "20px",
+            }}
+          >
+            <span style={{ width: "32px", height: "1px", background: "#00E5C5", display: "block" }} />
             Testimonials
-            <span className="w-8 h-[1px] bg-accent" />
+            <span style={{ width: "32px", height: "1px", background: "#00E5C5", display: "block" }} />
           </span>
-          <h2 className="text-4xl lg:text-5xl xl:text-6xl font-medium tracking-tight">
-            Client <span className="italic font-normal text-accent">voices</span>
+          <h2
+            style={{
+              fontSize: "clamp(40px, 5vw, 64px)",
+              fontWeight: 600,
+              letterSpacing: "-0.03em",
+              lineHeight: 0.95,
+              color: "#F0F0EE",
+              margin: 0,
+            }}
+          >
+            Client{" "}
+            <span style={{ color: "#00E5C5", fontStyle: "italic", fontWeight: 300 }}>voices</span>
           </h2>
         </MotionDiv>
 
-        {/* Testimonial Carousel */}
-        <div className="relative max-w-4xl mx-auto">
-          {/* Quote Icon */}
+        {/* Testimonial Area */}
+        <div style={{ maxWidth: "900px", margin: "0 auto", position: "relative" }}>
+          {/* Large quote mark */}
           <MotionDiv
             initial={{ opacity: 0, scale: 0.8 }}
             animate={isInView ? { opacity: 1, scale: 1 } : {}}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="absolute -top-8 left-1/2 -translate-x-1/2"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginBottom: "48px",
+            }}
           >
-            <Quote className="w-16 h-16 text-accent/20" />
+            <Quote style={{ width: "48px", height: "48px", color: "rgba(0,229,197,0.15)" }} />
           </MotionDiv>
 
-          {/* Testimonial Content */}
-          <div className="relative min-h-[300px] flex items-center justify-center">
+          {/* Content */}
+          <div style={{ minHeight: "280px", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <AnimatePresence mode="wait">
               <MotionDiv
                 key={activeIndex}
@@ -89,22 +139,69 @@ export function TestimonialsSection() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -30 }}
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                className="text-center"
+                style={{ textAlign: "center", width: "100%" }}
               >
-                <p className="text-2xl lg:text-3xl xl:text-4xl font-medium tracking-tight leading-relaxed text-foreground mb-12">
+                <p
+                  style={{
+                    fontSize: "clamp(20px, 2.5vw, 30px)",
+                    fontWeight: 400,
+                    letterSpacing: "-0.01em",
+                    lineHeight: 1.5,
+                    color: "rgba(240,240,238,0.85)",
+                    marginBottom: "48px",
+                  }}
+                >
                   &ldquo;{testimonials[activeIndex].quote}&rdquo;
                 </p>
-                <div className="flex flex-col items-center gap-4">
-                  <div className="w-16 h-16 rounded-full overflow-hidden ring-2 ring-accent/20 ring-offset-4 ring-offset-background">
-                    <img
-                      src={testimonials[activeIndex].image || "/placeholder.svg"}
-                      alt={testimonials[activeIndex].author}
-                      className="w-full h-full object-cover"
-                    />
+
+                {/* Author + metric */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "32px" }}>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}>
+                    <div
+                      style={{
+                        width: "56px",
+                        height: "56px",
+                        borderRadius: "50%",
+                        overflow: "hidden",
+                        border: "2px solid rgba(0,229,197,0.25)",
+                      }}
+                    >
+                      <img
+                        src={testimonials[activeIndex].image}
+                        alt={testimonials[activeIndex].author}
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      />
+                    </div>
+                    <div>
+                      <p style={{ fontSize: "15px", fontWeight: 600, color: "#F0F0EE", margin: "0 0 4px" }}>
+                        {testimonials[activeIndex].author}
+                      </p>
+                      <p style={{ fontSize: "12px", color: "rgba(240,240,238,0.4)", margin: 0, letterSpacing: "0.05em" }}>
+                        {testimonials[activeIndex].role}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-lg font-medium text-foreground">{testimonials[activeIndex].author}</p>
-                    <p className="text-sm text-muted-foreground">{testimonials[activeIndex].role}</p>
+
+                  {/* Divider */}
+                  <div style={{ width: "1px", height: "60px", background: "rgba(240,240,238,0.1)" }} />
+
+                  {/* Stat */}
+                  <div style={{ textAlign: "center" }}>
+                    <p
+                      style={{
+                        fontSize: "40px",
+                        fontWeight: 700,
+                        color: "#00E5C5",
+                        margin: "0 0 4px",
+                        letterSpacing: "-0.03em",
+                        lineHeight: 1,
+                      }}
+                    >
+                      {testimonials[activeIndex].metric.value}
+                    </p>
+                    <p style={{ fontSize: "12px", color: "rgba(240,240,238,0.35)", margin: 0, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                      {testimonials[activeIndex].metric.label}
+                    </p>
                   </div>
                 </div>
               </MotionDiv>
@@ -112,26 +209,55 @@ export function TestimonialsSection() {
           </div>
 
           {/* Navigation */}
-          <div className="flex items-center justify-center gap-6 mt-12">
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "24px", marginTop: "56px" }}>
             <MotionButton
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               onClick={prevTestimonial}
-              className="w-12 h-12 rounded-full border border-border flex items-center justify-center hover:bg-secondary hover:border-transparent transition-all duration-300"
+              style={{
+                width: "44px",
+                height: "44px",
+                borderRadius: "50%",
+                border: "1px solid rgba(240,240,238,0.15)",
+                background: "transparent",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                color: "rgba(240,240,238,0.6)",
+              }}
+              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                const el = e.currentTarget as HTMLButtonElement
+                el.style.borderColor = "rgba(0,229,197,0.4)"
+                el.style.color = "#00E5C5"
+              }}
+              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                const el = e.currentTarget as HTMLButtonElement
+                el.style.borderColor = "rgba(240,240,238,0.15)"
+                el.style.color = "rgba(240,240,238,0.6)"
+              }}
               aria-label="Previous testimonial"
             >
-              <ChevronLeft className="w-5 h-5 text-foreground" />
+              <ChevronLeft style={{ width: "18px", height: "18px" }} />
             </MotionButton>
 
-            {/* Dots */}
-            <div className="flex items-center gap-2">
+            {/* Progress dots */}
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               {testimonials.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setActiveIndex(index)}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    index === activeIndex ? "w-8 bg-accent" : "bg-border hover:bg-muted-foreground"
-                  }`}
+                  style={{
+                    height: "6px",
+                    borderRadius: "100px",
+                    border: "none",
+                    background: index === activeIndex ? "#00E5C5" : "rgba(240,240,238,0.15)",
+                    width: index === activeIndex ? "28px" : "6px",
+                    cursor: "pointer",
+                    transition: "all 0.3s ease",
+                    padding: 0,
+                  }}
                   aria-label={`Go to testimonial ${index + 1}`}
                 />
               ))}
@@ -141,10 +267,32 @@ export function TestimonialsSection() {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               onClick={nextTestimonial}
-              className="w-12 h-12 rounded-full border border-border flex items-center justify-center hover:bg-secondary hover:border-transparent transition-all duration-300"
+              style={{
+                width: "44px",
+                height: "44px",
+                borderRadius: "50%",
+                border: "1px solid rgba(240,240,238,0.15)",
+                background: "transparent",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                color: "rgba(240,240,238,0.6)",
+              }}
+              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                const el = e.currentTarget as HTMLButtonElement
+                el.style.borderColor = "rgba(0,229,197,0.4)"
+                el.style.color = "#00E5C5"
+              }}
+              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                const el = e.currentTarget as HTMLButtonElement
+                el.style.borderColor = "rgba(240,240,238,0.15)"
+                el.style.color = "rgba(240,240,238,0.6)"
+              }}
               aria-label="Next testimonial"
             >
-              <ChevronRight className="w-5 h-5 text-foreground" />
+              <ChevronRight style={{ width: "18px", height: "18px" }} />
             </MotionButton>
           </div>
         </div>

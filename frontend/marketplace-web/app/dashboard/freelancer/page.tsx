@@ -1,9 +1,10 @@
 "use client"
 
 import { PageLayout } from '@/components/ui'
+import { useMyApplications } from '@/hooks/useJobs'
 import { authService } from '@/lib/auth'
 import { DashboardStats, FreelancerDashboard, ProjectSummary, dashboardService, getDashboardData } from '@/lib/dashboard'
-import { ArrowRight, Briefcase, CheckCircle, Clock, FileText, FolderOpen, Loader2, Send, Star } from 'lucide-react'
+import { AlertCircle, ArrowRight, Briefcase, Calendar, CheckCheck, CheckCircle, Clock, FileText, FolderOpen, Loader2, MapPin, Send, Star } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -13,6 +14,7 @@ export default function FreelancerDashboardPage() {
   const [data, setData] = useState<FreelancerDashboard | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { data: myApplications = [], isLoading: applicationsLoading } = useMyApplications()
 
   useEffect(() => {
     if (!authService.isAuthenticated()) {
@@ -244,6 +246,93 @@ export default function FreelancerDashboardPage() {
                 ))
               )}
             </div>
+          </div>
+        </div>
+
+        {/* My Applications */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">My Job Applications</h2>
+                <p className="text-sm text-gray-500 mt-1">Track your submitted applications and their status</p>
+              </div>
+              <Link
+                href="/my-applications"
+                className="inline-flex items-center gap-1 text-primary-600 hover:text-primary-700 font-medium text-sm"
+              >
+                View All
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+          <div className="divide-y divide-gray-100">
+            {applicationsLoading ? (
+              <div className="p-8 text-center">
+                <Loader2 className="w-8 h-8 text-primary-600 animate-spin mx-auto mb-3" />
+                <p className="text-gray-500">Loading applications...</p>
+              </div>
+            ) : myApplications.length === 0 ? (
+              <div className="p-8 text-center">
+                <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500">No applications yet.</p>
+                <p className="text-sm text-gray-400 mt-1">Start applying for jobs to track your progress here.</p>
+              </div>
+            ) : (
+              myApplications.slice(0, 5).map((app: any) => {
+                const statusConfig = {
+                  PENDING: { bg: 'bg-blue-50', icon: Clock, badge: 'bg-blue-100 text-blue-800', text: 'Pending Review' },
+                  REVIEWING: { bg: 'bg-purple-50', icon: AlertCircle, badge: 'bg-purple-100 text-purple-800', text: 'Under Review' },
+                  SHORTLISTED: { bg: 'bg-yellow-50', icon: CheckCircle, badge: 'bg-yellow-100 text-yellow-800', text: 'Shortlisted' },
+                  ACCEPTED: { bg: 'bg-green-50', icon: CheckCheck, badge: 'bg-green-100 text-green-800', text: 'Accepted' },
+                  REJECTED: { bg: 'bg-red-50', icon: AlertCircle, badge: 'bg-red-100 text-red-800', text: 'Not Selected' },
+                } as Record<string, any>;
+
+                const config = statusConfig[app?.status?.toUpperCase()] || statusConfig.PENDING;
+                const StatusIcon = config.icon;
+
+                return (
+                  <Link
+                    key={app?.id}
+                    href={`/jobs/${app?.jobId}`}
+                    className={`block hover:bg-gray-50 transition-colors ${config.bg}`}
+                  >
+                    <div className="p-6">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold text-gray-900">{app?.jobTitle}</h3>
+                            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${config.badge}`}>
+                              <StatusIcon className="w-3 h-3" />
+                              {config.text}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600 mt-1">{app?.companyName}</p>
+                          {app?.location && (
+                            <div className="flex items-center gap-1 text-sm text-gray-500 mt-2">
+                              <MapPin className="w-4 h-4" />
+                              {app?.location}
+                            </div>
+                          )}
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <div className="flex items-center gap-1 text-gray-500 text-xs">
+                            <Calendar className="w-4 h-4" />
+                            {app?.appliedAt ? new Date(app.appliedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'N/A'}
+                          </div>
+                          <Link
+                            href={`/jobs/${app?.jobId}`}
+                            className="inline-block mt-3 px-3 py-1 bg-primary-600 text-white text-xs font-medium rounded hover:bg-primary-700 transition-colors"
+                          >
+                            View Job
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })
+            )}
           </div>
         </div>
       </div>

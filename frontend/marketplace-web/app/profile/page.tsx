@@ -27,6 +27,7 @@ interface UserProfile {
 
 export default function ProfilePage() {
   const router = useRouter()
+  const [isMounted, setIsMounted] = useState(false)
   const [editing, setEditing] = useState(false)
   const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null)
   const [formData, setFormData] = useState({
@@ -43,6 +44,11 @@ export default function ProfilePage() {
   const { data, isLoading, isError, error, refetch } = useUserProfile(userId)
   const profile = data as UserProfile | undefined
   const updateUserMutation = useUpdateUser()
+
+  // Ensure hydration happens correctly - only render after mount
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   useEffect(() => {
     if (!authService.isAuthenticated()) {
@@ -108,7 +114,7 @@ export default function ProfilePage() {
     }
   }
 
-  if (isLoading) {
+  if (!isMounted || isLoading) {
     return (
       <PageLayout>
         <div className="min-h-[50vh] flex items-center justify-center">

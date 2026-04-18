@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#003824',
+  themeColor: '#FF1B6D',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
@@ -30,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <meta name="theme-color" content="#003824" />
+        <meta name="theme-color" content="#FF1B6D" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="preload" href="/images/landing-poster.svg" as="image" type="image/svg+xml" />

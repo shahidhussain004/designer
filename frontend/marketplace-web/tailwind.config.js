@@ -22,19 +22,19 @@ module.exports = {
       colors: {
         // Input focus - semantic token for form control focus
         'input-focus': '#102a3f',
-        // Primary - Brand Red/Coral (WCAG AA compliant) - Fastly/RedHat inspired
+        // Primary - Red-Pink Blend (Dark Red base #C41E3A with bright #FF1B6D accent)
         primary: {
-          50: '#fef2f2',
-          100: '#fee2e2',
-          200: '#fecaca',
-          300: '#fca5a5',
-          400: '#f87171',
-          500: '#ef4444',
-          600: '#dc2626',
-          700: '#b91c1c',
-          800: '#991b1b',
-          900: '#7f1d1d',
-          950: '#450a0a',
+          50: '#fff0f5',
+          100: '#ffc0dc',
+          200: '#ffb0d8',
+          300: '#ff7fb5',
+          400: '#ff4d96',
+          500: '#ff1b6d',
+          600: '#c41e3a',
+          700: '#a01633',
+          800: '#7a1128',
+          900: '#4a0a16',
+          950: '#2d070d',
         },
         // Secondary - Neutral slate
         secondary: {
@@ -76,18 +76,18 @@ module.exports = {
           800: '#92400e',
           900: '#78350f',
         },
-        // Error - Red
+        // Error - Red-Pink Blend (matches primary, dark red base)
         error: {
-          50: '#fef2f2',
-          100: '#fee2e2',
-          200: '#fecaca',
-          300: '#fca5a5',
-          400: '#f87171',
-          500: '#ef4444',
-          600: '#dc2626',
-          700: '#b91c1c',
-          800: '#991b1b',
-          900: '#7f1d1d',
+          50: '#fff0f5',
+          100: '#ffc0dc',
+          200: '#ffb0d8',
+          300: '#ff7fb5',
+          400: '#ff4d96',
+          500: '#ff1b6d',
+          600: '#c41e3a',
+          700: '#a01633',
+          800: '#7a1128',
+          900: '#4a0a16',
         },
         // Info - Cyan
         info: {
