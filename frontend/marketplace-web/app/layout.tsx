@@ -8,7 +8,7 @@ import PWARegister from './PWARegister'
 export const metadata: Metadata = {
   title: 'Designer Marketplace - Find Freelance Talent',
   description: 'Connect with top designers and developers for your projects',
-  manifest: '/manifest.json',
+  manifest: '/manifest.json?v=2',
   icons: {
     icon: '/favicon.ico',
     apple: '/icon-192.png',
@@ -31,7 +31,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="theme-color" content="#FF1B6D" />
-        <link rel="manifest" href="/manifest.json" />
+        <link rel="manifest" href="/manifest.json?v=2" />
         <link rel="icon" href="/favicon.ico" />
         {/* Removed preload for landing-poster.svg - poster is used on a video element and
           preloading the SVG caused a browser warning if not used immediately. */}
