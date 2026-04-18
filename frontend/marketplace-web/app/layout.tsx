@@ -35,6 +35,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
         {/* Removed preload for landing-poster.svg - poster is used on a video element and
           preloading the SVG caused a browser warning if not used immediately. */}
+        <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>

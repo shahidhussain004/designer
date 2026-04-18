@@ -244,7 +244,14 @@ const MobileMenu: React.FC<{
         {/* Header - Fixed */}
         <div className="flex items-center justify-between px-4 py-4 border-b border-gray-100 flex-shrink-0">
           <Link href="/" onClick={onClose} className="flex items-center">
-            <Image src="/logo-designer.png" alt="Designer" width={140} height={32} className="object-contain" />
+            <Image
+              src="/logo-designer.png"
+              alt="Designer"
+              width={140}
+              height={32}
+              className="object-contain"
+              style={{ width: 'auto', height: 'auto' }}
+            />
           </Link>
           <button
             onClick={onClose}
@@ -446,6 +453,7 @@ export const Navbar: React.FC<NavbarProps> = ({ className: _className }) => {
                 width={160} 
                 height={36} 
                 className="object-contain"
+                style={{ width: 'auto', height: 'auto' }}
                 priority
               />
             </Link>

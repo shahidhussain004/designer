@@ -19,23 +19,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true)
 
   const refreshUser = async () => {
-    console.log('[AuthContext] refreshUser called');
     try {
       // Get user from localStorage
       const u = authService.getCurrentUser()
-      console.log('[AuthContext] User from localStorage:', u);
-      
       // Check if token exists (not expiration - let API interceptor handle that)
       const isValid = authService.isAuthenticated()
-      console.log('[AuthContext] Token exists:', isValid);
-      
       if (u && isValid) {
         // User exists in storage and token exists
-        console.log('[AuthContext] Setting user state:', u);
         setUser(u)
       } else {
         // No user data or no token - just clear user state, don't logout
-        console.log('[AuthContext] No user or token found');
         setUser(null)
       }
     } catch (err) {
@@ -46,7 +39,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const initializeAuth = async () => {
-      console.log('[AuthContext] Initializing auth on app startup');
       
       try {
         // Check if we have refresh token - only try refresh if we DON'T already have a valid access token
