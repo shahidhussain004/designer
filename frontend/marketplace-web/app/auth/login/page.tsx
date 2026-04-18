@@ -35,7 +35,7 @@ export default function LoginPage() {
       
       router.push('/dashboard')
     } catch (err) {
-      console.error('[Login] Error:', err);
+
       const error = err as { response?: { data?: { message?: string } } }
       setError(error.response?.data?.message || 'Login failed. Please check your credentials.')
     } finally {

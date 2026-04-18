@@ -35,8 +35,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true })
     }
 
-    // No external endpoint - as fallback, log the message on server and return success
-    console.log('[contact]', body)
+    // No external endpoint - as fallback, return success
     return NextResponse.json({ success: true })
   } catch (err) {
     console.error('Contact API error', err)

@@ -84,7 +84,7 @@ export const authService = {
     if (typeof window !== 'undefined') {
       // Debug tracing: log a stack trace so we can see who triggered logout
       try {
-        console.warn('[AUTH] logout() called - clearing localStorage');
+
         console.trace();
       } catch (e) {
         // ignore

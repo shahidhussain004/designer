@@ -2,12 +2,12 @@ import React, { useState } from 'react'
 import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
 import {
-  Button,
-  Card,
-  Divider,
-  Flex,
-  Input,
-  Text,
+    Button,
+    Card,
+    Divider,
+    Flex,
+    Input,
+    Text,
 } from '../components/green'
 import { authApi } from '../lib/api'
 import { useAuthStore } from '../store/authStore'
@@ -44,7 +44,7 @@ export default function Login() {
           try {
             userFromUrl = JSON.parse(decodeURIComponent(urlUser))
           } catch (e) {
-            console.error('[Login] Failed to parse user from URL:', e)
+
           }
         }
       }
@@ -55,13 +55,13 @@ export default function Login() {
       }
 
       try {
-        console.log('[Login] Auto-login using shared token')
+
         // Fetch fresh user info using token for security
         const me = await authApi.me(token)
         const user = userFromUrl || me
 
         if (user.role !== 'ADMIN') {
-          console.warn('[Login] Auto-login blocked: role is not ADMIN')
+
           setIsAutoLoggingIn(false)
           return
         }
@@ -77,7 +77,7 @@ export default function Login() {
           token
         )
 
-        console.log('[Login] Auto-login successful')
+
 
         // Clean up URL
         if (urlToken || urlUser) {
@@ -86,7 +86,7 @@ export default function Login() {
 
         navigate('/dashboard')
       } catch (e) {
-        console.error('[Login] Auto-login failed:', e)
+
         setIsAutoLoggingIn(false)
       }
     }
@@ -101,7 +101,7 @@ export default function Login() {
     try {
       const response = await authApi.login(email, password)
      
-      console.log('Login response:', response)
+
       // Check if user is admin (role is inside user object)
       if (response.user.role !== 'ADMIN') {
         toast.error('Access denied. Admin privileges required.')

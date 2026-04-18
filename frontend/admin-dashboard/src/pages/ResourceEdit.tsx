@@ -37,7 +37,7 @@ export default function ResourceEditPage() {
 
   // Populate form with fetched data
   useEffect(() => {
-    console.log(' [ResourceEditPage] Fetched resource:', resource)
+
     if (resource) {
       setFormData(resource)
     }

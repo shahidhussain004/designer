@@ -16,7 +16,7 @@ const projects = [
     category: "Brand Identity",
     year: "2024",
     image: "/luxury-brand-identity-design-dark-elegant.jpg",
-    accent: "#00E5C5",
+    accent: "#C41E3A",
   },
   {
     id: 2,
@@ -32,7 +32,7 @@ const projects = [
     category: "Web Design",
     year: "2023",
     image: "/architecture-portfolio-website-minimalist-design.jpg",
-    accent: "#00E5C5",
+    accent: "#C41E3A",
   },
   {
     id: 4,
@@ -53,7 +53,7 @@ export function WorkShowcase() {
     <section
       id="work"
       ref={containerRef}
-      style={{ position: "relative", padding: "120px 0 160px", background: "#0D0E14" }}
+      style={{ position: "relative", padding: "120px 0 160px", background: "#111827" }}
     >
       {/* Diagonal separator line at top */}
       <div
@@ -63,7 +63,7 @@ export function WorkShowcase() {
           left: 0,
           right: 0,
           height: "1px",
-          background: "linear-gradient(90deg, transparent, rgba(0,229,197,0.2), transparent)",
+          background: "linear-gradient(90deg, transparent, rgba(196,30,58,0.2), transparent)",
         }}
       />
 
@@ -91,11 +91,11 @@ export function WorkShowcase() {
                 fontSize: "11px",
                 letterSpacing: "0.2em",
                 textTransform: "uppercase",
-                color: "#00E5C5",
+                color: "#C41E3A",
                 marginBottom: "20px",
               }}
             >
-              <span style={{ width: "32px", height: "1px", background: "#00E5C5", display: "block" }} />
+              <span style={{ width: "32px", height: "1px", background: "#C41E3A", display: "block" }} />
               Selected Work
             </span>
             <h2
@@ -109,7 +109,7 @@ export function WorkShowcase() {
               }}
             >
               Featured{" "}
-              <span style={{ color: "#00E5C5", fontStyle: "italic", fontWeight: 300 }}>projects</span>
+              <span style={{ color: "#C41E3A", fontStyle: "italic", fontWeight: 300 }}>projects</span>
             </h2>
           </MotionDiv>
           <MotionA

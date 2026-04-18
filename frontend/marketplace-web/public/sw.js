@@ -1,8 +1,8 @@
 // Basic service worker for PWA offline support
-const CACHE_NAME = 'designer-marketplace-v1';
+const CACHE_NAME = 'designer-marketplace-v2';
 const urlsToCache = [
   '/',
-  '/manifest.json',
+  '/manifest.json?v=2',
 ];
 
 self.addEventListener('install', (event) => {

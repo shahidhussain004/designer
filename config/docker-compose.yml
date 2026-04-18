@@ -209,6 +209,7 @@ services:
       MONGO_PORT: 27017
       MONGO_DB: lms_db
       JWT_SECRET: your-256-bit-secret-change-this-in-production-please-make-it-secure
+      MANAGEMENT_HEALTH_MAIL_ENABLED: "false"
     depends_on:
       postgres:
         condition: service_healthy
@@ -219,7 +220,7 @@ services:
     networks:
       - marketplace-network
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O - http://localhost:8080/actuator/health >/dev/null 2>&1 || exit 1"]
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:8080/api/actuator/health >/dev/null 2>&1 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5

@@ -3,14 +3,14 @@
 import { PageLayout } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import {
-    ArrowRight,
-    Bell,
-    BookOpen,
-    CheckCircle2,
-    Clock,
-    Copy,
-    Mail,
-    Search
+  ArrowRight,
+  Bell,
+  BookOpen,
+  CheckCircle2,
+  Clock,
+  Copy,
+  Mail,
+  Search
 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
@@ -84,7 +84,7 @@ export default function ApplicationSuccessPage() {
         <div className="mx-auto max-w-2xl px-4 py-12">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Application Not Found</h1>
-            <p className="text-gray-600 mb-6">We couldn't load your application details.</p>
+            <p className="text-gray-600 mb-6">We couldn&apos;t load your application details.</p>
             <Link href="/jobs" className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium">
               Back to Jobs
             </Link>
@@ -113,7 +113,7 @@ export default function ApplicationSuccessPage() {
             </p>
             
             <p className="text-gray-500">
-              We're excited to have you in our candidate pool. Here's what comes next.
+              We&apos;re excited to have you in our candidate pool. Here&apos;s what comes next.
             </p>
           </div>
 
@@ -201,7 +201,7 @@ export default function ApplicationSuccessPage() {
                 <div className="pb-8">
                   <h3 className="text-lg font-bold text-gray-900 mb-2">Receive Updates</h3>
                   <p className="text-gray-600 mb-3">
-                    We'll keep you updated on your application status via email. You'll be notified immediately if you move forward to the next stage.
+                    We&apos;ll keep you updated on your application status via email. You&apos;ll be notified immediately if you move forward to the next stage.
                   </p>
                   <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-sm font-medium">
                     <Mail className="w-4 h-4" />
@@ -220,7 +220,7 @@ export default function ApplicationSuccessPage() {
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">Interview or Next Step</h3>
                   <p className="text-gray-600">
-                    If your application matches what we're looking for, the team will reach out to schedule a conversation or next steps in the hiring process.
+                    If your application matches what we&apos;re looking for, the team will reach out to schedule a conversation or next steps in the hiring process.
                   </p>
                 </div>
               </div>
@@ -258,7 +258,7 @@ export default function ApplicationSuccessPage() {
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Keep Exploring</h3>
               <p className="text-sm text-gray-600">
-                Don't wait passively! Explore other opportunities while your application is being reviewed.
+                Don&apos;t wait passively! Explore other opportunities while your application is being reviewed.
               </p>
             </div>
           </div>

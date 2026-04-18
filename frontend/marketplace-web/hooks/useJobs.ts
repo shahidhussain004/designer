@@ -164,10 +164,8 @@ export function useMyApplications() {
       const { data } = await apiClient.get('/job-applications/my-applications', { signal });
       // Extract content array from Spring Data Page response
       if (data?.content && Array.isArray(data.content)) {
-        console.log('✅ Applications fetched successfully:', data.content.length, 'items');
         return data.content;
       }
-      console.warn('⚠️ Unexpected response format:', data);
       return [];
     },
     staleTime: 2 * 60 * 1000, // 2 minutes
