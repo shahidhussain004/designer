@@ -4,16 +4,16 @@ import { PageLayout } from '@/components/ui';
 import { useMyApplications } from '@/hooks/useJobs';
 import { useAuth } from '@/lib/auth';
 import {
-    ArrowLeft,
-    Briefcase,
-    Calendar,
-    CheckCircle,
-    Clock,
-    Filter,
-    MapPin,
-    Search,
-    Trash2,
-    X
+  ArrowLeft,
+  Briefcase,
+  Calendar,
+  CheckCircle,
+  Clock,
+  Filter,
+  MapPin,
+  Search,
+  Trash2,
+  X
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -212,19 +212,19 @@ export default function MyApplicationsPage() {
             </div>
             <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
               <div className="text-3xl font-bold text-amber-600">
-                {applications.filter((a) => a.status === 'REVIEWING').length}
+                {applications.filter((a: Application) => a.status === 'REVIEWING').length}
               </div>
               <p className="text-gray-600 text-sm mt-1">Under Review</p>
             </div>
             <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
               <div className="text-3xl font-bold text-green-600">
-                {applications.filter((a) => a.status === 'SHORTLISTED').length}
+                {applications.filter((a: Application) => a.status === 'SHORTLISTED').length}
               </div>
               <p className="text-gray-600 text-sm mt-1">Shortlisted</p>
             </div>
             <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
               <div className="text-3xl font-bold text-emerald-600">
-                {applications.filter((a) => a.status === 'OFFERED').length}
+                {applications.filter((a: Application) => a.status === 'OFFERED').length}
               </div>
               <p className="text-gray-600 text-sm mt-1">Offers</p>
             </div>

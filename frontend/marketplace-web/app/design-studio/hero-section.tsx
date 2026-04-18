@@ -44,14 +44,14 @@ export function HeroSection() {
     <section
       ref={containerRef}
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
-      style={{ background: "#0A0B0F" }}
+      style={{ background: "#111827" }}
     >
       {/* Grid texture overlay */}
       <div
         className="absolute inset-0"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(0,229,197,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,197,0.04) 1px, transparent 1px)",
+            "linear-gradient(rgba(196,30,58,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(196,30,58,0.04) 1px, transparent 1px)",
           backgroundSize: "60px 60px",
         }}
       />
@@ -60,28 +60,30 @@ export function HeroSection() {
       <div
         className="absolute inset-0"
         style={{
-          background: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,229,197,0.06) 0%, transparent 70%)",
+          background: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(196,30,58,0.06) 0%, transparent 70%)",
         }}
       />
 
       {/* Animated background orbs */}
       <MotionDiv
-        style={{ x: mouseX, y: mouseY }}
         className="absolute pointer-events-none"
         style={{
+          x: mouseX,
+          y: mouseY,
           top: "20%",
           left: "10%",
           width: "500px",
           height: "500px",
           borderRadius: "50%",
-          background: "rgba(0,229,197,0.03)",
+          background: "rgba(196,30,58,0.03)",
           filter: "blur(80px)",
         }}
       />
       <MotionDiv
-        style={{ x: useTransform(mouseX, (v) => -v * 0.7), y: useTransform(mouseY, (v) => -v * 0.7) }}
         className="absolute pointer-events-none"
         style={{
+          x: useTransform(mouseX, (v) => -v * 0.7),
+          y: useTransform(mouseY, (v) => -v * 0.7),
           bottom: "20%",
           right: "10%",
           width: "600px",
@@ -109,16 +111,16 @@ export function HeroSection() {
                   alignItems: "center",
                   gap: "8px",
                   padding: "6px 14px",
-                  border: "1px solid rgba(0,229,197,0.3)",
+                  border: "1px solid rgba(196,30,58,0.3)",
                   borderRadius: "100px",
                   fontSize: "11px",
                   letterSpacing: "0.15em",
                   textTransform: "uppercase",
-                  color: "#00E5C5",
-                  background: "rgba(0,229,197,0.06)",
+                  color: "#C41E3A",
+                  background: "rgba(196,30,58,0.06)",
                 }}
               >
-                <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#00E5C5", display: "inline-block" }} />
+                <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#C41E3A", display: "inline-block" }} />
                 Design Studio
               </span>
             </MotionDiv>
@@ -143,7 +145,7 @@ export function HeroSection() {
                 style={{
                   display: "block",
                   marginTop: "4px",
-                  color: "#00E5C5",
+                  color: "#C41E3A",
                   fontStyle: "italic",
                   fontWeight: 300,
                 }}
@@ -186,14 +188,14 @@ export function HeroSection() {
                   alignItems: "center",
                   gap: "10px",
                   padding: "14px 28px",
-                  background: "#00E5C5",
-                  color: "#0A0B0F",
+                  background: "#C41E3A",
+                  color: "#F0F0EE",
                   borderRadius: "100px",
                   fontSize: "13px",
                   letterSpacing: "0.05em",
                   fontWeight: 600,
                   textDecoration: "none",
-                  border: "1px solid #00E5C5",
+                  border: "1px solid #C41E3A",
                 }}
               >
                 <span>View Our Work</span>
@@ -236,12 +238,14 @@ export function HeroSection() {
                 aspectRatio: "4/5",
                 borderRadius: "16px",
                 overflow: "hidden",
-                border: "1px solid rgba(0,229,197,0.15)",
+                border: "1px solid rgba(196,30,58,0.15)",
               }}
             >
               <MotionImg
                 src="/elegant-minimalist-interior-design-wooden-furnitur.jpg"
                 alt="Featured design work"
+                width={800}
+                height={1000}
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 whileHover={{ scale: 1.05 }}
                 transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -264,10 +268,10 @@ export function HeroSection() {
                 position: "absolute",
                 left: "-28px",
                 bottom: "48px",
-                background: "#12141A",
+                background: "#1F2937",
                 padding: "20px 24px",
                 borderRadius: "12px",
-                border: "1px solid rgba(0,229,197,0.2)",
+                border: "1px solid rgba(196,30,58,0.2)",
                 backdropFilter: "blur(12px)",
               }}
             >
@@ -277,14 +281,14 @@ export function HeroSection() {
                     width: "48px",
                     height: "48px",
                     borderRadius: "50%",
-                    background: "rgba(0,229,197,0.1)",
+                    background: "rgba(196,30,58,0.1)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    border: "1px solid rgba(0,229,197,0.2)",
+                    border: "1px solid rgba(196,30,58,0.2)",
                   }}
                 >
-                  <span style={{ fontSize: "18px", fontWeight: 700, color: "#00E5C5" }}>15</span>
+                  <span style={{ fontSize: "18px", fontWeight: 700, color: "#C41E3A" }}>15</span>
                 </div>
                 <div>
                   <p style={{ fontSize: "20px", fontWeight: 600, color: "#F0F0EE", margin: 0, lineHeight: 1 }}>Years</p>
@@ -317,7 +321,7 @@ export function HeroSection() {
             Scroll to explore
           </span>
           <MotionDiv animate={{ y: [0, 8, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}>
-            <ArrowDown style={{ width: "16px", height: "16px", color: "rgba(0,229,197,0.5)" }} />
+            <ArrowDown style={{ width: "16px", height: "16px", color: "rgba(196,30,58,0.5)" }} />
           </MotionDiv>
         </MotionDiv>
       </MotionDiv>
@@ -351,8 +355,8 @@ export function HeroSection() {
                 position: "absolute",
                 right: "24px",
                 padding: "4px 10px",
-                background: "#00E5C5",
-                color: "#0A0B0F",
+                background: "#C41E3A",
+                color: "#F0F0EE",
                 fontSize: "10px",
                 fontWeight: 600,
                 letterSpacing: "0.08em",
@@ -367,7 +371,7 @@ export function HeroSection() {
             </MotionSpan>
             <span
               style={{ width: "8px", height: "8px", borderRadius: "50%", background: "rgba(240,240,238,0.2)", display: "block" }}
-              className="group-hover:bg-[#00E5C5] transition-colors duration-300"
+              className="group-hover:bg-[#C41E3A] transition-colors duration-300"
             />
           </MotionA>
         ))}

@@ -7,14 +7,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.designer.marketplace.dto.MessageResponse;
+import com.designer.marketplace.dto.NotificationPreferenceRequest;
+import com.designer.marketplace.dto.NotificationPreferenceResponse;
 import com.designer.marketplace.dto.UserResponse;
 import com.designer.marketplace.dto.UserUpdateRequest;
+import com.designer.marketplace.dto.request.ForgotPasswordRequest;
+import com.designer.marketplace.dto.request.ResetPasswordRequest;
 import com.designer.marketplace.entity.User.UserRole;
 import com.designer.marketplace.service.UserService;
 
@@ -111,5 +117,54 @@ public class UserController {
         Pageable pageable = PageRequest.of(page, size);
         Page<UserResponse> users = userService.findUsersByRole(UserRole.FREELANCER, pageable);
         return ResponseEntity.ok(users);
+    }
+
+    /**
+     * Request password reset (public endpoint)
+     * POST /api/users/forgot-password
+     */
+    @PostMapping("/forgot-password")
+    public ResponseEntity<MessageResponse> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request) {
+        log.info("Processing forgot password request for email: {}", request.getEmail());
+        userService.processForgotPasswordRequest(request.getEmail());
+        return ResponseEntity.ok(new MessageResponse("Password reset instructions sent to your email"));
+    }
+
+    /**
+     * Reset password with token (public endpoint)
+     * POST /api/users/reset-password
+     */
+    @PostMapping("/reset-password")
+    public ResponseEntity<MessageResponse> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request) {
+        log.info("Processing password reset with token");
+        userService.resetPassword(request.getToken(), request.getNewPassword());
+        return ResponseEntity.ok(new MessageResponse("Password reset successfully"));
+    }
+
+    /**
+     * Get notification preferences (authenticated endpoint)
+     * GET /api/users/me/notifications/preferences
+     */
+    @GetMapping("/me/notifications/preferences")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<NotificationPreferenceResponse> getNotificationPreferences() {
+        log.info("Getting notification preferences for current user");
+        NotificationPreferenceResponse preferences = userService.getNotificationPreferences();
+        return ResponseEntity.ok(preferences);
+    }
+
+    /**
+     * Update notification preferences (authenticated endpoint)
+     * PUT /api/users/me/notifications/preferences
+     */
+    @PutMapping("/me/notifications/preferences")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<NotificationPreferenceResponse> updateNotificationPreferences(
+            @Valid @RequestBody NotificationPreferenceRequest request) {
+        log.info("Updating notification preferences for current user");
+        NotificationPreferenceResponse preferences = userService.updateNotificationPreferences(request);
+        return ResponseEntity.ok(preferences);
     }
 }

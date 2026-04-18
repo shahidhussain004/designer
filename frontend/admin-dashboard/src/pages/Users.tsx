@@ -401,7 +401,7 @@ export default function Users() {
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
         onSubmit={(data) => {
-          console.log('Add user:', data)
+
           toast.success('User added successfully (feature coming soon)')
           setShowAddModal(false)
         }}

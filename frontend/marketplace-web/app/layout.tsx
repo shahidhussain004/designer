@@ -33,7 +33,8 @@ export default function RootLayout({
         <meta name="theme-color" content="#FF1B6D" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/favicon.ico" />
-        <link rel="preload" href="/images/landing-poster.svg" as="image" type="image/svg+xml" />
+        {/* Removed preload for landing-poster.svg - poster is used on a video element and
+          preloading the SVG caused a browser warning if not used immediately. */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>

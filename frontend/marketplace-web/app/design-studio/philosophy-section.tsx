@@ -1,6 +1,7 @@
 "use client"
 
 import { motion, useInView, useScroll, useTransform } from "framer-motion"
+import Image from 'next/image'
 import type React from "react"
 import { useRef } from "react"
 
@@ -46,15 +47,14 @@ export function PhilosophySection() {
     <section
       id="philosophy"
       ref={containerRef}
-      style={{ position: "relative", padding: "120px 0 160px", background: "#070809", overflow: "hidden" }}
+      style={{ position: "relative", padding: "120px 0 160px", background: "#0F1419", overflow: "hidden" }}
     >
       {/* Grid texture */}
       <div
         style={{
           position: "absolute",
           inset: 0,
-          backgroundImage:
-            "linear-gradient(rgba(0,229,197,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,197,0.03) 1px, transparent 1px)",
+          background: "#111827",
           backgroundSize: "60px 60px",
         }}
       />
@@ -67,7 +67,7 @@ export function PhilosophySection() {
           left: 0,
           right: 0,
           height: "1px",
-          background: "linear-gradient(90deg, transparent, rgba(0,229,197,0.25), transparent)",
+          background: "linear-gradient(90deg, transparent, rgba(196,30,58,0.25), transparent)",
         }}
       />
 
@@ -80,7 +80,7 @@ export function PhilosophySection() {
           transform: "translate(-50%, -50%)",
           width: "800px",
           height: "400px",
-          background: "radial-gradient(ellipse, rgba(0,229,197,0.04) 0%, transparent 70%)",
+          background: "radial-gradient(ellipse, rgba(196,30,58,0.04) 0%, transparent 70%)",
           pointerEvents: "none",
         }}
       />
@@ -101,11 +101,11 @@ export function PhilosophySection() {
                 fontSize: "11px",
                 letterSpacing: "0.2em",
                 textTransform: "uppercase",
-                color: "#00E5C5",
+                color: "#C41E3A",
                 marginBottom: "32px",
               }}
             >
-              <span style={{ width: "32px", height: "1px", background: "#00E5C5", display: "block" }} />
+              <span style={{ width: "32px", height: "1px", background: "#C41E3A", display: "block" }} />
               Our Philosophy
             </span>
 
@@ -119,10 +119,10 @@ export function PhilosophySection() {
                 margin: 0,
               }}
             >
-              <span style={{ color: "#00E5C5", fontSize: "1.4em", lineHeight: 1 }}>&ldquo;</span>
+              <span style={{ color: "#C41E3A", fontSize: "1.4em", lineHeight: 1 }}>&ldquo;</span>
               Design is not just what it looks like. Design is{" "}
-              <em style={{ color: "#00E5C5", fontStyle: "italic", fontWeight: 300 }}>how it works</em>
-              <span style={{ color: "#00E5C5", fontSize: "1.4em", lineHeight: 1 }}>&rdquo;</span>
+              <em style={{ color: "#C41E3A", fontStyle: "italic", fontWeight: 300 }}>how it works</em>
+              <span style={{ color: "#C41E3A", fontSize: "1.4em", lineHeight: 1 }}>&rdquo;</span>
             </blockquote>
 
             <MotionDiv
@@ -134,13 +134,16 @@ export function PhilosophySection() {
                   height: "56px",
                   borderRadius: "50%",
                   overflow: "hidden",
-                  border: "2px solid rgba(0,229,197,0.25)",
+                  border: "2px solid rgba(196,30,58,0.25)",
+                  position: 'relative'
                 }}
               >
-                <img
+                <Image
                   src="/minimalist-professional-portrait.png"
                   alt="Founder"
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  fill
+                  sizes="56px"
+                  style={{ objectFit: "cover" }}
                 />
               </div>
               <div>
@@ -177,8 +180,8 @@ export function PhilosophySection() {
                   }}
                   onMouseEnter={(e) => {
                     const el = e.currentTarget as HTMLElement
-                    el.style.background = "rgba(0,229,197,0.04)"
-                    el.style.borderColor = "rgba(0,229,197,0.18)"
+                  el.style.background = "rgba(196,30,58,0.04)"
+                  el.style.borderColor = "rgba(196,30,58,0.18)"
                   }}
                   onMouseLeave={(e) => {
                     const el = e.currentTarget as HTMLElement
@@ -190,7 +193,7 @@ export function PhilosophySection() {
                     style={{
                       fontSize: "11px",
                       fontFamily: "monospace",
-                      color: "#00E5C5",
+                    color: "#C41E3A",
                       letterSpacing: "0.1em",
                       flexShrink: 0,
                       marginTop: "3px",
@@ -241,7 +244,7 @@ export function PhilosophySection() {
               key={index}
               style={{
                 padding: "40px 32px",
-                background: "#0A0B0F",
+                background: "#111827",
                 textAlign: "center",
               }}
             >
@@ -249,7 +252,7 @@ export function PhilosophySection() {
                 style={{
                   fontSize: "48px",
                   fontWeight: 700,
-                  color: "#00E5C5",
+                  color: "#C41E3A",
                   margin: "0 0 8px",
                   letterSpacing: "-0.03em",
                   lineHeight: 1,

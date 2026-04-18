@@ -57,14 +57,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // This avoids a race where a freshly stored access token (just after login) is
         // immediately overwritten/cleared by a failing refresh attempt.
         if (!accessToken && refreshToken) {
-          console.log('[AuthContext] Refresh token found, attempting to refresh access token');
+
           try {
             // Try to refresh the access token silently
             const { apiClient } = await import('@/lib/api-client');
             const response = await apiClient.post('/auth/refresh', { refreshToken });
             
             if (response.data.accessToken) {
-              console.log('[AuthContext] Token refresh successful on startup');
+
               localStorage.setItem('access_token', response.data.accessToken);
               if (response.data.refreshToken) {
                 localStorage.setItem('refresh_token', response.data.refreshToken);
@@ -73,7 +73,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               apiClient.defaults.headers.Authorization = `Bearer ${response.data.accessToken}`;
             }
           } catch (err) {
-            console.warn('[AuthContext] Token refresh failed on startup, will require login:', err);
+            // Token refresh failed, user will need to login
           }
         }
         
@@ -81,7 +81,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         await refreshUser();
       } finally {
         // CRITICAL: Always set loading to false when initialization completes
-        console.log('[AuthContext] Auth initialization complete, setting loading=false');
+
         setLoading(false);
       }
     }

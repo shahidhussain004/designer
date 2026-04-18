@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion, useInView } from "framer-motion"
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react"
+import Image from "next/image"
 import type React from "react"
 import { useRef, useState } from "react"
 
@@ -50,7 +51,7 @@ export function TestimonialsSection() {
     <section
       id="testimonials"
       ref={containerRef}
-      style={{ position: "relative", padding: "120px 0 160px", background: "#0A0B0F" }}
+      style={{ position: "relative", padding: "120px 0 160px", background: "#111827" }}
     >
       {/* Grid */}
       <div
@@ -58,7 +59,7 @@ export function TestimonialsSection() {
           position: "absolute",
           inset: 0,
           backgroundImage:
-            "linear-gradient(rgba(0,229,197,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,197,0.025) 1px, transparent 1px)",
+            "linear-gradient(rgba(196,30,58,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(196,30,58,0.025) 1px, transparent 1px)",
           backgroundSize: "60px 60px",
         }}
       />
@@ -71,7 +72,7 @@ export function TestimonialsSection() {
           left: 0,
           right: 0,
           height: "1px",
-          background: "linear-gradient(90deg, transparent, rgba(0,229,197,0.2), transparent)",
+          background: "linear-gradient(90deg, transparent, rgba(196,30,58,0.2), transparent)",
         }}
       />
 
@@ -91,13 +92,13 @@ export function TestimonialsSection() {
               fontSize: "11px",
               letterSpacing: "0.2em",
               textTransform: "uppercase",
-              color: "#00E5C5",
+              color: "#C41E3A",
               marginBottom: "20px",
             }}
           >
-            <span style={{ width: "32px", height: "1px", background: "#00E5C5", display: "block" }} />
+            <span style={{ width: "32px", height: "1px", background: "#C41E3A", display: "block" }} />
             Testimonials
-            <span style={{ width: "32px", height: "1px", background: "#00E5C5", display: "block" }} />
+            <span style={{ width: "32px", height: "1px", background: "#C41E3A", display: "block" }} />
           </span>
           <h2
             style={{
@@ -110,7 +111,7 @@ export function TestimonialsSection() {
             }}
           >
             Client{" "}
-            <span style={{ color: "#00E5C5", fontStyle: "italic", fontWeight: 300 }}>voices</span>
+            <span style={{ color: "#C41E3A", fontStyle: "italic", fontWeight: 300 }}>voices</span>
           </h2>
         </MotionDiv>
 
@@ -127,7 +128,7 @@ export function TestimonialsSection() {
               marginBottom: "48px",
             }}
           >
-            <Quote style={{ width: "48px", height: "48px", color: "rgba(0,229,197,0.15)" }} />
+            <Quote style={{ width: "48px", height: "48px", color: "rgba(196,30,58,0.15)" }} />
           </MotionDiv>
 
           {/* Content */}
@@ -163,12 +164,14 @@ export function TestimonialsSection() {
                         height: "56px",
                         borderRadius: "50%",
                         overflow: "hidden",
-                        border: "2px solid rgba(0,229,197,0.25)",
+                        border: "2px solid rgba(196,30,58,0.25)",
                       }}
                     >
-                      <img
+                      <Image
                         src={testimonials[activeIndex].image}
                         alt={testimonials[activeIndex].author}
+                        width={56}
+                        height={56}
                         style={{ width: "100%", height: "100%", objectFit: "cover" }}
                       />
                     </div>
@@ -191,7 +194,7 @@ export function TestimonialsSection() {
                       style={{
                         fontSize: "40px",
                         fontWeight: 700,
-                        color: "#00E5C5",
+                        color: "#C41E3A",
                         margin: "0 0 4px",
                         letterSpacing: "-0.03em",
                         lineHeight: 1,
@@ -229,8 +232,8 @@ export function TestimonialsSection() {
               }}
               onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
                 const el = e.currentTarget as HTMLButtonElement
-                el.style.borderColor = "rgba(0,229,197,0.4)"
-                el.style.color = "#00E5C5"
+                el.style.borderColor = "rgba(196,30,58,0.4)"
+                el.style.color = "#C41E3A"
               }}
               onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
                 const el = e.currentTarget as HTMLButtonElement
@@ -252,7 +255,7 @@ export function TestimonialsSection() {
                     height: "6px",
                     borderRadius: "100px",
                     border: "none",
-                    background: index === activeIndex ? "#00E5C5" : "rgba(240,240,238,0.15)",
+                    background: index === activeIndex ? "#C41E3A" : "rgba(240,240,238,0.15)",
                     width: index === activeIndex ? "28px" : "6px",
                     cursor: "pointer",
                     transition: "all 0.3s ease",
@@ -282,8 +285,8 @@ export function TestimonialsSection() {
               }}
               onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
                 const el = e.currentTarget as HTMLButtonElement
-                el.style.borderColor = "rgba(0,229,197,0.4)"
-                el.style.color = "#00E5C5"
+                el.style.borderColor = "rgba(196,30,58,0.4)"
+                el.style.color = "#C41E3A"
               }}
               onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
                 const el = e.currentTarget as HTMLButtonElement

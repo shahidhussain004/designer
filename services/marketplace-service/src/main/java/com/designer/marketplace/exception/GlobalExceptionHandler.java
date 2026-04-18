@@ -95,6 +95,24 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Handle InvalidTokenException
+     */
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<Object> handleInvalidTokenException(
+            InvalidTokenException ex, WebRequest request) {
+
+        log.warn("Invalid token: {}", ex.getMessage());
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("error", "Invalid Token");
+        body.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
      * Handle ExpiredJwtException
      */
     @ExceptionHandler(ExpiredJwtException.class)

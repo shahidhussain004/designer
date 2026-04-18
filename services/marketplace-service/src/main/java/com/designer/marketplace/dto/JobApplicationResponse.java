@@ -1,6 +1,7 @@
 package com.designer.marketplace.dto;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.designer.marketplace.entity.JobApplication;
@@ -32,7 +33,7 @@ public class JobApplicationResponse {
     private String resumeUrl;
     private String portfolioUrl;
     private String linkedinUrl;
-    private List<String> additionalDocuments;
+    private String[] additionalDocuments;
     private JsonNode answers;
     private String status;
     private String companyNotes;
@@ -84,7 +85,7 @@ public class JobApplicationResponse {
                 .resumeUrl(application.getResumeUrl())
                 .portfolioUrl(application.getPortfolioUrl())
                 .linkedinUrl(application.getLinkedinUrl())
-                .additionalDocuments(application.getAdditionalDocuments())
+                .additionalDocuments(application.getAdditionalDocuments() != null ? application.getAdditionalDocuments().toArray(new String[0]) : null)
                 .answers(application.getAnswers())
                 .status(application.getStatus() != null ? application.getStatus().name() : null)
                 .companyNotes(application.getCompanyNotes())

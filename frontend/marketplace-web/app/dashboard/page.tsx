@@ -12,7 +12,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      console.log('[Dashboard] checkAuth called, user:', user, 'loading:', loading);
+
       
       // IMPORTANT: Try both context state AND localStorage to handle different timing scenarios
       let currentUser = user
@@ -20,26 +20,24 @@ export default function DashboardPage() {
       // If context doesn't have user but localStorage does, and token is valid, use localStorage
       if (!currentUser && authService.isAuthenticated()) {
         currentUser = authService.getCurrentUser()
-        console.log('[Dashboard] Got user from localStorage:', currentUser);
+
       }
       
       if (!currentUser) {
         // Not authenticated — redirect to login
-        console.log('[Dashboard] No user found, redirecting to login');
+
         router.replace('/auth/login')
         return
       }
 
       // Role-based redirect
-      console.log('[Dashboard] User role:', currentUser.role);
       if (currentUser.role === 'COMPANY') {
-        console.log('[Dashboard] Redirecting to /dashboard/company');
         router.replace('/dashboard/company')
       } else if (currentUser.role === 'FREELANCER') {
-        console.log('[Dashboard] Redirecting to /dashboard/freelancer');
+
         router.replace('/dashboard/freelancer')
       } else if (currentUser.role === 'ADMIN') {
-        console.log('[Dashboard] Redirecting to admin app');
+
         // Pass auth token via cookie (shared across ports on localhost). More secure than URL parameters.
         const token = localStorage.getItem('access_token');
         if (token) {
@@ -66,7 +64,7 @@ export default function DashboardPage() {
     
     // If still loading, wait a bit then check anyway (prevent infinite loading)
     const timer = setTimeout(() => {
-      console.log('[Dashboard] Timeout waiting for auth, checking anyway');
+
       checkAuth()
     }, 3000)
     

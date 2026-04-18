@@ -32,7 +32,7 @@ export default function FreelancerDashboardPage() {
             const jobsResp = await dashboardService.getAvailableJobs(0, 5)
             fd.availableJobs = jobsResp?.content || []
           } catch (e) {
-            console.debug('Fallback jobs fetch failed', e)
+            // Silently fail fallback
           }
         }
         setData(fd)

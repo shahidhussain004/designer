@@ -53,7 +53,6 @@ async function refreshAccessToken(): Promise<boolean> {
     });
 
     if (!response.ok) {
-      console.warn('[API-FETCH] Token refresh failed with status:', response.status);
       // Clear auth on refresh failure
       authService.logout();
       return false;
@@ -68,7 +67,7 @@ async function refreshAccessToken(): Promise<boolean> {
           localStorage.setItem('refresh_token', data.refreshToken);
         }
       }
-      console.log('[API-FETCH] Token refreshed successfully');
+
       return true;
     }
 
@@ -98,7 +97,7 @@ export async function apiFetch(
 
   // Check if token is expired before sending request
   if (token && isTokenExpired(token)) {
-    console.log('[API-FETCH] Token expired, attempting refresh...');
+
     const refreshed = await refreshAccessToken();
 
     if (!refreshed) {
@@ -145,7 +144,7 @@ export async function apiFetch(
 
   // If we get a 401, try to refresh and retry once
   if (response.status === 401) {
-    console.log('[API-FETCH] Got 401, attempting single retry with refresh...');
+
     const refreshed = await refreshAccessToken();
 
     if (refreshed) {

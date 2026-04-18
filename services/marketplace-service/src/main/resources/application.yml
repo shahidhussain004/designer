@@ -143,6 +143,32 @@ springdoc:
     operations-sorter: method
     tags-sorter: alpha
 
+# Email Configuration
+spring:
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:your-email@gmail.com}
+    password: ${MAIL_PASSWORD:your-app-password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+    from: ${MAIL_FROM:noreply@designer-marketplace.com}
+
+# Application Configuration
+app:
+  password-reset:
+    token-expiry-minutes: ${PASSWORD_RESET_TOKEN_EXPIRY_MINUTES:30}
+  frontend:
+    reset-password-url: ${FRONTEND_RESET_PASSWORD_URL:http://localhost:3000/reset-password}
+
 # Logging
 logging:
   level:
