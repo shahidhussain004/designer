@@ -15,6 +15,8 @@ interface LogContext {
 
 class Logger {
   private isDevelopment = process.env.NODE_ENV === 'development';
+  private enableVerboseApiLogs =
+    process.env.NEXT_PUBLIC_ENABLE_API_LOGS === 'true' || this.isDevelopment;
   private enableConsole = true;
   private logHistory: Array<{
     timestamp: string;
@@ -213,6 +215,10 @@ class Logger {
    * Log API request
    */
   apiRequest(method: string, url: string, data?: unknown) {
+    if (!this.enableVerboseApiLogs) {
+      return;
+    }
+
     this.info(`API Request: ${method} ${url}`, {
       component: 'API',
       action: 'request',
@@ -239,7 +245,7 @@ class Logger {
       this.error(`API Response: ${method} ${url} - ${status}`, undefined, context);
     } else if (status >= 300) {
       this.warn(`API Response: ${method} ${url} - ${status}`, context);
-    } else {
+    } else if (this.enableVerboseApiLogs) {
       this.info(`API Response: ${method} ${url} - ${status}`, context);
     }
   }
