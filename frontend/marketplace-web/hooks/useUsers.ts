@@ -22,15 +22,36 @@ interface User {
   ratingCount?: number;
 }
 
+interface PortfolioImage {
+  url: string;
+  caption?: string;
+  order?: number;
+}
+
 interface PortfolioItem {
   id: number;
   title: string;
   description: string;
+  // Primary image & gallery
   imageUrl?: string;
+  thumbnailUrl?: string;
+  images?: PortfolioImage[];
+  // Links
   projectUrl?: string;
+  liveUrl?: string;
+  githubUrl?: string;
+  sourceUrl?: string;
+  // Classification
+  projectCategory?: string;
   technologies?: string[];
+  toolsUsed?: string[];
+  skillsDemonstrated?: string[];
+  // Dates
+  startDate?: string;
   completionDate?: string;
+  // Display
   displayOrder: number;
+  highlightOrder?: number;
   isVisible: boolean;
   userId: number;
   createdAt: string;
@@ -72,12 +93,27 @@ interface Contract {
 interface CreatePortfolioInput {
   title: string;
   description: string;
+  // Primary image & gallery
   imageUrl?: string;
+  thumbnailUrl?: string;
+  images?: PortfolioImage[];
+  // Links
   projectUrl?: string;
+  liveUrl?: string;
+  githubUrl?: string;
+  sourceUrl?: string;
+  // Classification
+  projectCategory?: string;
   technologies?: string[];
+  toolsUsed?: string[];
+  skillsDemonstrated?: string[];
+  // Dates
+  startDate?: string;
   completionDate?: string;
+  // Display
   isVisible?: boolean;
   displayOrder?: number;
+  highlightOrder?: number;
 }
 
 interface UpdateUserInput {

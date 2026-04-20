@@ -1,15 +1,16 @@
 package com.designer.marketplace.security;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Security headers filter to add recommended HTTP security headers
@@ -24,8 +25,11 @@ public class SecurityHeadersFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         
+        // Allow Google GSI popup to communicate with parent window via postMessage
+        response.setHeader("Cross-Origin-Opener-Policy", "allow-popups");
+        
         // Prevent clickjacking attacks
-        response.setHeader("X-Frame-Options", "DENY");
+        response.setHeader("X-Frame-Options", "SAMEORIGIN");
         
         // Prevent XSS attacks - browser will block content if XSS is detected
         response.setHeader("X-XSS-Protection", "1; mode=block");
@@ -39,11 +43,12 @@ public class SecurityHeadersFilter extends OncePerRequestFilter {
         // Content Security Policy - restrict resource loading
         response.setHeader("Content-Security-Policy", 
             "default-src 'self'; " +
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://alcdn.msauth.net; " +
             "style-src 'self' 'unsafe-inline'; " +
             "img-src 'self' data: https:; " +
             "font-src 'self' data:; " +
-            "connect-src 'self' https://api.stripe.com; " +
+            "connect-src 'self' https://api.stripe.com https://oauth2.googleapis.com https://graph.microsoft.com https://accounts.google.com https://alcdn.msauth.net; " +
+            "frame-src https://accounts.google.com; " +
             "frame-ancestors 'none'");
         
         // Permissions Policy - control browser features

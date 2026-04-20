@@ -27,6 +27,21 @@ export interface AuthResponse {
 }
 
 /**
+ * Returned by `authService.oauthLogin()`.
+ * When `requiresRoleSelection` is true the other auth fields are absent and
+ * the caller should show a role picker, then re-call with the chosen role.
+ */
+export interface OAuthLoginResult {
+  requiresRoleSelection?: boolean;
+  email?: string;
+  fullName?: string;
+  pictureUrl?: string;
+  accessToken?: string;
+  refreshToken?: string;
+  user?: AuthResponse['user'];
+}
+
+/**
  * Authentication service for Designer Marketplace
  */
 export const authService = {
@@ -154,6 +169,39 @@ export const authService = {
     if (typeof window === 'undefined') return false;
     const user = this.getCurrentUser();
     return user?.role === 'INSTRUCTOR' || user?.role === 'ADMIN';
+  },
+
+  /**
+   * Sign in / sign up via a third-party OAuth provider (Google, Microsoft).
+   *
+   * The backend returns HTTP 200 when login is complete or HTTP 202 when the
+   * account is new and still needs a role selection.  In both cases the
+   * Axios interceptor will resolve the promise with `data`, so we inspect
+   * `requiresRoleSelection` to tell the two apart.
+   */
+  async oauthLogin(
+    provider: string,
+    token: string,
+    role?: string,
+  ): Promise<OAuthLoginResult> {
+    const payload: { provider: string; token: string; role?: string } = { provider, token };
+    if (role) payload.role = role;
+
+    // Allow 202 through without throwing
+    const { data } = await apiClient.post<OAuthLoginResult>('/auth/oauth-login', payload, {
+      validateStatus: (status) => status === 200 || status === 202,
+    });
+
+    if (!data.requiresRoleSelection && data.accessToken && data.refreshToken && data.user) {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('access_token', data.accessToken);
+        localStorage.setItem('refresh_token', data.refreshToken);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        apiClient.defaults.headers.Authorization = `Bearer ${data.accessToken}`;
+      }
+    }
+
+    return data;
   },
 };
 

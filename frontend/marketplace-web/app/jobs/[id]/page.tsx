@@ -6,27 +6,27 @@ import { PageLayout } from '@/components/ui';
 import { useJob } from '@/hooks/useJobs';
 import { useAuth } from '@/lib/auth';
 import {
-  AlertCircle,
-  ArrowLeft,
-  Award,
-  Briefcase,
-  Building2,
-  Calendar,
-  CheckCircle,
-  Clock,
-  DollarSign,
-  ExternalLink,
-  Eye,
-  Globe,
-  Mail,
-  MapPin,
-  Plane,
-  Send,
-  Shield,
-  Star,
-  Target,
-  Users,
-  Zap
+    AlertCircle,
+    ArrowLeft,
+    Award,
+    Briefcase,
+    Building2,
+    Calendar,
+    CheckCircle,
+    Clock,
+    DollarSign,
+    ExternalLink,
+    Eye,
+    Globe,
+    Mail,
+    MapPin,
+    Plane,
+    Send,
+    Shield,
+    Star,
+    Target,
+    Users,
+    Zap
 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -401,7 +401,7 @@ export default function JobDetailsPage() {
                   <h3 className="text-lg font-bold text-gray-900 mb-2">Sign in to apply for this job</h3>
                   <p className="text-gray-600 mb-6">You need to be logged in to submit an application.</p>
                   <Link
-                    href="/login"
+                    href="/auth/login"
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary-600 text-white hover:bg-primary-700 font-semibold transition-colors"
                   >
                     Sign In

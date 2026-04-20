@@ -1,6 +1,6 @@
 'use client';
 
-import { PageLayout } from '@/components/ui';
+import { PageLayout, SocialAuthButtons } from '@/components/ui';
 import { authService } from '@/lib/auth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -44,13 +44,6 @@ export default function RegisterPage() {
     <PageLayout>
       <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full">
-          {/* Logo/Brand */}
-          <div className="text-center mb-8">
-            <Link href="/" className="text-3xl font-bold text-gray-900">
-              Designer<span className="text-primary-600">Hub</span>
-            </Link>
-          </div>
-
           {/* Register Card */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
             <div className="text-center mb-8">
@@ -68,6 +61,18 @@ export default function RegisterPage() {
                 <p className="text-red-700 text-sm">{error}</p>
               </div>
             )}
+
+            {/* Social sign-up */}
+            <SocialAuthButtons mode="register" />
+
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="bg-white px-4 text-gray-500">or register with email</span>
+              </div>
+            </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>

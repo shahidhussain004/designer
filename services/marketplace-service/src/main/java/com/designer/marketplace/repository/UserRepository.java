@@ -49,4 +49,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     
     @Query("SELECT u FROM User u ORDER BY u.createdAt DESC")
     List<User> findRecentUsers(Pageable pageable);
+
+    /** Look up a user by the OAuth provider + provider-issued subject identifier. */
+    Optional<User> findByOauthProviderAndOauthProviderId(String oauthProvider, String oauthProviderId);
 }

@@ -66,7 +66,7 @@ export default function FreelancerDashboardPage() {
   const { stats = {} as DashboardStats, availableJobs = [], availableProjects = [] } = data
 
   const quickLinks = [
-    { href: '/dashboard/freelancer/portfolio', icon: FolderOpen, title: 'Portfolio', subtitle: 'Manage your work' },
+    { href: '/portfolio', icon: FolderOpen, title: 'Portfolio', subtitle: 'Manage your work' },
     { href: '/dashboard/freelancer/reviews', icon: Star, title: 'Reviews', subtitle: 'Company feedback' },
     { href: '/dashboard/freelancer/time-tracking', icon: Clock, title: 'Time Tracking', subtitle: 'Log your hours' },
     { href: '/dashboard/freelancer/contracts', icon: FileText, title: 'Contracts', subtitle: 'Active agreements' },
@@ -320,12 +320,9 @@ export default function FreelancerDashboardPage() {
                             <Calendar className="w-4 h-4" />
                             {app?.appliedAt ? new Date(app.appliedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'N/A'}
                           </div>
-                          <Link
-                            href={`/jobs/${app?.jobId}`}
-                            className="inline-block mt-3 px-3 py-1 bg-primary-600 text-white text-xs font-medium rounded hover:bg-primary-700 transition-colors"
-                          >
+                          <span className="inline-block mt-3 px-3 py-1 bg-primary-600 text-white text-xs font-medium rounded">
                             View Job
-                          </Link>
+                          </span>
                         </div>
                       </div>
                     </div>

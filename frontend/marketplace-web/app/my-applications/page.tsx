@@ -177,7 +177,7 @@ export default function MyApplicationsPage() {
         <div className="min-h-screen bg-gray-50 py-12">
           <div className="mx-auto max-w-6xl px-4 text-center">
             <p className="text-gray-600 mb-6">Please log in to view your applications.</p>
-            <Link href="/login" className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium">
+            <Link href="/auth/login" className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium">
               Sign In
             </Link>
           </div>

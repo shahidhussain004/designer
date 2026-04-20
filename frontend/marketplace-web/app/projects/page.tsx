@@ -128,7 +128,7 @@ function ProjectsPageContent() {
     return (
       <div
         key={project.id}
-        className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-lg hover:border-primary-300 transition-all cursor-pointer group"
+        className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-lg hover:border-gray-300 transition-all cursor-pointer group"
         onClick={() => router.push(`/projects/${project.id}`)}
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && router.push(`/projects/${project.id}`)}
         role="button"
@@ -136,7 +136,7 @@ function ProjectsPageContent() {
       >
         <div className="flex flex-col h-full">
           <div className="flex justify-between items-start mb-3">
-            <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-primary-100 text-primary-700">
+            <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-gray-400 text-white">
               {project.category?.name ?? 'Uncategorized'}
             </span>
             <span className={`inline-block px-3 py-1 text-xs font-medium rounded-full ${
@@ -171,7 +171,7 @@ function ProjectsPageContent() {
           
           <button
             onClick={(e) => { e.stopPropagation(); router.push(`/projects/${project.id}`); }}
-            className="mt-4 w-full py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors group-hover:border-primary-300 group-hover:text-primary-600"
+            className="mt-4 w-full py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors group-hover:border-gray-300 group-hover:text-primary-600"
           >
             View Details →
           </button>
@@ -246,7 +246,7 @@ function ProjectsPageContent() {
                   onClick={() => setLayoutMode('list')}
                   className={`p-2 rounded transition-colors ${
                     layoutMode === 'list'
-                      ? 'bg-primary-100 text-primary-600'
+                      ? 'bg-gray-200 text-gray-900'
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                   title="List View"
@@ -257,7 +257,7 @@ function ProjectsPageContent() {
                   onClick={() => setLayoutMode('grid')}
                   className={`p-2 rounded transition-colors ${
                     layoutMode === 'grid'
-                      ? 'bg-primary-100 text-primary-600'
+                      ? 'bg-gray-200 text-gray-900'
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                   title="Grid View"
@@ -318,7 +318,7 @@ function ProjectsPageContent() {
                     .map((project) => (
                       <div
                         key={project.id}
-                        className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-lg hover:border-primary-300 transition-all cursor-pointer group"
+                        className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-lg hover:border-gray-300 transition-all cursor-pointer group"
                         onClick={() => router.push(`/projects/${project.id}`)}
                       >
                         <div className="flex items-start justify-between gap-6 mb-4">
@@ -333,7 +333,7 @@ function ProjectsPageContent() {
                                 </p>
                               </div>
                               <div className="flex-shrink-0">
-                                <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-primary-100 text-primary-700">
+                                <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-gray-400 text-white">
                                   {project.category?.name ?? 'Uncategorized'}
                                 </span>
                               </div>

@@ -18,19 +18,19 @@
 @layer base {
   :root {
     /* --------------------------------------------------------------------------
-       COLOR PALETTE - Primary (Red-Pink Blend: Dark Red Base #C41E3A with #FF1B6D Accent)
+       COLOR PALETTE - Primary (Brand Red/Coral - Fastly/RedHat inspired)
        -------------------------------------------------------------------------- */
-    --color-primary-50: 255 240 245;
-    --color-primary-100: 255 192 220;
-    --color-primary-200: 255 176 216;
-    --color-primary-300: 255 127 181;
-    --color-primary-400: 255 77 150;
-    --color-primary-500: 255 27 109;
-    --color-primary-600: 196 30 58;
-    --color-primary-700: 160 22 51;
-    --color-primary-800: 122 17 40;
-    --color-primary-900: 74 10 22;
-    --color-primary-950: 45 7 13;
+    --color-primary-50: 254 242 242;
+    --color-primary-100: 254 226 226;
+    --color-primary-200: 254 202 202;
+    --color-primary-300: 252 165 165;
+    --color-primary-400: 248 113 113;
+    --color-primary-500: 239 68 68;
+    --color-primary-600: 220 38 38;
+    --color-primary-700: 185 28 28;
+    --color-primary-800: 153 27 27;
+    --color-primary-900: 127 29 29;
+    --color-primary-950: 69 10 10;
 
     /* --------------------------------------------------------------------------
        COLOR PALETTE - Secondary (Neutral)
@@ -78,16 +78,16 @@
     /* --------------------------------------------------------------------------
        COLOR PALETTE - Error (Red)
        -------------------------------------------------------------------------- */
-    --color-error-50: 255 240 245;
-    --color-error-100: 255 192 220;
-    --color-error-200: 255 176 216;
-    --color-error-300: 255 127 181;
-    --color-error-400: 255 77 150;
-    --color-error-500: 255 27 109;
-    --color-error-600: 196 30 58;
-    --color-error-700: 160 22 51;
-    --color-error-800: 122 17 40;
-    --color-error-900: 74 10 22;
+    --color-error-50: 254 242 242;
+    --color-error-100: 254 226 226;
+    --color-error-200: 254 202 202;
+    --color-error-300: 252 165 165;
+    --color-error-400: 248 113 113;
+    --color-error-500: 239 68 68;
+    --color-error-600: 220 38 38;
+    --color-error-700: 185 28 28;
+    --color-error-800: 153 27 27;
+    --color-error-900: 127 29 29;
 
     /* --------------------------------------------------------------------------
        COLOR PALETTE - Info (Cyan)

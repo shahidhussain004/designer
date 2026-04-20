@@ -44,6 +44,7 @@ export { FluidNotificationsDropdown } from './FluidNotificationsDropdown';
 export { Footer } from './Footer';
 export { default as Navbar } from './Navbar';
 export { default as PageLayout, type PageLayoutProps } from './PageLayout';
+export { SocialAuthButtons, type SocialAuthButtonsProps } from './SocialAuthButtons';
 export { Tab, TabList, TabPanel, Tabs } from './Tabs';
 export type { TabListProps, TabPanelProps, TabProps, TabsProps } from './Tabs';
 

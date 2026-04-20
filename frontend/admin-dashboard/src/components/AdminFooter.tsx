@@ -15,7 +15,7 @@ export default function AdminFooter() {
           </div>
 
           {/* Quick Links */}
-          <div>
+          <div className="ml-4">
             <Text className="text-white font-semibold mb-4">Quick Links</Text>
             <Flex flex-direction="column" gap="s" className="text-sm">
               <a href="#" className="hover:text-white transition">Dashboard</a>
@@ -25,7 +25,7 @@ export default function AdminFooter() {
           </div>
 
           {/* Resources */}
-          <div>
+          <div className="ml-4">
             <Text className="text-white font-semibold mb-4">Resources</Text>
             <Flex flex-direction="column" gap="s" className="text-sm">
               <a href="#" className="hover:text-white transition">API Docs</a>
@@ -35,7 +35,7 @@ export default function AdminFooter() {
           </div>
 
           {/* Legal */}
-          <div>
+          <div className="ml-4">
             <Text className="text-white font-semibold mb-4">Legal</Text>
             <Flex flex-direction="column" gap="s" className="text-sm">
               <a href="#" className="hover:text-white transition">Privacy</a>

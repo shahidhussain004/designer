@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 import { VideoBackground } from '@/components/ui';
+import { useAuth } from '@/lib/context/AuthContext';
 import { AnimatePresence, motion } from "framer-motion";
 import type React from "react";
 import HowItWorksCarousel from './how-it-works-carousel';
@@ -131,6 +132,7 @@ const trustedCompanies = [
 ];
 
 const LandingPage = () => {
+  const { user, loading } = useAuth();
   const [activeTab, setActiveTab] = useState<'talents' | 'jobs'>('talents');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -199,15 +201,17 @@ const LandingPage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.6 }}
              className="flex flex-col sm:flex-row gap-4 mb-12">
-                <Link
-                  href="/auth/register"
-                  className="inline-flex items-center justify-center px-8 py-4 rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-semibold text-lg transition-all shadow-lg hover:shadow-primary-500/25"
-                >
-                  Get Started Free
-                  <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </Link>
+                {!loading && !user && (
+                  <Link
+                    href="/auth/register"
+                    className="inline-flex items-center justify-center px-8 py-4 rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-semibold text-lg transition-all shadow-lg hover:shadow-primary-500/25"
+                  >
+                    Get Started Free
+                    <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </Link>
+                )}
                 <Link
                   href="/jobs"
                   className="inline-flex items-center justify-center px-8 py-4 rounded-lg bg-white/10 hover:bg-white/20 text-white font-semibold text-lg transition-all border border-white/20"
@@ -282,7 +286,7 @@ const LandingPage = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="bg-primary-700 py-12 border-b border-primary-700">
+      <section className="bg-primary-600 py-12 border-b border-primary-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, idx) => (
@@ -400,12 +404,14 @@ const LandingPage = () => {
               </ul>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 lg:justify-end">
-              <Link
-                href="/auth/register"
-                className="inline-flex items-center justify-center px-8 py-4 rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-semibold text-lg transition-all shadow-lg"
-              >
-                Create Free Account
-              </Link>
+              {!loading && !user && (
+                <Link
+                  href="/auth/register"
+                  className="inline-flex items-center justify-center px-8 py-4 rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-semibold text-lg transition-all shadow-lg"
+                >
+                  Create Free Account
+                </Link>
+              )}
               <Link
                 href="/contact"
                 className="inline-flex items-center justify-center px-8 py-4 rounded-lg bg-white/10 hover:bg-white/20 text-white font-semibold text-lg transition-all border border-white/20"
