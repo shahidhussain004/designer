@@ -178,7 +178,7 @@ const testimonials = [
     quote: "The category filtering is what makes this platform different. Companies searching for a brand designer who also does motion found me specifically, reached out with a well-matched brief, and we closed within three days of first contact.",
     highlight: '£80k+ in placed contracts',
     initials: 'MW',
-    color: 'bg-amber-100 text-amber-700',
+    color: 'bg-warning-100 text-warning-700',
   },
   {
     name: 'Aiko Tanaka',
@@ -197,7 +197,7 @@ const samplePortfolios = [
     category: 'UI/UX Design',
     designer: 'Sarah K.',
     tags: ['Figma', 'Prototyping', 'User Research'],
-    gradient: 'from-indigo-500 to-purple-600',
+    gradient: 'from-primary-500 to-primary-600',
     letter: 'F',
     description: 'End-to-end redesign of a mobile banking app — from discovery to shipped product — that increased task completion by 34%.',
   },
@@ -206,7 +206,7 @@ const samplePortfolios = [
     category: 'Brand Identity',
     designer: 'James O.',
     tags: ['Figma', 'Adobe CC', 'Motion'],
-    gradient: 'from-amber-400 to-orange-500',
+    gradient: 'from-warning-400 to-orange-500',
     letter: 'M',
     description: 'A flexible, system-first brand identity for a SaaS company spanning logo, typography, colour, and guidelines across 80+ brand touchpoints.',
   },
@@ -355,26 +355,26 @@ function PortfolioForm({
   onCancel: () => void
   isSaving: boolean
 }) {
-  const label = 'block text-sm font-semibold text-gray-700 mb-1.5'
+  const label = 'block text-sm font-semibold text-secondary-700 mb-1.5'
   const input =
-    'w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition placeholder-gray-400'
+    'w-full px-3.5 py-2.5 border border-secondary-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition placeholder-secondary-400'
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+    <div className="bg-white rounded-2xl border border-secondary-200 shadow-sm overflow-hidden">
       {/* Form header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-secondary-100 bg-secondary-50">
         <div>
-          <h3 className="font-bold text-gray-900 text-base">
+          <h3 className="font-bold text-secondary-900 text-base">
             {editingItem ? 'Edit Project' : 'Add New Project'}
           </h3>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-secondary-500 mt-0.5">
             The more detail you add, the more companies will find you through search.
           </p>
         </div>
         <button
           type="button"
           onClick={onCancel}
-          className="p-2 hover:bg-gray-200 rounded-lg transition text-gray-500"
+          className="p-2 hover:bg-secondary-200 rounded-lg transition text-secondary-500"
           aria-label="Close form"
         >
           <X className="w-5 h-5" />
@@ -384,7 +384,7 @@ function PortfolioForm({
       <form onSubmit={onSubmit} className="p-6 space-y-6">
         {/* Section: Core */}
         <div>
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">
+          <p className="text-xs font-bold text-secondary-400 uppercase tracking-wider mb-4">
             Project Details
           </p>
           <div className="grid gap-4">
@@ -444,10 +444,10 @@ function PortfolioForm({
                 className={input}
                 placeholder="Describe the project: your role, the brief, your process, and the outcome. Aim for 80+ characters."
               />
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-secondary-400 mt-1">
                 {formData.description.length} chars
                 {formData.description.length > 0 && formData.description.length < 80 && (
-                  <span className="text-amber-500 ml-1">— add a bit more context for best results</span>
+                  <span className="text-warning-500 ml-1">— add a bit more context for best results</span>
                 )}
               </p>
             </div>
@@ -456,7 +456,7 @@ function PortfolioForm({
 
         {/* Section: Images */}
         <div>
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">
+          <p className="text-xs font-bold text-secondary-400 uppercase tracking-wider mb-4">
             Images
           </p>
           <div className="grid sm:grid-cols-2 gap-4">
@@ -470,10 +470,10 @@ function PortfolioForm({
                 className={input}
                 placeholder="https://…/cover.jpg"
               />
-              <p className="text-xs text-gray-400 mt-1">Shown as the primary card thumbnail</p>
+              <p className="text-xs text-secondary-400 mt-1">Shown as the primary card thumbnail</p>
             </div>
             <div>
-              <label className={label}>Additional Images <span className="text-gray-400 font-normal">(comma-separated URLs)</span></label>
+              <label className={label}>Additional Images <span className="text-secondary-400 font-normal">(comma-separated URLs)</span></label>
               <input
                 type="text"
                 value={formData.additionalImages}
@@ -481,20 +481,20 @@ function PortfolioForm({
                 className={input}
                 placeholder="https://…/screen1.jpg, https://…/screen2.jpg"
               />
-              <p className="text-xs text-gray-400 mt-1">Up to 8 additional images for the full gallery</p>
+              <p className="text-xs text-secondary-400 mt-1">Up to 8 additional images for the full gallery</p>
             </div>
           </div>
         </div>
 
         {/* Section: Links */}
         <div>
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">
+          <p className="text-xs font-bold text-secondary-400 uppercase tracking-wider mb-4">
             Links
           </p>
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
               <label className={label}>
-                <Globe className="inline w-3.5 h-3.5 mr-1 text-gray-400" />
+                <Globe className="inline w-3.5 h-3.5 mr-1 text-secondary-400" />
                 Live Demo URL
               </label>
               <input
@@ -507,7 +507,7 @@ function PortfolioForm({
             </div>
             <div>
               <label className={label}>
-                <Github className="inline w-3.5 h-3.5 mr-1 text-gray-400" />
+                <Github className="inline w-3.5 h-3.5 mr-1 text-secondary-400" />
                 GitHub Repository
               </label>
               <input
@@ -543,8 +543,8 @@ function PortfolioForm({
 
         {/* Section: Skills & Tools */}
         <div>
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">
-            Skills & Technologies <span className="text-gray-300 font-normal normal-case">(comma-separated)</span>
+          <p className="text-xs font-bold text-secondary-400 uppercase tracking-wider mb-4">
+            Skills & Technologies <span className="text-secondary-300 font-normal normal-case">(comma-separated)</span>
           </p>
           <div className="grid sm:grid-cols-3 gap-4">
             <div>
@@ -556,7 +556,7 @@ function PortfolioForm({
                 className={input}
                 placeholder="React, TypeScript, Node.js"
               />
-              <p className="text-xs text-gray-400 mt-1">Programming languages & frameworks</p>
+              <p className="text-xs text-secondary-400 mt-1">Programming languages & frameworks</p>
             </div>
             <div>
               <label className={label}>Design / Creation Tools</label>
@@ -567,7 +567,7 @@ function PortfolioForm({
                 className={input}
                 placeholder="Figma, After Effects, Framer"
               />
-              <p className="text-xs text-gray-400 mt-1">Apps and tools you designed in</p>
+              <p className="text-xs text-secondary-400 mt-1">Apps and tools you designed in</p>
             </div>
             <div>
               <label className={label}>Skills Demonstrated</label>
@@ -578,14 +578,14 @@ function PortfolioForm({
                 className={input}
                 placeholder="User Research, Interaction Design"
               />
-              <p className="text-xs text-gray-400 mt-1">Discipline-level skills shown in this project</p>
+              <p className="text-xs text-secondary-400 mt-1">Discipline-level skills shown in this project</p>
             </div>
           </div>
         </div>
 
         {/* Section: Display */}
         <div>
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">
+          <p className="text-xs font-bold text-secondary-400 uppercase tracking-wider mb-4">
             Display Settings
           </p>
           <div className="flex flex-wrap items-center gap-6">
@@ -594,11 +594,11 @@ function PortfolioForm({
                 type="checkbox"
                 checked={formData.isVisible}
                 onChange={e => setFormData({ ...formData, isVisible: e.target.checked })}
-                className="w-4 h-4 rounded text-primary-600 border-gray-300 focus:ring-primary-500"
+                className="w-4 h-4 rounded text-primary-600 border-secondary-300 focus:ring-primary-500"
               />
               <div>
-                <span className="text-sm font-semibold text-gray-700">Visible on your public profile</span>
-                <p className="text-xs text-gray-400">Hidden projects are saved but not shown to companies</p>
+                <span className="text-sm font-semibold text-secondary-700">Visible on your public profile</span>
+                <p className="text-xs text-secondary-400">Hidden projects are saved but not shown to companies</p>
               </div>
             </label>
             <div className="flex items-center gap-3">
@@ -612,10 +612,10 @@ function PortfolioForm({
                   className={`${input} w-24`}
                   placeholder="0"
                 />
-                <p className="text-xs text-gray-400 mt-1">Lower = shown first</p>
+                <p className="text-xs text-secondary-400 mt-1">Lower = shown first</p>
               </div>
               <div>
-                <label className={label}>Feature Pin <span className="text-gray-400 font-normal">(optional)</span></label>
+                <label className={label}>Feature Pin <span className="text-secondary-400 font-normal">(optional)</span></label>
                 <input
                   type="number"
                   min={1}
@@ -624,14 +624,14 @@ function PortfolioForm({
                   className={`${input} w-24`}
                   placeholder="—"
                 />
-                <p className="text-xs text-gray-400 mt-1">1 = top featured slot</p>
+                <p className="text-xs text-secondary-400 mt-1">1 = top featured slot</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Actions */}
-        <div className="flex gap-3 pt-2 border-t border-gray-100">
+        <div className="flex gap-3 pt-2 border-t border-secondary-100">
           <button
             type="submit"
             disabled={isSaving}
@@ -649,7 +649,7 @@ function PortfolioForm({
           <button
             type="button"
             onClick={onCancel}
-            className="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold rounded-lg transition-colors"
+            className="px-6 py-2.5 bg-secondary-100 hover:bg-secondary-200 text-secondary-700 text-sm font-semibold rounded-lg transition-colors"
           >
             Cancel
           </button>
@@ -675,12 +675,12 @@ function PortfolioCard({
   return (
     <div
       className={`group bg-white rounded-2xl border overflow-hidden transition-all duration-200 hover:shadow-md ${
-        item.isVisible ? 'border-gray-200 hover:border-primary-200' : 'border-amber-200 bg-amber-50/30'
+        item.isVisible ? 'border-secondary-200 hover:border-primary-200' : 'border-warning-200 bg-warning-50/30'
       }`}
     >
       <div className="flex flex-col lg:flex-row">
         {/* Thumbnail */}
-        <div className="lg:w-64 xl:w-72 flex-shrink-0 relative bg-gray-100 aspect-video lg:aspect-auto lg:min-h-[200px]">
+        <div className="lg:w-64 xl:w-72 flex-shrink-0 relative bg-secondary-100 aspect-video lg:aspect-auto lg:min-h-[200px]">
           {item.imageUrl ? (
             <Image
               src={item.imageUrl}
@@ -690,7 +690,7 @@ function PortfolioCard({
               sizes="(max-width: 1024px) 100vw, 288px"
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center text-gray-300">
+            <div className="absolute inset-0 flex items-center justify-center text-secondary-300">
               <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
               </svg>
@@ -699,7 +699,7 @@ function PortfolioCard({
           {/* Category badge */}
           {item.projectCategory && (
             <div className="absolute top-3 left-3">
-              <span className="px-2.5 py-1 text-xs font-semibold bg-white/90 backdrop-blur-sm text-gray-700 rounded-full shadow-sm">
+              <span className="px-2.5 py-1 text-xs font-semibold bg-white/90 backdrop-blur-sm text-secondary-700 rounded-full shadow-sm">
                 {item.projectCategory}
               </span>
             </div>
@@ -707,7 +707,7 @@ function PortfolioCard({
           {/* Not visible badge */}
           {!item.isVisible && (
             <div className="absolute top-3 right-3">
-              <span className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold bg-amber-100 text-amber-700 rounded-full">
+              <span className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold bg-warning-100 text-warning-700 rounded-full">
                 <EyeOff className="w-3 h-3" /> Hidden
               </span>
             </div>
@@ -725,26 +725,26 @@ function PortfolioCard({
         {/* Content */}
         <div className="flex-1 p-5 flex flex-col">
           <div className="flex items-start justify-between gap-3 mb-2">
-            <h3 className="font-bold text-gray-900 text-base leading-snug">{item.title}</h3>
+            <h3 className="font-bold text-secondary-900 text-base leading-snug">{item.title}</h3>
             {/* Actions */}
             <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
               <button
                 onClick={() => onToggleVisibility(item)}
-                className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition"
+                className="p-1.5 rounded-lg text-secondary-400 hover:text-secondary-700 hover:bg-secondary-100 transition"
                 title={item.isVisible ? 'Hide from profile' : 'Make visible'}
               >
                 {item.isVisible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
               </button>
               <button
                 onClick={() => onEdit(item)}
-                className="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition"
+                className="p-1.5 rounded-lg text-secondary-400 hover:text-primary-600 hover:bg-primary-50 transition"
                 title="Edit"
               >
                 <Edit3 className="w-4 h-4" />
               </button>
               <button
                 onClick={() => onDelete(item.id)}
-                className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition"
+                className="p-1.5 rounded-lg text-secondary-400 hover:text-error-600 hover:bg-error-50 transition"
                 title="Delete"
               >
                 <Trash2 className="w-4 h-4" />
@@ -754,19 +754,19 @@ function PortfolioCard({
 
           {/* Date range */}
           {(item.startDate || item.completionDate) && (
-            <p className="text-xs text-gray-400 mb-2">
+            <p className="text-xs text-secondary-400 mb-2">
               {item.startDate && new Date(item.startDate).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}
               {item.startDate && item.completionDate && ' – '}
               {item.completionDate && new Date(item.completionDate).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}
             </p>
           )}
 
-          <p className="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-2">{item.description}</p>
+          <p className="text-secondary-500 text-sm leading-relaxed mb-4 line-clamp-2">{item.description}</p>
 
           {/* Tag groups */}
           <div className="flex flex-wrap gap-1.5 mb-3">
             {(item.technologies ?? []).slice(0, 4).map(tag => (
-              <span key={tag} className="px-2.5 py-0.5 text-xs rounded-full bg-blue-50 text-blue-700 font-medium">{tag}</span>
+              <span key={tag} className="px-2.5 py-0.5 text-xs rounded-full bg-primary-50 text-primary-700 font-medium">{tag}</span>
             ))}
             {(item.toolsUsed ?? []).slice(0, 2).map(tag => (
               <span key={tag} className="px-2.5 py-0.5 text-xs rounded-full bg-violet-50 text-violet-700 font-medium">{tag}</span>
@@ -775,7 +775,7 @@ function PortfolioCard({
               <span key={tag} className="px-2.5 py-0.5 text-xs rounded-full bg-teal-50 text-teal-700 font-medium">{tag}</span>
             ))}
             {((item.technologies?.length ?? 0) + (item.toolsUsed?.length ?? 0) + (item.skillsDemonstrated?.length ?? 0)) > 8 && (
-              <span className="px-2.5 py-0.5 text-xs rounded-full bg-gray-100 text-gray-500">+more</span>
+              <span className="px-2.5 py-0.5 text-xs rounded-full bg-secondary-100 text-secondary-500">+more</span>
             )}
           </div>
 
@@ -796,7 +796,7 @@ function PortfolioCard({
                 href={item.githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 font-medium"
+                className="inline-flex items-center gap-1.5 text-sm text-secondary-500 hover:text-secondary-700 font-medium"
               >
                 <Github className="w-3.5 h-3.5" /> Source
               </a>
@@ -806,7 +806,7 @@ function PortfolioCard({
                 href={item.sourceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 font-medium"
+                className="inline-flex items-center gap-1.5 text-sm text-secondary-500 hover:text-secondary-700 font-medium"
               >
                 <ExternalLink className="w-3.5 h-3.5" /> View Files
               </a>
@@ -980,15 +980,15 @@ function AuthPortfolioHub({ userId, userName }: { userId: number; userName: stri
     <PageLayout>
       <div className="bg-white">
         {/* ── Command Header ── */}
-        <div className="border-b border-gray-100">
+        <div className="border-b border-secondary-100">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
               <div>
-                <p className="text-sm text-gray-400 mb-1">Portfolio Hub</p>
-                <h1 className="text-3xl font-bold text-gray-900">
+                <p className="text-sm text-secondary-400 mb-1">Portfolio Hub</p>
+                <h1 className="text-3xl font-bold text-secondary-900">
                   {firstName}&rsquo;s Portfolio
                 </h1>
-                <p className="text-gray-500 mt-1.5">
+                <p className="text-secondary-500 mt-1.5">
                   {portfolio.length === 0
                     ? 'Start adding projects to build your profile.'
                     : `${portfolio.length} project${portfolio.length !== 1 ? 's' : ''} · ${portfolio.filter(p => p.isVisible).length} visible`}
@@ -998,7 +998,7 @@ function AuthPortfolioHub({ userId, userName }: { userId: number; userName: stri
                 <Link
                   href={publicProfileUrl}
                   target="_blank"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-200 hover:border-gray-300 text-gray-700 hover:text-gray-900 text-sm font-medium rounded-lg transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 border border-secondary-200 hover:border-secondary-300 text-secondary-700 hover:text-secondary-900 text-sm font-medium rounded-lg transition-colors"
                 >
                   <ExternalLink className="w-4 h-4" />
                   View Public Profile
@@ -1008,7 +1008,7 @@ function AuthPortfolioHub({ userId, userName }: { userId: number; userName: stri
                     navigator.clipboard.writeText(window.location.origin + publicProfileUrl)
                     alert('Portfolio link copied to clipboard!')
                   }}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-200 hover:border-gray-300 text-gray-700 hover:text-gray-900 text-sm font-medium rounded-lg transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 border border-secondary-200 hover:border-secondary-300 text-secondary-700 hover:text-secondary-900 text-sm font-medium rounded-lg transition-colors"
                 >
                   <Share2 className="w-4 h-4" />
                   Share Link
@@ -1045,14 +1045,14 @@ function AuthPortfolioHub({ userId, userName }: { userId: number; userName: stri
 
               {/* Empty state */}
               {portfolio.length === 0 && !showForm && (
-                <div className="flex flex-col items-center justify-center py-20 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 text-center px-6">
+                <div className="flex flex-col items-center justify-center py-20 bg-secondary-50 rounded-2xl border-2 border-dashed border-secondary-200 text-center px-6">
                   <div className="w-16 h-16 rounded-2xl bg-primary-50 flex items-center justify-center mb-5">
                     <svg className="w-8 h-8 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                     </svg>
                   </div>
-                  <h2 className="text-xl font-bold text-gray-900 mb-2">Your portfolio is empty</h2>
-                  <p className="text-gray-500 text-sm max-w-sm leading-relaxed mb-6">
+                  <h2 className="text-xl font-bold text-secondary-900 mb-2">Your portfolio is empty</h2>
+                  <p className="text-secondary-500 text-sm max-w-sm leading-relaxed mb-6">
                     Profiles with portfolios get 8× more views. Add your first project — it only takes two minutes.
                   </p>
                   <button
@@ -1080,7 +1080,7 @@ function AuthPortfolioHub({ userId, userName }: { userId: number; userName: stri
                   {!showForm && (
                     <button
                       onClick={handleAddNew}
-                      className="w-full flex items-center justify-center gap-2 py-4 border-2 border-dashed border-gray-200 hover:border-primary-300 hover:bg-primary-50 text-sm font-medium text-gray-400 hover:text-primary-600 rounded-2xl transition-all duration-200"
+                      className="w-full flex items-center justify-center gap-2 py-4 border-2 border-dashed border-secondary-200 hover:border-primary-300 hover:bg-primary-50 text-sm font-medium text-secondary-400 hover:text-primary-600 rounded-2xl transition-all duration-200"
                     >
                       <Plus className="w-4 h-4" />
                       Add another project
@@ -1093,21 +1093,21 @@ function AuthPortfolioHub({ userId, userName }: { userId: number; userName: stri
             {/* Sidebar */}
             <div className="space-y-5 lg:sticky lg:top-6">
               {/* Completeness score */}
-              <div className="bg-white rounded-2xl border border-gray-200 p-5">
+              <div className="bg-white rounded-2xl border border-secondary-200 p-5">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-bold text-gray-900 text-sm">Portfolio Strength</h3>
+                  <h3 className="font-bold text-secondary-900 text-sm">Portfolio Strength</h3>
                   <span
                     className={`text-sm font-bold ${
-                      score >= 80 ? 'text-green-600' : score >= 50 ? 'text-amber-600' : 'text-red-500'
+                      score >= 80 ? 'text-success-600' : score >= 50 ? 'text-warning-600' : 'text-error-500'
                     }`}
                   >
                     {score}%
                   </span>
                 </div>
-                <div className="w-full h-2 bg-gray-100 rounded-full mb-4">
+                <div className="w-full h-2 bg-secondary-100 rounded-full mb-4">
                   <div
                     className={`h-2 rounded-full transition-all duration-700 ${
-                      score >= 80 ? 'bg-green-500' : score >= 50 ? 'bg-amber-400' : 'bg-red-400'
+                      score >= 80 ? 'bg-success-500' : score >= 50 ? 'bg-warning-400' : 'bg-error-400'
                     }`}
                     style={{ width: `${score}%` }}
                   />
@@ -1115,8 +1115,8 @@ function AuthPortfolioHub({ userId, userName }: { userId: number; userName: stri
                 {tips.length > 0 && (
                   <div className="space-y-2">
                     {tips.map((tip, i) => (
-                      <div key={i} className="flex items-start gap-2 text-xs text-gray-500">
-                        <span className="w-4 h-4 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0 font-bold text-[10px] mt-0.5">
+                      <div key={i} className="flex items-start gap-2 text-xs text-secondary-500">
+                        <span className="w-4 h-4 rounded-full bg-warning-100 text-warning-600 flex items-center justify-center flex-shrink-0 font-bold text-[10px] mt-0.5">
                           !
                         </span>
                         {tip}
@@ -1125,7 +1125,7 @@ function AuthPortfolioHub({ userId, userName }: { userId: number; userName: stri
                   </div>
                 )}
                 {score === 100 && (
-                  <p className="text-xs text-green-600 font-medium flex items-center gap-1.5">
+                  <p className="text-xs text-success-600 font-medium flex items-center gap-1.5">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
                     Portfolio complete — maximum discoverability
                   </p>
@@ -1133,8 +1133,8 @@ function AuthPortfolioHub({ userId, userName }: { userId: number; userName: stri
               </div>
 
               {/* Quick stats */}
-              <div className="bg-white rounded-2xl border border-gray-200 p-5">
-                <h3 className="font-bold text-gray-900 text-sm mb-4">At a Glance</h3>
+              <div className="bg-white rounded-2xl border border-secondary-200 p-5">
+                <h3 className="font-bold text-secondary-900 text-sm mb-4">At a Glance</h3>
                 <div className="space-y-3">
                   {[
                     { label: 'Total Projects', value: portfolio.length },
@@ -1144,8 +1144,8 @@ function AuthPortfolioHub({ userId, userName }: { userId: number; userName: stri
                     { label: 'With GitHub Links', value: portfolio.filter(p => p.githubUrl).length },
                   ].map(stat => (
                     <div key={stat.label} className="flex justify-between text-sm">
-                      <span className="text-gray-500">{stat.label}</span>
-                      <span className="font-semibold text-gray-900">{stat.value}</span>
+                      <span className="text-secondary-500">{stat.label}</span>
+                      <span className="font-semibold text-secondary-900">{stat.value}</span>
                     </div>
                   ))}
                 </div>
@@ -1162,10 +1162,10 @@ function AuthPortfolioHub({ userId, userName }: { userId: number; userName: stri
               {/* Back to dashboard */}
               <Link
                 href="/dashboard/freelancer"
-                className="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-2xl border border-gray-200 transition-colors text-sm font-medium text-gray-700 group"
+                className="flex items-center justify-between p-4 bg-secondary-50 hover:bg-secondary-100 rounded-2xl border border-secondary-200 transition-colors text-sm font-medium text-secondary-700 group"
               >
                 <span>Go to Dashboard</span>
-                <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                <ArrowRight className="w-4 h-4 text-secondary-400 group-hover:text-secondary-600 transition-colors" />
               </Link>
             </div>
           </div>
@@ -1174,7 +1174,7 @@ function AuthPortfolioHub({ userId, userName }: { userId: number; userName: stri
 
       {/* Undo banner */}
       {undoItem && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 px-5 py-3 bg-gray-900 text-white text-sm rounded-xl shadow-xl">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 px-5 py-3 bg-secondary-900 text-white text-sm rounded-xl shadow-xl">
           <span>Project hidden from your profile</span>
           <button
             onClick={restoreVisibility}
@@ -1194,7 +1194,7 @@ function GuestPortfolioPage() {
   return (
     <PageLayout>
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden bg-gray-900 text-white">
+      <section className="relative overflow-hidden bg-secondary-900 text-white">
         <div
           className="absolute inset-0 opacity-[0.04]"
           style={{
@@ -1209,7 +1209,7 @@ function GuestPortfolioPage() {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left: copy */}
             <div>
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-sm font-medium text-gray-300 mb-6 border border-white/10">
+              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-sm font-medium text-secondary-300 mb-6 border border-white/10">
                 <span className="w-2 h-2 rounded-full bg-primary-400 animate-pulse" />
                 Free Portfolio Builder
               </span>
@@ -1217,7 +1217,7 @@ function GuestPortfolioPage() {
                 Your design portfolio,{' '}
                 <span className="text-primary-400">built to win work.</span>
               </h1>
-              <p className="text-xl text-gray-300 leading-relaxed mb-10 max-w-lg">
+              <p className="text-xl text-secondary-300 leading-relaxed mb-10 max-w-lg">
                 Stand out in a marketplace of 60,000+ designers. Add projects, showcase your skills, and
                 get discovered by companies that match your expertise — for free, forever.
               </p>
@@ -1236,7 +1236,7 @@ function GuestPortfolioPage() {
                   Sign In
                 </Link>
               </div>
-              <p className="text-gray-500 text-sm mt-4">No credit card. Takes 2 minutes.</p>
+              <p className="text-secondary-500 text-sm mt-4">No credit card. Takes 2 minutes.</p>
             </div>
 
             {/* Right: sample portfolio cards */}
@@ -1252,10 +1252,10 @@ function GuestPortfolioPage() {
                     </div>
                     <div className="min-w-0">
                       <p className="font-semibold text-white text-sm truncate">{p.title}</p>
-                      <p className="text-gray-400 text-xs mb-2">{p.category}</p>
+                      <p className="text-secondary-400 text-xs mb-2">{p.category}</p>
                       <div className="flex gap-1.5">
                         {p.tags.map(tag => (
-                          <span key={tag} className="px-2 py-0.5 text-[10px] font-medium bg-white/10 text-gray-300 rounded-full">{tag}</span>
+                          <span key={tag} className="px-2 py-0.5 text-[10px] font-medium bg-white/10 text-secondary-300 rounded-full">{tag}</span>
                         ))}
                       </div>
                     </div>
@@ -1286,21 +1286,21 @@ function GuestPortfolioPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="text-primary-600 text-sm font-semibold uppercase tracking-widest">Why it matters</span>
-            <h2 className="text-4xl font-bold text-gray-900 mt-3 mb-4">
+            <h2 className="text-4xl font-bold text-secondary-900 mt-3 mb-4">
               Your portfolio is your strongest pitch.
             </h2>
-            <p className="text-gray-500 max-w-xl mx-auto leading-relaxed">
+            <p className="text-secondary-500 max-w-xl mx-auto leading-relaxed">
               A CV tells companies what you&rsquo;ve done. A portfolio proves it. Here&rsquo;s what a great one does for you.
             </p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {whyPortfolio.map(item => (
-              <div key={item.title} className="bg-gray-50 rounded-2xl p-6 border border-gray-100 hover:border-primary-200 hover:bg-white hover:shadow-sm transition-all duration-200">
+              <div key={item.title} className="bg-secondary-50 rounded-2xl p-6 border border-secondary-100 hover:border-primary-200 hover:bg-white hover:shadow-sm transition-all duration-200">
                 <div className="w-11 h-11 rounded-xl bg-primary-100 text-primary-600 flex items-center justify-center mb-4">
                   {item.icon}
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{item.description}</p>
+                <h3 className="font-bold text-secondary-900 mb-2">{item.title}</h3>
+                <p className="text-secondary-500 text-sm leading-relaxed">{item.description}</p>
               </div>
             ))}
           </div>
@@ -1308,44 +1308,44 @@ function GuestPortfolioPage() {
       </section>
 
       {/* ── Portfolio Showcase ── */}
-      <section className="bg-gray-50 py-20 lg:py-28">
+      <section className="bg-secondary-50 py-20 lg:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
             <span className="text-primary-600 text-sm font-semibold uppercase tracking-widest">See it in action</span>
-            <h2 className="text-4xl font-bold text-gray-900 mt-3 mb-4">Portfolios that win business</h2>
-            <p className="text-gray-500 max-w-lg mx-auto">
+            <h2 className="text-4xl font-bold text-secondary-900 mt-3 mb-4">Portfolios that win business</h2>
+            <p className="text-secondary-500 max-w-lg mx-auto">
               Every detail you add — images, links, tools, categories — is another signal that helps companies find and choose you.
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {samplePortfolios.map(p => (
-              <div key={p.title} className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-md hover:border-primary-200 transition-all duration-200 group">
+              <div key={p.title} className="bg-white rounded-2xl border border-secondary-200 overflow-hidden hover:shadow-md hover:border-primary-200 transition-all duration-200 group">
                 {/* Image area */}
                 <div className={`h-48 bg-gradient-to-br ${p.gradient} flex items-center justify-center relative`}>
                   <span className="text-6xl font-black text-white/20">{p.letter}</span>
                   <div className="absolute inset-0 bg-black/10" />
                   <div className="absolute bottom-3 left-3">
-                    <span className="px-2.5 py-1 text-xs font-semibold bg-white/90 text-gray-700 rounded-full">
+                    <span className="px-2.5 py-1 text-xs font-semibold bg-white/90 text-secondary-700 rounded-full">
                       {p.category}
                     </span>
                   </div>
                 </div>
                 <div className="p-5">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-bold text-gray-900 text-sm">{p.title}</h3>
+                    <h3 className="font-bold text-secondary-900 text-sm">{p.title}</h3>
                   </div>
-                  <p className="text-gray-500 text-xs leading-relaxed mb-4">{p.description}</p>
+                  <p className="text-secondary-500 text-xs leading-relaxed mb-4">{p.description}</p>
                   <div className="flex flex-wrap gap-1.5 mb-3">
                     {p.tags.map(tag => (
-                      <span key={tag} className="px-2.5 py-0.5 text-xs rounded-full bg-blue-50 text-blue-700 font-medium">{tag}</span>
+                      <span key={tag} className="px-2.5 py-0.5 text-xs rounded-full bg-primary-50 text-primary-700 font-medium">{tag}</span>
                     ))}
                   </div>
-                  <div className="flex items-center gap-3 pt-3 border-t border-gray-100">
-                    <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600">
+                  <div className="flex items-center gap-3 pt-3 border-t border-secondary-100">
+                    <div className="w-6 h-6 rounded-full bg-secondary-200 flex items-center justify-center text-xs font-bold text-secondary-600">
                       {p.designer[0]}
                     </div>
-                    <span className="text-xs text-gray-500">{p.designer}</span>
-                    <span className="ml-auto flex items-center gap-1 text-xs text-gray-400">
+                    <span className="text-xs text-secondary-500">{p.designer}</span>
+                    <span className="ml-auto flex items-center gap-1 text-xs text-secondary-400">
                       <Globe className="w-3 h-3" /> Live
                     </span>
                   </div>
@@ -1361,20 +1361,20 @@ function GuestPortfolioPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="text-primary-600 text-sm font-semibold uppercase tracking-widest">What you get</span>
-            <h2 className="text-4xl font-bold text-gray-900 mt-3 mb-4">Everything you need to stand out</h2>
-            <p className="text-gray-500 max-w-xl mx-auto">
+            <h2 className="text-4xl font-bold text-secondary-900 mt-3 mb-4">Everything you need to stand out</h2>
+            <p className="text-secondary-500 max-w-xl mx-auto">
               Our portfolio builder is designed around how companies actually search for designers — not how agencies think they do.
             </p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {portfolioFeatures.map(feature => (
-              <div key={feature.title} className="group flex gap-4 p-6 bg-gray-50 rounded-2xl border border-gray-100 hover:bg-white hover:border-primary-200 hover:shadow-sm transition-all duration-200">
+              <div key={feature.title} className="group flex gap-4 p-6 bg-secondary-50 rounded-2xl border border-secondary-100 hover:bg-white hover:border-primary-200 hover:shadow-sm transition-all duration-200">
                 <div className="w-10 h-10 rounded-xl bg-primary-100 text-primary-600 flex items-center justify-center flex-shrink-0 group-hover:bg-primary-200 transition-colors">
                   {feature.icon}
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-1.5">{feature.title}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed">{feature.description}</p>
+                  <h3 className="font-bold text-secondary-900 mb-1.5">{feature.title}</h3>
+                  <p className="text-secondary-500 text-sm leading-relaxed">{feature.description}</p>
                 </div>
               </div>
             ))}
@@ -1383,15 +1383,15 @@ function GuestPortfolioPage() {
       </section>
 
       {/* ── How It Works ── */}
-      <section className="bg-gray-50 py-20 lg:py-28">
+      <section className="bg-secondary-50 py-20 lg:py-28">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="text-primary-600 text-sm font-semibold uppercase tracking-widest">Get started</span>
-            <h2 className="text-4xl font-bold text-gray-900 mt-3 mb-4">Four steps to a portfolio that works for you</h2>
+            <h2 className="text-4xl font-bold text-secondary-900 mt-3 mb-4">Four steps to a portfolio that works for you</h2>
           </div>
           <div className="relative">
             {/* Connector line */}
-            <div className="hidden lg:block absolute top-6 left-[calc(12.5%-1px)] right-[calc(12.5%-1px)] h-px bg-gray-200" />
+            <div className="hidden lg:block absolute top-6 left-[calc(12.5%-1px)] right-[calc(12.5%-1px)] h-px bg-secondary-200" />
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {howItWorks.map(step => (
                 <div key={step.step} className="relative">
@@ -1399,9 +1399,9 @@ function GuestPortfolioPage() {
                     <div className="relative w-12 h-12 rounded-full bg-primary-600 text-white font-bold text-sm flex items-center justify-center mb-5 shadow-md z-10">
                       {step.step}
                     </div>
-                    <h3 className="font-bold text-gray-900 mb-1">{step.title}</h3>
+                    <h3 className="font-bold text-secondary-900 mb-1">{step.title}</h3>
                     <p className="text-xs font-semibold text-primary-600 mb-2">{step.time}</p>
-                    <p className="text-gray-500 text-sm leading-relaxed">{step.detail}</p>
+                    <p className="text-secondary-500 text-sm leading-relaxed">{step.detail}</p>
                   </div>
                 </div>
               ))}
@@ -1415,26 +1415,26 @@ function GuestPortfolioPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
             <span className="text-primary-600 text-sm font-semibold uppercase tracking-widest">Designer stories</span>
-            <h2 className="text-4xl font-bold text-gray-900 mt-3 mb-4">The work wins the work</h2>
+            <h2 className="text-4xl font-bold text-secondary-900 mt-3 mb-4">The work wins the work</h2>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {testimonials.map(t => (
-              <div key={t.name} className="flex flex-col bg-gray-50 rounded-2xl border border-gray-100 p-7 hover:border-primary-100 hover:shadow-sm transition-all duration-200">
+              <div key={t.name} className="flex flex-col bg-secondary-50 rounded-2xl border border-secondary-100 p-7 hover:border-primary-100 hover:shadow-sm transition-all duration-200">
                 {/* Quote */}
                 <div className="mb-6 flex-1">
                   <svg className="w-8 h-8 text-primary-200 mb-4" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
                   </svg>
-                  <p className="text-gray-600 leading-relaxed text-sm">&ldquo;{t.quote}&rdquo;</p>
+                  <p className="text-secondary-600 leading-relaxed text-sm">&ldquo;{t.quote}&rdquo;</p>
                 </div>
                 {/* Author */}
-                <div className="flex items-center gap-3 pt-5 border-t border-gray-200">
+                <div className="flex items-center gap-3 pt-5 border-t border-secondary-200">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 ${t.color}`}>
                     {t.initials}
                   </div>
                   <div className="min-w-0">
-                    <p className="font-bold text-gray-900 text-sm">{t.name}</p>
-                    <p className="text-gray-400 text-xs truncate">{t.role} · {t.context}</p>
+                    <p className="font-bold text-secondary-900 text-sm">{t.name}</p>
+                    <p className="text-secondary-400 text-xs truncate">{t.role} · {t.context}</p>
                   </div>
                 </div>
                 {/* Stat */}
@@ -1448,7 +1448,7 @@ function GuestPortfolioPage() {
       </section>
 
       {/* ── Final CTA ── */}
-      <section className="relative overflow-hidden bg-gray-900 text-white py-20 lg:py-28">
+      <section className="relative overflow-hidden bg-secondary-900 text-white py-20 lg:py-28">
         <div className="absolute inset-0 opacity-[0.04]"
           style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '28px 28px' }} />
         <div className="absolute top-0 left-0 w-96 h-96 opacity-20 rounded-full blur-3xl"
@@ -1458,7 +1458,7 @@ function GuestPortfolioPage() {
             Ready to build a portfolio that works<br />
             <span className="text-primary-400">while you sleep?</span>
           </h2>
-          <p className="text-xl text-gray-300 mb-10 leading-relaxed">
+          <p className="text-xl text-secondary-300 mb-10 leading-relaxed">
             12,000+ companies are actively searching portfolios on Designer Marketplace right now.
             Make sure you&rsquo;re there to be found.
           </p>
@@ -1477,7 +1477,7 @@ function GuestPortfolioPage() {
               Sign In
             </Link>
           </div>
-          <p className="text-gray-500 text-sm mt-6">Free forever for designers. No credit card required.</p>
+          <p className="text-secondary-500 text-sm mt-6">Free forever for designers. No credit card required.</p>
         </div>
       </section>
     </PageLayout>

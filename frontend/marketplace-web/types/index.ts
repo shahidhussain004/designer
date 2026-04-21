@@ -35,6 +35,7 @@ export interface Job {
   companyId: number;
   viewCount?: number;
   proposalCount?: number;
+  isOwner?: boolean;  // Indicates if current user owns this job
   createdAt: string;
   updatedAt: string;
 }

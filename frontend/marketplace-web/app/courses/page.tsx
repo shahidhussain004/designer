@@ -62,10 +62,10 @@ export default function CoursesPage() {
 
   const getSkillLevelColor = (level: string) => {
     switch (level) {
-      case 'Beginner': return 'bg-green-100 text-green-700';
-      case 'Intermediate': return 'bg-yellow-100 text-yellow-700';
-      case 'Advanced': return 'bg-red-100 text-red-700';
-      default: return 'bg-gray-100 text-gray-700';
+      case 'Beginner': return 'bg-success-100 text-success-700';
+      case 'Intermediate': return 'bg-warning-100 text-warning-700';
+      case 'Advanced': return 'bg-error-100 text-error-700';
+      default: return 'bg-secondary-100 text-secondary-700';
     }
   };
 
@@ -74,13 +74,13 @@ export default function CoursesPage() {
   return (
     <PageLayout>
       {/* Hero Header */}
-      <section className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-16 lg:py-20">
+      <section className="bg-gradient-to-br from-secondary-900 via-secondary-800 to-secondary-900 py-16 lg:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-8">
             <h1 className="text-3xl lg:text-4xl font-bold text-white mb-4">
               Expand Your Design Skills
             </h1>
-            <p className="text-xl text-gray-300">
+            <p className="text-xl text-secondary-300">
               Learn from industry leaders and master in-demand creative disciplines
             </p>
           </div>
@@ -89,7 +89,7 @@ export default function CoursesPage() {
           <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
             <div className="flex gap-3">
               <div className="flex-1 relative">
-                <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <input
@@ -97,7 +97,7 @@ export default function CoursesPage() {
                   placeholder="Search for courses..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-input-focus"
+                  className="w-full pl-12 pr-4 py-3.5 rounded-lg bg-white text-secondary-900 placeholder-secondary-500 focus:outline-none focus:ring-2 focus:ring-input-focus"
                 />
               </div>
               <button
@@ -112,14 +112,14 @@ export default function CoursesPage() {
       </section>
 
       {/* Filters & Sort Bar */}
-      <section className="bg-white border-b border-gray-200 sticky top-0 z-20">
+      <section className="bg-white border-b border-secondary-200 sticky top-0 z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               {/* Mobile Filters Toggle */}
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="lg:hidden flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="lg:hidden flex items-center gap-2 px-4 py-2 border border-secondary-300 rounded-lg hover:bg-secondary-50"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -131,7 +131,7 @@ export default function CoursesPage() {
               <select
                 value={selectedCategory}
                 onChange={(e) => { setSelectedCategory(e.target.value); setPage(0); }}
-                className="select-with-arrow hidden lg:block px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-input-focus bg-white"
+                className="select-with-arrow hidden lg:block px-4 py-2 border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-input-focus bg-white"
               >
                 <option value="">All Categories</option>
                 {COURSE_CATEGORIES.map((cat) => (
@@ -143,7 +143,7 @@ export default function CoursesPage() {
               <select
                 value={selectedSkillLevel}
                 onChange={(e) => { setSelectedSkillLevel(e.target.value); setPage(0); }}
-                className="select-with-arrow hidden lg:block px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-input-focus bg-white"
+                className="select-with-arrow hidden lg:block px-4 py-2 border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-input-focus bg-white"
               >
                 <option value="">All Levels</option>
                 {SKILL_LEVELS.map((level) => (
@@ -162,13 +162,13 @@ export default function CoursesPage() {
             </div>
 
             <div className="flex items-center gap-4">
-              <span className="text-gray-500 text-sm">
+              <span className="text-secondary-500 text-sm">
                 {totalCount} course{totalCount !== 1 ? 's' : ''}
               </span>
               <select
                 value={sortBy}
                 onChange={(e) => { setSortBy(e.target.value); setPage(0); }}
-                className="select-with-arrow px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-input-focus bg-white"
+                className="select-with-arrow px-4 py-2 border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-input-focus bg-white"
               >
                 <option value="popular">Most Popular</option>
                 <option value="newest">Newest</option>
@@ -181,11 +181,11 @@ export default function CoursesPage() {
 
           {/* Mobile Filters Panel */}
           {showFilters && (
-            <div className="lg:hidden mt-4 pt-4 border-t border-gray-200 grid grid-cols-2 gap-4">
+            <div className="lg:hidden mt-4 pt-4 border-t border-secondary-200 grid grid-cols-2 gap-4">
               <select
                 value={selectedCategory}
                 onChange={(e) => { setSelectedCategory(e.target.value); setPage(0); }}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-input-focus bg-white"
+                className="px-4 py-2 border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-input-focus bg-white"
               >
                 <option value="">All Categories</option>
                 {COURSE_CATEGORIES.map((cat) => (
@@ -195,7 +195,7 @@ export default function CoursesPage() {
               <select
                 value={selectedSkillLevel}
                 onChange={(e) => { setSelectedSkillLevel(e.target.value); setPage(0); }}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-input-focus bg-white"
+                className="px-4 py-2 border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-input-focus bg-white"
               >
                 <option value="">All Levels</option>
                 {SKILL_LEVELS.map((level) => (
@@ -208,7 +208,7 @@ export default function CoursesPage() {
       </section>
 
       {/* Course Grid */}
-      <section className="bg-gray-50 py-8 min-h-[60vh]">
+      <section className="bg-secondary-50 py-8 min-h-[60vh]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Loading State */}
           {isLoading && <CoursesSkeleton />}
@@ -233,17 +233,17 @@ export default function CoursesPage() {
                       <button
                         onClick={() => setPage(Math.max(0, page - 1))}
                         disabled={page === 0}
-                        className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-4 py-2 border border-secondary-300 rounded-lg hover:bg-secondary-50 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         ← Previous
                       </button>
-                      <span className="text-gray-600">
+                      <span className="text-secondary-600">
                         Page {page + 1} of {totalPages}
                       </span>
                       <button
                         onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
                         disabled={page >= totalPages - 1}
-                        className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-4 py-2 border border-secondary-300 rounded-lg hover:bg-secondary-50 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         Next →
                       </button>
@@ -251,10 +251,10 @@ export default function CoursesPage() {
                   )}
                 </>
               ) : (
-                <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
+                <div className="bg-white rounded-xl border border-secondary-200 p-12 text-center">
                   <div className="text-5xl mb-6">📚</div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No courses found</h3>
-                  <p className="text-gray-600 mb-6">Try adjusting your filters or search terms</p>
+                  <h3 className="text-xl font-semibold text-secondary-900 mb-2">No courses found</h3>
+                  <p className="text-secondary-600 mb-6">Try adjusting your filters or search terms</p>
                   <button
                     onClick={handleClearFilters}
                     className="text-primary-600 hover:text-primary-700 font-medium"
@@ -280,9 +280,9 @@ interface CourseCardProps {
 function CourseCard({ course, getSkillLevelColor }: CourseCardProps) {
   return (
     <Link href={`/courses/${course.slug}`} className="block group">
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:border-primary-300 hover:shadow-lg transition-all h-full flex flex-col">
+      <div className="bg-white rounded-xl border border-secondary-200 overflow-hidden hover:border-primary-300 hover:shadow-lg transition-all h-full flex flex-col">
         {/* Thumbnail */}
-        <div className="relative aspect-video bg-gray-100 overflow-hidden">
+        <div className="relative aspect-video bg-secondary-100 overflow-hidden">
           {course.thumbnailUrl ? (
             <Image
               src={course.thumbnailUrl}
@@ -311,22 +311,22 @@ function CourseCard({ course, getSkillLevelColor }: CourseCardProps) {
           </span>
 
           {/* Title */}
-          <h3 className="font-semibold text-gray-900 group-hover:text-primary-600 transition-colors mb-2 line-clamp-2">
+          <h3 className="font-semibold text-secondary-900 group-hover:text-primary-600 transition-colors mb-2 line-clamp-2">
             {course.title}
           </h3>
 
           {/* Instructor */}
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-secondary-500 mb-4">
             by {course.instructorName}
           </p>
 
           {/* Stats */}
-          <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+          <div className="flex items-center gap-4 text-sm text-secondary-500 mb-4">
             <div className="flex items-center gap-1">
-              <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-4 h-4 text-warning-400" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
               </svg>
-              <span className="font-medium text-gray-900">
+              <span className="font-medium text-secondary-900">
                 {typeof course.rating === 'number' && isFinite(course.rating) ? course.rating.toFixed(1) : '—'}
               </span>
             </div>
@@ -335,11 +335,11 @@ function CourseCard({ course, getSkillLevelColor }: CourseCardProps) {
           </div>
 
           {/* Footer */}
-          <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
-            <span className="text-lg font-bold text-gray-900">
+          <div className="mt-auto pt-4 border-t border-secondary-100 flex items-center justify-between">
+            <span className="text-lg font-bold text-secondary-900">
               {formatCurrency(course.price, course.currency)}
             </span>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-secondary-500">
               {typeof course.enrollmentCount === 'number' ? course.enrollmentCount.toLocaleString() : '0'} enrolled
             </span>
           </div>

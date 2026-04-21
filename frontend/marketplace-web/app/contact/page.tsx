@@ -17,7 +17,7 @@ const channels = [
     description: 'Questions about your account, billing, or how the platform works.',
     contact: 'support@designermarket.io',
     cta: 'Email Support',
-    color: 'bg-blue-50 text-blue-600',
+    color: 'bg-primary-50 text-primary-600',
   },
   {
     icon: (
@@ -41,7 +41,7 @@ const channels = [
     description: 'Agency partnerships, platform integrations, and white-label enquiries.',
     contact: 'partners@designermarket.io',
     cta: 'Explore Partnerships',
-    color: 'bg-purple-50 text-purple-600',
+    color: 'bg-primary-50 text-primary-600',
   },
   {
     icon: (
@@ -53,7 +53,7 @@ const channels = [
     description: 'Interview requests, press access, spokesperson enquiries, and media assets.',
     contact: 'press@designermarket.io',
     cta: 'Press Enquiry',
-    color: 'bg-amber-50 text-amber-600',
+    color: 'bg-warning-50 text-warning-600',
   },
 ]
 
@@ -80,18 +80,18 @@ export default function ContactPage() {
   return (
     <PageLayout>
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden bg-gray-900 text-white">
+      <section className="relative overflow-hidden bg-secondary-900 text-white">
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
           <div className="max-w-2xl">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-sm font-medium text-gray-300 mb-6 border border-white/10">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-sm font-medium text-secondary-300 mb-6 border border-white/10">
               <span className="w-2 h-2 rounded-full bg-primary-500" />
               Get in Touch
             </span>
             <h1 className="text-5xl font-bold mb-5 leading-tight">
               We&rsquo;d love to <span className="text-primary-400">hear from you.</span>
             </h1>
-            <p className="text-xl text-gray-300 leading-relaxed">
+            <p className="text-xl text-secondary-300 leading-relaxed">
               Whether you have a question about your account, want to explore a partnership, or just want to say hello — our team is here.
             </p>
           </div>
@@ -102,17 +102,17 @@ export default function ContactPage() {
       <section className="bg-white py-16 lg:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-3">Choose the right channel</h2>
-            <p className="text-gray-500 text-lg">Different teams, different enquiries — routed to the right people.</p>
+            <h2 className="text-3xl font-bold text-secondary-900 mb-3">Choose the right channel</h2>
+            <p className="text-secondary-500 text-lg">Different teams, different enquiries — routed to the right people.</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {channels.map((ch) => (
-              <div key={ch.label} className="bg-gray-50 rounded-2xl p-6 border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all duration-200">
+              <div key={ch.label} className="bg-secondary-50 rounded-2xl p-6 border border-secondary-200 hover:border-secondary-300 hover:shadow-sm transition-all duration-200">
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${ch.color}`}>
                   {ch.icon}
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">{ch.label}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed mb-4">{ch.description}</p>
+                <h3 className="font-bold text-secondary-900 mb-2">{ch.label}</h3>
+                <p className="text-secondary-500 text-sm leading-relaxed mb-4">{ch.description}</p>
                 <a href={`mailto:${ch.contact}`} className="text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors">
                   {ch.contact}
                 </a>
@@ -123,60 +123,60 @@ export default function ContactPage() {
       </section>
 
       {/* ── Form + Office info ── */}
-      <section className="bg-gray-50 py-16 lg:py-20">
+      <section className="bg-secondary-50 py-16 lg:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-5 gap-12">
             {/* Form */}
             <div className="lg:col-span-3">
-              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 lg:p-10">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Send us a message</h2>
-                <p className="text-gray-500 mb-8">Fill in the form and we&rsquo;ll be in touch promptly.</p>
+              <div className="bg-white rounded-2xl border border-secondary-200 shadow-sm p-8 lg:p-10">
+                <h2 className="text-2xl font-bold text-secondary-900 mb-2">Send us a message</h2>
+                <p className="text-secondary-500 mb-8">Fill in the form and we&rsquo;ll be in touch promptly.</p>
                 <ContactForm />
               </div>
             </div>
 
             {/* Sidebar: office + office hours + social */}
             <div className="lg:col-span-2 space-y-6">
-              <div className="bg-white rounded-2xl border border-gray-200 p-6">
+              <div className="bg-white rounded-2xl border border-secondary-200 p-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <div className="w-10 h-10 rounded-xl bg-secondary-100 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5 text-secondary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-1">London HQ</h3>
-                    <p className="text-gray-500 text-sm leading-relaxed">12 Worship Street<br />London, EC2A 2EL<br />United Kingdom</p>
+                    <h3 className="font-semibold text-secondary-900 mb-1">London HQ</h3>
+                    <p className="text-secondary-500 text-sm leading-relaxed">12 Worship Street<br />London, EC2A 2EL<br />United Kingdom</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl border border-gray-200 p-6">
+              <div className="bg-white rounded-2xl border border-secondary-200 p-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <div className="w-10 h-10 rounded-xl bg-secondary-100 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5 text-secondary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-1">New York Office</h3>
-                    <p className="text-gray-500 text-sm leading-relaxed">340 Pine Street, Suite 800<br />San Francisco, CA 94104<br />United States</p>
+                    <h3 className="font-semibold text-secondary-900 mb-1">New York Office</h3>
+                    <p className="text-secondary-500 text-sm leading-relaxed">340 Pine Street, Suite 800<br />San Francisco, CA 94104<br />United States</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl border border-gray-200 p-6">
+              <div className="bg-white rounded-2xl border border-secondary-200 p-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <div className="w-10 h-10 rounded-xl bg-secondary-100 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5 text-secondary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-1">Office Hours</h3>
-                    <p className="text-gray-500 text-sm leading-relaxed">
+                    <h3 className="font-semibold text-secondary-900 mb-1">Office Hours</h3>
+                    <p className="text-secondary-500 text-sm leading-relaxed">
                       Mon–Fri: 9:00 – 18:00 GMT<br />
                       Support available 24/7 for critical issues
                     </p>
@@ -185,8 +185,8 @@ export default function ContactPage() {
               </div>
 
               <div className="bg-primary-50 rounded-2xl border border-primary-100 p-6">
-                <h3 className="font-semibold text-gray-900 mb-1">Urgent trust &amp; safety issues</h3>
-                <p className="text-gray-500 text-sm leading-relaxed mb-3">For abuse reports, fraud, or account compromises that are time-sensitive:</p>
+                <h3 className="font-semibold text-secondary-900 mb-1">Urgent trust &amp; safety issues</h3>
+                <p className="text-secondary-500 text-sm leading-relaxed mb-3">For abuse reports, fraud, or account compromises that are time-sensitive:</p>
                 <a href="mailto:trust@designermarket.io" className="text-primary-600 font-semibold text-sm hover:underline">
                   trust@designermarket.io
                 </a>
@@ -200,14 +200,14 @@ export default function ContactPage() {
       <section className="bg-white py-16 lg:py-20">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-3">Frequently asked questions</h2>
-            <p className="text-gray-500">Quick answers before you reach out.</p>
+            <h2 className="text-3xl font-bold text-secondary-900 mb-3">Frequently asked questions</h2>
+            <p className="text-secondary-500">Quick answers before you reach out.</p>
           </div>
           <div className="space-y-4">
             {faqs.map((faq) => (
-              <div key={faq.q} className="bg-gray-50 rounded-xl border border-gray-200 p-6">
-                <h3 className="font-semibold text-gray-900 mb-2">{faq.q}</h3>
-                <p className="text-gray-600 leading-relaxed text-sm">{faq.a}</p>
+              <div key={faq.q} className="bg-secondary-50 rounded-xl border border-secondary-200 p-6">
+                <h3 className="font-semibold text-secondary-900 mb-2">{faq.q}</h3>
+                <p className="text-secondary-600 leading-relaxed text-sm">{faq.a}</p>
               </div>
             ))}
           </div>

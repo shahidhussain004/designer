@@ -76,7 +76,7 @@ export default function DashboardPage() {
       <PageLayout>
         <div className="max-w-4xl mx-auto py-24 text-center">
           <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
-          <p className="text-gray-700">Loading your account…</p>
+          <p className="text-secondary-700">Loading your account…</p>
         </div>
       </PageLayout>
     )
@@ -88,7 +88,7 @@ export default function DashboardPage() {
     <PageLayout>
       <div className="max-w-4xl mx-auto py-24 text-center">
         <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
-        <p className="text-gray-700 mb-8">Redirecting to your dashboard…</p>
+        <p className="text-secondary-700 mb-8">Redirecting to your dashboard…</p>
       </div>
     </PageLayout>
   )

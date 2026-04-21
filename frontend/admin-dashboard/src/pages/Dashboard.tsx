@@ -1,17 +1,17 @@
 // Types handled by 'any' casts
 import {
-  BriefcaseIcon,
-  ClockIcon,
-  CurrencyDollarIcon,
-  UsersIcon,
+    BriefcaseIcon,
+    ClockIcon,
+    CurrencyDollarIcon,
+    UsersIcon,
 } from '@heroicons/react/24/outline'
 import { useQuery } from '@tanstack/react-query'
 import {
-  Card,
-  Flex,
-  Grid,
-  Spinner,
-  Text
+    Card,
+    Flex,
+    Grid,
+    Spinner,
+    Text
 } from '../components/green'
 import { adminApi } from '../lib/api'
 
@@ -95,8 +95,8 @@ export default function Dashboard() {
         {statCards.map((stat) => (
           <Card key={stat.name} padding="m">
             <Flex align-items="center" gap="m">
-              <div className="w-12 h-12 flex items-center justify-center rounded-full bg-indigo-50">
-                <stat.icon width={20} height={20} className="text-indigo-600" />
+              <div className="w-12 h-12 flex items-center justify-center rounded-full bg-primary-50">
+                <stat.icon width={20} height={20} className="text-primary-600" />
               </div>
               <Flex flex-direction="column">
                 <Text font-size="body-s" color="secondary">{stat.name}</Text>
@@ -116,7 +116,7 @@ export default function Dashboard() {
             <Flex flex-direction="column" gap="s">
               {activity && activity.length > 0 ? (
                 activity.slice(0, 6).map((item: any, idx: number) => (
-                  <Flex key={idx} justify-content="space-between" align-items="center" className="border-b border-gray-100 pb-3">
+                  <Flex key={idx} justify-content="space-between" align-items="center" className="border-b border-secondary-100 pb-3">
                     <Flex flex-direction="column">
                       <Text font-size="body-s" font-weight="book">{item.title}</Text>
                       <Text font-size="body-s" color="secondary">{item.description}</Text>

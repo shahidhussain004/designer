@@ -114,13 +114,13 @@ const TopicReadingPage = () => {
 
       {/* Main Content */}
       <div className="container mx-auto max-w-5xl px-4 py-8">
-        <article className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 md:p-12">
+        <article className="bg-white dark:bg-secondary-800 rounded-xl shadow-lg p-8 md:p-12">
           {/* Topic Header */}
-          <div className="mb-8 pb-6 border-b border-gray-200 dark:border-gray-700">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+          <div className="mb-8 pb-6 border-b border-secondary-200 dark:border-secondary-700">
+            <h1 className="text-4xl md:text-5xl font-bold text-secondary-900 dark:text-white mb-4">
               {topic.title}
             </h1>
-            <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+            <div className="flex items-center gap-4 text-sm text-secondary-600 dark:text-secondary-400">
               <div className="flex items-center gap-1">
                 <BookOpen className="w-4 h-4" />
                 <span>{topic.section.title}</span>
@@ -136,18 +136,18 @@ const TopicReadingPage = () => {
             prose-h1:text-3xl prose-h1:mb-6 prose-h1:mt-8
             prose-h2:text-2xl prose-h2:mb-4 prose-h2:mt-6
             prose-h3:text-xl prose-h3:mb-3 prose-h3:mt-4
-            prose-p:text-gray-700 prose-p:dark:text-gray-300 prose-p:leading-relaxed prose-p:mb-4
-            prose-a:text-gray-900 prose-a:dark:text-gray-100 prose-a:no-underline hover:prose-a:underline
-            prose-code:bg-gray-100 prose-code:dark:bg-gray-700 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono prose-code:before:content-[''] prose-code:after:content-['']
-            prose-pre:bg-gray-900 prose-pre:dark:bg-gray-950 prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto
+            prose-p:text-secondary-700 prose-p:dark:text-secondary-300 prose-p:leading-relaxed prose-p:mb-4
+            prose-a:text-secondary-900 prose-a:dark:text-secondary-100 prose-a:no-underline hover:prose-a:underline
+            prose-code:bg-secondary-100 prose-code:dark:bg-secondary-700 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono prose-code:before:content-[''] prose-code:after:content-['']
+            prose-pre:bg-secondary-900 prose-pre:dark:bg-secondary-950 prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto
             prose-ul:list-disc prose-ul:pl-6 prose-ul:mb-4
             prose-ol:list-decimal prose-ol:pl-6 prose-ol:mb-4
-            prose-li:text-gray-700 prose-li:dark:text-gray-300 prose-li:mb-2
-            prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-700 prose-blockquote:dark:text-gray-400
-            prose-strong:text-gray-900 prose-strong:dark:text-gray-100 prose-strong:font-semibold
+            prose-li:text-secondary-700 prose-li:dark:text-secondary-300 prose-li:mb-2
+            prose-blockquote:border-l-4 prose-blockquote:border-secondary-300 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-secondary-700 prose-blockquote:dark:text-secondary-400
+            prose-strong:text-secondary-900 prose-strong:dark:text-secondary-100 prose-strong:font-semibold
             prose-table:w-full prose-table:border-collapse
-            prose-th:bg-gray-100 prose-th:dark:bg-gray-700 prose-th:p-3 prose-th:text-left prose-th:border prose-th:border-gray-300 prose-th:dark:border-gray-600
-            prose-td:p-3 prose-td:border prose-td:border-gray-300 prose-td:dark:border-gray-600
+            prose-th:bg-secondary-100 prose-th:dark:bg-secondary-700 prose-th:p-3 prose-th:text-left prose-th:border prose-th:border-secondary-300 prose-th:dark:border-secondary-600
+            prose-td:p-3 prose-td:border prose-td:border-secondary-300 prose-td:dark:border-secondary-600
           ">
             <ReactMarkdown>{topic.content}</ReactMarkdown>
           </div>
@@ -158,12 +158,12 @@ const TopicReadingPage = () => {
           {topic.navigation.prev ? (
             <Link
               href={`/tutorials/${tutorialSlug}/${sectionSlug}/${topic.navigation.prev.slug}`}
-              className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-md transition-all border border-gray-200 dark:border-gray-700 group"
+              className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-secondary-800 rounded-lg shadow hover:shadow-md transition-all border border-secondary-200 dark:border-secondary-700 group"
             >
-              <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:-translate-x-1 transition-transform" />
+              <ChevronLeft className="w-5 h-5 text-secondary-600 dark:text-secondary-400 group-hover:-translate-x-1 transition-transform" />
               <div className="text-left">
-                <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Previous</div>
-                <div className="font-medium text-gray-900 dark:text-white">
+                <div className="text-xs text-secondary-500 dark:text-secondary-400 mb-1">Previous</div>
+                <div className="font-medium text-secondary-900 dark:text-white">
                   {topic.navigation.prev.title}
                 </div>
               </div>
@@ -175,15 +175,15 @@ const TopicReadingPage = () => {
           {topic.navigation.next ? (
             <Link
               href={`/tutorials/${tutorialSlug}/${sectionSlug}/${topic.navigation.next.slug}`}
-              className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-md transition-all border border-gray-200 dark:border-gray-700 group ml-auto"
+              className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-secondary-800 rounded-lg shadow hover:shadow-md transition-all border border-secondary-200 dark:border-secondary-700 group ml-auto"
             >
               <div className="text-right">
-                <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Next</div>
-                <div className="font-medium text-gray-900 dark:text-white">
+                <div className="text-xs text-secondary-500 dark:text-secondary-400 mb-1">Next</div>
+                <div className="font-medium text-secondary-900 dark:text-white">
                   {topic.navigation.next.title}
                 </div>
               </div>
-              <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:translate-x-1 transition-transform" />
+              <ChevronRight className="w-5 h-5 text-secondary-600 dark:text-secondary-400 group-hover:translate-x-1 transition-transform" />
             </Link>
           ) : null}
         </div>

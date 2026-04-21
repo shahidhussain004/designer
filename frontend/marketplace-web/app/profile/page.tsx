@@ -141,7 +141,7 @@ export default function ProfilePage() {
     return (
       <PageLayout>
         <div className="min-h-[50vh] flex items-center justify-center">
-          <p className="text-red-600">Profile not found</p>
+          <p className="text-error-600">Profile not found</p>
         </div>
       </PageLayout>
     )
@@ -150,17 +150,17 @@ export default function ProfilePage() {
   return (
     <PageLayout>
       {/* Header */}
-      <div className="bg-gray-900 text-white py-12 lg:py-16">
+      <div className="bg-secondary-900 text-white py-12 lg:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold">My Profile</h1>
-              <p className="text-gray-300 mt-1">Manage your account information</p>
+              <p className="text-secondary-300 mt-1">Manage your account information</p>
             </div>
             {!editing && (
               <button 
                 onClick={() => setEditing(true)}
-                className="flex items-center gap-2 bg-white text-gray-900 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+                className="flex items-center gap-2 bg-white text-secondary-900 px-4 py-2 rounded-lg font-medium hover:bg-secondary-100 transition-colors"
               >
                 <Edit2 className="w-4 h-4" />
                 Edit Profile
@@ -171,14 +171,14 @@ export default function ProfilePage() {
       </div>
 
       {/* Content */}
-      <div className="bg-gray-50 py-8">
+      <div className="bg-secondary-50 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Notification */}
           {notification && (
             <div className={`mb-6 px-4 py-3 rounded-lg flex items-center gap-2 ${
               notification.type === 'success' 
-                ? 'bg-green-50 text-green-700 border border-green-200' 
-                : 'bg-red-50 text-red-700 border border-red-200'
+                ? 'bg-success-50 text-success-700 border border-success-200' 
+                : 'bg-error-50 text-error-700 border border-error-200'
             }`}>
               {notification.type === 'success' ? (
                 <CheckCircle className="w-5 h-5" />
@@ -190,19 +190,19 @@ export default function ProfilePage() {
           )}
 
           {/* Profile Card */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
             {/* Avatar and Basic Info */}
-            <div className="flex items-center gap-4 mb-6 pb-6 border-b border-gray-200">
-              <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center text-3xl font-bold text-gray-500">
+            <div className="flex items-center gap-4 mb-6 pb-6 border-b border-secondary-200">
+              <div className="w-20 h-20 rounded-full bg-secondary-200 flex items-center justify-center text-3xl font-bold text-secondary-500">
                 {profile.fullName?.charAt(0).toUpperCase() || 'U'}
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-gray-900">{profile.fullName}</h2>
-                <p className="text-gray-500">@{profile.username}</p>
+                <h2 className="text-xl font-semibold text-secondary-900">{profile.fullName}</h2>
+                <p className="text-secondary-500">@{profile.username}</p>
                 <span className={`inline-block mt-2 px-3 py-1 rounded-full text-sm font-medium ${
                   profile.role === 'FREELANCER' 
-                    ? 'bg-blue-100 text-blue-700' 
-                    : 'bg-purple-100 text-purple-700'
+                    ? 'bg-primary-100 text-primary-700' 
+                    : 'bg-primary-100 text-primary-700'
                 }`}>
                   {profile.role}
                 </span>
@@ -213,66 +213,66 @@ export default function ProfilePage() {
             {editing ? (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                  <label className="block text-sm font-medium text-secondary-700 mb-1">Full Name</label>
                   <input
                     value={formData.fullName}
                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                     placeholder="Your full name"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none"
+                    className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <label className="block text-sm font-medium text-secondary-700 mb-1">Email</label>
                   <input
                     value={profile.email}
                     disabled
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
+                    className="w-full px-4 py-3 border border-secondary-300 rounded-lg bg-secondary-50 text-secondary-500"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+                  <p className="text-xs text-secondary-500 mt-1">Email cannot be changed</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                  <label className="block text-sm font-medium text-secondary-700 mb-1">Bio</label>
                   <textarea
                     value={formData.bio}
                     onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                     placeholder="Tell us about yourself"
                     rows={4}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none"
+                    className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                  <label className="block text-sm font-medium text-secondary-700 mb-1">Location</label>
                   <input
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                     placeholder="City, Country"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none"
+                    className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:outline-none"
                   />
                 </div>
 
                 {profile.role === 'FREELANCER' && (
                   <>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Hourly Rate (USD)</label>
+                      <label className="block text-sm font-medium text-secondary-700 mb-1">Hourly Rate (USD)</label>
                       <input
                         type="number"
                         value={formData.hourlyRate}
                         onChange={(e) => setFormData({ ...formData, hourlyRate: e.target.value })}
                         placeholder="50"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none"
+                        className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:outline-none"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Portfolio URL</label>
+                      <label className="block text-sm font-medium text-secondary-700 mb-1">Portfolio URL</label>
                       <input
                         value={formData.portfolioUrl}
                         onChange={(e) => setFormData({ ...formData, portfolioUrl: e.target.value })}
                         placeholder="https://yourportfolio.com"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none"
+                        className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:outline-none"
                       />
                     </div>
                   </>
@@ -286,7 +286,7 @@ export default function ProfilePage() {
                       setNotification(null)
                     }}
                     disabled={updateUserMutation.isPending}
-                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="px-4 py-2 border border-secondary-300 rounded-lg text-secondary-700 hover:bg-secondary-50 transition-colors"
                   >
                     Cancel
                   </button>
@@ -302,34 +302,34 @@ export default function ProfilePage() {
             ) : (
               <div className="space-y-4">
                 <div>
-                  <p className="text-sm text-gray-500">Email</p>
-                  <p className="text-gray-900">{profile.email}</p>
+                  <p className="text-sm text-secondary-500">Email</p>
+                  <p className="text-secondary-900">{profile.email}</p>
                 </div>
 
                 {profile.bio && (
                   <div>
-                    <p className="text-sm text-gray-500">Bio</p>
-                    <p className="text-gray-900">{profile.bio}</p>
+                    <p className="text-sm text-secondary-500">Bio</p>
+                    <p className="text-secondary-900">{profile.bio}</p>
                   </div>
                 )}
 
                 {profile.location && (
                   <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-900">{profile.location}</span>
+                    <MapPin className="w-4 h-4 text-secondary-400" />
+                    <span className="text-secondary-900">{profile.location}</span>
                   </div>
                 )}
 
                 {profile.role === 'FREELANCER' && profile.hourlyRate && (
                   <div>
-                    <p className="text-sm text-gray-500">Hourly Rate</p>
-                    <p className="text-gray-900 font-semibold">${profile.hourlyRate}/hour</p>
+                    <p className="text-sm text-secondary-500">Hourly Rate</p>
+                    <p className="text-secondary-900 font-semibold">${profile.hourlyRate}/hour</p>
                   </div>
                 )}
 
                 {profile.role === 'FREELANCER' && profile.portfolioUrl && (
                   <div>
-                    <p className="text-sm text-gray-500">Portfolio</p>
+                    <p className="text-sm text-secondary-500">Portfolio</p>
                     <a 
                       href={profile.portfolioUrl} 
                       target="_blank" 
@@ -344,9 +344,9 @@ export default function ProfilePage() {
 
                 {profile.role === 'FREELANCER' && typeof profile.ratingAvg !== 'undefined' && (
                   <div className="flex items-center gap-2">
-                    <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                    <span className="font-semibold text-gray-900">{profile.ratingAvg.toFixed(1)}</span>
-                    <span className="text-gray-500">({profile.ratingCount} reviews)</span>
+                    <Star className="w-5 h-5 text-warning-400 fill-current" />
+                    <span className="font-semibold text-secondary-900">{profile.ratingAvg.toFixed(1)}</span>
+                    <span className="text-secondary-500">({profile.ratingCount} reviews)</span>
                   </div>
                 )}
               </div>

@@ -83,21 +83,21 @@ const team = [
     role: 'Co-Founder & CTO',
     bio: 'Ex-staff engineer at Stripe and GitHub. Believes the best infrastructure is invisible — you should feel the platform working, not fight against it.',
     initials: 'MW',
-    color: 'bg-blue-100 text-blue-700',
+    color: 'bg-primary-100 text-primary-700',
   },
   {
     name: 'Priya Nakamura',
     role: 'Chief Design Officer',
     bio: 'Award-winning product designer with studios in Tokyo and London. Leads all platform UX and our internal design standards that set the benchmark for the industry.',
     initials: 'PN',
-    color: 'bg-purple-100 text-purple-700',
+    color: 'bg-primary-100 text-primary-700',
   },
   {
     name: 'James Okafor',
     role: 'Head of Community',
     bio: 'Coach, curator, and community builder. Previously ran the creative talent programme at Publicis Sapient. Deeply passionate about mentor-driven designer growth.',
     initials: 'JO',
-    color: 'bg-emerald-100 text-emerald-700',
+    color: 'bg-success-100 text-success-700',
   },
 ]
 
@@ -114,12 +114,12 @@ export default function AboutPage() {
   return (
     <PageLayout>
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden bg-gray-900 text-white">
+      <section className="relative overflow-hidden bg-secondary-900 text-white">
         {/* Subtle grid overlay */}
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
           <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-sm font-medium text-gray-300 mb-6 border border-white/10">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-sm font-medium text-secondary-300 mb-6 border border-white/10">
               <span className="w-2 h-2 rounded-full bg-primary-500 animate-pulse" />
               Our Story
             </span>
@@ -128,7 +128,7 @@ export default function AboutPage() {
               <span className="text-primary-400">design</span>{' '}
               as a profession.
             </h1>
-            <p className="text-xl text-gray-300 leading-relaxed mb-10 max-w-2xl">
+            <p className="text-xl text-secondary-300 leading-relaxed mb-10 max-w-2xl">
               Designer Marketplace was born from a simple belief: that exceptional design talent shouldn&rsquo;t be hidden behind outdated hiring processes. We built the platform we always wished existed.
             </p>
             <div className="flex flex-wrap gap-4">
@@ -164,10 +164,10 @@ export default function AboutPage() {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
               <span className="text-primary-600 text-sm font-semibold uppercase tracking-widest">Our Origin</span>
-              <h2 className="text-4xl font-bold text-gray-900 mt-3 mb-6 leading-tight">
+              <h2 className="text-4xl font-bold text-secondary-900 mt-3 mb-6 leading-tight">
                 Built by designers, <br />for the design community.
               </h2>
-              <div className="space-y-5 text-gray-600 leading-relaxed">
+              <div className="space-y-5 text-secondary-600 leading-relaxed">
                 <p>
                   In 2020, Alexandra Chen and Marcus Webb were on opposite sides of the same frustration. Alexandra, a veteran design lead, was spending more time filtering irrelevant proposals on generic freelance platforms than actually making things. Marcus, an engineer who loved working with creatives, kept watching brilliant designers undersell themselves and get underserved.
                 </p>
@@ -180,40 +180,40 @@ export default function AboutPage() {
               </div>
             </div>
             <div className="relative">
-              <div className="aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden flex items-center justify-center">
+              <div className="aspect-[4/3] bg-gradient-to-br from-secondary-100 to-secondary-200 rounded-2xl overflow-hidden flex items-center justify-center">
                 <div className="text-center p-12">
                   <div className="w-24 h-24 bg-primary-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
                     <svg className="w-12 h-12 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />
                     </svg>
                   </div>
-                  <p className="text-gray-500 text-sm italic leading-relaxed max-w-xs">&ldquo;We wanted to build a platform that treats design as the discipline it truly is — not a commodity, but a craft.&rdquo;</p>
-                  <p className="text-gray-700 font-semibold text-sm mt-4">— Alexandra Chen, CEO</p>
+                  <p className="text-secondary-500 text-sm italic leading-relaxed max-w-xs">&ldquo;We wanted to build a platform that treats design as the discipline it truly is — not a commodity, but a craft.&rdquo;</p>
+                  <p className="text-secondary-700 font-semibold text-sm mt-4">— Alexandra Chen, CEO</p>
                 </div>
               </div>
               <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-primary-50 rounded-2xl -z-10" />
-              <div className="absolute -top-4 -left-4 w-20 h-20 bg-gray-100 rounded-xl -z-10" />
+              <div className="absolute -top-4 -left-4 w-20 h-20 bg-secondary-100 rounded-xl -z-10" />
             </div>
           </div>
         </div>
       </section>
 
       {/* ── Values ── */}
-      <section className="bg-gray-50 py-20 lg:py-28">
+      <section className="bg-secondary-50 py-20 lg:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="text-primary-600 text-sm font-semibold uppercase tracking-widest">What We Stand For</span>
-            <h2 className="text-4xl font-bold text-gray-900 mt-3 mb-4">Principles we don&rsquo;t compromise on</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto text-lg">Every product decision, hiring choice, and policy we write is filtered through these six commitments.</p>
+            <h2 className="text-4xl font-bold text-secondary-900 mt-3 mb-4">Principles we don&rsquo;t compromise on</h2>
+            <p className="text-secondary-600 max-w-2xl mx-auto text-lg">Every product decision, hiring choice, and policy we write is filtered through these six commitments.</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {values.map((value) => (
-              <div key={value.title} className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-primary-200 hover:shadow-md transition-all duration-200 group">
+              <div key={value.title} className="bg-white rounded-2xl p-8 border border-secondary-200 hover:border-primary-200 hover:shadow-md transition-all duration-200 group">
                 <div className="w-12 h-12 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center mb-5 group-hover:bg-primary-100 transition-colors">
                   {value.icon}
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-3">{value.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{value.description}</p>
+                <h3 className="text-lg font-bold text-secondary-900 mb-3">{value.title}</h3>
+                <p className="text-secondary-600 leading-relaxed">{value.description}</p>
               </div>
             ))}
           </div>
@@ -225,10 +225,10 @@ export default function AboutPage() {
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="text-primary-600 text-sm font-semibold uppercase tracking-widest">Our Journey</span>
-            <h2 className="text-4xl font-bold text-gray-900 mt-3">Five years of building something worth using</h2>
+            <h2 className="text-4xl font-bold text-secondary-900 mt-3">Five years of building something worth using</h2>
           </div>
           <div className="relative">
-            <div className="absolute left-8 top-0 bottom-0 w-px bg-gray-200" />
+            <div className="absolute left-8 top-0 bottom-0 w-px bg-secondary-200" />
             <div className="space-y-10">
               {milestones.map((m) => (
                 <div key={m.year} className="flex gap-8 items-start">
@@ -238,7 +238,7 @@ export default function AboutPage() {
                     </div>
                   </div>
                   <div className="pt-3 pb-6">
-                    <p className="text-gray-700 leading-relaxed">{m.event}</p>
+                    <p className="text-secondary-700 leading-relaxed">{m.event}</p>
                   </div>
                 </div>
               ))}
@@ -248,22 +248,22 @@ export default function AboutPage() {
       </section>
 
       {/* ── Team ── */}
-      <section className="bg-gray-50 py-20 lg:py-28">
+      <section className="bg-secondary-50 py-20 lg:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="text-primary-600 text-sm font-semibold uppercase tracking-widest">The People</span>
-            <h2 className="text-4xl font-bold text-gray-900 mt-3 mb-4">Meet the leadership team</h2>
-            <p className="text-gray-600 max-w-xl mx-auto">A small team with big conviction that the creative economy deserves better infrastructure.</p>
+            <h2 className="text-4xl font-bold text-secondary-900 mt-3 mb-4">Meet the leadership team</h2>
+            <p className="text-secondary-600 max-w-xl mx-auto">A small team with big conviction that the creative economy deserves better infrastructure.</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {team.map((member) => (
-              <div key={member.name} className="bg-white rounded-2xl p-8 border border-gray-200 text-center hover:shadow-md transition-all duration-200">
+              <div key={member.name} className="bg-white rounded-2xl p-8 border border-secondary-200 text-center hover:shadow-md transition-all duration-200">
                 <div className={`w-16 h-16 rounded-full ${member.color} flex items-center justify-center mx-auto mb-5 text-xl font-bold`}>
                   {member.initials}
                 </div>
-                <h3 className="font-bold text-gray-900 mb-1">{member.name}</h3>
+                <h3 className="font-bold text-secondary-900 mb-1">{member.name}</h3>
                 <p className="text-primary-600 text-sm font-medium mb-4">{member.role}</p>
-                <p className="text-gray-500 text-sm leading-relaxed">{member.bio}</p>
+                <p className="text-secondary-500 text-sm leading-relaxed">{member.bio}</p>
               </div>
             ))}
           </div>
@@ -271,10 +271,10 @@ export default function AboutPage() {
       </section>
 
       {/* ── CTA ── */}
-      <section className="bg-gray-900 text-white py-20">
+      <section className="bg-secondary-900 text-white py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-4">Ready to be part of something meaningful?</h2>
-          <p className="text-gray-300 text-lg mb-10 max-w-xl mx-auto">
+          <p className="text-secondary-300 text-lg mb-10 max-w-xl mx-auto">
             Whether you&rsquo;re a designer looking for your next great project, or a company searching for exceptional creative talent — your place is here.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">

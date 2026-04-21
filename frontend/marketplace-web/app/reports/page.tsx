@@ -18,7 +18,7 @@ export default function ReportsPage() {
       .catch((e) => setError(String(e)));
   }, []);
 
-  if (error) return (<div className="p-8"><h2 className="text-xl font-semibold">Reports</h2><p className="text-red-600">Failed to load: {error}</p></div>);
+  if (error) return (<div className="p-8"><h2 className="text-xl font-semibold">Reports</h2><p className="text-error-600">Failed to load: {error}</p></div>);
   if (!data) return (<div className="p-8">Loading reports...</div>);
 
   return (
@@ -103,7 +103,7 @@ export default function ReportsPage() {
         <p>{data.sample_recent_job_applications}</p>
       </section>
 
-      <footer className="text-sm text-gray-500 mt-8">This page is public and static; to update the data, replace <code>/public/reports/summary.json</code> with a new JSON export.</footer>
+      <footer className="text-sm text-secondary-500 mt-8">This page is public and static; to update the data, replace <code>/public/reports/summary.json</code> with a new JSON export.</footer>
     </div>
   );
 }

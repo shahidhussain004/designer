@@ -50,12 +50,12 @@ public class AuthService {
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         // Check if email exists
-        if (userRepository.existsByEmail(request.getEmail())) {
+        if (userRepository.existsByEmailIgnoreCase(request.getEmail())) {
             throw new RuntimeException("Email already registered");
         }
 
         // Check if username exists
-        if (userRepository.existsByUsername(request.getUsername())) {
+        if (userRepository.existsByUsernameIgnoreCase(request.getUsername())) {
             throw new RuntimeException("Username already taken");
         }
 
@@ -131,7 +131,7 @@ public class AuthService {
         // ── Find existing user by OAuth identity or email ──────────────────────
         Optional<User> byOAuth = userRepository
                 .findByOauthProviderAndOauthProviderId(provider, info.providerId());
-        Optional<User> byEmail = userRepository.findByEmail(info.email());
+        Optional<User> byEmail = userRepository.findByEmailIgnoreCase(info.email());
 
         User user = byOAuth.or(() -> byEmail).orElse(null);
 
@@ -207,7 +207,7 @@ public class AuthService {
         if (base.length() < 3)  base = "user_" + base;
         if (base.length() > 20) base = base.substring(0, 20);
 
-        if (!userRepository.existsByUsername(base)) return base;
+        if (!userRepository.existsByUsernameIgnoreCase(base)) return base;
 
         String candidate;
         int attempts = 0;
@@ -215,7 +215,7 @@ public class AuthService {
             int suffix = 1000 + new SecureRandom().nextInt(9000);
             String trimmed = base.length() > 15 ? base.substring(0, 15) : base;
             candidate = trimmed + "_" + suffix;
-        } while (userRepository.existsByUsername(candidate) && ++attempts < 20);
+        } while (userRepository.existsByUsernameIgnoreCase(candidate) && ++attempts < 20);
 
         return candidate;
     }

@@ -71,8 +71,8 @@ export const usersApi = {
     const response = await api.get(`/api/admin/users/${id}`)
     return response.data
   },
-  create: async (payload: { email: string; fullName: string; role: string }) => {
-    const response = await api.post('/api/admin/users', payload)
+  create: async (payload: { email: string; username: string; password: string; fullName: string; role: string }) => {
+    const response = await api.post('/api/auth/register', payload)
     return response.data
   },
   update: async (id: number, payload: { email?: string; fullName?: string; role?: string }) => {

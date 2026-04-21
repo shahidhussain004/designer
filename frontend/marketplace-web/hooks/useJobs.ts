@@ -49,6 +49,7 @@ interface Job {
   applicationsCount?: number;
   isFeatured?: boolean;
   isUrgent?: boolean;
+  isOwner?: boolean;
   createdAt: string;
   updatedAt: string;
   publishedAt?: string;
@@ -161,14 +162,34 @@ export function useMyApplications() {
   return useQuery({
     queryKey: ['job-applications', 'my'],
     queryFn: async ({ signal }) => {
-      const { data } = await apiClient.get('/job-applications/my-applications', { signal });
-      // Extract content array from Spring Data Page response
-      if (data?.content && Array.isArray(data.content)) {
-        return data.content;
+      try {
+        const { data } = await apiClient.get('/job-applications/my-applications', { signal });
+        // Extract content array from Spring Data Page response
+        if (data?.content && Array.isArray(data.content)) {
+          return data.content;
+        }
+        return [];
+      } catch {
+        return [];
       }
-      return [];
     },
     staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+}
+
+/**
+ * Fetch current user's company profile
+ * Only useful for COMPANY role users
+ */
+export function useMyCompany() {
+  return useQuery({
+    queryKey: ['my-company'],
+    queryFn: async ({ signal }) => {
+      const { data } = await apiClient.get('/companies/me', { signal });
+      return data as { id: number; companyName: string; userId: number; [key: string]: unknown };
+    },
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    retry: false, // Don't retry if user isn't a company
   });
 }
 
@@ -185,7 +206,7 @@ export function useCreateJob() {
 
   return useMutation({
     mutationFn: async (input: CreateJobInput) => {
-      const { data } = await apiClient.post<Job>('/jobs', input);
+      const { data } = await apiClient.post<Job>('/companies/me/jobs', input);
       return data;
     },
     onSuccess: (newJob) => {
@@ -202,22 +223,24 @@ export function useCreateJob() {
 }
 
 /**
- * Update an existing job
+ * Update an existing job (company owner only)
  */
 export function useUpdateJob() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, input }: { id: string | number; input: UpdateJobInput }) => {
-      const { data } = await apiClient.patch<Job>(`/jobs/${id}`, input);
+    mutationFn: async ({ id, input }: { id: string | number; input: Partial<CreateJobInput> }) => {
+      const { data } = await apiClient.put<Job>(`/companies/me/jobs/${id}`, input);
       return data;
     },
     onSuccess: (updatedJob) => {
       // Update specific job in cache
       queryClient.setQueryData(['job', updatedJob.id], updatedJob);
+      queryClient.setQueryData(['job', String(updatedJob.id)], updatedJob);
       
       // Invalidate jobs list
       queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      queryClient.invalidateQueries({ queryKey: ['my-company-jobs'] });
     },
   });
 }
@@ -231,7 +254,7 @@ export function useDeleteJob() {
 
   return useMutation({
     mutationFn: async (id: string | number) => {
-      await apiClient.delete(`/jobs/${id}`);
+      await apiClient.delete(`/companies/me/jobs/${id}`);
       return id;
     },
     onSuccess: (deletedId) => {
@@ -242,7 +265,49 @@ export function useDeleteJob() {
       queryClient.invalidateQueries({ queryKey: ['jobs'] });
       
       // Navigate away
-      router.push('/jobs');
+      router.push('/dashboard/company');
+    },
+  });
+}
+
+/**
+ * Publish a job (change status from DRAFT to OPEN)
+ */
+export function usePublishJob() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string | number) => {
+      const { data } = await apiClient.post<Job>(`/companies/me/jobs/${id}/publish`);
+      return data;
+    },
+    onSuccess: (updatedJob) => {
+      // Update specific job in cache
+      queryClient.setQueryData(['job', updatedJob.id], updatedJob);
+      
+      // Invalidate jobs list
+      queryClient.invalidateQueries({ queryKey: ['jobs'] });
+    },
+  });
+}
+
+/**
+ * Close a job (change status from OPEN to CLOSED)
+ */
+export function useCloseJob() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string | number) => {
+      const { data } = await apiClient.post<Job>(`/companies/me/jobs/${id}/close`);
+      return data;
+    },
+    onSuccess: (updatedJob) => {
+      // Update specific job in cache
+      queryClient.setQueryData(['job', updatedJob.id], updatedJob);
+      
+      // Invalidate jobs list
+      queryClient.invalidateQueries({ queryKey: ['jobs'] });
     },
   });
 }

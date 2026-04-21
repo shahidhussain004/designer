@@ -153,22 +153,22 @@ export const Footer = React.forwardRef<HTMLElement, FooterProps>(
       return (
         <footer
           ref={ref}
-          className={`w-full bg-gray-900 py-6 ${className || ''}`}
+          className={`w-full bg-secondary-900 py-6 ${className || ''}`}
           {...props}
         >
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-secondary-400">
                 © {currentYear} Designer Marketplace. All rights reserved.
               </p>
               <div className="flex items-center gap-6">
-                <Link href="/privacy" className="text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href="/privacy" className="text-sm text-secondary-400 hover:text-white transition-colors">
                   Privacy
                 </Link>
-                <Link href="/terms" className="text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href="/terms" className="text-sm text-secondary-400 hover:text-white transition-colors">
                   Terms
                 </Link>
-                <Link href="/cookies" className="text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href="/cookies" className="text-sm text-secondary-400 hover:text-white transition-colors">
                   Cookies
                 </Link>
               </div>
@@ -181,7 +181,7 @@ export const Footer = React.forwardRef<HTMLElement, FooterProps>(
     return (
       <footer
         ref={ref}
-        className={`w-full bg-gray-900 ${className || ''}`}
+        className={`w-full bg-secondary-900 ${className || ''}`}
         {...props}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -195,7 +195,7 @@ export const Footer = React.forwardRef<HTMLElement, FooterProps>(
                 </div>
                 <span className="hidden sm:inline text-lg font-extralight text-white">Designer</span>
               </Link>
-              <p className="text-sm text-gray-400 mb-8 max-w-xs leading-relaxed">
+              <p className="text-sm text-secondary-400 mb-8 max-w-xs leading-relaxed">
                 The premier platform connecting talented designers and developers with innovative companies worldwide.
               </p>
               {/* Social links */}
@@ -206,7 +206,7 @@ export const Footer = React.forwardRef<HTMLElement, FooterProps>(
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-primary-500 transition-colors"
+                    className="text-secondary-400 hover:text-primary-500 transition-colors"
                     aria-label={social.name ?? 'social'}
                   >
                     {social.icon}
@@ -226,7 +226,7 @@ export const Footer = React.forwardRef<HTMLElement, FooterProps>(
                     <li key={link.href}>
                       <Link
                         href={link.href}
-                        className="text-sm text-gray-400 hover:text-primary-500 transition-colors"
+                        className="text-sm text-secondary-400 hover:text-primary-500 transition-colors"
                       >
                         {link.label}
                       </Link>
@@ -238,11 +238,11 @@ export const Footer = React.forwardRef<HTMLElement, FooterProps>(
           </div>
 
           {/* Newsletter signup */}
-          <div className="py-8 border-t border-gray-800">
+          <div className="py-8 border-t border-secondary-800">
             <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
               <div className="text-center lg:text-left">
                 <h3 className="text-lg font-semibold text-white mb-1">Stay up to date</h3>
-                <p className="text-sm text-gray-400">Get the latest jobs, tutorials, and platform updates.</p>
+                <p className="text-sm text-secondary-400">Get the latest jobs, tutorials, and platform updates.</p>
               </div>
               <div className="flex-1 max-w-md">
                 <form onSubmit={handleSubscribe} className="flex gap-3 w-full">
@@ -252,7 +252,7 @@ export const Footer = React.forwardRef<HTMLElement, FooterProps>(
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={loading}
-                    className="flex-1 px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:border-primary-500 disabled:opacity-50"
+                    className="flex-1 px-4 py-2.5 bg-secondary-800 border border-secondary-700 rounded-lg text-white placeholder-secondary-500 text-sm focus:outline-none focus:border-primary-500 disabled:opacity-50"
                   />
                   <button
                     type="submit"
@@ -263,7 +263,7 @@ export const Footer = React.forwardRef<HTMLElement, FooterProps>(
                   </button>
                 </form>
                 {message && (
-                  <p className={`mt-3 text-xs ${message.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+                  <p className={`mt-3 text-xs ${message.type === 'success' ? 'text-success-400' : 'text-error-400'}`}>
                     {message.text}
                   </p>
                 )}
@@ -272,25 +272,25 @@ export const Footer = React.forwardRef<HTMLElement, FooterProps>(
           </div>
 
           {/* Bottom bar */}
-          <div className="py-6 border-t border-gray-800">
+          <div className="py-6 border-t border-secondary-800">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-secondary-500">
                 © {currentYear} Designer Marketplace. All rights reserved.
               </p>
               <div className="flex flex-wrap justify-center gap-6">
-                <Link href="/privacy" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
+                <Link href="/privacy" className="text-sm text-secondary-500 hover:text-secondary-300 transition-colors">
                   Privacy Policy
                 </Link>
-                <Link href="/terms" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
+                <Link href="/terms" className="text-sm text-secondary-500 hover:text-secondary-300 transition-colors">
                   Terms of Service
                 </Link>
-                <Link href="/cookies" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
+                <Link href="/cookies" className="text-sm text-secondary-500 hover:text-secondary-300 transition-colors">
                   Cookie Policy
                 </Link>
-                <Link href="/accessibility" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
+                <Link href="/accessibility" className="text-sm text-secondary-500 hover:text-secondary-300 transition-colors">
                   Accessibility
                 </Link>
-                <Link href="/design-system" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
+                <Link href="/design-system" className="text-sm text-secondary-500 hover:text-secondary-300 transition-colors">
                   Design System
                 </Link>
               </div>

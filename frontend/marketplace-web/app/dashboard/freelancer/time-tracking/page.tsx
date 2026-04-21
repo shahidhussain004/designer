@@ -100,15 +100,15 @@ export default function TimeTrackingPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'APPROVED':
-        return 'bg-green-100 text-green-800';
+        return 'bg-success-100 text-success-800';
       case 'PAID':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-primary-100 text-blue-800';
       case 'PENDING':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-warning-100 text-warning-800';
       case 'REJECTED':
-        return 'bg-red-100 text-red-800';
+        return 'bg-error-100 text-error-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-secondary-100 text-secondary-800';
     }
   };
 
@@ -192,13 +192,13 @@ export default function TimeTrackingPage() {
 
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Time Tracking</h1>
-          <p className="text-gray-600 mt-2">Log and manage your work hours</p>
+          <h1 className="text-3xl font-bold text-secondary-900">Time Tracking</h1>
+          <p className="text-secondary-600 mt-2">Log and manage your work hours</p>
         </div>
         {contracts.length > 0 && (
           <button
             onClick={() => setShowForm(!showForm)}
-            className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+            className="flex items-center gap-2 bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition"
           >
             <Plus size={20} />
             Log Time
@@ -211,23 +211,11 @@ export default function TimeTrackingPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Total Hours Logged</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{totalHours.toFixed(1)}</p>
+              <p className="text-sm text-secondary-600">Total Hours Logged</p>
+              <p className="text-3xl font-bold text-secondary-900 mt-2">{totalHours.toFixed(1)}</p>
             </div>
-            <div className="bg-blue-100 p-3 rounded-full">
-              <Clock className="text-blue-600" size={24} />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Total Earnings (Paid)</p>
-              <p className="text-3xl font-bold text-green-600 mt-2">{formatAmount(totalEarnings)}</p>
-            </div>
-            <div className="bg-green-100 p-3 rounded-full">
-              <Check className="text-green-600" size={24} />
+            <div className="bg-primary-100 p-3 rounded-full">
+              <Clock className="text-primary-600" size={24} />
             </div>
           </div>
         </div>
@@ -235,11 +223,23 @@ export default function TimeTrackingPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Pending Payment</p>
-              <p className="text-3xl font-bold text-yellow-600 mt-2">{formatAmount(pendingAmount)}</p>
+              <p className="text-sm text-secondary-600">Total Earnings (Paid)</p>
+              <p className="text-3xl font-bold text-success-600 mt-2">{formatAmount(totalEarnings)}</p>
             </div>
-            <div className="bg-yellow-100 p-3 rounded-full">
-              <Clock className="text-yellow-600" size={24} />
+            <div className="bg-success-100 p-3 rounded-full">
+              <Check className="text-success-600" size={24} />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-secondary-600">Pending Payment</p>
+              <p className="text-3xl font-bold text-warning-600 mt-2">{formatAmount(pendingAmount)}</p>
+            </div>
+            <div className="bg-warning-100 p-3 rounded-full">
+              <Clock className="text-warning-600" size={24} />
             </div>
           </div>
         </div>
@@ -250,14 +250,14 @@ export default function TimeTrackingPage() {
           <h2 className="text-xl font-semibold mb-4">Log Work Hours</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-secondary-700 mb-2">
                 Select Contract *
               </label>
               <select
                 required
                 value={formData.contractId}
                 onChange={(e) => setFormData({ ...formData, contractId: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >
                 <option value="">Choose a contract...</option>
                 {contracts.map((contract) => (
@@ -269,7 +269,7 @@ export default function TimeTrackingPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-secondary-700 mb-2">
                 Work Description *
               </label>
               <textarea
@@ -277,14 +277,14 @@ export default function TimeTrackingPage() {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 placeholder="Describe what you worked on..."
               />
             </div>
 
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-secondary-700 mb-2">
                   Hours Worked *
                 </label>
                 <input
@@ -294,13 +294,13 @@ export default function TimeTrackingPage() {
                   required
                   value={formData.hoursWorked}
                   onChange={(e) => setFormData({ ...formData, hoursWorked: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="8.0"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-secondary-700 mb-2">
                   Rate per Hour ($) *
                 </label>
                 <input
@@ -310,13 +310,13 @@ export default function TimeTrackingPage() {
                   required
                   value={formData.ratePerHour}
                   onChange={(e) => setFormData({ ...formData, ratePerHour: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="50.00"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-secondary-700 mb-2">
                   Work Date *
                 </label>
                 <input
@@ -325,7 +325,7 @@ export default function TimeTrackingPage() {
                   value={formData.workDate}
                   max={new Date().toISOString().split('T')[0]}
                   onChange={(e) => setFormData({ ...formData, workDate: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -333,14 +333,14 @@ export default function TimeTrackingPage() {
             <div className="flex gap-3 pt-4">
               <button
                 type="submit"
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
+                className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition"
               >
                 Log Hours
               </button>
               <button
                 type="button"
                 onClick={resetForm}
-                className="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition"
+                className="bg-secondary-200 text-secondary-700 px-6 py-2 rounded-lg hover:bg-secondary-300 transition"
               >
                 Cancel
               </button>
@@ -351,9 +351,9 @@ export default function TimeTrackingPage() {
 
       {contracts.length === 0 && (
         <div className="bg-white rounded-lg shadow p-12 text-center">
-          <Clock size={48} className="mx-auto text-gray-400 mb-4" />
-          <p className="text-gray-600 mb-2">No active contracts</p>
-          <p className="text-sm text-gray-500">
+          <Clock size={48} className="mx-auto text-secondary-400 mb-4" />
+          <p className="text-secondary-600 mb-2">No active contracts</p>
+          <p className="text-sm text-secondary-500">
             You need an active contract to start logging time
           </p>
         </div>
@@ -361,11 +361,11 @@ export default function TimeTrackingPage() {
 
       {timeEntries.length === 0 && contracts.length > 0 ? (
         <div className="bg-white rounded-lg shadow p-12 text-center">
-          <Clock size={48} className="mx-auto text-gray-400 mb-4" />
-          <p className="text-gray-600 mb-4">No time entries logged yet</p>
+          <Clock size={48} className="mx-auto text-secondary-400 mb-4" />
+          <p className="text-secondary-600 mb-4">No time entries logged yet</p>
           <button
             onClick={() => setShowForm(true)}
-            className="text-blue-600 hover:text-blue-700 font-medium"
+            className="text-primary-600 hover:text-primary-700 font-medium"
           >
             Log your first hours
           </button>
@@ -378,10 +378,10 @@ export default function TimeTrackingPage() {
                 <div className="flex-1">
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                      <h3 className="text-lg font-semibold text-secondary-900 mb-1">
                         {entry.contract.title}
                       </h3>
-                      <p className="text-sm text-gray-600">{entry.description}</p>
+                      <p className="text-sm text-secondary-600">{entry.description}</p>
                     </div>
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${getStatusColor(
@@ -395,35 +395,35 @@ export default function TimeTrackingPage() {
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
-                      <p className="text-gray-500 mb-1">Hours</p>
-                      <p className="font-medium text-gray-900">{entry.hoursWorked}h</p>
+                      <p className="text-secondary-500 mb-1">Hours</p>
+                      <p className="font-medium text-secondary-900">{entry.hoursWorked}h</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 mb-1">Rate</p>
-                      <p className="font-medium text-gray-900">{formatAmount(entry.ratePerHour)}/h</p>
+                      <p className="text-secondary-500 mb-1">Rate</p>
+                      <p className="font-medium text-secondary-900">{formatAmount(entry.ratePerHour)}/h</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 mb-1">Total</p>
-                      <p className="font-medium text-gray-900">
+                      <p className="text-secondary-500 mb-1">Total</p>
+                      <p className="font-medium text-secondary-900">
                         {formatAmount(entry.hoursWorked * entry.ratePerHour)}
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-500 mb-1">Work Date</p>
-                      <p className="font-medium text-gray-900">{formatDate(entry.workDate)}</p>
+                      <p className="text-secondary-500 mb-1">Work Date</p>
+                      <p className="font-medium text-secondary-900">{formatDate(entry.workDate)}</p>
                     </div>
                   </div>
 
                   {entry.rejectionReason && (
-                    <div className="mt-3 p-3 bg-red-50 rounded-lg">
-                      <p className="text-sm text-red-800">
+                    <div className="mt-3 p-3 bg-error-50 rounded-lg">
+                      <p className="text-sm text-error-800">
                         <strong>Rejection Reason:</strong> {entry.rejectionReason}
                       </p>
                     </div>
                   )}
 
                   {entry.paidAt && (
-                    <div className="mt-3 text-sm text-gray-600">
+                    <div className="mt-3 text-sm text-secondary-600">
                       <Calendar size={14} className="inline mr-1" />
                       Paid on {formatDate(entry.paidAt)}
                     </div>

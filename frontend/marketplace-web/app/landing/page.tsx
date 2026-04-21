@@ -28,7 +28,7 @@ const TAGLINES = [
 function Particle({ delay, x, y }: { delay: number; x: number; y: number }) {
   return (
     <MotionSpan
-      className="absolute w-1 h-1 rounded-full bg-red-500"
+      className="absolute w-1 h-1 rounded-full bg-error-500"
       initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
       animate={{
         opacity: [0, 1, 0],
@@ -46,7 +46,7 @@ function Particle({ delay, x, y }: { delay: number; x: number; y: number }) {
 }
 
 // Animated word with glow and particle trail
-function MorphingWord({ word, color = "text-red-500" }: { word: string; color?: string }) {
+function MorphingWord({ word, color = "text-error-500" }: { word: string; color?: string }) {
   const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; delay: number }>>([])
 
   useEffect(() => {
@@ -64,7 +64,7 @@ function MorphingWord({ word, color = "text-red-500" }: { word: string; color?: 
     <span className="relative inline-block">
       {/* Glow effect behind text */}
       <MotionSpan
-        className="absolute inset-0 blur-xl bg-red-500/30 -z-10"
+        className="absolute inset-0 blur-xl bg-error-500/30 -z-10"
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: [0, 0.6, 0.3], scale: [0.8, 1.1, 1] }}
         transition={{ duration: 0.6 }}
@@ -153,12 +153,12 @@ const LandingPage = () => {
   return (
     <div className="bg-white">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-secondary-900 via-secondary-800 to-secondary-900 overflow-hidden">
         {/* Background video (covers hero) */}
         <VideoBackground />
         {/* Background pattern overlay for grain */}
         <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10 mix-blend-overlay" />
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-secondary-900/80 to-transparent" />
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -189,7 +189,7 @@ const LandingPage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.6 }}
-              className="text-xl text-gray-300 mb-8 max-w-xl"
+              className="text-xl text-secondary-300 mb-8 max-w-xl"
             >
                 Connect with world-class designers, developers, and creative professionals. 
                 Build your dream team or find your next opportunity.
@@ -233,7 +233,7 @@ const LandingPage = () => {
                   onClick={() => setActiveTab('talents')}
                   className={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-all ${
                     activeTab === 'talents'
-                      ? 'bg-white text-gray-900 shadow-lg'
+                      ? 'bg-white text-secondary-900 shadow-lg'
                       : 'bg-white/10 text-white hover:bg-white/20'
                   }`}
                 >Find Talent
@@ -242,7 +242,7 @@ const LandingPage = () => {
                   onClick={() => setActiveTab('jobs')}
                   className={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-all ${
                     activeTab === 'jobs'
-                      ? 'bg-white text-gray-900 shadow-lg'
+                      ? 'bg-white text-secondary-900 shadow-lg'
                       : 'bg-white/10 text-white hover:bg-white/20'
                   }`}
                 >Find Jobs
@@ -256,7 +256,7 @@ const LandingPage = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={activeTab === 'talents' ? 'Search for designers, developers...' : 'Search for job opportunities...'}
-                  className="flex-1 px-4 py-3 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-input-focus"
+                  className="flex-1 px-4 py-3 rounded-lg bg-white text-secondary-900 placeholder-secondary-500 focus:outline-none focus:ring-2 focus:ring-input-focus"
                 />
                 <button className="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-semibold transition-all shadow-lg">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -302,14 +302,14 @@ const LandingPage = () => {
       {/* Trusted By Section */}
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-gray-500 text-sm font-medium uppercase tracking-wide mb-8">
+          <p className="text-center text-secondary-500 text-sm font-medium uppercase tracking-wide mb-8">
             Trusted by leading companies worldwide
           </p>
           <div className="flex flex-wrap justify-center items-center gap-8 lg:gap-16">
             {trustedCompanies.map((company, idx) => (
               <div
                 key={idx}
-                className="text-2xl font-bold text-gray-300 hover:text-gray-500 transition-colors cursor-pointer"
+                className="text-2xl font-bold text-secondary-300 hover:text-secondary-500 transition-colors cursor-pointer"
               >
                 {company}
               </div>
@@ -329,8 +329,8 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-12">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Learn New Skills</h2>
-              <p className="text-gray-600">Master the latest technologies with expert-led courses</p>
+              <h2 className="text-3xl font-bold text-secondary-900 mb-2">Learn New Skills</h2>
+              <p className="text-secondary-600">Master the latest technologies with expert-led courses</p>
             </div>
             <Link href="/courses" className="hidden sm:inline-flex items-center text-primary-600 hover:text-primary-700 font-medium">
               View all courses
@@ -343,20 +343,20 @@ const LandingPage = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               { title: 'Master Modern UI Design', category: 'UI/UX Design', lessons: 12, duration: '4h 30m', color: 'bg-pink-500', emoji: '🎨' },
-              { title: 'React & Next.js Fundamentals', category: 'Web Development', lessons: 20, duration: '8h 15m', color: 'bg-blue-500', emoji: '💻' },
-              { title: 'Build iOS & Android Apps', category: 'Mobile Development', lessons: 18, duration: '7h 45m', color: 'bg-green-500', emoji: '📱' },
+              { title: 'React & Next.js Fundamentals', category: 'Web Development', lessons: 20, duration: '8h 15m', color: 'bg-primary-500', emoji: '💻' },
+              { title: 'Build iOS & Android Apps', category: 'Mobile Development', lessons: 18, duration: '7h 45m', color: 'bg-success-500', emoji: '📱' },
             ].map((course, idx) => (
               <Link key={idx} href="/courses" className="group">
-                <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all hover:border-primary-200">
+                <div className="bg-white rounded-xl border border-secondary-200 overflow-hidden hover:shadow-lg transition-all hover:border-primary-200">
                   <div className={`${course.color} h-40 flex items-center justify-center text-5xl`}>
                     {course.emoji}
                   </div>
                   <div className="p-6">
                     <span className="text-primary-600 text-sm font-medium">{course.category}</span>
-                    <h3 className="text-lg font-semibold text-gray-900 mt-1 group-hover:text-primary-600 transition-colors">
+                    <h3 className="text-lg font-semibold text-secondary-900 mt-1 group-hover:text-primary-600 transition-colors">
                       {course.title}
                     </h3>
-                    <p className="text-gray-500 text-sm mt-2">
+                    <p className="text-secondary-500 text-sm mt-2">
                       {course.lessons} lessons • {course.duration}
                     </p>
                   </div>
@@ -377,14 +377,14 @@ const LandingPage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gray-900">
+      <section className="py-20 bg-secondary-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">
                 Ready to Start Your Journey?
               </h2>
-              <p className="text-xl text-gray-300 mb-8">
+              <p className="text-xl text-secondary-300 mb-8">
                 Join thousands of creative professionals and companies building the future together.
               </p>
               <ul className="space-y-4 mb-8">
@@ -394,7 +394,7 @@ const LandingPage = () => {
                   'Dedicated support when you need it',
                   'No hidden fees or commissions',
                 ].map((benefit, idx) => (
-                  <li key={idx} className="flex items-center text-gray-300">
+                  <li key={idx} className="flex items-center text-secondary-300">
                     <svg className="w-5 h-5 text-primary-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>

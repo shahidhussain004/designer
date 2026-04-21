@@ -18,6 +18,9 @@ export interface DashboardStats {
   completedProjects?: number;
   totalEarnings?: number;
   avgRating?: number;
+  activeContracts?: number;
+  jobsApplied?: number;
+  averageRating?: number;
 }
 
 export interface JobSummary {

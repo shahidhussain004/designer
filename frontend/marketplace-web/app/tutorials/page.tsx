@@ -27,11 +27,11 @@ const TutorialsPage = () => {
     const baseClasses = 'px-3 py-1 rounded-full text-sm font-medium';
     switch (level) {
       case 'beginner':
-        return `${baseClasses} bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300`;
+        return `${baseClasses} bg-success-100 text-success-700 dark:bg-success-900 dark:text-success-300`;
       case 'intermediate':
-        return `${baseClasses} bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300`;
+        return `${baseClasses} bg-warning-100 text-warning-700 dark:bg-warning-900 dark:text-warning-300`;
       case 'advanced':
-        return `${baseClasses} bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300`;
+        return `${baseClasses} bg-error-100 text-error-700 dark:bg-error-900 dark:text-error-300`;
       default:
         return baseClasses;
     }
@@ -59,33 +59,33 @@ const TutorialsPage = () => {
   return (
     <PageLayout>
       {/* Hero Section */}
-      <div className="bg-gray-900 text-white py-16 px-4">
+      <div className="bg-secondary-900 text-white py-16 px-4">
         <div className="container mx-auto max-w-6xl">
           <h1 className="text-5xl font-bold mb-4">Master Programming Skills</h1>
-          <p className="text-xl text-gray-200 mb-8">
+          <p className="text-xl text-secondary-200 mb-8">
             Learn at your own pace with interactive tutorials, audio guides, and video lessons
           </p>
           
           {/* Three Modes of Learning */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            <div className="bg-gray-800/50 backdrop-blur-md rounded-lg p-6 border border-gray-700">
+            <div className="bg-secondary-800/50 backdrop-blur-md rounded-lg p-6 border border-secondary-700">
               <BookOpen className="w-10 h-10 mb-3" />
               <h3 className="text-lg font-semibold mb-2">Read</h3>
-              <p className="text-gray-200 text-sm">
+              <p className="text-secondary-200 text-sm">
                 Comprehensive text tutorials with code examples
               </p>
             </div>
-            <div className="bg-gray-800/50 backdrop-blur-md rounded-lg p-6 border border-gray-700">
+            <div className="bg-secondary-800/50 backdrop-blur-md rounded-lg p-6 border border-secondary-700">
               <Headphones className="w-10 h-10 mb-3" />
               <h3 className="text-lg font-semibold mb-2">Listen</h3>
-              <p className="text-gray-200 text-sm">
+              <p className="text-secondary-200 text-sm">
                 AI-generated audio guides for hands-free learning
               </p>
             </div>
-            <div className="bg-gray-800/50 backdrop-blur-md rounded-lg p-6 border border-gray-700">
+            <div className="bg-secondary-800/50 backdrop-blur-md rounded-lg p-6 border border-secondary-700">
               <Video className="w-10 h-10 mb-3" />
               <h3 className="text-lg font-semibold mb-2">Watch</h3>
-              <p className="text-gray-200 text-sm">
+              <p className="text-secondary-200 text-sm">
                 AI-powered video tutorials with visual demonstrations
               </p>
             </div>
@@ -100,8 +100,8 @@ const TutorialsPage = () => {
             onClick={() => setDifficultyFilter('all')}
             className={`px-6 py-2 rounded-full font-medium transition-colors ${
               difficultyFilter === 'all'
-                ? 'bg-gray-800 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                ? 'bg-secondary-800 text-white'
+                : 'bg-secondary-200 text-secondary-700 hover:bg-secondary-300 dark:bg-secondary-700 dark:text-secondary-300 dark:hover:bg-secondary-600'
             }`}
           >
             All Tutorials
@@ -110,8 +110,8 @@ const TutorialsPage = () => {
             onClick={() => setDifficultyFilter('beginner')}
             className={`px-6 py-2 rounded-full font-medium transition-colors ${
               difficultyFilter === 'beginner'
-                ? 'bg-green-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                ? 'bg-success-600 text-white'
+                : 'bg-secondary-200 text-secondary-700 hover:bg-secondary-300 dark:bg-secondary-700 dark:text-secondary-300 dark:hover:bg-secondary-600'
             }`}
           >
             Beginner
@@ -120,8 +120,8 @@ const TutorialsPage = () => {
             onClick={() => setDifficultyFilter('intermediate')}
             className={`px-6 py-2 rounded-full font-medium transition-colors ${
               difficultyFilter === 'intermediate'
-                ? 'bg-yellow-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                ? 'bg-warning-600 text-white'
+                : 'bg-secondary-200 text-secondary-700 hover:bg-secondary-300 dark:bg-secondary-700 dark:text-secondary-300 dark:hover:bg-secondary-600'
             }`}
           >
             Intermediate
@@ -130,8 +130,8 @@ const TutorialsPage = () => {
             onClick={() => setDifficultyFilter('advanced')}
             className={`px-6 py-2 rounded-full font-medium transition-colors ${
               difficultyFilter === 'advanced'
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                ? 'bg-error-600 text-white'
+                : 'bg-secondary-200 text-secondary-700 hover:bg-secondary-300 dark:bg-secondary-700 dark:text-secondary-300 dark:hover:bg-secondary-600'
             }`}
           >
             Advanced
@@ -143,14 +143,14 @@ const TutorialsPage = () => {
           {filteredTutorials.map((tutorial: any) => (
             <div
               key={tutorial.id}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-shadow overflow-hidden border border-gray-200 dark:border-gray-700"
+              className="bg-white dark:bg-secondary-800 rounded-xl shadow-lg hover:shadow-xl transition-shadow overflow-hidden border border-secondary-200 dark:border-secondary-700"
             >
               <div className="p-6">
                 {/* Icon and Title */}
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <span className="text-4xl mb-3 block">{tutorial.icon || '📘'}</span>
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                    <h3 className="text-2xl font-bold text-secondary-900 dark:text-white mb-2">
                       {tutorial.title}
                     </h3>
                   </div>
@@ -160,12 +160,12 @@ const TutorialsPage = () => {
                 </div>
 
                 {/* Description */}
-                <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
+                <p className="text-secondary-600 dark:text-secondary-300 mb-4 line-clamp-2">
                   {tutorial.description}
                 </p>
 
                 {/* Stats */}
-                <div className="flex items-center gap-4 mb-6 text-sm text-gray-500 dark:text-gray-400">
+                <div className="flex items-center gap-4 mb-6 text-sm text-secondary-500 dark:text-secondary-400">
                   <div className="flex items-center gap-1">
                     <BookOpen className="w-4 h-4" />
                     <span>{tutorial.sections_count} sections</span>
@@ -186,7 +186,7 @@ const TutorialsPage = () => {
                 <div className="flex gap-2">
                   <Link
                     href={`/tutorials/${tutorial.slug}`}
-                    className="flex-1 bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium text-center transition-colors"
+                    className="flex-1 bg-secondary-800 hover:bg-secondary-700 text-white px-4 py-2 rounded-lg font-medium text-center transition-colors"
                   >
                     Start Learning
                   </Link>
@@ -199,11 +199,11 @@ const TutorialsPage = () => {
         {/* Empty State */}
         {filteredTutorials.length === 0 && (
           <div className="text-center py-16">
-            <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            <BookOpen className="w-16 h-16 text-secondary-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-secondary-700 dark:text-secondary-300 mb-2">
               No tutorials found
             </h3>
-            <p className="text-gray-500 dark:text-gray-400">
+            <p className="text-secondary-500 dark:text-secondary-400">
               Try adjusting your filters or check back later for new content.
             </p>
           </div>

@@ -82,7 +82,7 @@ const openRoles = [
     description: 'Drive technical direction for our Next.js platform. Work on complex UI challenges, define our component architecture, and raise the bar for what "polished" means to the engineering team.',
     tags: ['TypeScript', 'React', 'Next.js', 'Performance'],
     badge: 'Urgent',
-    badgeColor: 'bg-amber-100 text-amber-700',
+    badgeColor: 'bg-warning-100 text-warning-700',
   },
   {
     title: 'Senior Backend Engineer — Matching & Recommendations',
@@ -137,11 +137,11 @@ export default function CareersPage() {
   return (
     <PageLayout>
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden bg-gray-900 text-white">
+      <section className="relative overflow-hidden bg-secondary-900 text-white">
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
           <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-sm font-medium text-gray-300 mb-6 border border-white/10">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-sm font-medium text-secondary-300 mb-6 border border-white/10">
               <span className="w-2 h-2 rounded-full bg-primary-500 animate-pulse" />
               We&rsquo;re Hiring
             </span>
@@ -149,7 +149,7 @@ export default function CareersPage() {
               Work on something <br />
               <span className="text-primary-400">worth caring about.</span>
             </h1>
-            <p className="text-xl text-gray-300 leading-relaxed mb-10 max-w-2xl">
+            <p className="text-xl text-secondary-300 leading-relaxed mb-10 max-w-2xl">
               We&rsquo;re a small team with an outsized mission: to make the creative economy work for everyone who shapes it. If you care deeply about craft and want to build tools that matter, we&rsquo;d like to meet you.
             </p>
             <div className="flex gap-3">
@@ -182,10 +182,10 @@ export default function CareersPage() {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
               <span className="text-primary-600 text-sm font-semibold uppercase tracking-widest">Why Us</span>
-              <h2 className="text-4xl font-bold text-gray-900 mt-3 mb-6 leading-tight">
+              <h2 className="text-4xl font-bold text-secondary-900 mt-3 mb-6 leading-tight">
                 We take how we work as seriously as what we build.
               </h2>
-              <div className="space-y-5 text-gray-600 leading-relaxed">
+              <div className="space-y-5 text-secondary-600 leading-relaxed">
                 <p>
                   Designer Marketplace is design-led in every sense. Our product is used by some of the world&rsquo;s most demanding creative professionals — which means we hold ourselves to the same standard. The bar for craft here is high, and that&rsquo;s exactly why the right people love working here.
                 </p>
@@ -199,10 +199,10 @@ export default function CareersPage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               {principles.map((p) => (
-                <div key={p.label} className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                <div key={p.label} className="bg-secondary-50 rounded-xl p-5 border border-secondary-200">
                   <div className="w-2 h-2 rounded-full bg-primary-500 mb-3" />
-                  <h3 className="font-bold text-gray-900 text-sm mb-2">{p.label}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed">{p.detail}</p>
+                  <h3 className="font-bold text-secondary-900 text-sm mb-2">{p.label}</h3>
+                  <p className="text-secondary-500 text-sm leading-relaxed">{p.detail}</p>
                 </div>
               ))}
             </div>
@@ -211,21 +211,21 @@ export default function CareersPage() {
       </section>
 
       {/* ── Perks ── */}
-      <section className="bg-gray-50 py-20 lg:py-28">
+      <section className="bg-secondary-50 py-20 lg:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="text-primary-600 text-sm font-semibold uppercase tracking-widest">Perks & Benefits</span>
-            <h2 className="text-4xl font-bold text-gray-900 mt-3 mb-4">We invest in our people</h2>
-            <p className="text-gray-600 max-w-xl mx-auto">These aren&rsquo;t perks as afterthoughts. They&rsquo;re an acknowledgement that great work requires whole humans.</p>
+            <h2 className="text-4xl font-bold text-secondary-900 mt-3 mb-4">We invest in our people</h2>
+            <p className="text-secondary-600 max-w-xl mx-auto">These aren&rsquo;t perks as afterthoughts. They&rsquo;re an acknowledgement that great work requires whole humans.</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {perks.map((perk) => (
-              <div key={perk.title} className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-primary-200 hover:shadow-sm transition-all duration-200 group">
+              <div key={perk.title} className="bg-white rounded-2xl p-8 border border-secondary-200 hover:border-primary-200 hover:shadow-sm transition-all duration-200 group">
                 <div className="w-12 h-12 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center mb-5 group-hover:bg-primary-100 transition-colors">
                   {perk.icon}
                 </div>
-                <h3 className="text-base font-bold text-gray-900 mb-2">{perk.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{perk.description}</p>
+                <h3 className="text-base font-bold text-secondary-900 mb-2">{perk.title}</h3>
+                <p className="text-secondary-500 text-sm leading-relaxed">{perk.description}</p>
               </div>
             ))}
           </div>
@@ -238,30 +238,30 @@ export default function CareersPage() {
           <div className="flex items-center justify-between mb-12 flex-wrap gap-4">
             <div>
               <span className="text-primary-600 text-sm font-semibold uppercase tracking-widest">Open Positions</span>
-              <h2 className="text-4xl font-bold text-gray-900 mt-2">
+              <h2 className="text-4xl font-bold text-secondary-900 mt-2">
                 {openRoles.length} roles we&rsquo;re hiring for right now
               </h2>
             </div>
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-full border border-green-200">
-              <span className="w-2 h-2 rounded-full bg-green-500" />
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-success-50 text-success-700 text-sm font-medium rounded-full border border-success-200">
+              <span className="w-2 h-2 rounded-full bg-success-500" />
               Actively interviewing
             </span>
           </div>
 
           <div className="space-y-4">
             {openRoles.map((role) => (
-              <div key={role.title} className="bg-gray-50 rounded-2xl border border-gray-200 p-6 hover:border-primary-200 hover:bg-white hover:shadow-sm transition-all duration-200">
+              <div key={role.title} className="bg-secondary-50 rounded-2xl border border-secondary-200 p-6 hover:border-primary-200 hover:bg-white hover:shadow-sm transition-all duration-200">
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-2 flex-wrap">
-                      <h3 className="font-bold text-gray-900 text-lg">{role.title}</h3>
+                      <h3 className="font-bold text-secondary-900 text-lg">{role.title}</h3>
                       {role.badge && (
                         <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${role.badgeColor}`}>
                           {role.badge}
                         </span>
                       )}
                     </div>
-                    <div className="flex flex-wrap gap-3 text-sm text-gray-500 mb-4">
+                    <div className="flex flex-wrap gap-3 text-sm text-secondary-500 mb-4">
                       <span className="flex items-center gap-1">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>
                         {role.team}
@@ -275,17 +275,17 @@ export default function CareersPage() {
                         {role.type}
                       </span>
                     </div>
-                    <p className="text-gray-600 text-sm leading-relaxed mb-4">{role.description}</p>
+                    <p className="text-secondary-600 text-sm leading-relaxed mb-4">{role.description}</p>
                     <div className="flex flex-wrap gap-2">
                       {role.tags.map((tag) => (
-                        <span key={tag} className="text-xs px-2.5 py-1 bg-gray-200 text-gray-600 rounded-full">{tag}</span>
+                        <span key={tag} className="text-xs px-2.5 py-1 bg-secondary-200 text-secondary-600 rounded-full">{tag}</span>
                       ))}
                     </div>
                   </div>
                   <div className="flex-shrink-0">
                     <Link
                       href={`/careers/apply?role=${encodeURIComponent(role.title)}`}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 hover:bg-primary-600 text-white text-sm font-semibold rounded-lg transition-colors"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-secondary-900 hover:bg-primary-600 text-white text-sm font-semibold rounded-lg transition-colors"
                     >
                       Apply
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
@@ -296,10 +296,10 @@ export default function CareersPage() {
             ))}
           </div>
 
-          <div className="mt-12 bg-gray-50 rounded-2xl border border-dashed border-gray-300 p-8 text-center">
-            <h3 className="font-bold text-gray-900 mb-2">Don&rsquo;t see a role that fits?</h3>
-            <p className="text-gray-500 mb-5 max-w-md mx-auto text-sm leading-relaxed">We keep a running list of exceptional people for roles we haven&rsquo;t posted yet. Send us a speculative application and tell us what you&rsquo;d build.</p>
-            <Link href="mailto:careers@designermarket.io" className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 hover:bg-primary-600 text-white text-sm font-semibold rounded-lg transition-colors">
+          <div className="mt-12 bg-secondary-50 rounded-2xl border border-dashed border-secondary-300 p-8 text-center">
+            <h3 className="font-bold text-secondary-900 mb-2">Don&rsquo;t see a role that fits?</h3>
+            <p className="text-secondary-500 mb-5 max-w-md mx-auto text-sm leading-relaxed">We keep a running list of exceptional people for roles we haven&rsquo;t posted yet. Send us a speculative application and tell us what you&rsquo;d build.</p>
+            <Link href="mailto:careers@designermarket.io" className="inline-flex items-center gap-2 px-6 py-3 bg-secondary-900 hover:bg-primary-600 text-white text-sm font-semibold rounded-lg transition-colors">
               Send Speculative Application
             </Link>
           </div>
@@ -307,12 +307,12 @@ export default function CareersPage() {
       </section>
 
       {/* ── Process ── */}
-      <section className="bg-gray-50 py-16 lg:py-20">
+      <section className="bg-secondary-50 py-16 lg:py-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <span className="text-primary-600 text-sm font-semibold uppercase tracking-widest">Our Process</span>
-            <h2 className="text-4xl font-bold text-gray-900 mt-3 mb-4">Transparent. Fast. Human.</h2>
-            <p className="text-gray-600 max-w-xl mx-auto">We respect your time. Our process is designed to be thorough without being exhausting.</p>
+            <h2 className="text-4xl font-bold text-secondary-900 mt-3 mb-4">Transparent. Fast. Human.</h2>
+            <p className="text-secondary-600 max-w-xl mx-auto">We respect your time. Our process is designed to be thorough without being exhausting.</p>
           </div>
           <div className="grid md:grid-cols-4 gap-8">
             {[
@@ -325,9 +325,9 @@ export default function CareersPage() {
                 <div className="w-12 h-12 rounded-full bg-primary-100 text-primary-700 font-bold flex items-center justify-center mx-auto mb-4 text-sm">
                   {s.step}
                 </div>
-                <h3 className="font-bold text-gray-900 mb-1 text-sm">{s.title}</h3>
+                <h3 className="font-bold text-secondary-900 mb-1 text-sm">{s.title}</h3>
                 <p className="text-primary-600 text-xs font-medium mb-2">{s.time}</p>
-                <p className="text-gray-500 text-xs leading-relaxed">{s.detail}</p>
+                <p className="text-secondary-500 text-xs leading-relaxed">{s.detail}</p>
               </div>
             ))}
           </div>

@@ -74,9 +74,15 @@ public class JobApplicationService {
         log.info("Getting applications for user: {}", currentUser.getUsername());
 
         // Get the freelancer profile for the current user
-        Freelancer freelancer = freelancerRepository.findByUserId(currentUser.getId())
-                .orElseThrow(() -> new RuntimeException("Freelancer profile not found for user: " + currentUser.getUsername()));
+        var freelancerOptional = freelancerRepository.findByUserId(currentUser.getId());
+        
+        // If user is not a freelancer (e.g., COMPANY user), return empty page
+        if (freelancerOptional.isEmpty()) {
+            log.debug("User {} is not a freelancer, returning empty applications page", currentUser.getUsername());
+            return Page.empty(pageable);
+        }
 
+        Freelancer freelancer = freelancerOptional.get();
         // Query applications by freelancer ID (applicant)
         Page<JobApplication> applications = applicationRepository.findByApplicantId(freelancer.getId(), pageable);
         return applications.map(JobApplicationResponse::fromEntity);

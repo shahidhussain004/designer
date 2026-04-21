@@ -33,17 +33,17 @@ export default function ContractsPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'ACTIVE':
-        return 'bg-green-100 text-green-800';
+        return 'bg-success-100 text-success-800';
       case 'COMPLETED':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-primary-100 text-blue-800';
       case 'PENDING':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-warning-100 text-warning-800';
       case 'CANCELLED':
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-secondary-100 text-secondary-800';
       case 'DISPUTED':
-        return 'bg-red-100 text-red-800';
+        return 'bg-error-100 text-error-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-secondary-100 text-secondary-800';
     }
   };
 
@@ -127,8 +127,8 @@ export default function ContractsPage() {
       </div>
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">My Contracts</h1>
-        <p className="text-gray-600 mt-2">Manage all your project contracts</p>
+        <h1 className="text-3xl font-bold text-secondary-900">My Contracts</h1>
+        <p className="text-secondary-600 mt-2">Manage all your project contracts</p>
       </div>
 
       {/* Stats Cards */}
@@ -136,23 +136,11 @@ export default function ContractsPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Active Contracts</p>
-              <p className="text-3xl font-bold text-green-600 mt-2">{contractStats.active}</p>
+              <p className="text-sm text-secondary-600">Active Contracts</p>
+              <p className="text-3xl font-bold text-success-600 mt-2">{contractStats.active}</p>
             </div>
-            <div className="bg-green-100 p-3 rounded-full">
-              <FileText className="text-green-600" size={24} />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Completed</p>
-              <p className="text-3xl font-bold text-blue-600 mt-2">{contractStats.completed}</p>
-            </div>
-            <div className="bg-blue-100 p-3 rounded-full">
-              <CheckCircle className="text-blue-600" size={24} />
+            <div className="bg-success-100 p-3 rounded-full">
+              <FileText className="text-success-600" size={24} />
             </div>
           </div>
         </div>
@@ -160,13 +148,25 @@ export default function ContractsPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Total Earned</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
+              <p className="text-sm text-secondary-600">Completed</p>
+              <p className="text-3xl font-bold text-primary-600 mt-2">{contractStats.completed}</p>
+            </div>
+            <div className="bg-primary-100 p-3 rounded-full">
+              <CheckCircle className="text-primary-600" size={24} />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-secondary-600">Total Earned</p>
+              <p className="text-3xl font-bold text-secondary-900 mt-2">
                 {formatAmount(contractStats.totalEarned)}
               </p>
             </div>
-            <div className="bg-purple-100 p-3 rounded-full">
-              <DollarSign className="text-purple-600" size={24} />
+            <div className="bg-primary-100 p-3 rounded-full">
+              <DollarSign className="text-primary-600" size={24} />
             </div>
           </div>
         </div>
@@ -181,8 +181,8 @@ export default function ContractsPage() {
               onClick={() => setFilterStatus(status)}
               className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition ${
                 filterStatus === status
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-secondary-100 text-secondary-700 hover:bg-secondary-200'
               }`}
             >
               {status}
@@ -194,9 +194,9 @@ export default function ContractsPage() {
       {/* Contracts List */}
       {filteredContracts.length === 0 ? (
         <div className="bg-white rounded-lg shadow p-12 text-center">
-          <FileText size={48} className="mx-auto text-gray-400 mb-4" />
-          <p className="text-gray-600 mb-2">No contracts found</p>
-          <p className="text-sm text-gray-500">
+          <FileText size={48} className="mx-auto text-secondary-400 mb-4" />
+          <p className="text-secondary-600 mb-2">No contracts found</p>
+          <p className="text-sm text-secondary-500">
             {filterStatus !== 'ALL'
               ? 'Try changing the filter'
               : 'Your contracts will appear here once you start working'}
@@ -210,10 +210,10 @@ export default function ContractsPage() {
                 <div className="flex-1">
                   <div className="flex items-start gap-3 mb-3">
                     <div className="flex-1">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-1">
+                      <h3 className="text-xl font-semibold text-secondary-900 mb-1">
                         {contract.title}
                       </h3>
-                      <p className="text-sm text-gray-600">Job: {contract.job?.title ?? '—'}</p>
+                      <p className="text-sm text-secondary-600">Job: {contract.job?.title ?? '—'}</p>
                     </div>
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${getStatusColor(
@@ -225,36 +225,36 @@ export default function ContractsPage() {
                     </span>
                   </div>
 
-                  <p className="text-gray-600 mb-4">{contract.description}</p>
+                  <p className="text-secondary-600 mb-4">{contract.description}</p>
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                     <div>
-                      <p className="text-xs text-gray-500 mb-1">Type</p>
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-xs text-secondary-500 mb-1">Type</p>
+                      <p className="text-sm font-medium text-secondary-900">
                         {contract.contractType?.replace('_', ' ') ?? '—'}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 mb-1">Amount</p>
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-xs text-secondary-500 mb-1">Amount</p>
+                      <p className="text-sm font-medium text-secondary-900">
                         {formatAmount(contract.totalAmount ?? 0)}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 mb-1">Payment</p>
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-xs text-secondary-500 mb-1">Payment</p>
+                      <p className="text-sm font-medium text-secondary-900">
                         {contract.paymentSchedule?.replace('_', ' ') ?? '—'}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 mb-1">Start Date</p>
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-xs text-secondary-500 mb-1">Start Date</p>
+                      <p className="text-sm font-medium text-secondary-900">
                         {formatDate(contract.startDate)}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
+                  <div className="flex items-center gap-4 text-sm text-secondary-600">
                     <div className="flex items-center gap-1">
                       <Users size={16} />
                       <span>Company: {contract.company?.fullName ?? '—'}</span>
@@ -271,7 +271,7 @@ export default function ContractsPage() {
                   <div className="flex md:flex-col gap-2">
                     <button
                       onClick={() => (window.location.href = `/dashboard/contracts/${contract.id}`)}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm"
+                      className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition text-sm"
                     >
                       View Details
                     </button>
@@ -279,13 +279,13 @@ export default function ContractsPage() {
                       <>
                         <button
                           onClick={() => (window.location.href = `/dashboard/freelancer/time-tracking?contractId=${contract.id}`)}
-                          className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm"
+                          className="px-4 py-2 bg-secondary-100 text-secondary-700 rounded-lg hover:bg-secondary-200 transition text-sm"
                         >
                           Log Time
                         </button>
                         <button
                           onClick={() => (window.location.href = `/dashboard/freelancer/time-tracking?contractId=${contract.id}`)}
-                          className="px-4 py-2 bg-white border border-gray-200 text-gray-800 rounded-lg hover:bg-gray-50 transition text-sm"
+                          className="px-4 py-2 bg-white border border-secondary-200 text-secondary-800 rounded-lg hover:bg-secondary-50 transition text-sm"
                         >
                           View Time Tracking
                         </button>

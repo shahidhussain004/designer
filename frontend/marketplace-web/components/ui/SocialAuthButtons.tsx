@@ -205,12 +205,12 @@ export function SocialAuthButtons({ mode = 'login' }: SocialAuthButtonsProps) {
             </div>
           )}
           {pending.info.fullName && (
-            <p className="font-semibold text-gray-900">{pending.info.fullName}</p>
+            <p className="font-semibold text-secondary-900">{pending.info.fullName}</p>
           )}
-          <p className="text-sm text-gray-500">{pending.info.email}</p>
+          <p className="text-sm text-secondary-500">{pending.info.email}</p>
         </div>
 
-        <p className="text-sm font-medium text-gray-700 text-center">
+        <p className="text-sm font-medium text-secondary-700 text-center">
           Almost there! How will you use the platform?
         </p>
 
@@ -227,7 +227,7 @@ export function SocialAuthButtons({ mode = 'login' }: SocialAuthButtonsProps) {
               className={`flex items-center p-4 border rounded-lg cursor-pointer transition-colors ${
                 selectedRole === value
                   ? 'border-primary-500 bg-primary-50'
-                  : 'border-gray-300 hover:border-gray-400'
+                  : 'border-secondary-300 hover:border-secondary-400'
               }`}
             >
               <input
@@ -236,18 +236,18 @@ export function SocialAuthButtons({ mode = 'login' }: SocialAuthButtonsProps) {
                 value={value}
                 checked={selectedRole === value}
                 onChange={() => setSelectedRole(value)}
-                className="w-4 h-4 text-primary-600 border-gray-300 focus:ring-input-focus"
+                className="w-4 h-4 text-primary-600 border-secondary-300 focus:ring-input-focus"
               />
               <div className="ml-3">
-                <p className="font-medium text-gray-900">{title}</p>
-                <p className="text-sm text-gray-500">{sub}</p>
+                <p className="font-medium text-secondary-900">{title}</p>
+                <p className="text-sm text-secondary-500">{sub}</p>
               </div>
             </label>
           ))}
         </div>
 
         {errorMsg && (
-          <p className="text-sm text-red-600 text-center">{errorMsg}</p>
+          <p className="text-sm text-error-600 text-center">{errorMsg}</p>
         )}
 
         <button
@@ -262,7 +262,7 @@ export function SocialAuthButtons({ mode = 'login' }: SocialAuthButtonsProps) {
         <button
           type="button"
           onClick={handleRoleCancel}
-          className="w-full py-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+          className="w-full py-2 text-sm text-secondary-500 hover:text-secondary-700 transition-colors"
         >
           ← Back to sign-in options
         </button>
@@ -307,7 +307,7 @@ export function SocialAuthButtons({ mode = 'login' }: SocialAuthButtonsProps) {
             type="button"
             onClick={handleMicrosoftLogin}
             disabled={busy || !msalReady}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700 bg-white disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-secondary-300 rounded-lg hover:bg-secondary-50 transition-colors text-sm font-medium text-secondary-700 bg-white disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {/* Microsoft logomark */}
             <svg viewBox="0 0 21 21" width="20" height="20" aria-hidden="true">
@@ -322,11 +322,11 @@ export function SocialAuthButtons({ mode = 'login' }: SocialAuthButtonsProps) {
       )}
 
       {errorMsg && (
-        <p className="text-sm text-red-600 text-center">{errorMsg}</p>
+        <p className="text-sm text-error-600 text-center">{errorMsg}</p>
       )}
 
       {busy && !pending && (
-        <p className="text-sm text-gray-500 text-center">Authenticating…</p>
+        <p className="text-sm text-secondary-500 text-center">Authenticating…</p>
       )}
     </div>
   )

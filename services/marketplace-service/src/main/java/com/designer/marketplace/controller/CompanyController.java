@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.designer.marketplace.dto.CompanyProfileResponse;
 import com.designer.marketplace.dto.JobResponse;
 import com.designer.marketplace.dto.UserResponse;
+import com.designer.marketplace.entity.Company;
+import com.designer.marketplace.security.UserPrincipal;
 import com.designer.marketplace.service.JobService;
 import com.designer.marketplace.service.UserService;
 
@@ -24,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
  * Controller for company profile endpoints
  * 
  * Endpoints:
+ * - GET /api/companies/me - Get current user's company profile
  * - GET /api/companies/{id} - Get company profile by ID
  * - GET /api/companies - List all companies (with pagination)
  * - GET /api/companies/{id}/jobs - Get jobs posted by a specific company
@@ -39,6 +43,63 @@ public class CompanyController {
     private final JobService jobService;
 
     /**
+     * Get current user's company profile
+     * GET /api/companies/me
+     * Requires authentication
+     */
+    @GetMapping("/me")
+    public ResponseEntity<CompanyProfileResponse> getMyCompanyProfile(
+            @AuthenticationPrincipal UserPrincipal currentUser) {
+
+        if (currentUser == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        log.info("Getting company profile for user: {}", currentUser.getId());
+
+        return companyRepository.findByUserIdWithUser(currentUser.getId())
+                .map(c -> {
+                    CompanyProfileResponse resp = buildCompanyProfileResponse(c);
+                    return ResponseEntity.ok(resp);
+                })
+                .orElseGet(() -> {
+                    log.warn("No company profile found for user: {}", currentUser.getId());
+                    return ResponseEntity.notFound().<CompanyProfileResponse>build();
+                });
+    }
+
+    private CompanyProfileResponse buildCompanyProfileResponse(Company c) {
+        CompanyProfileResponse resp = CompanyProfileResponse.builder()
+                .id(c.getId())
+                .companyName(c.getCompanyName())
+                .companyType(c.getCompanyType())
+                .industry(c.getIndustry())
+                .websiteUrl(c.getWebsiteUrl())
+                .companySize(c.getCompanySize() != null ? c.getCompanySize().name() : null)
+                .registrationNumber(c.getRegistrationNumber())
+                .taxId(c.getTaxId())
+                .phone(c.getPhone())
+                .headquartersLocation(c.getHeadquartersLocation())
+                .description(c.getDescription())
+                .logoUrl(c.getLogoUrl())
+                .contactEmail(c.getContactEmail())
+                .totalJobsPosted(c.getTotalJobsPosted())
+                .createdAt(c.getCreatedAt())
+                .updatedAt(c.getUpdatedAt())
+                .build();
+        if (c.getUser() != null) {
+            resp.setUserId(c.getUser().getId());
+            resp.setUsername(c.getUser().getUsername());
+            resp.setFullName(c.getUser().getFullName());
+            resp.setEmail(c.getUser().getEmail());
+            resp.setProfileImageUrl(c.getUser().getProfileImageUrl());
+            resp.setLocation(c.getUser().getLocation());
+            resp.setBio(c.getUser().getBio());
+        }
+        return resp;
+    }
+
+    /**
      * Get company profile by ID
      * GET /api/companies/{id}
      */
@@ -48,36 +109,7 @@ public class CompanyController {
 
         // Prefer company table as source of truth. Try to load Company by id.
         return companyRepository.findByIdWithUser(id)
-                .map(c -> {
-                    CompanyProfileResponse resp = CompanyProfileResponse.builder()
-                            .id(c.getId())
-                            .companyName(c.getCompanyName())
-                            .companyType(c.getCompanyType())
-                            .industry(c.getIndustry())
-                            .websiteUrl(c.getWebsiteUrl())
-                            .companySize(c.getCompanySize() != null ? c.getCompanySize().name() : null)
-                            .registrationNumber(c.getRegistrationNumber())
-                            .taxId(c.getTaxId())
-                            .phone(c.getPhone())
-                            .headquartersLocation(c.getHeadquartersLocation())
-                            .description(c.getDescription())
-                            .logoUrl(c.getLogoUrl())
-                            .contactEmail(c.getContactEmail())
-                            .totalJobsPosted(c.getTotalJobsPosted())
-                            .createdAt(c.getCreatedAt())
-                            .updatedAt(c.getUpdatedAt())
-                            .build();
-                    if (c.getUser() != null) {
-                        resp.setUserId(c.getUser().getId());
-                        resp.setUsername(c.getUser().getUsername());
-                        resp.setFullName(c.getUser().getFullName());
-                        resp.setEmail(c.getUser().getEmail());
-                        resp.setProfileImageUrl(c.getUser().getProfileImageUrl());
-                        resp.setLocation(c.getUser().getLocation());
-                        resp.setBio(c.getUser().getBio());
-                    }
-                    return ResponseEntity.ok(resp);
-                })
+                .map(c -> ResponseEntity.ok(buildCompanyProfileResponse(c)))
                 .orElseGet(() -> {
                     // Fallback: if no company record, return user profile for backwards compatibility
                     log.warn("Company id {} not found in companies table, falling back to userService", id);

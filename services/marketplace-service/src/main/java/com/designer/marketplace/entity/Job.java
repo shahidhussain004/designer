@@ -142,6 +142,9 @@ public class Job {
     @Column(name = "application_deadline")
     private LocalDateTime applicationDeadline;
 
+    @Column(name = "application_email")
+    private String applicationEmail;
+
     @Column(name = "application_url", columnDefinition = "TEXT")
     private String applicationUrl;
 

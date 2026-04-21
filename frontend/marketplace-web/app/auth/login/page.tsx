@@ -53,13 +53,13 @@ export default function LoginPage() {
 
   return (
     <PageLayout>
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-secondary-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full">
           {/* Login Card */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+          <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-8">
             <div className="text-center mb-8">
-              <h1 className="text-2xl font-bold text-gray-900">Sign in to your account</h1>
-              <p className="mt-2 text-gray-600">
+              <h1 className="text-2xl font-bold text-secondary-900">Sign in to your account</h1>
+              <p className="mt-2 text-secondary-600">
                 Or{' '}
                 <Link href="/auth/register" className="text-primary-600 hover:text-primary-700 font-medium">
                   create a new account
@@ -68,8 +68,8 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-700 text-sm">{error}</p>
+              <div className="mb-6 p-4 bg-error-50 border border-error-200 rounded-lg">
+                <p className="text-error-700 text-sm">{error}</p>
               </div>
             )}
 
@@ -78,16 +78,16 @@ export default function LoginPage() {
 
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
+                <div className="w-full border-t border-secondary-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="bg-white px-4 text-gray-500">or continue with email</span>
+                <span className="bg-white px-4 text-secondary-500">or continue with email</span>
               </div>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="emailOrUsername" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="emailOrUsername" className="block text-sm font-medium text-secondary-700 mb-2">
                   Email or Username
                 </label>
                 <input
@@ -96,13 +96,13 @@ export default function LoginPage() {
                   value={formData.emailOrUsername}
                   onChange={(e) => setFormData({ ...formData, emailOrUsername: e.target.value })}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-transparent transition-colors"
+                  className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-transparent transition-colors"
                   placeholder="Enter your email or username"
                 />
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="password" className="block text-sm font-medium text-secondary-700 mb-2">
                   Password
                 </label>
                 <input
@@ -111,7 +111,7 @@ export default function LoginPage() {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-transparent transition-colors"
+                  className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-transparent transition-colors"
                   placeholder="Enter your password"
                 />
               </div>
@@ -122,9 +122,9 @@ export default function LoginPage() {
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-input-focus"
+                    className="w-4 h-4 text-primary-600 border-secondary-300 rounded focus:ring-input-focus"
                   />
-                  <span className="ml-2 text-sm text-gray-600">Remember me</span>
+                  <span className="ml-2 text-sm text-secondary-600">Remember me</span>
                 </label>
                 <Link href="#" className="text-sm text-primary-600 hover:text-primary-700 font-medium">
                   Forgot your password?
@@ -140,9 +140,9 @@ export default function LoginPage() {
               </button>
             </form>
 
-            <div className="mt-8 pt-6 border-t border-gray-200">
-              <p className="text-center text-xs text-gray-500 mb-4">Test Credentials</p>
-              <div className="space-y-2 text-sm text-gray-600">
+            <div className="mt-8 pt-6 border-t border-secondary-200">
+              <p className="text-center text-xs text-secondary-500 mb-4">Test Credentials</p>
+              <div className="space-y-2 text-sm text-secondary-600">
                 <p><span className="font-medium">Company:</span> company1@example.com / password123</p>
                 <p><span className="font-medium">Freelancer:</span> freelancer1@example.com / password123</p>
               </div>
@@ -150,7 +150,7 @@ export default function LoginPage() {
           </div>
 
           {/* Footer */}
-          <p className="mt-8 text-center text-sm text-gray-500">
+          <p className="mt-8 text-center text-sm text-secondary-500">
             By signing in, you agree to our{' '}
             <Link href="/terms" className="text-primary-600 hover:underline">Terms of Service</Link>
             {' '}and{' '}

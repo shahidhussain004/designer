@@ -84,6 +84,9 @@ public class JobResponse {
     private Boolean isFeatured;
     private Boolean isUrgent;
     
+    // Ownership (set by controller based on current user context)
+    private Boolean isOwner;
+    
     // Timestamps
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

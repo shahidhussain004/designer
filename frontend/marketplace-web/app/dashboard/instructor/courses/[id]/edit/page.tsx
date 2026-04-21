@@ -96,10 +96,10 @@ export default function EditCoursePage() {
   if (loading) {
     return (
       <PageLayout>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="min-h-screen bg-secondary-50 flex items-center justify-center">
           <div className="text-center">
             <Loader2 className="w-8 h-8 text-primary-600 animate-spin mx-auto mb-4" />
-            <p className="text-gray-500">Loading course...</p>
+            <p className="text-secondary-500">Loading course...</p>
           </div>
         </div>
       </PageLayout>
@@ -109,9 +109,9 @@ export default function EditCoursePage() {
   if (!course) {
     return (
       <PageLayout>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-            <p className="text-red-700 font-medium">Course not found</p>
+        <div className="min-h-screen bg-secondary-50 flex items-center justify-center">
+          <div className="bg-error-50 border border-error-200 rounded-lg p-6">
+            <p className="text-error-700 font-medium">Course not found</p>
           </div>
         </div>
       </PageLayout>
@@ -120,11 +120,11 @@ export default function EditCoursePage() {
 
   return (
     <PageLayout>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-secondary-50">
         {/* Header */}
-        <div className="bg-gray-900 text-white py-12">
+        <div className="bg-secondary-900 text-white py-12">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <Link href="/dashboard/instructor" className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-4">
+            <Link href="/dashboard/instructor" className="inline-flex items-center gap-2 text-secondary-400 hover:text-white mb-4">
               <ArrowLeft className="w-4 h-4" />
               Back to Dashboard
             </Link>
@@ -146,8 +146,8 @@ export default function EditCoursePage() {
         {/* Content */}
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-700 text-sm">{error}</p>
+            <div className="mb-6 p-4 bg-error-50 border border-error-200 rounded-lg">
+              <p className="text-error-700 text-sm">{error}</p>
             </div>
           )}
 
@@ -158,7 +158,7 @@ export default function EditCoursePage() {
                 className={`px-4 py-2 font-medium border-b-2 transition ${
                   activeTab === 'details'
                     ? 'border-primary-600 text-primary-600'
-                    : 'border-transparent text-gray-600 hover:text-gray-900'
+                    : 'border-transparent text-secondary-600 hover:text-secondary-900'
                 }`}
               >
                 Course Details
@@ -168,7 +168,7 @@ export default function EditCoursePage() {
                 className={`px-4 py-2 font-medium border-b-2 transition ${
                   activeTab === 'modules'
                     ? 'border-primary-600 text-primary-600'
-                    : 'border-transparent text-gray-600 hover:text-gray-900'
+                    : 'border-transparent text-secondary-600 hover:text-secondary-900'
                 }`}
               >
                 Modules & Lessons
@@ -178,7 +178,7 @@ export default function EditCoursePage() {
                 className={`px-4 py-2 font-medium border-b-2 transition ${
                   activeTab === 'preview'
                     ? 'border-primary-600 text-primary-600'
-                    : 'border-transparent text-gray-600 hover:text-gray-900'
+                    : 'border-transparent text-secondary-600 hover:text-secondary-900'
                 }`}
               >
                 Preview
@@ -187,53 +187,53 @@ export default function EditCoursePage() {
 
             {/* Details Tab */}
             {activeTab === 'details' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h2 className="text-lg font-bold text-gray-900 mb-6">Course Information</h2>
+              <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
+                <h2 className="text-lg font-bold text-secondary-900 mb-6">Course Information</h2>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                    <label className="block text-sm font-medium text-secondary-700 mb-1">Title</label>
                     <input
                       name="title"
                       value={formData.title}
                       onChange={handleChange}
                       placeholder="Course title"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus outline-none"
+                      className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Short Description</label>
+                    <label className="block text-sm font-medium text-secondary-700 mb-1">Short Description</label>
                     <textarea
                       name="shortDescription"
                       value={formData.shortDescription}
                       onChange={handleChange}
                       placeholder="Brief description (shown in course cards)"
                       rows={2}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus outline-none resize-none"
+                      className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus outline-none resize-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Full Description</label>
+                    <label className="block text-sm font-medium text-secondary-700 mb-1">Full Description</label>
                     <textarea
                       name="description"
                       value={formData.description}
                       onChange={handleChange}
                       placeholder="Complete course description"
                       rows={4}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus outline-none resize-none"
+                      className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus outline-none resize-none"
                     />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                      <label className="block text-sm font-medium text-secondary-700 mb-1">Category</label>
                       <select
                         name="category"
                         value={formData.category}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus outline-none"
+                        className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus outline-none"
                       >
                         <option value="WebDevelopment">Web Development</option>
                         <option value="MobileDevelopment">Mobile Development</option>
@@ -244,12 +244,12 @@ export default function EditCoursePage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Skill Level</label>
+                      <label className="block text-sm font-medium text-secondary-700 mb-1">Skill Level</label>
                       <select
                         name="level"
                         value={formData.level}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus outline-none"
+                        className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus outline-none"
                       >
                         <option value="Beginner">Beginner</option>
                         <option value="Intermediate">Intermediate</option>
@@ -258,7 +258,7 @@ export default function EditCoursePage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Price ($)</label>
+                      <label className="block text-sm font-medium text-secondary-700 mb-1">Price ($)</label>
                       <input
                         name="price"
                         type="number"
@@ -267,24 +267,24 @@ export default function EditCoursePage() {
                         placeholder="0 for free"
                         min="0"
                         step="0.01"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus outline-none"
+                        className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus outline-none"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Thumbnail URL</label>
+                      <label className="block text-sm font-medium text-secondary-700 mb-1">Thumbnail URL</label>
                       <input
                         name="thumbnailUrl"
                         value={formData.thumbnailUrl}
                         onChange={handleChange}
                         placeholder="Course image URL"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus outline-none"
+                        className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus outline-none"
                       />
                     </div>
                   </div>
                 </div>
 
-                <hr className="border-gray-200 my-6" />
+                <hr className="border-secondary-200 my-6" />
 
                 <div className="flex gap-3">
                   <button
@@ -296,7 +296,7 @@ export default function EditCoursePage() {
                   </button>
                   <Link
                     href="/dashboard/instructor"
-                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                    className="px-4 py-2 border border-secondary-300 rounded-lg text-secondary-700 hover:bg-secondary-50 transition-colors font-medium"
                   >
                     Cancel
                   </Link>
@@ -306,29 +306,29 @@ export default function EditCoursePage() {
 
             {/* Modules & Lessons Tab */}
             {activeTab === 'modules' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-lg font-bold text-gray-900">Modules & Lessons</h2>
-                  <button className="px-3 py-1.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium inline-flex items-center gap-1">
+                  <h2 className="text-lg font-bold text-secondary-900">Modules & Lessons</h2>
+                  <button className="px-3 py-1.5 border border-secondary-300 rounded-lg text-secondary-700 hover:bg-secondary-50 transition-colors text-sm font-medium inline-flex items-center gap-1">
                     <Plus className="w-4 h-4" />
                     Add Module
                   </button>
                 </div>
 
                 <div className="space-y-4">
-                  <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="p-4 bg-secondary-50 rounded-lg border border-secondary-200">
                     <div className="flex justify-between items-center">
                       <div>
-                        <p className="font-medium text-gray-900">Module 1: Getting Started</p>
-                        <p className="text-sm text-gray-500">2 lessons</p>
+                        <p className="font-medium text-secondary-900">Module 1: Getting Started</p>
+                        <p className="text-sm text-secondary-500">2 lessons</p>
                       </div>
-                      <ChevronDown className="w-5 h-5 text-gray-400" />
+                      <ChevronDown className="w-5 h-5 text-secondary-400" />
                     </div>
                   </div>
                 </div>
 
-                <hr className="border-gray-200 my-6" />
-                <p className="text-sm text-gray-500">
+                <hr className="border-secondary-200 my-6" />
+                <p className="text-sm text-secondary-500">
                   Click on a module to expand and manage lessons, or add a new module to get started.
                 </p>
               </div>
@@ -336,11 +336,11 @@ export default function EditCoursePage() {
 
             {/* Preview Tab */}
             {activeTab === 'preview' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h2 className="text-lg font-bold text-gray-900 mb-6">Course Preview</h2>
+              <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
+                <h2 className="text-lg font-bold text-secondary-900 mb-6">Course Preview</h2>
                 
                 {course.thumbnailUrl && (
-                  <div className="mb-6 h-64 bg-gray-200 rounded-lg overflow-hidden relative">
+                  <div className="mb-6 h-64 bg-secondary-200 rounded-lg overflow-hidden relative">
                     <Image
                       src={course.thumbnailUrl}
                       alt={course.title}
@@ -351,32 +351,32 @@ export default function EditCoursePage() {
                   </div>
                 )}
 
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{formData.title}</h3>
-                <p className="text-gray-500 mb-4">{formData.shortDescription}</p>
+                <h3 className="text-xl font-bold text-secondary-900 mb-2">{formData.title}</h3>
+                <p className="text-secondary-500 mb-4">{formData.shortDescription}</p>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
                   <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider">Price</p>
-                    <p className="font-bold text-gray-900">${(formData.price).toFixed(2)}</p>
+                    <p className="text-xs text-secondary-500 uppercase tracking-wider">Price</p>
+                    <p className="font-bold text-secondary-900">${(formData.price).toFixed(2)}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider">Level</p>
-                    <p className="font-bold text-gray-900">{formData.level}</p>
+                    <p className="text-xs text-secondary-500 uppercase tracking-wider">Level</p>
+                    <p className="font-bold text-secondary-900">{formData.level}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider">Category</p>
-                    <p className="font-bold text-gray-900">{formData.category}</p>
+                    <p className="text-xs text-secondary-500 uppercase tracking-wider">Category</p>
+                    <p className="font-bold text-secondary-900">{formData.category}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider">Lessons</p>
-                    <p className="font-bold text-gray-900">{course.lessonsCount || 0}</p>
+                    <p className="text-xs text-secondary-500 uppercase tracking-wider">Lessons</p>
+                    <p className="font-bold text-secondary-900">{course.lessonsCount || 0}</p>
                   </div>
                 </div>
 
-                <hr className="border-gray-200 my-6" />
+                <hr className="border-secondary-200 my-6" />
 
-                <h4 className="text-lg font-bold text-gray-900 mb-3">About this course</h4>
-                <p className="text-gray-500 whitespace-pre-wrap">{formData.description}</p>
+                <h4 className="text-lg font-bold text-secondary-900 mb-3">About this course</h4>
+                <p className="text-secondary-500 whitespace-pre-wrap">{formData.description}</p>
               </div>
             )}
           </Tabs>

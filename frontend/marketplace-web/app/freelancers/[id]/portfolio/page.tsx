@@ -48,7 +48,7 @@ export default function FreelancerPortfolioPage() {
   if (loading) {
     return (
       <PageLayout>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="min-h-screen bg-secondary-50 flex items-center justify-center">
           <LoadingSpinner />
         </div>
       </PageLayout>
@@ -58,7 +58,7 @@ export default function FreelancerPortfolioPage() {
   if (error || !freelancer) {
     return (
       <PageLayout>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="min-h-screen bg-secondary-50 flex items-center justify-center">
           <ErrorMessage 
             message={errorMessage || 'Failed to load portfolio'} 
             retry={() => {
@@ -73,9 +73,9 @@ export default function FreelancerPortfolioPage() {
 
   return (
     <PageLayout>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-secondary-50">
         {/* Header */}
-        <div className="bg-gray-900 text-white py-12">
+        <div className="bg-secondary-900 text-white py-12">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Breadcrumb */}
             <div className="mb-6">
@@ -95,14 +95,14 @@ export default function FreelancerPortfolioPage() {
               </div>
               <div className="flex-1">
                 <h1 className="text-2xl font-bold mb-1">{freelancer.fullName}&rsquo;s Portfolio</h1>
-                <p className="text-gray-400">@{freelancer.username}</p>
+                <p className="text-secondary-400">@{freelancer.username}</p>
                 {(freelancer.hourlyRate || freelancer.ratingAvg) && (
                   <div className="flex gap-4 mt-3">
                     {freelancer.hourlyRate && (
                       <span className="text-white">💰 ${freelancer.hourlyRate}/hr</span>
                     )}
                     {typeof freelancer.ratingAvg !== 'undefined' && (
-                      <span className="text-gray-300">
+                      <span className="text-secondary-300">
                         ⭐ {freelancer.ratingAvg.toFixed(1)} ({freelancer.ratingCount} reviews)
                       </span>
                     )}
@@ -117,18 +117,18 @@ export default function FreelancerPortfolioPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Portfolio Content */}
           {portfolio.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No Portfolio Items</h3>
-              <p className="text-gray-500">
+            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-12 text-center">
+              <h3 className="text-xl font-semibold text-secondary-900 mb-2">No Portfolio Items</h3>
+              <p className="text-secondary-500">
                 This freelancer has not added any portfolio items yet
               </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               {portfolio.map(item => (
-                <div key={item.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                <div key={item.id} className="bg-white rounded-lg shadow-sm border border-secondary-200 overflow-hidden">
                   {/* Image Section */}
-                  <div className="relative h-64 bg-gradient-to-br from-primary-50 to-gray-100">
+                  <div className="relative h-64 bg-gradient-to-br from-primary-50 to-secondary-100">
                     {item.imageUrl && (
                       <Image
                         src={item.imageUrl}
@@ -143,10 +143,10 @@ export default function FreelancerPortfolioPage() {
                   {/* Content Section */}
                   <div className="p-6">
                     {/* Title */}
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.title}</h3>
+                    <h3 className="text-lg font-semibold text-secondary-900 mb-2">{item.title}</h3>
 
                     {/* Description */}
-                    <p className="text-gray-600 mb-4 line-clamp-3">{item.description}</p>
+                    <p className="text-secondary-600 mb-4 line-clamp-3">{item.description}</p>
 
                     {/* Technologies */}
                     {item.technologies && item.technologies.length > 0 && (
@@ -164,12 +164,12 @@ export default function FreelancerPortfolioPage() {
 
                     {/* Metadata */}
                     {item.completionDate && (
-                      <p className="text-sm text-gray-500 mb-4">
+                      <p className="text-sm text-secondary-500 mb-4">
                         📅 Completed: {new Date(item.completionDate).toLocaleDateString()}
                       </p>
                     )}
 
-                    <hr className="border-gray-200 my-4" />
+                    <hr className="border-secondary-200 my-4" />
 
                     {/* Actions */}
                     {item.projectUrl && (
@@ -177,7 +177,7 @@ export default function FreelancerPortfolioPage() {
                         href={item.projectUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                        className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 border border-secondary-300 rounded-lg text-secondary-700 hover:bg-secondary-50 transition-colors font-medium"
                       >
                         <ExternalLink className="w-4 h-4" />
                         View Live Project
@@ -216,7 +216,7 @@ export default function FreelancerPortfolioPage() {
           <div className="flex justify-center">
             <Link
               href="/talents"
-              className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              className="inline-flex items-center gap-2 text-secondary-600 hover:text-secondary-900"
             >
               <ArrowLeft className="w-4 h-4" />
               Browse More Talent

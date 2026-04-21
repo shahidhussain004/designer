@@ -164,7 +164,7 @@ export default function ResourceEditPage() {
         <div className="lg:col-span-2 space-y-6">
           {/* Title */}
           <Card padding="m">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-secondary-700 mb-2">
               Title *
             </label>
             <input
@@ -172,14 +172,14 @@ export default function ResourceEditPage() {
               name="title"
               value={formData.title || ''}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               placeholder="Resource title"
             />
           </Card>
 
           {/* Excerpt */}
           <Card padding="m">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-secondary-700 mb-2">
               Excerpt / Summary
             </label>
             <textarea
@@ -187,14 +187,14 @@ export default function ResourceEditPage() {
               value={formData.excerpt || ''}
               onChange={handleChange}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               placeholder="Brief summary of the resource"
             />
           </Card>
 
           {/* Content */}
           <Card padding="m">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-secondary-700 mb-2">
               Content *
             </label>
             <textarea
@@ -202,7 +202,7 @@ export default function ResourceEditPage() {
               value={formData.content || ''}
               onChange={handleChange}
               rows={12}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+              className="w-full px-3 py-2 border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 font-mono text-sm"
               placeholder="Resource full content (HTML supported)"
             />
           </Card>
@@ -220,14 +220,14 @@ export default function ResourceEditPage() {
                 <span
                   className={`inline-block px-3 py-1 text-sm rounded-full ${
                     formData.status === 'published'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-yellow-100 text-yellow-800'
+                      ? 'bg-success-100 text-success-800'
+                      : 'bg-warning-100 text-warning-800'
                   }`}
                 >
                   {formData.status === 'published' ? 'Published' : 'Draft'}
                 </span>
               </div>
-              <p className="text-xs text-gray-600">
+              <p className="text-xs text-secondary-600">
                 {formData.status === 'published'
                   ? 'This resource is visible to everyone'
                   : 'This resource is only visible to admins'}
@@ -237,14 +237,14 @@ export default function ResourceEditPage() {
 
           {/* Type */}
           <Card padding="m">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-secondary-700 mb-2">
               Type
             </label>
             <select
               name="content_type"
               value={formData.content_type || 'blog'}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="blog">Blog Post</option>
               <option value="article">Article</option>
@@ -254,7 +254,7 @@ export default function ResourceEditPage() {
 
           {/* Author */}
           <Card padding="m">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-secondary-700 mb-2">
               Author
             </label>
             <input
@@ -262,14 +262,14 @@ export default function ResourceEditPage() {
               name="author_id"
               value={formData.author_id || ''}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               placeholder="Author ID"
             />
           </Card>
 
           {/* Featured Image */}
           <Card padding="m">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-secondary-700 mb-2">
               Featured Image URL
             </label>
             <input
@@ -277,7 +277,7 @@ export default function ResourceEditPage() {
               name="featured_image"
               value={formData.featured_image || ''}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               placeholder="https://example.com/image.jpg"
             />
             {formData.featured_image && (
@@ -302,13 +302,13 @@ export default function ResourceEditPage() {
                 name="is_featured"
                 checked={formData.is_featured || false}
                 onChange={handleChange}
-                className="w-4 h-4 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                className="w-4 h-4 border border-secondary-300 rounded focus:ring-2 focus:ring-primary-500"
               />
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-secondary-700">
                 Mark as Featured
               </span>
             </label>
-            <p className="text-xs text-gray-600 mt-2">
+            <p className="text-xs text-secondary-600 mt-2">
               Featured resources appear at the top of listings
             </p>
           </Card>
@@ -318,7 +318,7 @@ export default function ResourceEditPage() {
             <Text font-size="body-s" font-weight="bold" className="mb-2 block">
               Metadata
             </Text>
-            <div className="space-y-1 text-xs text-gray-600">
+            <div className="space-y-1 text-xs text-secondary-600">
               <p>
                 <strong>ID:</strong> {resource?.id}
               </p>

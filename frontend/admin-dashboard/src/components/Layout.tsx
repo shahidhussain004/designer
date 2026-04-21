@@ -1,14 +1,14 @@
 import {
-  ArrowRightOnRectangleIcon,
-  BriefcaseIcon,
-  ChartBarIcon,
-  ExclamationTriangleIcon,
-  HomeIcon,
-  MoonIcon,
-  NewspaperIcon,
-  SunIcon,
-  UsersIcon,
-  XMarkIcon
+    ArrowRightOnRectangleIcon,
+    BriefcaseIcon,
+    ChartBarIcon,
+    ExclamationTriangleIcon,
+    HomeIcon,
+    MoonIcon,
+    NewspaperIcon,
+    SunIcon,
+    UsersIcon,
+    XMarkIcon
 } from '@heroicons/react/24/outline'
 import { useContext, useState } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
@@ -16,8 +16,8 @@ import { useAuthStore } from '../store/authStore'
 import AdminFooter from './AdminFooter'
 import AdminHeader from './AdminHeader'
 import {
-  Button,
-  Text
+    Button,
+    Text
 } from './green'
 import { ThemeContext } from './ThemeProvider'
 
@@ -46,7 +46,7 @@ export default function Layout() {
   const isActive = (href: string) => location.pathname === href
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-secondary-50">
       {/* Header */}
       <AdminHeader />
 
@@ -60,10 +60,10 @@ export default function Layout() {
         )}
 
         {/* Sidebar */}
-        <aside className={`sidebar bg-white border-r border-gray-200 transition-all ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed md:relative w-64 h-screen md:h-auto z-50 md:z-0`}>
+        <aside className={`sidebar bg-white border-r border-secondary-200 transition-all ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed md:relative w-64 h-screen md:h-auto z-50 md:z-0`}>
           <div className="flex flex-col h-full">
             {/* Sidebar Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 md:hidden">
+            <div className="flex items-center justify-between p-4 border-b border-secondary-200 md:hidden">
               <Text className="font-bold text-lg">Menu</Text>
               <Button rank="tertiary" onClick={() => setSidebarOpen(false)}>
                 <XMarkIcon width={24} height={24} />
@@ -80,8 +80,8 @@ export default function Layout() {
                     onClick={() => setSidebarOpen(false)}
                     className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
                       isActive(item.href)
-                        ? 'bg-indigo-600 text-white'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        ? 'bg-blue-800 text-white'
+                        : 'text-secondary-700 hover:bg-secondary-100'
                     }`}
                   >
                     <item.icon width={20} height={20} />
@@ -92,7 +92,7 @@ export default function Layout() {
             </nav>
 
             {/* Sidebar Footer */}
-            <div className="border-t border-gray-200 p-4 space-y-3">
+            <div className="border-t border-secondary-200 p-4 space-y-3">
               <Button
                 rank="tertiary"
                 onClick={toggleTheme}
@@ -113,7 +113,7 @@ export default function Layout() {
               <Button
                 rank="secondary"
                 onClick={handleLogout}
-                className="w-full flex items-center gap-2 justify-center bg-red-50 text-red-600 hover:bg-red-100"
+                className="w-full flex items-center gap-2 justify-center bg-error-50 text-error-600 hover:bg-error-100"
               >
                 <ArrowRightOnRectangleIcon width={18} height={18} />
                 <span>Logout</span>

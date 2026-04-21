@@ -76,9 +76,9 @@ export default function ResourceTypeListPage() {
   if (!contentType) {
     return (
       <PageLayout title="Resources | Designer Marketplace">
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center max-w-md">
-            <p className="text-red-600 text-xl mb-4">Resource type not found</p>
+        <div className="min-h-screen bg-secondary-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-8 text-center max-w-md">
+            <p className="text-error-600 text-xl mb-4">Resource type not found</p>
             <button
               onClick={() => router.push('/resources')}
               className="px-4 py-2 bg-primary-600 text-white rounded-lg"
@@ -128,21 +128,21 @@ export default function ResourceTypeListPage() {
 
   const getContentTypeBadge = (type: ContentType) => {
     const styles: Record<ContentType, { bg: string; text: string }> = {
-      blog: { bg: 'bg-blue-100', text: 'text-blue-800' },
-      article: { bg: 'bg-green-100', text: 'text-green-800' },
-      news: { bg: 'bg-amber-100', text: 'text-amber-800' },
+      blog: { bg: 'bg-primary-100', text: 'text-blue-800' },
+      article: { bg: 'bg-success-100', text: 'text-success-800' },
+      news: { bg: 'bg-warning-100', text: 'text-warning-800' },
     };
-    return styles[type] || { bg: 'bg-gray-100', text: 'text-gray-800' };
+    return styles[type] || { bg: 'bg-secondary-100', text: 'text-secondary-800' };
   };
 
   return (
     <PageLayout title={`${typeConfig.label} | Designer Marketplace`}>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-secondary-50">
         {/* Page Header */}
-        <div className="bg-gray-900 text-white py-16 lg:py-20">
+        <div className="bg-secondary-900 text-white py-16 lg:py-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <h1 className="text-4xl font-bold mb-4">{typeConfig.label}</h1>
-            <p className="text-gray-300 text-lg max-w-2xl">
+            <p className="text-secondary-300 text-lg max-w-2xl">
               Explore our collection of {typeConfig.label.toLowerCase()} to help you succeed in the design marketplace.
             </p>
           </div>
@@ -160,7 +160,7 @@ export default function ResourceTypeListPage() {
           </div>
 
           {/* Search and Filters */}
-          <div className="sticky top-0 z-10 bg-white rounded-lg shadow-sm border border-gray-200 mb-8 p-6">
+          <div className="sticky top-0 z-10 bg-white rounded-lg shadow-sm border border-secondary-200 mb-8 p-6">
             <form onSubmit={handleSearch}>
               <div className="flex flex-col lg:flex-row gap-4">
                 <div className="flex-1">
@@ -169,7 +169,7 @@ export default function ResourceTypeListPage() {
                     placeholder="Search resources..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
+                    className="w-full px-4 py-2 border border-secondary-300 rounded-lg focus:outline-none"
                   />
                 </div>
                 <select
@@ -178,7 +178,7 @@ export default function ResourceTypeListPage() {
                     setSelectedCategory(e.target.value);
                     setPage(1);
                   }}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
+                  className="px-4 py-2 border border-secondary-300 rounded-lg focus:outline-none"
                 >
                   <option value="">All Categories</option>
                   {categories.map((cat: any) => (
@@ -195,7 +195,7 @@ export default function ResourceTypeListPage() {
                     setSortOrder(order as 'asc' | 'desc');
                     setPage(1);
                   }}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
+                  className="px-4 py-2 border border-secondary-300 rounded-lg focus:outline-none"
                 >
                   <option value="publishedAt-desc">Newest First</option>
                   <option value="publishedAt-asc">Oldest First</option>
@@ -211,7 +211,7 @@ export default function ResourceTypeListPage() {
                 <button
                   type="button"
                   onClick={clearFilters}
-                  className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-6 py-2 border border-secondary-300 rounded-lg hover:bg-secondary-50 transition-colors"
                 >
                   Clear
                 </button>
@@ -221,7 +221,7 @@ export default function ResourceTypeListPage() {
             {/* Tags Filter */}
             {tags.length > 0 && (
               <div className="mt-4">
-                <p className="text-sm text-gray-600 mb-2">Filter by tags:</p>
+                <p className="text-sm text-secondary-600 mb-2">Filter by tags:</p>
                 <div className="flex flex-wrap gap-2">
                   {tags.slice(0, 15).map((tag: any) => (
                     <button
@@ -230,7 +230,7 @@ export default function ResourceTypeListPage() {
                       className={`px-3 py-1 text-sm rounded-full transition-colors ${
                         selectedTags.includes(tag.id)
                           ? 'bg-primary-600 text-white'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                          : 'bg-secondary-200 text-secondary-700 hover:bg-secondary-300'
                       }`}
                     >
                       {tag?.name ?? 'Tag'}
@@ -243,7 +243,7 @@ export default function ResourceTypeListPage() {
 
           {/* Results Summary */}
           <div className="flex justify-between items-center mb-6">
-            <p className="text-gray-600">
+            <p className="text-secondary-600">
               {isLoading ? 'Loading...' : `${totalCount} ${typeConfig.label.toLowerCase()} found`}
             </p>
           </div>
@@ -263,8 +263,8 @@ export default function ResourceTypeListPage() {
           {!isLoading && !error && (
             <>
               {content.length === 0 ? (
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-                  <p className="text-gray-500 text-lg">
+                <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-12 text-center">
+                  <p className="text-secondary-500 text-lg">
                     No {typeConfig.label.toLowerCase()} found matching your criteria.
                   </p>
                   <button
@@ -284,9 +284,9 @@ export default function ResourceTypeListPage() {
                       <Link
                         href={`/resources/${typeSlug}/${item.slug}`}
                       >
-                        <div className="h-full bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-lg hover:border-primary-300 transition-all cursor-pointer overflow-hidden">
+                        <div className="h-full bg-white rounded-lg shadow-sm border border-secondary-200 hover:shadow-lg hover:border-primary-300 transition-all cursor-pointer overflow-hidden">
                           {/* Featured Image */}
-                          <div className="relative h-48 bg-gray-200">
+                          <div className="relative h-48 bg-secondary-200">
                             {item.featuredImageUrl ? (
                               <Image
                                 src={item.featuredImageUrl}
@@ -295,7 +295,7 @@ export default function ResourceTypeListPage() {
                                 className="object-cover group-hover:scale-105 transition-transform duration-300"
                               />
                             ) : (
-                              <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                              <div className="absolute inset-0 flex items-center justify-center text-secondary-400">
                                 <svg
                                   className="w-16 h-16"
                                   fill="none"
@@ -323,7 +323,7 @@ export default function ResourceTypeListPage() {
                             </div>
                             {item.isFeatured && (
                               <div className="absolute top-3 right-3">
-                                <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-amber-500 text-white">
+                                <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-warning-500 text-white">
                                   Featured
                                 </span>
                               </div>
@@ -340,17 +340,17 @@ export default function ResourceTypeListPage() {
                             )}
 
                             {/* Title */}
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+                            <h3 className="text-lg font-semibold text-secondary-900 mb-2 line-clamp-2">
                               {item.title}
                             </h3>
 
                             {/* Excerpt */}
-                            <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                            <p className="text-sm text-secondary-600 mb-4 line-clamp-2">
                               {item.excerpt || item.body?.replace(/<[^>]*>/g, '').substring(0, 100)}
                             </p>
 
                             {/* Meta */}
-                            <div className="flex items-center justify-between text-xs text-gray-500 pt-4 border-t">
+                            <div className="flex items-center justify-between text-xs text-secondary-500 pt-4 border-t">
                               <span>{formatDate(item.publishedAt || item.createdAt)}</span>
                               <div className="flex items-center gap-3">
                                 <span>👁 {item.viewCount || 0}</span>
@@ -370,7 +370,7 @@ export default function ResourceTypeListPage() {
                               // Open admin dashboard in same window
                               window.location.href = `http://localhost:3001/admin/resources/${item.id}/edit`;
                             }}
-                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity px-3 py-1 bg-blue-600 text-white text-xs rounded font-medium hover:bg-blue-700"
+                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity px-3 py-1 bg-primary-600 text-white text-xs rounded font-medium hover:bg-primary-700"
                             title="Edit this resource"
                           >
                             ✎ Edit
@@ -388,17 +388,17 @@ export default function ResourceTypeListPage() {
                   <button
                     onClick={() => setPage(Math.max(1, page - 1))}
                     disabled={page === 1}
-                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 border border-secondary-300 rounded-lg hover:bg-secondary-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Previous
                   </button>
-                  <span className="px-4 py-2 text-gray-600">
+                  <span className="px-4 py-2 text-secondary-600">
                     Page {page} of {totalPages}
                   </span>
                   <button
                     onClick={() => setPage(Math.min(totalPages, page + 1))}
                     disabled={page === totalPages}
-                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 border border-secondary-300 rounded-lg hover:bg-secondary-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Next
                   </button>

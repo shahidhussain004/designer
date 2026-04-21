@@ -19,7 +19,7 @@ export default function PageLayout({
   whiteBg = false,
 }: PageLayoutProps) {
   return (
-    <div className={`flex flex-col min-h-screen ${whiteBg ? 'bg-white' : 'bg-gray-50'}`}>
+    <div className={`flex flex-col min-h-screen ${whiteBg ? 'bg-white' : 'bg-secondary-50'}`}>
       {showNavbar && <Navbar />}
       <main className="flex-1 w-full">
         {children}

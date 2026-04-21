@@ -10,7 +10,7 @@ module.exports = {
   safelist: [
     // Ensure all color variants are generated
     {
-      pattern: /(bg|text|border|ring)-(primary|secondary|success|warning|error|info)-(50|100|200|300|400|500|600|700|800|900)/,
+      pattern: /(bg|text|border|ring)-(primary|secondary|blue|success|warning|error|info)-(50|100|200|300|400|500|600|700|800|900|950)/,
     },
   ],
   theme: {
@@ -20,39 +20,72 @@ module.exports = {
       // All colors meet WCAG 2.1 AA contrast requirements (4.5:1 ratio)
       // ==========================================================================
       colors: {
-        // Input focus - semantic token for form control focus
-        'input-focus': '#102a3f',
-        // Primary - Brand Red/Coral (WCAG AA compliant) - Fastly/RedHat inspired
+        // Input focus — Nordic Cobalt 800 for form control focus
+        'input-focus': '#0c2e56',
+
+        // Primary — Carmine (Swiss/Bauhaus red · richer & cooler than pure red)
         primary: {
-          50: '#fef2f2',
-          100: '#fee2e2',
-          200: '#fecaca',
-          300: '#fca5a5',
-          400: '#f87171',
-          500: '#ef4444',
-          600: '#dc2626',
-          700: '#b91c1c',
-          800: '#991b1b',
-          900: '#7f1d1d',
-          950: '#450a0a',
+          50:  '#fef1f1',
+          100: '#fde3e3',
+          200: '#fbc5c5',
+          300: '#f89797',
+          400: '#f26262',
+          500: '#e33232',
+          600: '#c21c1c',
+          700: '#9e1616',
+          800: '#821313',
+          900: '#6b1010',
+          950: '#3d0909',
         },
-        // Secondary - Neutral slate
+
+        // Blue — Nordic Cobalt (deep European authority · pairs with carmine)
+        blue: {
+          50:  '#eef4fb',
+          100: '#d5e7f7',
+          200: '#aacfee',
+          300: '#74afe1',
+          400: '#3d8bd1',
+          500: '#1f6aba',
+          600: '#155398',
+          700: '#103f75',
+          800: '#0c2e56',
+          900: '#071e39',
+          950: '#040e1c',
+        },
+
+        // Secondary — Stone (warm neutral · replaces cool blue-slate)
         secondary: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
-          950: '#020617',
+          50:  '#faf9f7',
+          100: '#f5f3f0',
+          200: '#e8e4de',
+          300: '#d5cfc6',
+          400: '#b0a898',
+          500: '#8c8272',
+          600: '#6e6456',
+          700: '#564e42',
+          800: '#3d372f',
+          900: '#282420',
+          950: '#151311',
         },
-        // Success - Green
+
+        // Error — Signal Red (pure alarm red · distinct from Carmine)
+        error: {
+          50:  '#fff1f0',
+          100: '#ffe0de',
+          200: '#ffc7c2',
+          300: '#ffa097',
+          400: '#ff6f61',
+          500: '#f04438',
+          600: '#d92d20',
+          700: '#b42318',
+          800: '#912018',
+          900: '#7a271a',
+          950: '#430d09',
+        },
+
+        // Success — Green (unchanged)
         success: {
-          50: '#f0fdf4',
+          50:  '#f0fdf4',
           100: '#dcfce7',
           200: '#bbf7d0',
           300: '#86efac',
@@ -63,9 +96,10 @@ module.exports = {
           800: '#166534',
           900: '#14532d',
         },
-        // Warning - Amber
+
+        // Warning — Amber (unchanged)
         warning: {
-          50: '#fffbeb',
+          50:  '#fffbeb',
           100: '#fef3c7',
           200: '#fde68a',
           300: '#fcd34d',
@@ -76,22 +110,10 @@ module.exports = {
           800: '#92400e',
           900: '#78350f',
         },
-        // Error - Red
-        error: {
-          50: '#fef2f2',
-          100: '#fee2e2',
-          200: '#fecaca',
-          300: '#fca5a5',
-          400: '#f87171',
-          500: '#ef4444',
-          600: '#dc2626',
-          700: '#b91c1c',
-          800: '#991b1b',
-          900: '#7f1d1d',
-        },
-        // Info - Cyan
+
+        // Info — Cyan (unchanged)
         info: {
-          50: '#ecfeff',
+          50:  '#ecfeff',
           100: '#cffafe',
           200: '#a5f3fc',
           300: '#67e8f9',
@@ -145,9 +167,10 @@ module.exports = {
         'soft-md': '0 6px 12px 0 rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.03)',
         'soft-lg': '0 12px 24px 0 rgb(0 0 0 / 0.06), 0 8px 16px -8px rgb(0 0 0 / 0.04)',
         'soft-xl': '0 24px 48px 0 rgb(0 0 0 / 0.08), 0 16px 32px -16px rgb(0 0 0 / 0.06)',
-        'glow': '0 0 20px rgb(59 130 246 / 0.25)',
+        'glow': '0 0 20px rgb(31 106 186 / 0.25)',
+        'glow-primary': '0 0 20px rgb(227 50 50 / 0.20)',
         'glow-success': '0 0 20px rgb(34 197 94 / 0.25)',
-        'glow-error': '0 0 20px rgb(239 68 68 / 0.25)',
+        'glow-error': '0 0 20px rgb(240 68 56 / 0.25)',
       },
       // ==========================================================================
       // ANIMATIONS

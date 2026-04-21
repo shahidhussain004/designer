@@ -52,37 +52,37 @@ export default function PrivacyPage() {
   return (
     <PageLayout>
       {/* Header */}
-      <div className="bg-gray-900 text-white py-16 lg:py-20">
+      <div className="bg-secondary-900 text-white py-16 lg:py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
           <Shield className="w-16 h-16 mx-auto mb-6 text-primary-400" />
           <h1 className="text-4xl lg:text-5xl font-bold mb-4">Privacy Policy</h1>
-          <p className="text-gray-300">Last updated: January 2024</p>
+          <p className="text-secondary-300">Last updated: January 2024</p>
         </div>
       </div>
 
       {/* Content */}
-      <div className="bg-gray-50 py-12">
+      <div className="bg-secondary-50 py-12">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <div className="space-y-4">
             {privacyData.map((section, index) => {
               const IconComponent = section.icon
               return (
-                <div key={index} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div key={index} className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0 w-10 h-10 bg-primary-50 rounded-lg flex items-center justify-center">
                       <IconComponent className="w-5 h-5 text-primary-600" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-gray-900 mb-2">{section.title}</h2>
-                      <p className="text-gray-600">{section.content}</p>
+                      <h2 className="text-lg font-semibold text-secondary-900 mb-2">{section.title}</h2>
+                      <p className="text-secondary-600">{section.content}</p>
                     </div>
                   </div>
                 </div>
               )
             })}
             
-            <div className="bg-gray-100 rounded-lg p-6 text-center">
-              <p className="text-sm text-gray-500">
+            <div className="bg-secondary-100 rounded-lg p-6 text-center">
+              <p className="text-sm text-secondary-500">
                 For questions about this privacy policy, please contact us at{' '}
                 <a href="mailto:privacy@designer-marketplace.com" className="text-primary-600 hover:text-primary-700 font-medium">
                   privacy@designer-marketplace.com

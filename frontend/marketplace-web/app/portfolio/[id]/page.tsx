@@ -222,7 +222,7 @@ export default function PortfolioPage() {
   if (loading) {
     return (
       <PageLayout>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="min-h-screen bg-secondary-50 flex items-center justify-center">
           <LoadingSpinner />
         </div>
       </PageLayout>
@@ -232,7 +232,7 @@ export default function PortfolioPage() {
   if (error || !freelancer) {
     return (
       <PageLayout>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="min-h-screen bg-secondary-50 flex items-center justify-center">
           <ErrorMessage 
             message={errorMessage || 'Failed to load portfolio'} 
             retry={() => loadData()}
@@ -244,9 +244,9 @@ export default function PortfolioPage() {
 
   return (
     <PageLayout>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-secondary-50">
         {/* Header */}
-        <div className="bg-gray-900 text-white py-12">
+        <div className="bg-secondary-900 text-white py-12">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Breadcrumb Navigation */}
             <div className="mb-6">
@@ -283,10 +283,10 @@ export default function PortfolioPage() {
                   <h1 className="text-2xl font-bold mb-1">
                     {isOwnPortfolio ? 'My Portfolio' : `${freelancer.fullName}'s Portfolio`}
                   </h1>
-                  <p className="text-gray-400">@{freelancer.username}</p>
+                  <p className="text-secondary-400">@{freelancer.username}</p>
 
                   {freelancer.bio && (
-                    <p className="text-gray-300 mt-2">{freelancer.bio}</p>
+                    <p className="text-secondary-300 mt-2">{freelancer.bio}</p>
                   )}
 
                   {(freelancer.hourlyRate || freelancer.ratingAvg) && (
@@ -295,7 +295,7 @@ export default function PortfolioPage() {
                         <span className="text-white font-medium">💰 ${freelancer.hourlyRate}/hr</span>
                       )}
                       {typeof freelancer.ratingAvg !== 'undefined' && (
-                        <span className="text-gray-300">⭐ {freelancer.ratingAvg.toFixed(1)} ({freelancer.ratingCount} reviews)</span>
+                        <span className="text-secondary-300">⭐ {freelancer.ratingAvg.toFixed(1)} ({freelancer.ratingCount} reviews)</span>
                       )}
                     </div>
                   )}
@@ -320,14 +320,14 @@ export default function PortfolioPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Add/Edit Form (Owner Only) */}
           {isOwnPortfolio && showForm && (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-6">
+            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6 mb-8">
+              <h2 className="text-xl font-bold text-secondary-900 mb-6">
                 {editingItem ? 'Edit Project' : 'Add New Project'}
               </h2>
               <form onSubmit={handleSubmit} className="space-y-6">
               {/* Title */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-secondary-700 mb-1">
                   Project Title *
                 </label>
                 <input
@@ -335,14 +335,14 @@ export default function PortfolioPage() {
                   required
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none"
+                  className="w-full px-4 py-3 border border-secondary-300 rounded-lg outline-none"
                   placeholder="E.g., E-commerce Website Redesign"
                 />
               </div>
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-secondary-700 mb-1">
                   Description *
                 </label>
                 <textarea
@@ -350,7 +350,7 @@ export default function PortfolioPage() {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={4}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none resize-none"
+                  className="w-full px-4 py-3 border border-secondary-300 rounded-lg outline-none resize-none"
                   placeholder="Describe the project, your role, and key achievements..."
                 />
               </div>
@@ -358,7 +358,7 @@ export default function PortfolioPage() {
               {/* URLs Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-secondary-700 mb-1">
                     Image URL *
                   </label>
                   <input
@@ -366,19 +366,19 @@ export default function PortfolioPage() {
                     required
                     value={formData.imageUrl}
                     onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none"
+                    className="w-full px-4 py-3 border border-secondary-300 rounded-lg outline-none"
                     placeholder="https://example.com/project.jpg"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-secondary-700 mb-1">
                     Project URL (Optional)
                   </label>
                   <input
                     type="url"
                     value={formData.projectUrl}
                     onChange={(e) => setFormData({ ...formData, projectUrl: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus outline-none"
+                    className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus outline-none"
                     placeholder="https://example.com"
                   />
                 </div>
@@ -386,7 +386,7 @@ export default function PortfolioPage() {
 
               {/* Technologies */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-secondary-700 mb-1">
                   Technologies (comma-separated) *
                 </label>
                 <input
@@ -394,7 +394,7 @@ export default function PortfolioPage() {
                   required
                   value={formData.technologies}
                   onChange={(e) => setFormData({ ...formData, technologies: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus outline-none"
+                  className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus outline-none"
                   placeholder="React, Node.js, PostgreSQL, AWS"
                 />
               </div>
@@ -402,14 +402,14 @@ export default function PortfolioPage() {
               {/* Completion Date & Visibility Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-secondary-700 mb-1">
                     Completion Date
                   </label>
                   <input
                     type="date"
                     value={formData.completionDate}
                     onChange={(e) => setFormData({ ...formData, completionDate: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus outline-none"
+                    className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus outline-none"
                   />
                 </div>
 
@@ -418,9 +418,9 @@ export default function PortfolioPage() {
                     type="checkbox"
                     checked={formData.isVisible}
                     onChange={(e) => setFormData({ ...formData, isVisible: e.target.checked })}
-                    className="w-5 h-5 rounded border-gray-300 text-primary-600"
+                    className="w-5 h-5 rounded border-secondary-300 text-primary-600"
                   />
-                  <span className="text-sm text-gray-700">Visible to public</span>
+                  <span className="text-sm text-secondary-700">Visible to public</span>
                 </label>
               </div>
 
@@ -429,7 +429,7 @@ export default function PortfolioPage() {
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                  className="px-4 py-2 border border-secondary-300 rounded-lg text-secondary-700 hover:bg-secondary-50 transition-colors font-medium"
                 >
                   Cancel
                 </button>
@@ -446,7 +446,7 @@ export default function PortfolioPage() {
 
           {/* Undo Banner */}
           {undoItem && isOwnPortfolio && (
-            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-4">
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-secondary-900 text-white px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-4">
               <span>Project hidden</span>
               <button
                 onClick={() => restoreVisibility(undoItem)}
@@ -459,11 +459,11 @@ export default function PortfolioPage() {
 
           {/* Portfolio Content */}
           {portfolio.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-12 text-center">
+              <h3 className="text-xl font-semibold text-secondary-900 mb-2">
                 {isOwnPortfolio ? 'No Projects Yet' : 'No Public Portfolio Items'}
               </h3>
-              <p className="text-gray-500 mb-6">
+              <p className="text-secondary-500 mb-6">
                 {isOwnPortfolio
                   ? 'Add your best work to showcase your skills'
                   : 'This freelancer hasnt added any public portfolio items yet'}
@@ -481,9 +481,9 @@ export default function PortfolioPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {portfolio.map((item) => (
-                <div key={item.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                <div key={item.id} className="bg-white rounded-lg shadow-sm border border-secondary-200 overflow-hidden">
                   {/* Image Section */}
-                  <div className="relative h-64 bg-gradient-to-br from-primary-50 to-gray-100">
+                  <div className="relative h-64 bg-gradient-to-br from-primary-50 to-secondary-100">
                     {item.imageUrl && (
                       <Image
                         src={item.imageUrl}
@@ -496,7 +496,7 @@ export default function PortfolioPage() {
 
                     {/* Hidden Badge (Owner Only) */}
                     {isOwnPortfolio && !item.isVisible && (
-                      <div className="absolute top-3 right-3 bg-amber-500 text-amber-900 px-3 py-1 rounded text-xs font-semibold">
+                      <div className="absolute top-3 right-3 bg-warning-500 text-warning-900 px-3 py-1 rounded text-xs font-semibold">
                         Hidden
                       </div>
                     )}
@@ -505,10 +505,10 @@ export default function PortfolioPage() {
                   {/* Content Section */}
                   <div className="p-6">
                     {/* Title */}
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.title}</h3>
+                    <h3 className="text-lg font-semibold text-secondary-900 mb-2">{item.title}</h3>
 
                     {/* Description */}
-                    <p className="text-gray-600 mb-4 line-clamp-3">{item.description}</p>
+                    <p className="text-secondary-600 mb-4 line-clamp-3">{item.description}</p>
 
                     {/* Technologies */}
                     {item.technologies && item.technologies.length > 0 && (
@@ -526,19 +526,19 @@ export default function PortfolioPage() {
 
                     {/* Metadata */}
                     {item.completionDate && (
-                      <p className="text-sm text-gray-500 mb-4">
+                      <p className="text-sm text-secondary-500 mb-4">
                         📅 Completed: {new Date(item.completionDate).toLocaleDateString()}
                       </p>
                     )}
 
-                    <hr className="border-gray-200 my-4" />
+                    <hr className="border-secondary-200 my-4" />
 
                     {/* Actions */}
                     {isOwnPortfolio ? (
                       <div className="flex items-center justify-between">
                         <button
                           onClick={() => toggleVisibility(item)}
-                          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+                          className="inline-flex items-center gap-2 text-sm text-secondary-600 hover:text-secondary-900"
                           title={item.isVisible ? 'Hide from public' : 'Make visible'}
                         >
                           {item.isVisible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
@@ -555,7 +555,7 @@ export default function PortfolioPage() {
                           </button>
                           <button
                             onClick={() => handleDelete(item.id)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            className="p-2 text-error-600 hover:bg-error-50 rounded-lg transition-colors"
                             title="Delete"
                           >
                             <Trash2 className="w-5 h-5" />
@@ -569,7 +569,7 @@ export default function PortfolioPage() {
                             href={item.projectUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 border border-secondary-300 rounded-lg text-secondary-700 hover:bg-secondary-50 transition-colors font-medium"
                           >
                             <ExternalLink className="w-4 h-4" />
                             View Live Project
@@ -611,7 +611,7 @@ export default function PortfolioPage() {
             {isOwnPortfolio ? (
               <Link
                 href="/dashboard"
-                className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900"
+                className="inline-flex items-center gap-2 text-secondary-600 hover:text-secondary-900"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to Dashboard
@@ -619,7 +619,7 @@ export default function PortfolioPage() {
             ) : (
               <Link
                 href="/talents"
-                className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900"
+                className="inline-flex items-center gap-2 text-secondary-600 hover:text-secondary-900"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Browse More Talent

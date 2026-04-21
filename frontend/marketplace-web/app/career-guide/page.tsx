@@ -61,11 +61,11 @@ const careerPaths = [
     description:
       'Sit at the intersection of design and engineering. Build the things designers dream up — interactive, animated, and technically precise.',
     tags: ['React', 'Three.js', 'GSAP', 'WebGL'],
-    color: 'bg-blue-50 text-blue-600',
-    borderColor: 'border-blue-100',
-    tagColor: 'bg-blue-50 text-blue-700',
+    color: 'bg-primary-50 text-primary-600',
+    borderColor: 'border-primary-100',
+    tagColor: 'bg-primary-50 text-primary-700',
     demand: 'Very High',
-    demandColor: 'text-blue-600 bg-blue-50',
+    demandColor: 'text-primary-600 bg-primary-50',
   },
   {
     icon: Layers,
@@ -73,11 +73,11 @@ const careerPaths = [
     description:
       'Communicate through time. From micro-interactions and UI animation to broadcast titles and explainer videos — motion is everywhere.',
     tags: ['After Effects', 'Lottie', 'Cinema 4D', 'Rive'],
-    color: 'bg-amber-50 text-amber-600',
-    borderColor: 'border-amber-100',
-    tagColor: 'bg-amber-50 text-amber-700',
+    color: 'bg-warning-50 text-warning-600',
+    borderColor: 'border-warning-100',
+    tagColor: 'bg-warning-50 text-warning-700',
     demand: 'Growing',
-    demandColor: 'text-amber-600 bg-amber-50',
+    demandColor: 'text-warning-600 bg-warning-50',
   },
   {
     icon: Globe,
@@ -85,11 +85,11 @@ const careerPaths = [
     description:
       'Craft worlds and direct visual narratives. Editorial illustration, publishing, advertising, and conceptual art demand a strong creative perspective.',
     tags: ['Procreate', 'Illustrator', 'Concept Art', 'Editorial'],
-    color: 'bg-emerald-50 text-emerald-600',
-    borderColor: 'border-emerald-100',
-    tagColor: 'bg-emerald-50 text-emerald-700',
+    color: 'bg-success-50 text-success-600',
+    borderColor: 'border-success-100',
+    tagColor: 'bg-success-50 text-success-700',
     demand: 'Stable',
-    demandColor: 'text-emerald-600 bg-emerald-50',
+    demandColor: 'text-success-600 bg-success-50',
   },
   {
     icon: Sparkles,
@@ -97,11 +97,11 @@ const careerPaths = [
     description:
       'Sculpt the next frontier. Product visualisation, spatial UI, AR experiences, and virtual environments are growing fields with few truly skilled practitioners.',
     tags: ['Blender', 'Cinema 4D', 'Unity', 'Spline'],
-    color: 'bg-indigo-50 text-indigo-600',
-    borderColor: 'border-indigo-100',
-    tagColor: 'bg-indigo-50 text-indigo-700',
+    color: 'bg-primary-50 text-primary-600',
+    borderColor: 'border-primary-100',
+    tagColor: 'bg-primary-50 text-primary-700',
     demand: 'Emerging',
-    demandColor: 'text-indigo-600 bg-indigo-50',
+    demandColor: 'text-primary-600 bg-primary-50',
   },
 ]
 
@@ -123,7 +123,7 @@ const stages = [
     number: '02',
     title: 'First Anchor Clients',
     subtitle: 'Building a stable foundation',
-    color: 'border-l-blue-400',
+    color: 'border-l-primary-400',
     items: [
       'Prioritise 2–3 retainer clients over endless one-off projects',
       'Document your process — clients pay for thinking, not just output',
@@ -149,7 +149,7 @@ const stages = [
     number: '04',
     title: 'Studio or Senior IC',
     subtitle: 'Choosing your long-term shape',
-    color: 'border-l-emerald-400',
+    color: 'border-l-success-400',
     items: [
       'The studio path: hire slowly, invest in systems, and price for the team not just yourself',
       'The senior IC path: fewer, larger engagements with leading companies and agencies',
@@ -229,7 +229,7 @@ const resources = [
     label: 'Tutorials',
     href: '/tutorials',
     description: 'Short-form, practical skill-building from working designers.',
-    color: 'text-blue-600',
+    color: 'text-primary-600',
   },
   {
     label: 'Design Resources',
@@ -241,13 +241,13 @@ const resources = [
     label: 'Browse Jobs',
     href: '/jobs',
     description: 'Apply your skills. Real briefs from companies hiring right now.',
-    color: 'text-emerald-600',
+    color: 'text-success-600',
   },
   {
     label: 'Browse Projects',
     href: '/projects',
     description: 'Shorter engagements — ideal while you\'re building your practice.',
-    color: 'text-amber-600',
+    color: 'text-warning-600',
   },
   {
     label: 'My Portfolio',
@@ -268,7 +268,7 @@ export default function CareerGuidePage() {
       {/* ================================================================== */}
       {/* Hero                                                                */}
       {/* ================================================================== */}
-      <div className="bg-gray-900 text-white py-20 lg:py-28">
+      <div className="bg-secondary-900 text-white py-20 lg:py-28">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 bg-primary-500/10 border border-primary-500/20 rounded-full px-4 py-1.5 text-sm text-primary-400 font-medium mb-6">
             <Rocket className="w-3.5 h-3.5" />
@@ -278,7 +278,7 @@ export default function CareerGuidePage() {
             Your design career,{' '}
             <span className="text-primary-400">your way.</span>
           </h1>
-          <p className="text-lg lg:text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-lg lg:text-xl text-secondary-400 max-w-2xl mx-auto mb-10 leading-relaxed">
             A practical, honest guide to building a creative career on your own terms —
             from landing your first client to running a studio that works while you sleep.
           </p>
@@ -292,7 +292,7 @@ export default function CareerGuidePage() {
               <a
                 key={link.label}
                 href={link.href}
-                className="text-sm text-gray-400 border border-white/10 rounded-full px-4 py-1.5 hover:border-white/30 hover:text-gray-200 transition"
+                className="text-sm text-secondary-400 border border-white/10 rounded-full px-4 py-1.5 hover:border-white/30 hover:text-secondary-200 transition"
               >
                 {link.label}
               </a>
@@ -304,7 +304,7 @@ export default function CareerGuidePage() {
       {/* ================================================================== */}
       {/* Intro strip — honest positioning                                   */}
       {/* ================================================================== */}
-      <div className="bg-white border-b border-gray-100 py-12">
+      <div className="bg-white border-b border-secondary-100 py-12">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             {[
@@ -325,11 +325,11 @@ export default function CareerGuidePage() {
               },
             ].map((item, i) => (
               <div key={i} className="flex flex-col items-center">
-                <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mb-3">
-                  <item.icon className="w-6 h-6 text-gray-600" />
+                <div className="w-12 h-12 bg-secondary-100 rounded-xl flex items-center justify-center mb-3">
+                  <item.icon className="w-6 h-6 text-secondary-600" />
                 </div>
-                <p className="text-base font-semibold text-gray-900 mb-1">{item.stat}</p>
-                <p className="text-sm text-gray-500 leading-snug">{item.note}</p>
+                <p className="text-base font-semibold text-secondary-900 mb-1">{item.stat}</p>
+                <p className="text-sm text-secondary-500 leading-snug">{item.note}</p>
               </div>
             ))}
           </div>
@@ -339,13 +339,13 @@ export default function CareerGuidePage() {
       {/* ================================================================== */}
       {/* Career Paths                                                        */}
       {/* ================================================================== */}
-      <div id="paths" className="bg-gray-50 py-16 lg:py-20">
+      <div id="paths" className="bg-secondary-50 py-16 lg:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-12">
-            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">
+            <h2 className="text-2xl lg:text-3xl font-bold text-secondary-900 mb-3">
               Choose your path
             </h2>
-            <p className="text-gray-500 max-w-xl leading-relaxed">
+            <p className="text-secondary-500 max-w-xl leading-relaxed">
               There is no single design career. Know which discipline excites you most,
               then go uncomfortably deep before expanding outwards.
             </p>
@@ -367,8 +367,8 @@ export default function CareerGuidePage() {
                       {path.demand} demand
                     </span>
                   </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">{path.title}</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed mb-5 flex-1">
+                  <h3 className="font-semibold text-secondary-900 mb-2">{path.title}</h3>
+                  <p className="text-sm text-secondary-600 leading-relaxed mb-5 flex-1">
                     {path.description}
                   </p>
                   <div className="flex flex-wrap gap-1.5">
@@ -383,7 +383,7 @@ export default function CareerGuidePage() {
             })}
           </div>
 
-          <p className="text-sm text-gray-400 mt-8 text-center">
+          <p className="text-sm text-secondary-400 mt-8 text-center">
             Demand signals based on job posting volume and proposal activity on Designer Marketplace, Q1 2026.
           </p>
         </div>
@@ -395,10 +395,10 @@ export default function CareerGuidePage() {
       <div id="stages" className="bg-white py-16 lg:py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <div className="mb-12">
-            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">
+            <h2 className="text-2xl lg:text-3xl font-bold text-secondary-900 mb-3">
               The four stages
             </h2>
-            <p className="text-gray-500 max-w-xl leading-relaxed">
+            <p className="text-secondary-500 max-w-xl leading-relaxed">
               Most creative careers move through these phases in roughly this order.
               The timeline varies — the moves don&apos;t.
             </p>
@@ -408,19 +408,19 @@ export default function CareerGuidePage() {
             {stages.map((stage, i) => (
               <div key={i} className={`border-l-4 ${stage.color} pl-6 py-1`}>
                 <div className="flex items-baseline gap-3 mb-1">
-                  <span className="text-3xl font-black text-gray-100 select-none leading-none">
+                  <span className="text-3xl font-black text-secondary-100 select-none leading-none">
                     {stage.number}
                   </span>
                   <div>
-                    <h3 className="text-lg font-bold text-gray-900">{stage.title}</h3>
-                    <p className="text-sm text-gray-500">{stage.subtitle}</p>
+                    <h3 className="text-lg font-bold text-secondary-900">{stage.title}</h3>
+                    <p className="text-sm text-secondary-500">{stage.subtitle}</p>
                   </div>
                 </div>
                 <ul className="mt-4 space-y-3">
                   {stage.items.map((item, j) => (
                     <li key={j} className="flex items-start gap-3">
-                      <CheckCircle className="w-4 h-4 text-gray-300 flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-gray-700 leading-snug">{item}</span>
+                      <CheckCircle className="w-4 h-4 text-secondary-300 flex-shrink-0 mt-0.5" />
+                      <span className="text-sm text-secondary-700 leading-snug">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -433,13 +433,13 @@ export default function CareerGuidePage() {
       {/* ================================================================== */}
       {/* Rates & Pricing                                                     */}
       {/* ================================================================== */}
-      <div id="rates" className="bg-gray-50 py-16 lg:py-20">
+      <div id="rates" className="bg-secondary-50 py-16 lg:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-12 max-w-xl">
-            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">
+            <h2 className="text-2xl lg:text-3xl font-bold text-secondary-900 mb-3">
               Rates & pricing
             </h2>
-            <p className="text-gray-500 leading-relaxed">
+            <p className="text-secondary-500 leading-relaxed">
               Transparent, realistic ranges. Prices below are UK-market GBP and will vary by
               discipline, client sector, and geography — treat them as a north star, not a ceiling.
             </p>
@@ -447,29 +447,29 @@ export default function CareerGuidePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {rateGuide.map((row, i) => (
-              <div key={i} className="bg-white rounded-xl border border-gray-100 p-6">
-                <h3 className="font-semibold text-gray-900 mb-4">{row.label}</h3>
+              <div key={i} className="bg-white rounded-xl border border-secondary-100 p-6">
+                <h3 className="font-semibold text-secondary-900 mb-4">{row.label}</h3>
                 <div className="grid grid-cols-3 gap-3 mb-4">
-                  <div className="text-center bg-gray-50 rounded-lg p-3">
-                    <p className="text-xs text-gray-400 mb-1">Hourly</p>
-                    <p className="text-sm font-semibold text-gray-900">{row.hourly}</p>
+                  <div className="text-center bg-secondary-50 rounded-lg p-3">
+                    <p className="text-xs text-secondary-400 mb-1">Hourly</p>
+                    <p className="text-sm font-semibold text-secondary-900">{row.hourly}</p>
                   </div>
-                  <div className="text-center bg-gray-50 rounded-lg p-3">
-                    <p className="text-xs text-gray-400 mb-1">Day rate</p>
-                    <p className="text-sm font-semibold text-gray-900">{row.daily}</p>
+                  <div className="text-center bg-secondary-50 rounded-lg p-3">
+                    <p className="text-xs text-secondary-400 mb-1">Day rate</p>
+                    <p className="text-sm font-semibold text-secondary-900">{row.daily}</p>
                   </div>
-                  <div className="text-center bg-gray-50 rounded-lg p-3">
-                    <p className="text-xs text-gray-400 mb-1">Project</p>
-                    <p className="text-sm font-semibold text-gray-900">{row.project}</p>
+                  <div className="text-center bg-secondary-50 rounded-lg p-3">
+                    <p className="text-xs text-secondary-400 mb-1">Project</p>
+                    <p className="text-sm font-semibold text-secondary-900">{row.project}</p>
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 leading-snug italic">{row.note}</p>
+                <p className="text-xs text-secondary-500 leading-snug italic">{row.note}</p>
               </div>
             ))}
           </div>
 
-          <div className="mt-8 bg-amber-50 border border-amber-100 rounded-xl p-5 max-w-2xl">
-            <p className="text-sm text-amber-800 leading-relaxed">
+          <div className="mt-8 bg-warning-50 border border-warning-100 rounded-xl p-5 max-w-2xl">
+            <p className="text-sm text-warning-800 leading-relaxed">
               <span className="font-semibold">The most common mistake:</span> undercharging
               out of imposter syndrome, then resentment at being undervalued. Price is also a
               signal of quality. Clients who push back hardest on rate are usually the most
@@ -486,10 +486,10 @@ export default function CareerGuidePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
-              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-4">
+              <h2 className="text-2xl lg:text-3xl font-bold text-secondary-900 mb-4">
                 Portfolio that wins work
               </h2>
-              <p className="text-gray-500 leading-relaxed mb-8">
+              <p className="text-secondary-500 leading-relaxed mb-8">
                 Your portfolio is a sales document, not a gallery. Every choice — piece
                 selection, layout, case study framing — should answer one question: why
                 should this client hire me for this kind of work?
@@ -499,12 +499,12 @@ export default function CareerGuidePage() {
                   const Icon = tip.icon
                   return (
                     <div key={i} className="flex items-start gap-4">
-                      <div className="w-9 h-9 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Icon className="w-4 h-4 text-gray-600" />
+                      <div className="w-9 h-9 bg-secondary-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Icon className="w-4 h-4 text-secondary-600" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-900 mb-1">{tip.title}</p>
-                        <p className="text-sm text-gray-600 leading-snug">{tip.description}</p>
+                        <p className="text-sm font-semibold text-secondary-900 mb-1">{tip.title}</p>
+                        <p className="text-sm text-secondary-600 leading-snug">{tip.description}</p>
                       </div>
                     </div>
                   )
@@ -512,7 +512,7 @@ export default function CareerGuidePage() {
               </div>
             </div>
 
-            <div className="bg-gray-900 rounded-2xl p-8 text-white">
+            <div className="bg-secondary-900 rounded-2xl p-8 text-white">
               <div className="flex items-center gap-2 mb-6">
                 <Zap className="w-4 h-4 text-primary-400" />
                 <span className="text-sm font-medium text-primary-400 uppercase tracking-wide">
@@ -530,7 +530,7 @@ export default function CareerGuidePage() {
                   'Verified reviews from past clients build your trust score',
                   'Skill assessments add credibility beyond self-reported claims',
                 ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm text-gray-300">
+                  <li key={i} className="flex items-start gap-3 text-sm text-secondary-300">
                     <CheckCircle className="w-4 h-4 text-primary-400 flex-shrink-0 mt-0.5" />
                     {item}
                   </li>
@@ -551,15 +551,15 @@ export default function CareerGuidePage() {
       {/* ================================================================== */}
       {/* The mindset section                                                 */}
       {/* ================================================================== */}
-      <div className="bg-gray-50 border-y border-gray-100 py-14">
+      <div className="bg-secondary-50 border-y border-secondary-100 py-14">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <blockquote className="text-center">
-            <p className="text-xl lg:text-2xl font-medium text-gray-900 leading-relaxed mb-6">
+            <p className="text-xl lg:text-2xl font-medium text-secondary-900 leading-relaxed mb-6">
               &ldquo;The designers who thrive freelance aren&apos;t necessarily the most talented.
               They&apos;re the ones who treat their practice like a business — without losing the
               thing that makes their work worth hiring.&rdquo;
             </p>
-            <footer className="text-sm text-gray-400">
+            <footer className="text-sm text-secondary-400">
               Designer Marketplace Editorial Team
             </footer>
           </blockquote>
@@ -572,10 +572,10 @@ export default function CareerGuidePage() {
       <div className="bg-white py-16 lg:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-12">
-            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">
+            <h2 className="text-2xl lg:text-3xl font-bold text-secondary-900 mb-3">
               Getting your first clients
             </h2>
-            <p className="text-gray-500 max-w-xl leading-relaxed">
+            <p className="text-secondary-500 max-w-xl leading-relaxed">
               Cold outreach is dead. Here&apos;s what actually works for creative freelancers in 2026.
             </p>
           </div>
@@ -596,7 +596,7 @@ export default function CareerGuidePage() {
                 body: "Every proposal should prove you read the brief. Reference a specific challenge from the job post. Share a directly relevant piece of work. Propose a scoped first deliverable — a quick audit, a conceptual direction — to reduce the client's perceived risk.",
                 cta: 'Browse open projects',
                 href: '/projects',
-                color: 'border-t-blue-400',
+                color: 'border-t-primary-400',
               },
               {
                 step: '3',
@@ -607,12 +607,12 @@ export default function CareerGuidePage() {
                 color: 'border-t-violet-400',
               },
             ].map((item, i) => (
-              <div key={i} className={`bg-white rounded-xl border border-gray-100 border-t-4 ${item.color} p-6 flex flex-col`}>
-                <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-sm font-bold text-gray-500 mb-4">
+              <div key={i} className={`bg-white rounded-xl border border-secondary-100 border-t-4 ${item.color} p-6 flex flex-col`}>
+                <div className="w-8 h-8 bg-secondary-100 rounded-lg flex items-center justify-center text-sm font-bold text-secondary-500 mb-4">
                   {item.step}
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-3">{item.title}</h3>
-                <p className="text-sm text-gray-600 leading-relaxed mb-6 flex-1">{item.body}</p>
+                <h3 className="font-semibold text-secondary-900 mb-3">{item.title}</h3>
+                <p className="text-sm text-secondary-600 leading-relaxed mb-6 flex-1">{item.body}</p>
                 <Link
                   href={item.href}
                   className="inline-flex items-center gap-1.5 text-sm font-medium text-primary-600 hover:text-primary-700 transition"
@@ -629,23 +629,23 @@ export default function CareerGuidePage() {
       {/* ================================================================== */}
       {/* Resources hub                                                       */}
       {/* ================================================================== */}
-      <div className="bg-gray-50 py-16 lg:py-20">
+      <div className="bg-secondary-50 py-16 lg:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Keep learning</h2>
-            <p className="text-gray-500">Everything on the platform, in one place.</p>
+            <h2 className="text-2xl font-bold text-secondary-900 mb-2">Keep learning</h2>
+            <p className="text-secondary-500">Everything on the platform, in one place.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {resources.map((resource, i) => (
               <Link
                 key={i}
                 href={resource.href}
-                className="bg-white rounded-xl border border-gray-100 p-5 hover:border-gray-200 hover:shadow-sm transition group"
+                className="bg-white rounded-xl border border-secondary-100 p-5 hover:border-secondary-200 hover:shadow-sm transition group"
               >
                 <p className={`text-sm font-semibold ${resource.color} mb-1 group-hover:underline`}>
                   {resource.label} →
                 </p>
-                <p className="text-sm text-gray-500 leading-snug">{resource.description}</p>
+                <p className="text-sm text-secondary-500 leading-snug">{resource.description}</p>
               </Link>
             ))}
           </div>
@@ -655,12 +655,12 @@ export default function CareerGuidePage() {
       {/* ================================================================== */}
       {/* CTA                                                                */}
       {/* ================================================================== */}
-      <div className="bg-gray-900 py-20">
+      <div className="bg-secondary-900 py-20">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Ready to put this into practice?
           </h2>
-          <p className="text-gray-400 mb-10 leading-relaxed">
+          <p className="text-secondary-400 mb-10 leading-relaxed">
             Your next client is on Designer Marketplace. Build your portfolio, apply to open
             projects, and start growing the career you want — not the one you defaulted into.
           </p>

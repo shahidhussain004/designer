@@ -25,10 +25,10 @@ const tiers = [
       'Co-marketing and case study opportunities',
     ],
     cta: 'Apply as Agency',
-    color: 'bg-blue-600',
-    lightColor: 'bg-blue-50',
-    iconColor: 'text-blue-600',
-    borderColor: 'border-blue-200',
+    color: 'bg-primary-600',
+    lightColor: 'bg-primary-50',
+    iconColor: 'text-primary-600',
+    borderColor: 'border-primary-200',
   },
   {
     name: 'Technology Partner',
@@ -72,10 +72,10 @@ const tiers = [
       'Quarterly business reviews with product roadmap preview',
     ],
     cta: 'Talk to Enterprise',
-    color: 'bg-gray-900',
-    lightColor: 'bg-gray-50',
-    iconColor: 'text-gray-700',
-    borderColor: 'border-gray-200',
+    color: 'bg-secondary-900',
+    lightColor: 'bg-secondary-50',
+    iconColor: 'text-secondary-700',
+    borderColor: 'border-secondary-200',
   },
 ]
 
@@ -136,11 +136,11 @@ export default function PartnersPage() {
   return (
     <PageLayout>
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden bg-gray-900 text-white">
+      <section className="relative overflow-hidden bg-secondary-900 text-white">
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
           <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-sm font-medium text-gray-300 mb-6 border border-white/10">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-sm font-medium text-secondary-300 mb-6 border border-white/10">
               <span className="w-2 h-2 rounded-full bg-primary-500" />
               Partner Programme
             </span>
@@ -148,7 +148,7 @@ export default function PartnersPage() {
               Build better. <br />
               <span className="text-primary-400">Build together.</span>
             </h1>
-            <p className="text-xl text-gray-300 leading-relaxed mb-10 max-w-2xl">
+            <p className="text-xl text-secondary-300 leading-relaxed mb-10 max-w-2xl">
               The best tools for creative professionals don&rsquo;t exist in isolation. We partner with agencies, platforms, and global organisations to create a more connected creative ecosystem.
             </p>
             <div className="flex flex-wrap gap-4">
@@ -169,17 +169,17 @@ export default function PartnersPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <span className="text-primary-600 text-sm font-semibold uppercase tracking-widest">Why Partner With Us</span>
-            <h2 className="text-3xl font-bold text-gray-900 mt-3 mb-3">Built to be mutually beneficial</h2>
-            <p className="text-gray-500 max-w-xl mx-auto">We don&rsquo;t do partnerships for optics. Every arrangement is structured to create measurable value on both sides.</p>
+            <h2 className="text-3xl font-bold text-secondary-900 mt-3 mb-3">Built to be mutually beneficial</h2>
+            <p className="text-secondary-500 max-w-xl mx-auto">We don&rsquo;t do partnerships for optics. Every arrangement is structured to create measurable value on both sides.</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {benefits.map((b) => (
-              <div key={b.title} className="bg-gray-50 rounded-2xl p-6 border border-gray-200 hover:border-primary-200 transition-colors">
+              <div key={b.title} className="bg-secondary-50 rounded-2xl p-6 border border-secondary-200 hover:border-primary-200 transition-colors">
                 <div className="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center mb-4">
                   {b.icon}
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">{b.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{b.description}</p>
+                <h3 className="font-bold text-secondary-900 mb-2">{b.title}</h3>
+                <p className="text-secondary-500 text-sm leading-relaxed">{b.description}</p>
               </div>
             ))}
           </div>
@@ -187,18 +187,18 @@ export default function PartnersPage() {
       </section>
 
       {/* ── Partner Tiers ── */}
-      <section id="partner-tiers" className="bg-gray-50 py-20 lg:py-28">
+      <section id="partner-tiers" className="bg-secondary-50 py-20 lg:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="text-primary-600 text-sm font-semibold uppercase tracking-widest">Partnership Tiers</span>
-            <h2 className="text-4xl font-bold text-gray-900 mt-3 mb-4">Choose your partnership type</h2>
-            <p className="text-gray-600 max-w-xl mx-auto">Three structured programmes, each designed around a different kind of relationship.</p>
+            <h2 className="text-4xl font-bold text-secondary-900 mt-3 mb-4">Choose your partnership type</h2>
+            <p className="text-secondary-600 max-w-xl mx-auto">Three structured programmes, each designed around a different kind of relationship.</p>
           </div>
           <div className="grid lg:grid-cols-3 gap-8">
             {tiers.map((tier) => (
               <div
                 key={tier.name}
-                className={`relative bg-white rounded-2xl border-2 ${tier.featured ? 'border-primary-400 shadow-lg shadow-primary-50' : 'border-gray-200'} overflow-hidden flex flex-col`}
+                className={`relative bg-white rounded-2xl border-2 ${tier.featured ? 'border-primary-400 shadow-lg shadow-primary-50' : 'border-secondary-200'} overflow-hidden flex flex-col`}
               >
                 {tier.featured && (
                   <div className="absolute top-0 left-0 right-0 h-1 bg-primary-500" />
@@ -212,12 +212,12 @@ export default function PartnersPage() {
                   <div className={`w-14 h-14 rounded-2xl ${tier.lightColor} ${tier.iconColor} flex items-center justify-center mb-5 border ${tier.borderColor}`}>
                     {tier.icon}
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">{tier.name}</h3>
-                  <p className="text-sm font-medium text-gray-500 mb-4">{tier.tagline}</p>
-                  <p className="text-gray-600 text-sm leading-relaxed mb-6">{tier.description}</p>
+                  <h3 className="text-xl font-bold text-secondary-900 mb-1">{tier.name}</h3>
+                  <p className="text-sm font-medium text-secondary-500 mb-4">{tier.tagline}</p>
+                  <p className="text-secondary-600 text-sm leading-relaxed mb-6">{tier.description}</p>
                   <ul className="space-y-3">
                     {tier.highlights.map((h) => (
-                      <li key={h} className="flex items-start gap-3 text-sm text-gray-700">
+                      <li key={h} className="flex items-start gap-3 text-sm text-secondary-700">
                         <svg className="w-4 h-4 text-primary-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
@@ -245,25 +245,25 @@ export default function PartnersPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <span className="text-primary-600 text-sm font-semibold uppercase tracking-widest">Integration Ecosystem</span>
-            <h2 className="text-3xl font-bold text-gray-900 mt-3 mb-3">Works with the tools you already use</h2>
-            <p className="text-gray-500 max-w-xl mx-auto">Designer Marketplace integrates natively with the platforms design and engineering teams depend on.</p>
+            <h2 className="text-3xl font-bold text-secondary-900 mt-3 mb-3">Works with the tools you already use</h2>
+            <p className="text-secondary-500 max-w-xl mx-auto">Designer Marketplace integrates natively with the platforms design and engineering teams depend on.</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {currentPartners.map(({ category, partners }) => (
-              <div key={category} className="bg-gray-50 rounded-2xl border border-gray-200 p-6">
-                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">{category}</h3>
+              <div key={category} className="bg-secondary-50 rounded-2xl border border-secondary-200 p-6">
+                <h3 className="text-xs font-bold text-secondary-400 uppercase tracking-widest mb-4">{category}</h3>
                 <ul className="space-y-2">
                   {partners.map((p) => (
                     <li key={p} className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-primary-400 flex-shrink-0" />
-                      <span className="text-sm text-gray-700 font-medium">{p}</span>
+                      <span className="text-sm text-secondary-700 font-medium">{p}</span>
                     </li>
                   ))}
                 </ul>
               </div>
             ))}
           </div>
-          <p className="text-center text-gray-400 text-sm mt-8">
+          <p className="text-center text-secondary-400 text-sm mt-8">
             Want your tool listed here?{' '}
             <a href="mailto:partners@designermarket.io" className="text-primary-600 font-semibold hover:underline">
               Apply as a Technology Partner
@@ -273,24 +273,24 @@ export default function PartnersPage() {
       </section>
 
       {/* ── Process ── */}
-      <section className="bg-gray-50 py-16 lg:py-20">
+      <section className="bg-secondary-50 py-16 lg:py-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <span className="text-primary-600 text-sm font-semibold uppercase tracking-widest">How It Works</span>
-            <h2 className="text-3xl font-bold text-gray-900 mt-3 mb-3">Getting started is straightforward</h2>
-            <p className="text-gray-500 max-w-xl mx-auto">We&rsquo;ve kept the process lean so you spend time building, not navigating procurement.</p>
+            <h2 className="text-3xl font-bold text-secondary-900 mt-3 mb-3">Getting started is straightforward</h2>
+            <p className="text-secondary-500 max-w-xl mx-auto">We&rsquo;ve kept the process lean so you spend time building, not navigating procurement.</p>
           </div>
           <div className="grid md:grid-cols-4 gap-8">
             {process.map((s, i) => (
               <div key={s.step} className="relative text-center">
                 {i < process.length - 1 && (
-                  <div className="hidden md:block absolute top-6 left-[calc(50%+24px)] right-[-50%] h-px bg-gray-200" />
+                  <div className="hidden md:block absolute top-6 left-[calc(50%+24px)] right-[-50%] h-px bg-secondary-200" />
                 )}
                 <div className="w-12 h-12 rounded-full bg-primary-100 text-primary-700 font-bold flex items-center justify-center mx-auto mb-4 text-sm relative z-10">
                   {s.step}
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2 text-sm">{s.title}</h3>
-                <p className="text-gray-500 text-xs leading-relaxed">{s.detail}</p>
+                <h3 className="font-bold text-secondary-900 mb-2 text-sm">{s.title}</h3>
+                <p className="text-secondary-500 text-xs leading-relaxed">{s.detail}</p>
               </div>
             ))}
           </div>
@@ -298,10 +298,10 @@ export default function PartnersPage() {
       </section>
 
       {/* ── CTA ── */}
-      <section className="bg-gray-900 text-white py-20">
+      <section className="bg-secondary-900 text-white py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-4">Ready to explore a partnership?</h2>
-          <p className="text-gray-300 text-lg mb-10 max-w-xl mx-auto">
+          <p className="text-secondary-300 text-lg mb-10 max-w-xl mx-auto">
             Our partnerships team reviews every application personally. Tell us what you&rsquo;re building and how we can grow together.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
@@ -313,8 +313,8 @@ export default function PartnersPage() {
               View Press Kit
             </Link>
           </div>
-          <p className="text-gray-500 text-sm mt-6">
-            Or email us directly at <a href="mailto:partners@designermarket.io" className="text-gray-300 hover:text-white transition-colors">partners@designermarket.io</a>
+          <p className="text-secondary-500 text-sm mt-6">
+            Or email us directly at <a href="mailto:partners@designermarket.io" className="text-secondary-300 hover:text-white transition-colors">partners@designermarket.io</a>
           </p>
         </div>
       </section>
