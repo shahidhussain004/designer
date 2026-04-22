@@ -11,10 +11,26 @@ const nextConfig = {
   },
   images: {
     remotePatterns: [
+      // Cloudinary (all subdomains)
       {
         protocol: 'https',
         hostname: '**.cloudinary.com',
       },
+      // Unsplash images
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      // Portfolio & test images
+      {
+        protocol: 'https',
+        hostname: 'www.datainvent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.unilever.pk',
+      },
+      // Generic example domains
       {
         protocol: 'https',
         hostname: 'api.example.com',
@@ -23,9 +39,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'images.example.com',
       },
+      // Allow any HTTPS image (for development flexibility)
       {
         protocol: 'https',
-        hostname: 'images.unsplash.com',
+        hostname: '**',
       },
     ],
   },

@@ -3,20 +3,18 @@
 import { useCategories } from '@/hooks/useContent';
 import { useCreateProject } from '@/hooks/useProjects';
 import { useAuth } from '@/lib/auth';
-import { 
-  AlertCircle, 
-  ArrowLeft, 
-  Briefcase, 
-  Calendar, 
-  CheckCircle, 
-  Clock, 
-  DollarSign, 
-  FileText, 
-  Lightbulb, 
-  Shield, 
-  Star, 
+import {
+  AlertCircle,
+  ArrowLeft,
+  Calendar,
+  CheckCircle,
+  Clock,
+  DollarSign,
+  FileText,
+  Lightbulb,
+  Star,
   Target,
-  Zap 
+  Zap
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -225,6 +223,9 @@ export default function CreateProjectPage() {
       const preferredSkills = parseSkills(formData.preferredSkillsInput, false);
       const screeningQuestions = getScreeningQuestions();
 
+      // Map form budget type to API budget type
+      const apiBudgetType: 'FIXED' | 'HOURLY' = formData.budgetType === 'FIXED_PRICE' ? 'FIXED' : 'HOURLY';
+
       await createProjectMutation.mutateAsync({
         categoryId: Number(formData.categoryId),
         title: formData.title,
@@ -233,7 +234,7 @@ export default function CreateProjectPage() {
         experienceLevel: formData.experienceLevel,
         priorityLevel: formData.priorityLevel,
         timeline: formData.timeline,
-        budgetType: formData.budgetType,
+        budgetType: apiBudgetType,
         budgetAmountCents: formData.budgetType === 'FIXED_PRICE' && formData.budgetAmountCents
           ? Math.round(Number(formData.budgetAmountCents) * 100)
           : undefined,

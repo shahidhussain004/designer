@@ -389,14 +389,14 @@ export function useUpdatePortfolio() {
       itemId: number; 
       input: Partial<CreatePortfolioInput>;
     }) => {
-      const { data } = await apiClient.patch<PortfolioItem>(
-        `/users/${userId}/portfolio/${itemId}`,
-        input
+      const { data } = await apiClient.put<PortfolioItem>(
+        `/portfolio-items/${itemId}`,
+        { ...input, userId }
       );
       return data;
     },
-    onSuccess: (updatedItem) => {
-      queryClient.invalidateQueries({ queryKey: ['user', updatedItem.userId, 'portfolio'] });
+    onSuccess: (_updatedItem, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['user', variables.userId, 'portfolio'] });
     },
   });
 }
@@ -409,7 +409,7 @@ export function useDeletePortfolio() {
 
   return useMutation({
     mutationFn: async ({ userId, itemId }: { userId: number; itemId: number }) => {
-      await apiClient.delete(`/users/${userId}/portfolio/${itemId}`);
+      await apiClient.delete(`/portfolio-items/${itemId}`, { params: { userId } });
       return { userId, itemId };
     },
     onSuccess: ({ userId }) => {

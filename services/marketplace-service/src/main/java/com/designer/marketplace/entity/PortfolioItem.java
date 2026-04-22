@@ -64,8 +64,23 @@ public class PortfolioItem {
     @Column(name = "image_url", length = 500)
     private String imageUrl;
 
+    @Column(name = "thumbnail_url", length = 500)
+    private String thumbnailUrl;
+
     @Column(name = "project_url", length = 500)
     private String projectUrl;
+
+    @Column(name = "live_url", length = 500)
+    private String liveUrl;
+
+    @Column(name = "github_url", length = 500)
+    private String githubUrl;
+
+    @Column(name = "source_url", length = 500)
+    private String sourceUrl;
+
+    @Column(name = "project_category", length = 100)
+    private String projectCategory;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "technologies", columnDefinition = "jsonb")
@@ -91,6 +106,9 @@ public class PortfolioItem {
 
     @Column(name = "display_order")
     private Integer displayOrder = 0;
+
+    @Column(name = "highlight_order")
+    private Integer highlightOrder;
 
     @Column(name = "is_visible")
     private Boolean isVisible = true;

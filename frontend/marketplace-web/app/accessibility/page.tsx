@@ -85,7 +85,7 @@ export default function AccessibilityPage() {
             <div className="flex-1">
               <h2 className="text-2xl font-bold text-secondary-900 mb-3">Key Accessibility Features</h2>
               <p className="text-secondary-700 mb-6 leading-relaxed">
-                We've implemented comprehensive accessibility features to ensure our design platform serves all professionals:
+                We&apos;ve implemented comprehensive accessibility features to ensure our design platform serves all professionals:
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -173,7 +173,7 @@ export default function AccessibilityPage() {
                 <div className="border-l-4 border-primary-500 pl-6 py-2">
                   <h3 className="font-semibold text-secondary-900 text-lg mb-2">Flexible Layouts</h3>
                   <p className="text-secondary-700">
-                    Responsive design isn't just about screen sizes—it's about adapting to user needs. Our platform works seamlessly across all devices and assistive technologies.
+                    Responsive design isn&apos;t just about screen sizes—it&apos;s about adapting to user needs. Our platform works seamlessly across all devices and assistive technologies.
                   </p>
                 </div>
               </div>
@@ -261,7 +261,7 @@ export default function AccessibilityPage() {
               <div className="bg-primary-50 border border-primary-200 rounded-lg p-6 mb-6">
                 <p className="text-sm text-blue-900 font-semibold mb-3">Report Accessibility Issues</p>
                 <p className="text-sm text-blue-800 mb-4">
-                  If you encounter accessibility barriers while using Designer Marketplace, please let us know. We're committed to addressing your concerns promptly.
+                  If you encounter accessibility barriers while using Designer Marketplace, please let us know. We&apos;re committed to addressing your concerns promptly.
                 </p>
                 <a 
                   href="/contact?subject=accessibility"
@@ -368,7 +368,7 @@ export default function AccessibilityPage() {
         <section className="mb-16 bg-gradient-to-br from-primary-50 to-primary-100 rounded-lg px-8 py-12 border border-primary-200">
           <h2 className="text-2xl font-bold text-secondary-900 mb-4">Join an Accessible Design Community</h2>
           <p className="text-secondary-700 mb-6 leading-relaxed">
-            We believe accessible design is good design. By choosing Designer Marketplace, you're part of a community that values inclusion and excellence. Whether you're a freelancer showcasing your work or a company seeking talent, we provide an accessible platform that serves everyone.
+            We believe accessible design is good design. By choosing Designer Marketplace, you&apos;re part of a community that values inclusion and excellence. Whether you&apos;re a freelancer showcasing your work or a company seeking talent, we provide an accessible platform that serves everyone.
           </p>
           <div className="flex gap-4">
             <Link

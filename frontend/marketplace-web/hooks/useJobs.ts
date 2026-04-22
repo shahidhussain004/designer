@@ -350,10 +350,10 @@ export function useJobApplicationsForCompany(jobId: string | number | null | und
     queryFn: async ({ signal }) => {
       const { data } = await apiClient.get(`/companies/me/jobs/${jobId}/applications`, { signal });
       if (data?.content && Array.isArray(data.content)) {
-        return data.content as Record<string, unknown>[];
+        return data.content;
       }
-      if (Array.isArray(data)) return data as Record<string, unknown>[];
-      return [] as Record<string, unknown>[];
+      if (Array.isArray(data)) return data;
+      return [];
     },
     enabled: !!jobId,
     staleTime: 1 * 60 * 1000,

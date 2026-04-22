@@ -47,13 +47,36 @@ interface ProjectFilters {
   search?: string;
 }
 
+interface ScreeningQuestion {
+  question: string;
+  required: boolean;
+}
+
 interface CreateProjectInput {
   title: string;
   description: string;
   categoryId: number;
-  experienceLevelId: number;
-  budget: number;
+  projectType?: string;
+  experienceLevel?: string;
+  priorityLevel?: string;
+  timeline?: string;
   budgetType: 'FIXED' | 'HOURLY';
+  budgetAmountCents?: number;
+  hourlyRateMinCents?: number;
+  hourlyRateMaxCents?: number;
+  estimatedHours?: number;
+  currency?: string;
+  startDate?: string;
+  endDate?: string;
+  applicationDeadline?: string;
+  maxProposals?: number;
+  deliverables?: string[];
+  requiredSkills?: string[];
+  preferredSkills?: string[];
+  screeningQuestions?: ScreeningQuestion[];
+  status?: string;
+  isFeatured?: boolean;
+  isUrgent?: boolean;
 }
 
 interface ProposalInput {

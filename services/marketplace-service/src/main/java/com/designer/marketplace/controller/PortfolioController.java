@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.designer.marketplace.dto.PortfolioItemDTO;
+import com.designer.marketplace.dto.PortfolioItemRequest;
 import com.designer.marketplace.entity.PortfolioItem;
 import com.designer.marketplace.service.PortfolioService;
 import com.designer.marketplace.service.UserService;
@@ -50,49 +51,28 @@ public class PortfolioController {
             requesterId = null;
         }
 
-        // The userId path parameter could be either a user ID or a freelancer ID
-        // Try to find the freelancer associated with this user
         List<PortfolioItem> portfolio = portfolioService.getUserPortfolioByUserId(userId, requesterId);
-        
-        // Convert to DTO to avoid lazy loading issues
+
         List<PortfolioItemDTO> dtos = portfolio.stream()
-            .map(item -> PortfolioItemDTO.builder()
-                .id(item.getId())
-                .title(item.getTitle())
-                .description(item.getDescription())
-                .imageUrl(item.getImageUrl())
-                .projectUrl(item.getProjectUrl())
-                .technologies(item.getTechnologies())
-                .images(item.getImages())
-                .toolsUsed(item.getToolsUsed())
-                .skillsDemonstrated(item.getSkillsDemonstrated())
-                .startDate(item.getStartDate())
-                .endDate(item.getEndDate())
-                .displayOrder(item.getDisplayOrder())
-                .isVisible(item.getIsVisible())
-                .createdAt(item.getCreatedAt())
-                .updatedAt(item.getUpdatedAt())
-                .build())
+            .map(item -> toDTO(item, userId))
             .toList();
-        
+
         return ResponseEntity.ok(dtos);
     }
 
     @PostMapping("/portfolio-items")
-    public ResponseEntity<PortfolioItem> createPortfolioItem(
-            @RequestParam Long userId,
-            @RequestBody PortfolioItem portfolioItem) {
-        PortfolioItem created = portfolioService.createPortfolioItem(userId, portfolioItem);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    public ResponseEntity<PortfolioItemDTO> createPortfolioItem(
+            @RequestBody PortfolioItemRequest request) {
+        PortfolioItem created = portfolioService.createPortfolioItem(request.getUserId(), request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(created, request.getUserId()));
     }
 
     @PutMapping("/portfolio-items/{itemId}")
-    public ResponseEntity<PortfolioItem> updatePortfolioItem(
+    public ResponseEntity<PortfolioItemDTO> updatePortfolioItem(
             @PathVariable Long itemId,
-            @RequestParam Long userId,
-            @RequestBody PortfolioItem updates) {
-        PortfolioItem updated = portfolioService.updatePortfolioItem(itemId, userId, updates);
-        return ResponseEntity.ok(updated);
+            @RequestBody PortfolioItemRequest request) {
+        PortfolioItem updated = portfolioService.updatePortfolioItem(itemId, request.getUserId(), request);
+        return ResponseEntity.ok(toDTO(updated, request.getUserId()));
     }
 
     @DeleteMapping("/portfolio-items/{itemId}")
@@ -113,8 +93,37 @@ public class PortfolioController {
     }
 
     @GetMapping("/portfolio-items/{itemId}")
-    public ResponseEntity<PortfolioItem> getPortfolioItem(@PathVariable Long itemId) {
+    public ResponseEntity<PortfolioItemDTO> getPortfolioItem(@PathVariable Long itemId) {
         PortfolioItem item = portfolioService.getPortfolioItem(itemId);
-        return ResponseEntity.ok(item);
+        return ResponseEntity.ok(toDTO(item, null));
+    }
+
+    // ── Helper ───────────────────────────────────────────────────────────────
+
+    private PortfolioItemDTO toDTO(PortfolioItem item, Long userId) {
+        return PortfolioItemDTO.builder()
+            .id(item.getId())
+            .userId(userId)
+            .title(item.getTitle())
+            .description(item.getDescription())
+            .imageUrl(item.getImageUrl())
+            .thumbnailUrl(item.getThumbnailUrl())
+            .projectUrl(item.getProjectUrl())
+            .liveUrl(item.getLiveUrl())
+            .githubUrl(item.getGithubUrl())
+            .sourceUrl(item.getSourceUrl())
+            .projectCategory(item.getProjectCategory())
+            .technologies(item.getTechnologies())
+            .images(item.getImages())
+            .toolsUsed(item.getToolsUsed())
+            .skillsDemonstrated(item.getSkillsDemonstrated())
+            .startDate(item.getStartDate())
+            .endDate(item.getEndDate())
+            .displayOrder(item.getDisplayOrder())
+            .highlightOrder(item.getHighlightOrder())
+            .isVisible(item.getIsVisible())
+            .createdAt(item.getCreatedAt())
+            .updatedAt(item.getUpdatedAt())
+            .build();
     }
 }
