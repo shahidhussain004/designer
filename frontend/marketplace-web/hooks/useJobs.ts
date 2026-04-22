@@ -336,6 +336,56 @@ export function useApplyForJob() {
     onSuccess: () => {
       // Invalidate applications list
       queryClient.invalidateQueries({ queryKey: ['job-applications'] });
+      queryClient.invalidateQueries({ queryKey: ['job-applications', 'my'] });
+    },
+  });
+}
+
+/**
+ * Get all applications for a specific job (company owner only)
+ */
+export function useJobApplicationsForCompany(jobId: string | number | null | undefined) {
+  return useQuery({
+    queryKey: ['company-job-applications', jobId],
+    queryFn: async ({ signal }) => {
+      const { data } = await apiClient.get(`/companies/me/jobs/${jobId}/applications`, { signal });
+      if (data?.content && Array.isArray(data.content)) {
+        return data.content as Record<string, unknown>[];
+      }
+      if (Array.isArray(data)) return data as Record<string, unknown>[];
+      return [] as Record<string, unknown>[];
+    },
+    enabled: !!jobId,
+    staleTime: 1 * 60 * 1000,
+  });
+}
+
+/**
+ * Update the status of a job application (company owner only)
+ */
+export function useUpdateApplicationStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      id,
+      status,
+      companyNotes,
+      rejectionReason,
+    }: {
+      id: number;
+      status: string;
+      companyNotes?: string;
+      rejectionReason?: string;
+    }) => {
+      const { data } = await apiClient.put(`/job-applications/${id}/status`, {
+        status,
+        companyNotes,
+        rejectionReason,
+      });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['company-job-applications'] });
     },
   });
 }

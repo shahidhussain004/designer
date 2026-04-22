@@ -18,10 +18,12 @@ import com.designer.marketplace.dto.JobResponse;
 import com.designer.marketplace.dto.NotificationResponse;
 import com.designer.marketplace.dto.ProjectResponse;
 import com.designer.marketplace.dto.ProposalResponse;
+import com.designer.marketplace.entity.Company;
 import com.designer.marketplace.entity.Job;
 import com.designer.marketplace.entity.Project;
 import com.designer.marketplace.entity.Proposal;
 import com.designer.marketplace.entity.User;
+import com.designer.marketplace.repository.CompanyRepository;
 import com.designer.marketplace.repository.JobApplicationRepository;
 import com.designer.marketplace.repository.JobRepository;
 import com.designer.marketplace.repository.ProjectRepository;
@@ -44,6 +46,7 @@ public class DashboardService {
         private final JobRepository jobRepository;
         private final JobApplicationRepository jobApplicationRepository;
         private final NotificationService notificationService;
+        private final CompanyRepository companyRepository;
 
         /**
          * Task 3.17: Get company dashboard data
@@ -58,6 +61,11 @@ public class DashboardService {
 
                 log.info("Getting company dashboard for user: {}", currentUser.getUsername());
 
+                // Look up company so we use company.id (not userId) for all job/application queries
+                Company company = companyRepository.findByUserId(currentUser.getId())
+                                .orElseThrow(() -> new RuntimeException("Company profile not found for user: " + currentUser.getUsername()));
+                Long companyId = company.getId();
+
                 // Get project statistics
                 Long totalProjectsPosted = projectRepository.countByCompanyId(currentUser.getId());
                 Long activeProjects = projectRepository.countByCompanyIdAndStatus(currentUser.getId(), Project.ProjectStatus.OPEN) +
@@ -68,11 +76,11 @@ public class DashboardService {
                 Long pendingProposals = proposalRepository.countByProjectCompanyIdAndStatus(
                                 currentUser.getId(), Proposal.ProposalStatus.SUBMITTED);
 
-                // Get job statistics
-                Long totalJobsPosted = jobRepository.countByCompanyId(currentUser.getId());
-                Long openJobs = jobRepository.countByCompanyIdAndStatus(currentUser.getId(), Job.JobStatus.OPEN);
-                Long totalApplicationsReceived = jobApplicationRepository.countByCompanyId(currentUser.getId());
-                Long filledJobs = jobRepository.countByCompanyIdAndStatus(currentUser.getId(), Job.JobStatus.FILLED);
+                // Get job statistics using company.id (correct FK)
+                Long totalJobsPosted = jobRepository.countByCompanyId(companyId);
+                Long openJobs = jobRepository.countByCompanyIdAndStatus(companyId, Job.JobStatus.OPEN);
+                Long totalApplicationsReceived = jobApplicationRepository.countByCompanyId(companyId);
+                Long filledJobs = jobRepository.countByCompanyIdAndStatus(companyId, Job.JobStatus.FILLED);
 
                 CompanyDashboardResponse.DashboardStats stats = CompanyDashboardResponse.DashboardStats.builder()
                                 .totalProjectsPosted(totalProjectsPosted)
@@ -116,15 +124,18 @@ public class DashboardService {
 
                 // Get all jobs posted by company (including DRAFT)
                 Pageable openJobsPageable = PageRequest.of(0, 5, Sort.by("createdAt").descending());
-                Page<Job> openJobsPage = jobRepository.findByCompanyId(currentUser.getId(), openJobsPageable);
+                Page<Job> openJobsPage = jobRepository.findByCompanyId(companyId, openJobsPageable);
                 List<JobResponse> openJobsResponse = openJobsPage.getContent().stream()
                                 .map(JobResponse::fromEntity)
                                 .collect(Collectors.toList());
 
                 // Get recent applications for company's jobs
-                // NOTE: Skipping job applications due to Hibernate ARRAY type mapping issue
-                // TODO: Fix the additionalDocuments field type or use a custom query
-                List<JobApplicationResponse> recentApplicationsResponse = new java.util.ArrayList<>();
+                Pageable appPageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+                Page<com.designer.marketplace.entity.JobApplication> recentApps =
+                                jobApplicationRepository.findByJobCompanyIdWithDetails(companyId, appPageable);
+                List<JobApplicationResponse> recentApplicationsResponse = recentApps.getContent().stream()
+                                .map(JobApplicationResponse::fromEntity)
+                                .collect(Collectors.toList());
 
                 return CompanyDashboardResponse.builder()
                                 .stats(stats)

@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.designer.marketplace.dto.CompanyProfileResponse;
+import com.designer.marketplace.dto.JobApplicationResponse;
 import com.designer.marketplace.dto.JobResponse;
 import com.designer.marketplace.dto.UserResponse;
 import com.designer.marketplace.entity.Company;
 import com.designer.marketplace.security.UserPrincipal;
+import com.designer.marketplace.service.JobApplicationService;
 import com.designer.marketplace.service.JobService;
 import com.designer.marketplace.service.UserService;
 
@@ -41,6 +43,7 @@ public class CompanyController {
     private final UserService userService;
     private final com.designer.marketplace.repository.CompanyRepository companyRepository;
     private final JobService jobService;
+    private final JobApplicationService jobApplicationService;
 
     /**
      * Get current user's company profile
@@ -139,6 +142,28 @@ public class CompanyController {
             pageable
         );
         return ResponseEntity.ok(companies);
+    }
+
+    /**
+     * Get applications for a specific job owned by current user
+     * GET /api/companies/me/jobs/{jobId}/applications
+     */
+    @GetMapping("/me/jobs/{jobId}/applications")
+    public ResponseEntity<Page<JobApplicationResponse>> getJobApplications(
+            @PathVariable Long jobId,
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @AuthenticationPrincipal UserPrincipal currentUser) {
+
+        if (currentUser == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        log.info("Getting applications for job: {} by user: {}", jobId, currentUser.getId());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<JobApplicationResponse> applications = jobApplicationService.getJobApplications(jobId, status, pageable);
+        return ResponseEntity.ok(applications);
     }
 
     /**

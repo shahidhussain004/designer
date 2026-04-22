@@ -1,13 +1,14 @@
 "use client";
 
 import { PageLayout } from '@/components/ui';
-import { useApplyForJob, useJob } from '@/hooks/useJobs';
+import { useApplyForJob, useJob, useMyApplications } from '@/hooks/useJobs';
 import { useAuth } from '@/lib/auth';
 import {
-    AlertCircle,
-    ArrowLeft,
-    Send,
-    Upload
+  AlertCircle,
+  ArrowLeft,
+  CheckCircle,
+  Send,
+  Upload
 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -24,6 +25,14 @@ export default function JobApplicationPage() {
 
   // Application mutation
   const applyForJob = useApplyForJob();
+
+  // Check if user has already applied (for FREELANCER users)
+  const { data: myApplications = [] } = useMyApplications();
+  const alreadyApplied = Array.isArray(myApplications) &&
+    myApplications.some((app: any) => String(app.jobId) === String(jobId));
+  const existingApplication = Array.isArray(myApplications)
+    ? myApplications.find((app: any) => String(app.jobId) === String(jobId))
+    : null;
 
   // Form state
   const [formData, setFormData] = useState({
@@ -213,6 +222,44 @@ export default function JobApplicationPage() {
               <ArrowLeft className="w-4 h-4" aria-hidden="true" />
               Back to Job
             </Link>
+          </div>
+        </div>
+      </PageLayout>
+    );
+  }
+
+  // Show "already applied" screen
+  if (alreadyApplied && existingApplication) {
+    return (
+      <PageLayout>
+        <div className="max-w-2xl mx-auto py-12">
+          <div className="text-center">
+            <CheckCircle className="w-16 h-16 mx-auto mb-4 text-green-500" aria-hidden="true" />
+            <h1 className="text-2xl font-bold text-secondary-900 mb-2">Already Applied</h1>
+            <p className="text-secondary-600 mb-2">
+              You have already submitted an application for <strong>{job.title}</strong>.
+            </p>
+            <p className="text-secondary-500 text-sm mb-6">
+              Status: <span className="font-semibold capitalize">{existingApplication.status?.toLowerCase().replace('_', ' ')}</span>
+              {existingApplication.appliedAt && (
+                <> &middot; Applied {new Date(existingApplication.appliedAt).toLocaleDateString()}</>
+              )}
+            </p>
+            <div className="flex justify-center gap-4">
+              <Link
+                href={`/jobs/${jobId}`}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-secondary-300 text-secondary-700 hover:bg-secondary-50 font-semibold transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+                Back to Job
+              </Link>
+              <Link
+                href="/dashboard/freelancer"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary-600 text-white hover:bg-primary-700 font-semibold transition-colors"
+              >
+                My Applications
+              </Link>
+            </div>
           </div>
         </div>
       </PageLayout>

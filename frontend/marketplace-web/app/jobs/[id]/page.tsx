@@ -531,11 +531,12 @@ export default function JobDetailsPage() {
                       )}
 
                       {/* View Applications Button */}
-                      <button 
-                        className="w-full px-4 py-2 rounded-lg border border-secondary-300 text-secondary-700 hover:bg-secondary-50 font-medium transition-colors text-sm"
+                      <Link
+                        href={`/jobs/${job.id}/applications`}
+                        className="block w-full text-center px-4 py-2 rounded-lg border border-secondary-300 text-secondary-700 hover:bg-secondary-50 font-medium transition-colors text-sm"
                       >
                         View Applications ({job.applicationsCount || 0})
-                      </button>
+                      </Link>
 
                       {/* Delete Button */}
                       <button
@@ -792,7 +793,7 @@ export default function JobDetailsPage() {
               </div>
 
               {/* Additional Requirements */}
-              {(job.securityClearanceRequired || job.visaSponsorship !== undefined) && (
+              {(job.securityClearanceRequired || job.visaSponsorship) && (
                 <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6">
                   <h3 className="text-lg font-bold text-secondary-900 mb-4 flex items-center gap-2">
                     <Shield className="w-5 h-5 text-primary-600" aria-hidden="true" />
