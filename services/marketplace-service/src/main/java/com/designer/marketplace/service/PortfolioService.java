@@ -55,18 +55,22 @@ public class PortfolioService {
         Freelancer freelancer = freelancerRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Freelancer profile not found for user: " + userId));
         
-        // Now get the portfolio for this freelancer
-        return getUserPortfolio(freelancer.getId(), requesterId);
+        // Now get the portfolio for this freelancer, passing userId for owner comparison
+        return getUserPortfolio(freelancer.getId(), userId, requesterId);
     }
 
     /**
      * Get all portfolio items for a freelancer (admin/owner view)
+     * @param freelancerId The freelancer table ID 
+     * @param userId The user table ID (for owner comparison)
+     * @param requesterId The requester's user ID
      */
     @Transactional
-    public List<PortfolioItem> getUserPortfolio(Long freelancerId, Long requesterId) {
-        log.debug("Fetching portfolio for freelancer: {} by requester: {}", freelancerId, requesterId);
+    public List<PortfolioItem> getUserPortfolio(Long freelancerId, Long userId, Long requesterId) {
+        log.debug("Fetching portfolio for freelancer: {} (userId: {}) by requester: {}", freelancerId, userId, requesterId);
 
-        boolean isOwner = (requesterId != null && requesterId.equals(freelancerId));
+        // Compare requesterId with userId for owner check
+        boolean isOwner = (requesterId != null && requesterId.equals(userId));
         boolean isAdmin = false;
 
         if (requesterId != null) {

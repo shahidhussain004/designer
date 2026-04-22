@@ -308,14 +308,18 @@ export function useUserSearch(searchQuery: string, options?: { role?: string }) 
 /**
  * Fetch user's portfolio items
  */
-export function useUserPortfolio(userId: string | number | null) {
+export function useUserPortfolio(userId: string | number | null, includeHidden?: boolean) {
   return useQuery({
-    queryKey: ['user', userId, 'portfolio'],
+    queryKey: ['user', userId, 'portfolio', includeHidden],
     queryFn: async ({ signal }) => {
       if (!userId) throw new Error('User ID is required');
+      
       const { data } = await apiClient.get<PortfolioItem[] | PaginatedResponse<PortfolioItem>>(
         `/users/${userId}/portfolio-items`,
-        { signal }
+        { 
+          signal,
+          params: includeHidden ? { includeHidden: true } : {}
+        }
       );
       return normalizeArrayResponse(data);
     },

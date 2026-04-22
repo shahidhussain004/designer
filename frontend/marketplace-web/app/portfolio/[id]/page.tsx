@@ -93,7 +93,7 @@ export default function PortfolioPage() {
 
   // Fetch data
   const { data: freelancerData, isLoading: profileLoading, isError: profileError, error: profileErrorMsg, refetch: refetchProfile } = useUserProfile(portfolioUserId)
-  const { data: portfolioData = [], isLoading: portfolioLoading, isError: portfolioError, error: portfolioErrorMsg, refetch: refetchPortfolio } = useUserPortfolio(parseInt(portfolioUserId))
+  const { data: portfolioData = [], isLoading: portfolioLoading, isError: portfolioError, error: portfolioErrorMsg, refetch: refetchPortfolio } = useUserPortfolio(parseInt(portfolioUserId), isOwnPortfolio)
 
   const freelancer = freelancerData as FreelancerProfile | undefined
 
