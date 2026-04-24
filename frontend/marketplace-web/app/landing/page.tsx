@@ -12,9 +12,9 @@ import type React from "react";
 import HowItWorksCarousel from './how-it-works-carousel';
 import SuccessFeaturesSection from './success-feature-section';
 
-const MotionDiv = motion.div as unknown as React.ComponentType<React.ComponentProps<'div'> & any>
-const MotionP = motion.p as unknown as React.ComponentType<React.ComponentProps<'p'> & any>
-const MotionSpan = motion.span as unknown as React.ComponentType<React.ComponentProps<'span'> & any>
+const MotionDiv = motion.div as unknown as React.ComponentType<React.ComponentProps<'div'> & Record<string, unknown>>
+const MotionP = motion.p as unknown as React.ComponentType<React.ComponentProps<'p'> & Record<string, unknown>>
+const MotionSpan = motion.span as unknown as React.ComponentType<React.ComponentProps<'span'> & Record<string, unknown>>
 
 const TAGLINES = [
   ["Talent", "Opportunity"],

@@ -17,9 +17,9 @@ const TutorialsPage = () => {
   const { data: tutorials = [], isLoading, error, refetch } = useTutorials(true);
 
   const filteredTutorials = useMemo(() => {
-    return tutorials.filter((tutorial: any) => {
+    return (tutorials as Record<string, unknown>[]).filter((tutorial) => {
       if (difficultyFilter === 'all') return true;
-      return tutorial.difficulty_level === difficultyFilter;
+      return (tutorial.difficulty_level as string | undefined) === difficultyFilter;
     });
   }, [tutorials, difficultyFilter]);
 
@@ -140,44 +140,44 @@ const TutorialsPage = () => {
 
         {/* Tutorial Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredTutorials.map((tutorial: any) => (
+          {filteredTutorials.map((tutorial) => (
             <div
-              key={tutorial.id}
+              key={String(tutorial.id)}
               className="bg-white dark:bg-secondary-800 rounded-xl shadow-lg hover:shadow-xl transition-shadow overflow-hidden border border-secondary-200 dark:border-secondary-700"
             >
               <div className="p-6">
                 {/* Icon and Title */}
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <span className="text-4xl mb-3 block">{tutorial.icon || '📘'}</span>
+                    <span className="text-4xl mb-3 block">{(tutorial.icon as string | undefined) || '📘'}</span>
                     <h3 className="text-2xl font-bold text-secondary-900 dark:text-white mb-2">
-                      {tutorial.title}
+                      {tutorial.title as string}
                     </h3>
                   </div>
-                  <span className={getDifficultyBadgeClass(tutorial.difficulty_level)}>
-                    {tutorial.difficulty_level}
+                  <span className={getDifficultyBadgeClass((tutorial.difficulty_level as string | undefined) || 'beginner')}>
+                    {tutorial.difficulty_level as string}
                   </span>
                 </div>
 
                 {/* Description */}
                 <p className="text-secondary-600 dark:text-secondary-300 mb-4 line-clamp-2">
-                  {tutorial.description}
+                  {tutorial.description as string}
                 </p>
 
                 {/* Stats */}
                 <div className="flex items-center gap-4 mb-6 text-sm text-secondary-500 dark:text-secondary-400">
                   <div className="flex items-center gap-1">
                     <BookOpen className="w-4 h-4" />
-                    <span>{tutorial.sections_count} sections</span>
+                    <span>{tutorial.sections_count as number} sections</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Clock className="w-4 h-4" />
-                    <span>{tutorial.estimated_hours}h</span>
+                    <span>{tutorial.estimated_hours as number}h</span>
                   </div>
-                  {tutorial.stats && tutorial.stats.total_topics && (
+                  {Boolean(tutorial.stats && (tutorial.stats as Record<string, unknown>).total_topics) && (
                     <div className="flex items-center gap-1">
                       <TrendingUp className="w-4 h-4" />
-                      <span>{tutorial.stats.total_topics} topics</span>
+                      <span>{(tutorial.stats as Record<string, unknown>).total_topics as number} topics</span>
                     </div>
                   )}
                 </div>
@@ -185,7 +185,7 @@ const TutorialsPage = () => {
                 {/* Action Buttons */}
                 <div className="flex gap-2">
                   <Link
-                    href={`/tutorials/${tutorial.slug}`}
+                    href={`/tutorials/${tutorial.slug as string}`}
                     className="flex-1 bg-secondary-800 hover:bg-secondary-700 text-white px-4 py-2 rounded-lg font-medium text-center transition-colors"
                   >
                     Start Learning

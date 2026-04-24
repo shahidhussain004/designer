@@ -78,31 +78,31 @@ const TutorialDetailPage = () => {
   }
 
   // Adapt API response to component format
-  const p: any = rawTutorial;
+  const p = rawTutorial as unknown as Record<string, unknown>;
   const tutorial: Tutorial = {
-    id: p.id,
-    slug: p.slug,
-    title: p.title,
-    description: p.description ?? p.summary ?? p.excerpt ?? '',
-    icon: p.icon,
+    id: String(p.id),
+    slug: p.slug as string,
+    title: p.title as string,
+    description: (p.description ?? p.summary ?? p.excerpt ?? '') as string,
+    icon: p.icon as string,
     difficultyLevel: (p.difficulty_level as string) || (p.difficultyLevel as string) || 'beginner',
-    colorTheme: p.color_theme || p.colorTheme,
-    estimatedHours: p.estimated_hours ?? p.estimatedHours ?? 0,
+    colorTheme: (p.color_theme ?? p.colorTheme) as string,
+    estimatedHours: (p.estimated_hours ?? p.estimatedHours ?? 0) as number,
     sections: Array.isArray(p.sections)
-      ? p.sections.map((s: any) => ({
-          id: s.id,
-          slug: s.slug,
-          title: s.title,
-          description: s.description ?? s.summary ?? '',
-          icon: s.icon,
-          display_order: s.display_order ?? s.displayOrder ?? 0,
+      ? (p.sections as Record<string, unknown>[]).map((s) => ({
+          id: String(s.id),
+          slug: s.slug as string,
+          title: s.title as string,
+          description: (s.description ?? s.summary ?? '') as string,
+          icon: s.icon as string,
+          display_order: (s.display_order ?? s.displayOrder ?? 0) as number,
           topics: Array.isArray(s.topics)
-            ? s.topics.map((t: any) => ({
-                id: t.id,
-                slug: t.slug,
-                title: t.title,
-                estimated_read_time: t.estimated_read_time ?? t.estimatedReadTime ?? 0,
-                is_published: typeof t.is_published === 'boolean' ? t.is_published : (t.isPublished ?? true),
+            ? (s.topics as Record<string, unknown>[]).map((t) => ({
+                id: String(t.id),
+                slug: t.slug as string,
+                title: t.title as string,
+                estimated_read_time: (t.estimated_read_time ?? t.estimatedReadTime ?? 0) as number,
+                is_published: typeof t.is_published === 'boolean' ? (t.is_published as boolean) : ((t.isPublished ?? true) as boolean),
               }))
             : [],
         }))

@@ -33,6 +33,9 @@ export interface JobSummary {
   status: string;
   proposalCount: number;
   createdAt: string;
+  isFeatured?: boolean;
+  applicationsCount?: number;
+  viewsCount?: number;
 }
 
 export interface ProjectSummary {

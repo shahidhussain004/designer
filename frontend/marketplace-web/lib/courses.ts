@@ -91,7 +91,7 @@ export async function getCourses(params?: {
 
   // Use global fetch when available (tests mock global.fetch). Fall back to axios lmsClient.
   type ApiResponse = {
-    items?: any[];
+    items?: unknown[];
     totalCount?: number;
     page?: number;
     pageSize?: number;
@@ -127,7 +127,7 @@ export async function getCourses(params?: {
   };
 
   return {
-    courses: (data.items || []).map((item: ApiCourse) => {
+    courses: ((data.items || []) as ApiCourse[]).map((item) => {
       // Use slug from API if provided, otherwise generate from title
       const slug = item.slug || (item.title 
         ? item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
@@ -247,7 +247,7 @@ export async function createCourse(data: {
   objectives?: string[];
   requirements?: string[];
 }): Promise<Course> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  const _token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
   const response = await lmsClient.post('/instructor/courses', data);
   return response.data;
 }
@@ -272,7 +272,7 @@ export async function updateCourse(
     requirements: string[];
   }>
 ): Promise<Course> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  const _token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
   const response = await lmsClient.put(`/instructor/courses/${courseId}`, data);
   return response.data;
 }
@@ -281,7 +281,7 @@ export async function updateCourse(
  * Delete a course (draft only)
  */
 export async function deleteCourse(courseId: string): Promise<void> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  const _token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
   await lmsClient.delete(`/instructor/courses/${courseId}`);
 }
 
@@ -289,7 +289,7 @@ export async function deleteCourse(courseId: string): Promise<void> {
  * Publish a course (make it available for enrollment)
  */
 export async function publishCourse(courseId: string): Promise<Course> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  const _token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
   const response = await lmsClient.post(`/instructor/courses/${courseId}/publish`);
   return response.data;
 }
@@ -306,7 +306,7 @@ export async function getInstructorCourses(
   page: number;
   pageSize: number;
 }> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  const _token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
   const response = await lmsClient.get(`/instructor/courses`, { params: { page, pageSize: size } });
   return response.data;
 }
@@ -322,7 +322,7 @@ export async function addModule(
     orderIndex?: number;
   }
 ): Promise<Course> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  const _token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
   const response = await lmsClient.post(`/courses/${courseId}/modules`, data);
   return response.data;
 }
@@ -344,7 +344,7 @@ export async function addLesson(
     isFree?: boolean;
   }
 ): Promise<Course> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  const _token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
   const response = await lmsClient.post(`/courses/${courseId}/lessons`, data);
   return response.data;
 }
@@ -353,7 +353,7 @@ export async function addLesson(
  * Get course for instructor (with draft courses)
  */
 export async function getInstructorCourseById(courseId: string): Promise<Course> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  const _token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
   const response = await lmsClient.get(`/courses/${courseId}`);
   return response.data;
 }

@@ -28,7 +28,7 @@ interface Freelancer {
 }
 
 interface PaginationData {
-  content: any[]
+  content: Record<string, unknown>[]
   totalElements: number
   totalPages: number
   currentPage: number
@@ -64,7 +64,7 @@ export default function TalentsContent() {
     setItemsPerPageLocal(value)
     const params = new URLSearchParams(searchParams.toString())
     params.set('limit', value.toString())
-    router.push(`?${params.toString()}`, { scroll: false } as any)
+    router.push(`?${params.toString()}`, { scroll: false } as Record<string, unknown>)
   }
 
   const { data: freelancersData = { content: [], totalElements: 0, totalPages: 0, currentPage: 0, pageSize: DEFAULT_ITEMS_PER_PAGE } as PaginationData, isLoading, isError, error, refetch } = useUsersPaginated({ 
@@ -74,25 +74,25 @@ export default function TalentsContent() {
   })
 
   // Normalize the data: ensure we have an array before mapping
-  const _rawItems: any = freelancersData && typeof freelancersData === 'object'
-    ? ((freelancersData as any)?.content ?? (freelancersData as any)?.items ?? (freelancersData as any)?.data ?? freelancersData)
+  const _rawItems: unknown = freelancersData && typeof freelancersData === 'object'
+    ? ((freelancersData as Record<string, unknown>)?.content ?? (freelancersData as Record<string, unknown>)?.items ?? (freelancersData as Record<string, unknown>)?.data ?? freelancersData)
     : []
 
-  const _items: any[] = Array.isArray(_rawItems) ? _rawItems : []
+  const _items: Record<string, unknown>[] = Array.isArray(_rawItems) ? (_rawItems as Record<string, unknown>[]) : []
 
-  const freelancers: Freelancer[] = _items.map((u: any) => ({
-    id: u.id,
-    username: u.username,
-    fullName: u.full_name || u.fullName || u.fullName,
-    bio: u.bio,
-    profileImageUrl: u.profile_image_url || u.profileImageUrl,
-    location: u.location,
-    hourlyRate: u.hourly_rate || u.hourlyRate,
-    skills: u.skills || [],
-    ratingAvg: u.rating_avg || u.ratingAvg,
-    ratingCount: u.rating_count || u.ratingCount,
-    completionRate: u.completion_rate || u.completionRate,
-    portfolioItems: u.portfolio_items ? u.portfolio_items.map((p: any) => ({ id: p.id, title: p.title, imageUrl: p.image_url || p.imageUrl })) : [],
+  const freelancers: Freelancer[] = _items.map((u) => ({
+    id: u.id as number,
+    username: u.username as string,
+    fullName: (u.full_name || u.fullName || u.fullName) as string,
+    bio: u.bio as string | undefined,
+    profileImageUrl: (u.profile_image_url || u.profileImageUrl) as string | undefined,
+    location: u.location as string | undefined,
+    hourlyRate: (u.hourly_rate || u.hourlyRate) as number | undefined,
+    skills: (u.skills || []) as string[],
+    ratingAvg: (u.rating_avg || u.ratingAvg) as number | undefined,
+    ratingCount: (u.rating_count || u.ratingCount) as number | undefined,
+    completionRate: (u.completion_rate || u.completionRate) as number | undefined,
+    portfolioItems: u.portfolio_items ? (u.portfolio_items as Record<string, unknown>[]).map((p) => ({ id: p.id as number, title: p.title as string, imageUrl: (p.image_url || p.imageUrl) as string | undefined })) : [],
   }))
 
   const clearFilters = () => {
@@ -104,13 +104,13 @@ export default function TalentsContent() {
   }
 
   // Client-side filtering on current page results
-  const filteredFreelancers = freelancers.filter((freelancer: any) => {
+  const filteredFreelancers = freelancers.filter((freelancer) => {
     if (searchQuery && !freelancer.fullName.toLowerCase().includes(searchQuery.toLowerCase()) &&
         !freelancer.bio?.toLowerCase().includes(searchQuery.toLowerCase())) {
       return false
     }
 
-    if (skillFilter && !freelancer.skills?.some((skill: any) => 
+    if (skillFilter && !freelancer.skills?.some((skill) => 
       skill.toLowerCase().includes(skillFilter.toLowerCase())
     )) {
       return false

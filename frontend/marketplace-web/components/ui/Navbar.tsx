@@ -1,5 +1,6 @@
 'use client';
 
+import { SavedJobsLink } from '@/components/SavedJobsLink';
 import { authService } from '@/lib/auth';
 import { useAuth } from '@/lib/context/AuthContext';
 import Image from 'next/image';
@@ -51,7 +52,7 @@ const UserDropdown: React.FC<{
   user: User;
   onLogout: () => void;
   onClose: () => void;
-}> = ({ user, onLogout, onClose }) => {
+}> = ({ user: _user, onLogout, onClose }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -73,7 +74,7 @@ const UserDropdown: React.FC<{
     setIsOpen(false);
   };
 
-  const getInitials = () => user.fullName?.charAt(0)?.toUpperCase() || user.username?.charAt(0)?.toUpperCase() || 'U';
+  const getInitials = () => _user.fullName?.charAt(0)?.toUpperCase() || _user.username?.charAt(0)?.toUpperCase() || 'U';
   const getRoleColor = (role?: string) => {
     if (!role) return 'bg-secondary-100 text-secondary-700';
     if (role.toLowerCase().includes('freelancer')) return 'bg-blue-100 text-blue-700';
@@ -93,7 +94,7 @@ const UserDropdown: React.FC<{
         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-600 to-primary-700 flex items-center justify-center text-white font-semibold text-sm shadow-sm">
           {getInitials()}
         </div>
-        <span className="hidden sm:inline text-secondary-900">{user.fullName || user.username}</span>
+        <span className="hidden sm:inline text-secondary-900">{_user.fullName || _user.username}</span>
         <svg
           className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
@@ -112,11 +113,11 @@ const UserDropdown: React.FC<{
               {getInitials()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-secondary-900 truncate">{user.fullName || user.username}</p>
-              <p className="text-xs text-secondary-500 truncate">{user.email}</p>
-              {user.role && (
-                <span className={`inline-block mt-1.5 px-2 py-0.5 text-xs font-medium rounded-full ${getRoleColor(user.role)}`}>
-                  {user.role}
+              <p className="text-sm font-semibold text-secondary-900 truncate">{_user.fullName || _user.username}</p>
+              <p className="text-xs text-secondary-500 truncate">{_user.email}</p>
+              {_user.role && (
+                <span className={`inline-block mt-1.5 px-2 py-0.5 text-xs font-medium rounded-full ${getRoleColor(_user.role)}`}>
+                  {_user.role}
                 </span>
               )}
             </div>
@@ -271,7 +272,7 @@ const MobileMenu: React.FC<{
   onLogout: () => void;
   authInitialized: boolean;
   currentUser: User | null;
-}> = ({ isOpen, onClose, pathname, user, loading, onLogout, authInitialized, currentUser }) => {
+}> = ({ isOpen, onClose, pathname, onLogout, authInitialized, currentUser }) => {
   if (!isOpen) return null;
 
   return (
@@ -529,6 +530,9 @@ export const Navbar: React.FC<NavbarProps> = ({ className: _className }) => {
 
             {/* Desktop CTA */}
             <div className="hidden lg:flex lg:items-center lg:gap-3">
+              {/* Saved Jobs Link - Only show when logged in */}
+              <SavedJobsLink />
+              
               {authInitialized && currentUser ? (
                 <UserDropdown
                   user={currentUser}

@@ -415,7 +415,7 @@ export const Text = forwardRef<HTMLElement, TextProps>(({
   'text-align': textAlign,
   'margin-bottom': marginBottom,
   'margin-top': marginTop,
-  ...props
+  ..._props
 }, ref) => {
 
   const fontClasses: Record<string, string> = {

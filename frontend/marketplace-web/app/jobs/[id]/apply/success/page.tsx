@@ -32,7 +32,7 @@ export default function ApplicationSuccessPage() {
   const searchParams = useSearchParams();
   const jobId = params?.id as string;
   const applicationId = searchParams?.get('applicationId');
-  const { user } = useAuth();
+  const { user: _user } = useAuth();
   
   const [copied, setCopied] = useState(false);
   const [applicationData, setApplicationData] = useState<ApplicationData | null>(null);

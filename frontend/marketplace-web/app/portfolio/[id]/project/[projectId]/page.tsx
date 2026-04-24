@@ -74,8 +74,11 @@ export default function ProjectDetailPage() {
         const { data } = await apiClient.get<PortfolioItem>(`/portfolio-items/${projectId}`)
         setItem(data)
         setActiveImage(data.imageUrl || null)
-      } catch (err: any) {
-        setError(err?.response?.data?.message || 'Failed to load project details')
+      } catch (err: unknown) {
+        const error = err as Record<string, unknown>;
+        const response = error?.response as Record<string, unknown> | undefined;
+        const data = response?.data as Record<string, unknown> | undefined;
+        setError(data?.message as string | undefined || 'Failed to load project details')
       } finally {
         setLoading(false)
       }

@@ -24,7 +24,7 @@ interface TopicContent {
   slug: string;
   title: string;
   content: string;
-  code_examples: any;
+  code_examples: unknown;
   estimated_read_time: number;
   views_count: number;
   section: {
@@ -75,28 +75,28 @@ const TopicReadingPage = () => {
     );
   }
 
-  const p: any = data;
+  const p = data as unknown as Record<string, unknown>;
   const topic: TopicContent = {
-    id: p.id,
-    slug: p.slug,
-    title: p.title,
-    content: p.content ?? p.body ?? p.html ?? '',
-    code_examples: p.code_examples ?? p.codeExamples ?? null,
-    estimated_read_time: p.estimated_read_time ?? p.estimatedReadTime ?? 0,
-    views_count: p.views_count ?? p.viewsCount ?? 0,
+    id: String(p.id),
+    slug: p.slug as string,
+    title: p.title as string,
+    content: (p.content ?? p.body ?? p.html ?? '') as string,
+    code_examples: (p.code_examples ?? p.codeExamples ?? null) as string | null,
+    estimated_read_time: (p.estimated_read_time ?? p.estimatedReadTime ?? 0) as number,
+    views_count: (p.views_count ?? p.viewsCount ?? 0) as number,
     section: {
-      slug: p.section_slug ?? p.section?.slug ?? sectionSlug,
-      title: p.section_title ?? p.section?.title ?? '',
+      slug: (p.section_slug ?? (p.section as Record<string, unknown> | undefined)?.slug ?? sectionSlug) as string,
+      title: (p.section_title ?? (p.section as Record<string, unknown> | undefined)?.title ?? '') as string,
     },
     tutorial: {
-      slug: p.tutorial_slug ?? p.tutorial?.slug ?? tutorialSlug,
-      title: p.tutorial_title ?? p.tutorial?.title ?? '',
-      icon: p.tutorial_icon ?? p.tutorial?.icon ?? p.icon ?? '',
-      color_theme: p.color_theme ?? p.tutorial?.color_theme ?? p.tutorial?.colorTheme ?? '#000000',
+      slug: (p.tutorial_slug ?? (p.tutorial as Record<string, unknown> | undefined)?.slug ?? tutorialSlug) as string,
+      title: (p.tutorial_title ?? (p.tutorial as Record<string, unknown> | undefined)?.title ?? '') as string,
+      icon: (p.tutorial_icon ?? (p.tutorial as Record<string, unknown> | undefined)?.icon ?? p.icon ?? '') as string,
+      color_theme: (p.color_theme ?? (p.tutorial as Record<string, unknown> | undefined)?.color_theme ?? (p.tutorial as Record<string, unknown> | undefined)?.colorTheme ?? '#000000') as string,
     },
     navigation: {
-      prev: p.navigation?.prev ?? null,
-      next: p.navigation?.next ?? null,
+      prev: ((p.navigation as Record<string, unknown> | undefined)?.prev ?? null) as NavigationLink | null,
+      next: ((p.navigation as Record<string, unknown> | undefined)?.next ?? null) as NavigationLink | null,
     },
   };
 

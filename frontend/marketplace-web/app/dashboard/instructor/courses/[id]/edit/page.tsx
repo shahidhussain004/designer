@@ -7,7 +7,7 @@ import { ArrowLeft, ChevronDown, Loader2, Plus } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 export default function EditCoursePage() {
   const router = useRouter()
@@ -30,17 +30,7 @@ export default function EditCoursePage() {
     thumbnailUrl: '',
   })
 
-  useEffect(() => {
-    const user = authService.getCurrentUser()
-    if (!user || (user.role !== 'INSTRUCTOR' && user.role !== 'ADMIN')) {
-      router.push('/dashboards')
-      return
-    }
-
-    loadCourse()
-  }, [courseId, router])
-
-  const loadCourse = async () => {
+  const loadCourse = useCallback(async () => {
     try {
       setLoading(true)
       const data = await getInstructorCourseById(courseId)
@@ -59,7 +49,17 @@ export default function EditCoursePage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [courseId])
+
+  useEffect(() => {
+    const user = authService.getCurrentUser()
+    if (!user || (user.role !== 'INSTRUCTOR' && user.role !== 'ADMIN')) {
+      router.push('/dashboards')
+      return
+    }
+
+    loadCourse()
+  }, [courseId, router, loadCourse])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target

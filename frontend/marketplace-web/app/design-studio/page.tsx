@@ -1,41 +1,11 @@
 "use client"
 
 import { PageLayout } from '@/components/ui';
-import { ArrowRight, Code, Layers, Lightbulb, Palette, Shield, Users, Zap } from 'lucide-react';
+import { ArrowRight, Shield, Users, Zap } from 'lucide-react';
 import Link from 'next/link';
-import { DesignProcess } from './design-process';
-import { HeroSection } from './hero-section';
-import { PhilosophySection } from './philosophy-section';
-import { ServicesSection } from './services-section';
-import { TestimonialsSection } from './testimonials-section';
-import { WorkShowcase } from './work-showcase';
-
-const services = [
-  {
-    icon: Palette,
-    title: "Brand Identity",
-    description: "Crafting distinctive visual identities that capture your essence and create lasting impressions across all touchpoints.",
-    details: ["Logo Design & Concepts", "Visual Systems & Guidelines", "Brand Art Direction"],
-  },
-  {
-    icon: Code,
-    title: "Digital Experiences",
-    description: "Building immersive digital products with meticulous attention to interaction design and user experience.",
-    details: ["Web & App Design", "Interactive Prototypes", "Motion Design"],
-  },
-  {
-    icon: Lightbulb,
-    title: "Strategy & Insights",
-    description: "Developing strategic frameworks that align creative vision with business objectives for maximum impact.",
-    details: ["Research & User Analysis", "Content Strategy", "Market Positioning"],
-  },
-  {
-    icon: Layers,
-    title: "Product Design",
-    description: "Designing intuitive product experiences that balance beauty with functionality and user needs.",
-    details: ["UX & UI Design", "Design Systems", "Usability Testing"],
-  },
-];
+import { HeroSection } from './hero-section-new';
+import { PhilosophySection } from './philosophy-section-new';
+import { ServicesSection } from './services-section-new';
 
 const features = [
   {
@@ -67,9 +37,6 @@ export default function DesignStudioPage() {
       <HeroSection />
       <PhilosophySection />
       <ServicesSection />
-      <WorkShowcase />
-      <TestimonialsSection />
-      <DesignProcess />
       <div style={{ background: "#111827", color: "#F0F0EE" }}>
 
 

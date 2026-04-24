@@ -1,3 +1,4 @@
+import type { User } from '@/types';
 import { useEffect, useState } from 'react';
 import { apiClient } from './api-client';
 
@@ -101,7 +102,7 @@ export const authService = {
       try {
 
         console.trace();
-      } catch (e) {
+      } catch {
         // ignore
       }
 
@@ -146,7 +147,7 @@ export const authService = {
       // Try to fetch current user profile to verify token
       await apiClient.get('/users/me');
       return true;
-    } catch (error) {
+    } catch {
       // Token is invalid, clear it
       this.logout();
       return false;
@@ -210,7 +211,7 @@ export const authService = {
  * Returns `{ user, setUser }` for simple usage in client components.
  */
 export function useAuth() {
-  const [user, setUser] = useState<any>(() => {
+  const [user, setUser] = useState<User | null>(() => {
     if (typeof window !== 'undefined') {
       const userStr = localStorage.getItem('user');
       return userStr ? JSON.parse(userStr) : null;

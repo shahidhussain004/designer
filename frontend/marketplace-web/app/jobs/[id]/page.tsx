@@ -37,7 +37,7 @@ import { useState } from 'react';
 
 export default function JobDetailsPage() {
   const params = useParams();
-  const router = useRouter();
+  const _router = useRouter();
   const jobId = params?.id as string;
   const { user } = useAuth();
 
@@ -51,7 +51,7 @@ export default function JobDetailsPage() {
   const { data: myApplications = [] } = useMyApplications();
   
   // Check if user has already applied for this job
-  const userApplication = myApplications.find((app: any) => app.jobId === parseInt(jobId));
+  const userApplication = myApplications.find((app: Record<string, unknown>) => app.jobId === parseInt(jobId));
 
   // Determine ownership: user is owner if their company ID matches the job's company ID
   // Uses both backend isOwner flag AND frontend company ID comparison as fallback
@@ -608,7 +608,7 @@ export default function JobDetailsPage() {
 
                         {userApplication.status?.toUpperCase() === 'SHORTLISTED' && (
                           <div className="pt-3 border-t border-success-200">
-                            <p className="text-success-700 font-semibold text-sm">🎉 Great news! You've been shortlisted.</p>
+                            <p className="text-success-700 font-semibold text-sm">🎉 Great news! You&apos;ve been shortlisted.</p>
                           </div>
                         )}
 

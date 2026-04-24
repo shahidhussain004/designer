@@ -29,9 +29,9 @@ export default function JobApplicationPage() {
   // Check if user has already applied (for FREELANCER users)
   const { data: myApplications = [] } = useMyApplications();
   const alreadyApplied = Array.isArray(myApplications) &&
-    myApplications.some((app: any) => String(app.jobId) === String(jobId));
+    myApplications.some((app: Record<string, unknown>) => String(app.jobId) === String(jobId));
   const existingApplication = Array.isArray(myApplications)
-    ? myApplications.find((app: any) => String(app.jobId) === String(jobId))
+    ? myApplications.find((app: Record<string, unknown>) => String(app.jobId) === String(jobId))
     : null;
 
   // Form state

@@ -82,36 +82,36 @@ export default function EditJobPage() {
       setFormData({
         title: job.title || '',
         description: job.description || '',
-        responsibilities: (job as any).responsibilities || '',
-        requirements: (job as any).requirements || '',
-        categoryId: String((job as any).categoryId || ''),
+        responsibilities: ((job as unknown as Record<string, unknown>).responsibilities as string | undefined) || '',
+        requirements: ((job as unknown as Record<string, unknown>).requirements as string | undefined) || '',
+        categoryId: String((job as unknown as Record<string, unknown>).categoryId || ''),
         jobType: job.jobType || 'FULL_TIME',
         experienceLevel: typeof job.experienceLevel === 'string' ? job.experienceLevel : '',
-        location: (job as any).location || '',
-        city: (job as any).city || '',
-        state: (job as any).state || '',
-        country: (job as any).country || '',
-        isRemote: (job as any).isRemote || false,
-        remoteType: (job as any).remoteType || '',
-        salaryMin: centsToDisplay((job as any).salaryMinCents),
-        salaryMax: centsToDisplay((job as any).salaryMaxCents),
-        salaryCurrency: (job as any).salaryCurrency || 'USD',
-        salaryPeriod: (job as any).salaryPeriod || 'ANNUAL',
-        showSalary: (job as any).showSalary !== false,
-        requiredSkills: parseJsonArrayToString((job as any).requiredSkills),
-        preferredSkills: parseJsonArrayToString((job as any).preferredSkills),
-        educationLevel: (job as any).educationLevel || '',
-        benefits: parseJsonArrayToString((job as any).benefits),
-        perks: parseJsonArrayToString((job as any).perks),
-        applicationEmail: (job as any).applicationEmail || '',
-        applicationUrl: (job as any).applicationUrl || '',
-        applyInstructions: (job as any).applyInstructions || '',
-        applicationDeadline: (job as any).applicationDeadline
-          ? new Date((job as any).applicationDeadline).toISOString().split('T')[0]
+        location: ((job as unknown as Record<string, unknown>).location as string | undefined) || '',
+        city: ((job as unknown as Record<string, unknown>).city as string | undefined) || '',
+        state: ((job as unknown as Record<string, unknown>).state as string | undefined) || '',
+        country: ((job as unknown as Record<string, unknown>).country as string | undefined) || '',
+        isRemote: ((job as unknown as Record<string, unknown>).isRemote as boolean | undefined) || false,
+        remoteType: ((job as unknown as Record<string, unknown>).remoteType as string | undefined) || '',
+        salaryMin: centsToDisplay((job as unknown as Record<string, unknown>).salaryMinCents as number | null),
+        salaryMax: centsToDisplay((job as unknown as Record<string, unknown>).salaryMaxCents as number | null),
+        salaryCurrency: ((job as unknown as Record<string, unknown>).salaryCurrency as string | undefined) || 'USD',
+        salaryPeriod: ((job as unknown as Record<string, unknown>).salaryPeriod as string | undefined) || 'ANNUAL',
+        showSalary: (job as unknown as Record<string, unknown>).showSalary !== false,
+        requiredSkills: parseJsonArrayToString((job as unknown as Record<string, unknown>).requiredSkills),
+        preferredSkills: parseJsonArrayToString((job as unknown as Record<string, unknown>).preferredSkills),
+        educationLevel: ((job as unknown as Record<string, unknown>).educationLevel as string | undefined) || '',
+        benefits: parseJsonArrayToString((job as unknown as Record<string, unknown>).benefits),
+        perks: parseJsonArrayToString((job as unknown as Record<string, unknown>).perks),
+        applicationEmail: ((job as unknown as Record<string, unknown>).applicationEmail as string | undefined) || '',
+        applicationUrl: ((job as unknown as Record<string, unknown>).applicationUrl as string | undefined) || '',
+        applyInstructions: ((job as unknown as Record<string, unknown>).applyInstructions as string | undefined) || '',
+        applicationDeadline: (job as unknown as Record<string, unknown>).applicationDeadline
+          ? new Date((job as unknown as Record<string, unknown>).applicationDeadline as string).toISOString().split('T')[0]
           : '',
-        positionsAvailable: String((job as any).positionsAvailable || 1),
-        visaSponsorship: (job as any).visaSponsorship || false,
-        securityClearanceRequired: (job as any).securityClearanceRequired || false,
+        positionsAvailable: String((job as unknown as Record<string, unknown>).positionsAvailable || 1),
+        visaSponsorship: ((job as unknown as Record<string, unknown>).visaSponsorship as boolean | undefined) || false,
+        securityClearanceRequired: ((job as unknown as Record<string, unknown>).securityClearanceRequired as boolean | undefined) || false,
         status: job.status || 'DRAFT',
       });
     }
@@ -121,8 +121,8 @@ export default function EditJobPage() {
 
   // Determine ownership using both API flag and company ID comparison
   const isOwner = user?.role === 'COMPANY' && (
-    (job as any)?.isOwner === true ||
-    (myCompany?.id != null && (job as any)?.companyId != null && myCompany.id === (job as any).companyId)
+    (job as unknown as Record<string, unknown>)?.isOwner === true ||
+    (myCompany?.id != null && (job as unknown as Record<string, unknown>)?.companyId != null && myCompany.id === (job as unknown as Record<string, unknown>).companyId)
   );
 
   const handleChange = (
@@ -181,7 +181,7 @@ export default function EditJobPage() {
     setIsSaving(true);
     setSaveSuccess(false);
     try {
-      await updateJobMutation.mutateAsync({ id: jobId, input: updateData as any });
+      await updateJobMutation.mutateAsync({ id: jobId, input: updateData as Record<string, unknown> });
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
       if (publishAfterSave) {
@@ -282,8 +282,8 @@ export default function EditJobPage() {
                     <select name="categoryId" value={formData.categoryId} onChange={handleChange}
                       className="w-full px-3 py-2.5 rounded-lg border border-secondary-300 text-secondary-900 focus:outline-none focus:ring-2 focus:ring-primary-500">
                       <option value="">Select category</option>
-                      {(categories as any[]).map((cat: any) => (
-                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                      {(categories as Record<string, unknown>[]).map((cat) => (
+                        <option key={cat.id as string} value={cat.id as string}>{cat.name as string}</option>
                       ))}
                     </select>
                   </div>
@@ -560,7 +560,7 @@ export default function EditJobPage() {
                   </button>
                   {formData.status === 'DRAFT' && (
                     <button type="button" disabled={isSaving}
-                      onClick={(e) => handleSubmit(e as any, true)}
+                      onClick={(e) => handleSubmit(e as React.MouseEvent<HTMLButtonElement>, true)}
                       className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-success-600 text-white hover:bg-success-700 font-semibold transition-colors text-sm disabled:opacity-50">
                       Save &amp; Publish
                     </button>

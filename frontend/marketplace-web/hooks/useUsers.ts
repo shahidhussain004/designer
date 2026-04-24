@@ -64,8 +64,15 @@ interface TimeEntry {
   freelancerId: number;
   date: string;
   hoursLogged: number;
+  hoursWorked: number;
+  ratePerHour: number;
   description: string;
-  status: 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED';
+  status: 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'PENDING' | 'PAID';
+  rejectionReason?: string;
+  paidAt?: string;
+  contract?: {
+    title: string;
+  };
 }
 
 interface Review {

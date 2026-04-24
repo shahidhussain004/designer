@@ -43,13 +43,13 @@ export default function CreateProjectPage() {
     if (categories.length > 0 && formData.categoryId === 1) {
       setFormData(prev => ({ ...prev, categoryId: categories[0].id }));
     }
-  }, [categories]);
+  }, [categories, formData.categoryId]);
 
   useEffect(() => {
     if (experienceLevels.length > 0 && formData.experienceLevelId === 2) {
       setFormData(prev => ({ ...prev, experienceLevelId: experienceLevels[0].id }));
     }
-  }, [experienceLevels]);
+  }, [experienceLevels, formData.experienceLevelId]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>

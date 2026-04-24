@@ -8,7 +8,7 @@ import { authService } from './auth';
 interface TokenPayload {
   exp?: number;
   iat?: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**
@@ -176,7 +176,7 @@ export async function apiFetch(
 /**
  * Convenience wrapper for JSON API calls with automatic token handling
  */
-export async function apiJSON<T = any>(
+export async function apiJSON<T = unknown>(
   url: string,
   options: RequestInit = {},
 ): Promise<{ data?: T; error?: string; status: number }> {

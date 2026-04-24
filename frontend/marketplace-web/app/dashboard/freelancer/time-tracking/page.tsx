@@ -46,7 +46,7 @@ export default function TimeTrackingPage() {
         const sp = new URLSearchParams(window.location.search);
         setContractIdFromQuery(sp.get('contractId'));
       }
-    } catch (e) {
+    } catch {
       // ignore
     }
   }, []);
@@ -139,13 +139,13 @@ export default function TimeTrackingPage() {
     }).format(amount);
   };
 
-  const totalHours = timeEntries.reduce((sum: number, entry: any) => sum + entry.hoursWorked, 0);
+  const totalHours = timeEntries.reduce((sum: number, entry) => sum + entry.hoursWorked, 0);
   const totalEarnings = timeEntries
-    .filter((e: any) => e.status === 'PAID')
-    .reduce((sum: number, entry: any) => sum + entry.hoursWorked * entry.ratePerHour, 0);
+    .filter((e) => e.status === 'PAID')
+    .reduce((sum: number, entry) => sum + entry.hoursWorked * entry.ratePerHour, 0);
   const pendingAmount = timeEntries
-    .filter((e: any) => e.status === 'PENDING' || e.status === 'APPROVED')
-    .reduce((sum: number, entry: any) => sum + entry.hoursWorked * entry.ratePerHour, 0);
+    .filter((e) => e.status === 'PENDING' || e.status === 'APPROVED')
+    .reduce((sum: number, entry) => sum + entry.hoursWorked * entry.ratePerHour, 0);
 
   if (isLoading) {
     return (
@@ -180,7 +180,7 @@ export default function TimeTrackingPage() {
           ];
 
           if (contractIdFromQuery) {
-            const found = contracts.find((c: any) => String(c.id) === String(contractIdFromQuery));
+            const found = contracts.find((c) => String(c.id) === String(contractIdFromQuery));
             if (found) items.push({ label: `Contract: ${found.title}`, href: `/dashboard/contracts/${found.id}` });
           }
 
@@ -372,14 +372,14 @@ export default function TimeTrackingPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {timeEntries.map((entry: any) => (
+          {timeEntries.map((entry) => (
             <div key={entry.id} className="bg-white rounded-lg shadow p-6">
               <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-start justify-between mb-3">
                     <div>
                       <h3 className="text-lg font-semibold text-secondary-900 mb-1">
-                        {entry.contract.title}
+                        {entry.contract?.title || 'Unknown Contract'}
                       </h3>
                       <p className="text-sm text-secondary-600">{entry.description}</p>
                     </div>
@@ -410,7 +410,7 @@ export default function TimeTrackingPage() {
                     </div>
                     <div>
                       <p className="text-secondary-500 mb-1">Work Date</p>
-                      <p className="font-medium text-secondary-900">{formatDate(entry.workDate)}</p>
+                      <p className="font-medium text-secondary-900">{formatDate(entry.date)}</p>
                     </div>
                   </div>
 

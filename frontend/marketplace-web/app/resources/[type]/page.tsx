@@ -45,7 +45,7 @@ export default function ResourceTypeListPage() {
   // Fetch content with filters for this type
   const filters = useMemo(() => {
     if (!contentType) return null;
-    const f: any = {
+    const f: Record<string, unknown> = {
       type: contentType,
       page,
       limit: pageSize,
@@ -60,14 +60,14 @@ export default function ResourceTypeListPage() {
     return f;
   }, [contentType, page, sortBy, sortOrder, selectedCategory, selectedTags, searchQuery]);
 
-  const { data: contentData, isLoading, error, refetch } = useContent(filters);
+  const { data: contentData, isLoading, error, refetch } = useContent(filters || undefined);
 
   // DEBUG: log filters (must be before early returns)
   React.useEffect(() => {
     try {
       // eslint-disable-next-line no-console
       console.info('[DEBUG] resources[type].filters', filters);
-    } catch (e) {
+    } catch {
       // ignore
     }
   }, [filters]);
@@ -181,9 +181,9 @@ export default function ResourceTypeListPage() {
                   className="px-4 py-2 border border-secondary-300 rounded-lg focus:outline-none"
                 >
                   <option value="">All Categories</option>
-                  {categories.map((cat: any) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat?.name ?? 'Unnamed'}
+                  {categories.map((cat) => (
+                    <option key={(cat as Record<string, unknown>).id as number} value={(cat as Record<string, unknown>).id as number}>
+                      {((cat as Record<string, unknown>)?.name ?? 'Unnamed') as string}
                     </option>
                   ))}
                 </select>
@@ -223,17 +223,17 @@ export default function ResourceTypeListPage() {
               <div className="mt-4">
                 <p className="text-sm text-secondary-600 mb-2">Filter by tags:</p>
                 <div className="flex flex-wrap gap-2">
-                  {tags.slice(0, 15).map((tag: any) => (
+                  {tags.slice(0, 15).map((tag) => (
                     <button
-                      key={tag.id}
-                      onClick={() => handleTagToggle(tag.id)}
+                      key={(tag as Record<string, unknown>).id as string | number}
+                      onClick={() => handleTagToggle(String((tag as Record<string, unknown>).id))}
                       className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                        selectedTags.includes(tag.id)
+                        selectedTags.includes(String((tag as Record<string, unknown>).id))
                           ? 'bg-primary-600 text-white'
                           : 'bg-secondary-200 text-secondary-700 hover:bg-secondary-300'
                       }`}
                     >
-                      {tag?.name ?? 'Tag'}
+                      {(tag as Record<string, unknown>).name as string} ({(tag as Record<string, unknown>).count as number})
                     </button>
                   ))}
                 </div>
@@ -276,21 +276,23 @@ export default function ResourceTypeListPage() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {content.map((item: any) => (
+                  {content.map((item) => {
+                    const itemRecord = item as Record<string, unknown>;
+                    return (
                     <div
-                      key={item.id}
+                      key={itemRecord.id as number}
                       className="h-full relative group"
                     >
                       <Link
-                        href={`/resources/${typeSlug}/${item.slug}`}
+                        href={`/resources/${typeSlug}/${itemRecord.slug as string}`}
                       >
                         <div className="h-full bg-white rounded-lg shadow-sm border border-secondary-200 hover:shadow-lg hover:border-primary-300 transition-all cursor-pointer overflow-hidden">
                           {/* Featured Image */}
                           <div className="relative h-48 bg-secondary-200">
-                            {item.featuredImageUrl ? (
+                            {itemRecord.featuredImageUrl ? (
                               <Image
-                                src={item.featuredImageUrl}
-                                alt={item.title}
+                                src={itemRecord.featuredImageUrl as string}
+                                alt={itemRecord.title as string}
                                 fill
                                 className="object-cover group-hover:scale-105 transition-transform duration-300"
                               />
@@ -315,13 +317,13 @@ export default function ResourceTypeListPage() {
                             <div className="absolute top-3 left-3">
                               <span
                                 className={`inline-block px-3 py-1 text-xs font-medium rounded-full ${
-                                  getContentTypeBadge(item.type).bg
-                                } ${getContentTypeBadge(item.type).text}`}
+                                  getContentTypeBadge((itemRecord.type || itemRecord.content_type) as ContentType).bg
+                                } ${getContentTypeBadge((itemRecord.type || itemRecord.content_type) as ContentType).text}`}
                               >
-                                {item.content_type}
+                                {itemRecord.content_type as string}
                               </span>
                             </div>
-                            {item.isFeatured && (
+                            {!!(itemRecord.isFeatured) && (
                               <div className="absolute top-3 right-3">
                                 <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-warning-500 text-white">
                                   Featured
@@ -333,28 +335,28 @@ export default function ResourceTypeListPage() {
                           {/* Content */}
                           <div className="p-5">
                             {/* Category */}
-                            {item.category && (
+                            {!!(itemRecord.category) && (
                               <p className="text-xs text-primary-600 font-medium mb-2">
-                                {item.category?.name ?? 'Uncategorized'}
+                                {((itemRecord.category as Record<string, unknown>)?.name ?? 'Uncategorized') as string}
                               </p>
                             )}
 
                             {/* Title */}
                             <h3 className="text-lg font-semibold text-secondary-900 mb-2 line-clamp-2">
-                              {item.title}
+                              {itemRecord.title as string}
                             </h3>
 
                             {/* Excerpt */}
                             <p className="text-sm text-secondary-600 mb-4 line-clamp-2">
-                              {item.excerpt || item.body?.replace(/<[^>]*>/g, '').substring(0, 100)}
+                              {(itemRecord.excerpt || (itemRecord.body as string | undefined)?.replace(/<[^>]*>/g, '').substring(0, 100)) as string}
                             </p>
 
                             {/* Meta */}
                             <div className="flex items-center justify-between text-xs text-secondary-500 pt-4 border-t">
-                              <span>{formatDate(item.publishedAt || item.createdAt)}</span>
+                              <span>{formatDate((itemRecord.publishedAt || itemRecord.createdAt) as string)}</span>
                               <div className="flex items-center gap-3">
-                                <span>👁 {item.viewCount || 0}</span>
-                                <span>❤️ {item.likeCount || 0}</span>
+                                <span>👁 {(itemRecord.viewCount || 0) as number}</span>
+                                <span>❤️ {(itemRecord.likeCount || 0) as number}</span>
                               </div>
                             </div>
                           </div>
@@ -363,12 +365,12 @@ export default function ResourceTypeListPage() {
 
                       {/* Admin Edit Button */}
                       {isAdmin && (
-                        <Link href={`http://localhost:3001/admin/resources/${item.id}/edit`}>
+                        <Link href={`http://localhost:3001/admin/resources/${itemRecord.id as number}/edit`}>
                           <button
                             onClick={(e) => {
                               e.preventDefault();
                               // Open admin dashboard in same window
-                              window.location.href = `http://localhost:3001/admin/resources/${item.id}/edit`;
+                              window.location.href = `http://localhost:3001/admin/resources/${itemRecord.id as number}/edit`;
                             }}
                             className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity px-3 py-1 bg-primary-600 text-white text-xs rounded font-medium hover:bg-primary-700"
                             title="Edit this resource"
@@ -378,7 +380,8 @@ export default function ResourceTypeListPage() {
                         </Link>
                       )}
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
 

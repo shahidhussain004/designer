@@ -53,9 +53,9 @@ function ProjectsPageContent() {
   const searchParams = useSearchParams();
   
   // View and Sort states
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [_viewMode, _setViewMode] = useState<ViewMode>('grid');
   const [sortBy, setSortBy] = useState<SortBy>('recent');
-  const [filtersOpen, setFiltersOpen] = useState(true);
+  const [_filtersOpen, _setFiltersOpen] = useState(true);
   const [layoutMode, setLayoutMode] = useState<LayoutMode>('grid');
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
@@ -77,7 +77,7 @@ function ProjectsPageContent() {
 
   // Sort projects based on selection
   const sortedProjects = useMemo(() => {
-    return [...projects].sort((a: any, b: any) => {
+    return [...projects].sort((a, b) => {
       switch (sortBy) {
         case 'budget-high':
           return b.budget - a.budget;

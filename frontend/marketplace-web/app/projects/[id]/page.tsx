@@ -13,7 +13,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
-interface Project {
+interface _Project {
   id: number;
   title: string;
   description: string;
@@ -119,37 +119,38 @@ export default function ProjectDetailsPage() {
       setProposalData({ projectId: project!.id, coverLetter: '', proposedRate: 0, estimatedDuration: 30 });
 
       setTimeout(() => setProposalSuccess(false), 5000);
-    } catch (err: any) {
-      logger.error('Proposal submission failed', err);
+    } catch (err: unknown) {
+      const error = err as Record<string, unknown>;
+      const response = error?.response as Record<string, unknown> | undefined;
+      const data = response?.data as Record<string, unknown> | undefined;
+      logger.error('Proposal submission failed', err as Error);
 
       let message = 'Failed to submit proposal';
-      if (err?.response?.data) {
-        const data = err.response.data;
-
+      if (data) {
         if (data.errors && Array.isArray(data.errors)) {
           const fe: typeof fieldErrors = {};
-          data.errors.forEach((e: any) => {
+          data.errors.forEach((e: Record<string, unknown>) => {
             if (e.field && e.message) {
               const fieldKey = e.field as keyof typeof fieldErrors;
-              fe[fieldKey] = e.message;
+              fe[fieldKey] = e.message as string;
             }
           });
           setFieldErrors(fe);
           message = 'Please fix the highlighted fields';
         } else if (typeof data === 'object') {
           if (data.field && data.message) {
-            setFieldErrors({ [data.field]: data.message });
-            message = data.message;
+            setFieldErrors({ [data.field as string]: data.message as string });
+            message = data.message as string;
           } else if (data.message) {
-            message = data.message;
+            message = data.message as string;
           } else if (data.error) {
-            message = data.error;
+            message = data.error as string;
           }
         } else if (typeof data === 'string') {
           message = data;
         }
-      } else if (err?.message) {
-        message = err.message;
+      } else if (error?.message) {
+        message = error.message as string;
       }
 
       setProposalError(message);

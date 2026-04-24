@@ -276,9 +276,9 @@ export default function CreateJobPage() {
                 className="w-full px-4 py-2 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >
                 <option value="">Select a category</option>
-                {categories?.map((cat: any) => (
-                  <option key={cat.id} value={String(cat.id)}>
-                    {cat.name}
+                {(categories as Record<string, unknown>[])?.map((cat) => (
+                  <option key={cat.id as string | number} value={String(cat.id)}>
+                    {cat.name as string}
                   </option>
                 ))}
               </select>

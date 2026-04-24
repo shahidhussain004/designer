@@ -55,7 +55,7 @@ const EXPERIENCE_LEVELS = [
   { value: 'EXECUTIVE', label: 'Executive' },
 ];
 
-interface SkillInput {
+interface _SkillInput {
   skill: string;
   level: string;
   required: boolean;
@@ -171,7 +171,7 @@ export default function CreateProjectPage() {
     setActiveStep(prev => Math.max(prev - 1, 1));
   };
 
-  const parseSkills = (skillsStr: string, requiredByDefault: boolean): any[] => {
+  const parseSkills = (skillsStr: string, requiredByDefault: boolean) => {
     return skillsStr
       .split(',')
       .map(s => s.trim())
@@ -183,7 +183,7 @@ export default function CreateProjectPage() {
       }));
   };
 
-  const getScreeningQuestions = (): any[] => {
+  const getScreeningQuestions = () => {
     const questions: ScreeningQuestion[] = [];
     
     if (formData.question1.trim()) {
@@ -247,8 +247,8 @@ export default function CreateProjectPage() {
         estimatedHours: formData.estimatedHours ? Number(formData.estimatedHours) : undefined,
         currency: formData.currency,
         deliverables: deliverables.length > 0 ? deliverables : undefined,
-        requiredSkills: requiredSkills.length > 0 ? requiredSkills : undefined,
-        preferredSkills: preferredSkills.length > 0 ? preferredSkills : undefined,
+        requiredSkills: requiredSkills.length > 0 ? requiredSkills.map(s => s.skill) : undefined,
+        preferredSkills: preferredSkills.length > 0 ? preferredSkills.map(s => s.skill) : undefined,
         screeningQuestions: screeningQuestions.length > 0 ? screeningQuestions : undefined,
         startDate: formData.startDate || undefined,
         endDate: formData.endDate || undefined,
@@ -397,8 +397,8 @@ export default function CreateProjectPage() {
                         }`}
                       >
                         <option value="">Select a category</option>
-                        {categories?.map((cat: any) => (
-                          <option key={cat.id} value={String(cat.id)}>{cat.name}</option>
+                        {(categories as Record<string, unknown>[] | undefined)?.map((cat) => (
+                          <option key={cat.id as string | number} value={String(cat.id)}>{cat.name as string}</option>
                         ))}
                       </select>
                       {errors.categoryId && (

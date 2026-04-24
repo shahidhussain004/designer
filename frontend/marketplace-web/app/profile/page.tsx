@@ -79,7 +79,7 @@ export default function ProfilePage() {
         throw new Error('Not authenticated')
       }
 
-      const payload: any = {
+      const payload: Record<string, unknown> = {
         fullName: formData.fullName || undefined,
         bio: formData.bio || undefined,
         location: formData.location || undefined,
@@ -111,7 +111,7 @@ export default function ProfilePage() {
 
       setNotification({ type: 'success', message: 'Profile updated successfully!' })
       setEditing(false)
-    } catch (err) {
+    } catch {
       setNotification({ type: 'error', message: 'Failed to update profile. Please try again.' })
     }
   }
@@ -371,10 +371,9 @@ interface PortfolioPreviewProps { userId: number }
 
 function PortfolioPreview({ userId }: PortfolioPreviewProps) {
   const { data: portfolioData = [], isLoading } = useUserPortfolio(userId)
-  const portfolio: any[] = portfolioData
 
-  const featured = portfolio.find((p) => p.highlightOrder === 1) ?? (portfolio[0] || null)
-  const rest = portfolio.filter((p) => p.id !== featured?.id).slice(0, 3)
+  const featured = portfolioData.find((p) => p.highlightOrder === 1) ?? (portfolioData[0] || null)
+  const rest = portfolioData.filter((p) => p.id !== featured?.id).slice(0, 3)
 
   if (isLoading) {
     return (
@@ -394,9 +393,9 @@ function PortfolioPreview({ userId }: PortfolioPreviewProps) {
         <div className="flex items-center gap-2">
           <Briefcase className="w-5 h-5 text-primary-600" />
           <h3 className="text-lg font-semibold text-secondary-900">My Portfolio</h3>
-          {portfolio.length > 0 && (
+          {portfolioData.length > 0 && (
             <span className="px-2 py-0.5 bg-secondary-100 text-secondary-600 rounded-full text-xs">
-              {portfolio.length} project{portfolio.length !== 1 ? 's' : ''}
+              {portfolioData.length} project{portfolioData.length !== 1 ? 's' : ''}
             </span>
           )}
         </div>
@@ -413,7 +412,7 @@ function PortfolioPreview({ userId }: PortfolioPreviewProps) {
         </div>
       </div>
 
-      {portfolio.length === 0 ? (
+      {portfolioData.length === 0 ? (
         <div className="text-center py-8">
           <div className="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center mx-auto mb-3">
             <Briefcase className="w-6 h-6 text-primary-500" />
@@ -444,7 +443,7 @@ function PortfolioPreview({ userId }: PortfolioPreviewProps) {
                   <p className="font-semibold text-secondary-900 truncate">{featured.title}</p>
                   {featured.projectCategory && <p className="text-xs text-primary-600 font-medium mt-0.5">{featured.projectCategory}</p>}
                   <p className="text-sm text-secondary-500 line-clamp-1 mt-1">{featured.description}</p>
-                  {featured.technologies?.length > 0 && (
+                  {Array.isArray(featured.technologies) && featured.technologies.length > 0 && (
                     <div className="flex gap-1 mt-1.5 flex-wrap">
                       {featured.technologies.slice(0, 3).map((t: string, i: number) => (
                         <span key={i} className="px-1.5 py-0.5 bg-secondary-100 text-secondary-600 rounded text-xs">{t}</span>
@@ -463,7 +462,7 @@ function PortfolioPreview({ userId }: PortfolioPreviewProps) {
           {/* Rest of projects */}
           {rest.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {rest.map((item: any) => (
+              {rest.map((item) => (
                 <Link key={item.id} href={`/portfolio/${userId}/project/${item.id}`}
                   className="group block border border-secondary-200 rounded-xl overflow-hidden hover:border-primary-200 hover:shadow-md transition-all">
                   <div className="relative h-28 bg-secondary-100">
@@ -484,10 +483,10 @@ function PortfolioPreview({ userId }: PortfolioPreviewProps) {
           )}
 
           {/* Link to see all */}
-          {portfolio.length > 4 && (
+          {portfolioData.length > 4 && (
             <div className="mt-4 text-center">
               <Link href={`/portfolio/${userId}`} className="text-sm text-primary-600 hover:text-primary-700 font-medium">
-                View all {portfolio.length} projects →
+                View all {portfolioData.length} projects →
               </Link>
             </div>
           )}

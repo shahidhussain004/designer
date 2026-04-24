@@ -4,16 +4,16 @@ import { PageLayout } from '@/components/ui';
 import { useMyApplications } from '@/hooks/useJobs';
 import { useAuth } from '@/lib/auth';
 import {
-  ArrowLeft,
-  Briefcase,
-  Calendar,
-  CheckCircle,
-  Clock,
-  Filter,
-  MapPin,
-  Search,
-  Trash2,
-  X
+    ArrowLeft,
+    Briefcase,
+    Calendar,
+    CheckCircle,
+    Clock,
+    Filter,
+    MapPin,
+    Search,
+    Trash2,
+    X
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -36,7 +36,7 @@ interface Application {
 }
 
 export default function MyApplicationsPage() {
-  const router = useRouter();
+  const _router = useRouter();
   const { user } = useAuth();
   const { data: applications = [], isLoading, error } = useMyApplications();
 

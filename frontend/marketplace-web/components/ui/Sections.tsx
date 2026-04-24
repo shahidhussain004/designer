@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 
@@ -373,7 +374,7 @@ export const TrustedBySection: React.FC<TrustedBySectionProps> = ({
               className="flex items-center justify-center p-4 grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition-all"
             >
               {company.logo ? (
-                <img src={company.logo} alt={company?.name ?? 'Company'} className="h-8 object-contain" />
+                <Image src={company.logo} alt={company?.name ?? 'Company'} width={120} height={32} className="h-8 object-contain" unoptimized />
               ) : (
                 <span className="text-lg font-bold text-secondary-400">{company?.name ?? 'Company'}</span>
               )}

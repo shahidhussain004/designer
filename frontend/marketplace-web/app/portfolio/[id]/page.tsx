@@ -78,7 +78,7 @@ const initialForm = {
  */
 export default function PortfolioPage() {
   const params = useParams()
-  const router = useRouter()
+  const _router = useRouter()
   const portfolioUserId = params.id as string
   const currentUser = authService.getCurrentUser()
   const isOwnPortfolio = currentUser?.id?.toString() === portfolioUserId
@@ -87,7 +87,7 @@ export default function PortfolioPage() {
   const [editingItem, setEditingItem] = useState<PortfolioItem | null>(null)
   const [undoItem, setUndoItem] = useState<PortfolioItem | null>(null)
   const [visibilityFilter, setVisibilityFilter] = useState<'ALL' | 'PUBLIC' | 'HIDDEN'>('ALL')
-  const [showHiddenSection, setShowHiddenSection] = useState(false)
+  const [_showHiddenSection, _setShowHiddenSection] = useState(false);
   const undoTimerRef = useRef<number | null>(null)
   const [formData, setFormData] = useState(initialForm)
 
@@ -103,11 +103,11 @@ export default function PortfolioPage() {
 
   // Filter based on ownership and visibility
   const visiblePortfolio: PortfolioItem[] = isOwnPortfolio
-    ? portfolioData.filter((p: any) => p.isVisible)
-    : portfolioData.filter((p: any) => p.isVisible)
+    ? portfolioData.filter((p) => p.isVisible)
+    : portfolioData.filter((p) => p.isVisible)
 
   const hiddenPortfolio: PortfolioItem[] = isOwnPortfolio
-    ? portfolioData.filter((p: any) => !p.isVisible)
+    ? portfolioData.filter((p) => !p.isVisible)
     : []
 
   // Apply filter state to determine what to show
@@ -206,7 +206,7 @@ export default function PortfolioPage() {
 
   const editItem = (item: PortfolioItem) => {
     setEditingItem(item)
-    const toArr = (v: any) => (Array.isArray(v) ? v.join(', ') : '')
+    const toArr = (v: unknown) => (Array.isArray(v) ? v.join(', ') : '')
     setFormData({
       title: item.title,
       description: item.description,
@@ -321,7 +321,7 @@ export default function PortfolioPage() {
                 ].map((tab) => (
                   <button
                     key={tab.filter}
-                    onClick={() => setVisibilityFilter(tab.filter as any)}
+                    onClick={() => setVisibilityFilter(tab.filter as 'ALL' | 'PUBLIC' | 'HIDDEN')}
                     className={`px-3 py-2 rounded-lg font-medium text-sm transition-all ${
                       visibilityFilter === tab.filter
                         ? 'bg-white text-secondary-900 shadow-sm'

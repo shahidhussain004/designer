@@ -64,7 +64,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               // Update Axios default headers
               apiClient.defaults.headers.Authorization = `Bearer ${response.data.accessToken}`;
             }
-          } catch (err) {
+          } catch {
             // Token refresh failed, user will need to login
           }
         }

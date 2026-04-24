@@ -1,6 +1,7 @@
 'use client';
 
 import { ErrorMessage } from '@/components/ErrorMessage';
+import { JobSaveButton } from '@/components/JobSaveButton';
 import { JobsSkeleton } from '@/components/Skeletons';
 import { PageLayout } from '@/components/ui';
 import { useJobs } from '@/hooks/useJobs';
@@ -158,11 +159,11 @@ export default function JobsContent() {
                 </div>
               )}
               <h1 className="text-3xl lg:text-4xl font-bold text-white mb-3">
-                {companyIdParam ? `Jobs at ${(company as any)?.companyName ?? company?.fullName ?? 'Company'}` : 'Discover Your Next Role'}
+                {companyIdParam ? `Jobs at ${(company as unknown as Record<string, unknown>)?.companyName ?? company?.fullName ?? 'Company'}` : 'Discover Your Next Role'}
               </h1>
               <p className="text-xl text-secondary-300">
                 {companyIdParam 
-                  ? `Viewing ${filteredJobs.length} open position${filteredJobs.length !== 1 ? 's' : ''} from ${(company as any)?.companyName ?? company?.fullName ?? 'this company'}`
+                  ? `Viewing ${filteredJobs.length} open position${filteredJobs.length !== 1 ? 's' : ''} from ${(company as unknown as Record<string, unknown>)?.companyName ?? company?.fullName ?? 'this company'}`
                   : `Explore ${filteredJobs.length} open position${filteredJobs.length !== 1 ? 's' : ''} from leading companies — find the one that fits you.`
                 }
               </p>
@@ -309,70 +310,144 @@ export default function JobsContent() {
               {layoutMode === 'list' ? (
                 // List View
                 <div className="space-y-4">
-                  {paginatedJobs.map((job: Job) => (
-                    <Link key={job.id} href={`/jobs/${job.id}`} className="block group">
-                      <div className="bg-white rounded-xl border border-secondary-200 p-6 hover:border-primary-300 hover:shadow-lg transition-all">
-                        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                          {/* Main Info */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start gap-4">
-                              {/* Company Logo Placeholder */}
-                              <div className="hidden sm:flex w-12 h-12 rounded-lg bg-secondary-100 items-center justify-center flex-shrink-0">
-                                <span className="text-lg font-bold text-secondary-400">
-                                  {job.companyName?.charAt(0) || 'C'}
-                                </span>
-                              </div>
-                              
+                  {paginatedJobs.map((job: Job) => {
+                    return (
+                      <div key={job.id} className="relative">
+                        <Link href={`/jobs/${job.id}`} className="block group">
+                          <div className="bg-white rounded-xl border border-secondary-200 p-6 hover:border-primary-300 hover:shadow-lg transition-all">
+                            {/* Save Button - Top Right */}
+                            <div className="absolute top-4 right-4 z-10">
+                              <JobSaveButton jobId={job.id} />
+                            </div>
+
+                            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                              {/* Main Info */}
                               <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-3 flex-wrap">
-                                  <h2 className="text-lg font-semibold text-secondary-900 group-hover:text-primary-600 transition-colors truncate">
-                                    {job.title}
-                                  </h2>
-                                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(job.status || '')}`}>
-                                    {job.status}
-                                  </span>
+                                <div className="flex items-start gap-4">
+                                  {/* Company Logo Placeholder */}
+                                  <div className="hidden sm:flex w-12 h-12 rounded-lg bg-secondary-100 items-center justify-center flex-shrink-0">
+                                    <span className="text-lg font-bold text-secondary-400">{job.companyName?.charAt(0) || 'C'}</span>
+                                  </div>
+
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-3 flex-wrap">
+                                      <h2 className="text-lg font-semibold text-secondary-900 group-hover:text-primary-600 transition-colors truncate">{job.title}</h2>
+                                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(job.status || '')}`}>{job.status}</span>
+                                    </div>
+                                    <p className="text-secondary-600 mt-1">{job.companyName || 'Company'}</p>
+
+                                    <p className="text-secondary-600 mt-3 line-clamp-2">
+                                      {job.description ? job.description.substring(0, 200) : 'No description available'}
+                                      {job.description && job.description.length > 200 && '...'}
+                                    </p>
+
+                                    {/* Meta Info */}
+                                    <div className="flex flex-wrap gap-4 mt-4 text-sm">
+                                      {job.location && (
+                                        <span className="flex items-center text-secondary-500">
+                                          <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                          </svg>
+                                          {job.location}
+                                        </span>
+                                      )}
+                                      {job.jobType && (
+                                        <span className="flex items-center text-secondary-500">
+                                          <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                          </svg>
+                                          {getJobTypeLabel(job.jobType)}
+                                        </span>
+                                      )}
+                                      {job.createdAt && (
+                                        <span className="flex items-center text-secondary-500">
+                                          <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                          </svg>
+                                          {new Date(job.createdAt).toLocaleDateString()}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
                                 </div>
-                                <p className="text-secondary-600 mt-1">{job.companyName || 'Company'}</p>
-                                
-                                <p className="text-secondary-600 mt-3 line-clamp-2">
-                                  {job.description ? job.description.substring(0, 200) : 'No description available'}
-                                  {job.description && job.description.length > 200 && '...'}
-                                </p>
-                                
-                                {/* Meta Info */}
-                                <div className="flex flex-wrap gap-4 mt-4 text-sm">
-                                  {job.location && (
-                                    <span className="flex items-center text-secondary-500">
-                                      <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                      </svg>
-                                      {job.location}
-                                    </span>
-                                  )}
-                                  {job.jobType && (
-                                    <span className="flex items-center text-secondary-500">
-                                      <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                      </svg>
-                                      {getJobTypeLabel(job.jobType)}
-                                    </span>
-                                  )}
-                                  {job.createdAt && (
-                                    <span className="flex items-center text-secondary-500">
-                                      <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                      </svg>
-                                      {new Date(job.createdAt).toLocaleDateString()}
-                                    </span>
-                                  )}
-                                </div>
+                              </div>
+
+                              {/* Action */}
+                              <div className="flex items-center lg:flex-shrink-0">
+                                <span className="text-primary-600 font-medium text-sm group-hover:translate-x-1 transition-transform inline-flex items-center">
+                                  View Details
+                                  <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                  </svg>
+                                </span>
                               </div>
                             </div>
                           </div>
+                        </Link>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                // Grid View
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {paginatedJobs.map((job: Job) => (
+                    <div key={job.id} className="relative">
+                      <Link href={`/jobs/${job.id}`} className="block group">
+                        <div className="bg-white rounded-xl border border-secondary-200 p-6 h-full hover:border-primary-300 hover:shadow-lg transition-all flex flex-col">
+                          {/* Save Button - Top Right */}
+                          <div className="absolute top-4 right-4 z-10">
+                            <JobSaveButton jobId={job.id} />
+                          </div>
                           
-                          {/* Action */}
-                          <div className="flex items-center lg:flex-shrink-0">
+                          {/* Company Logo */}
+                          <div className="w-12 h-12 rounded-lg bg-secondary-100 items-center justify-center flex mb-4">
+                            <span className="text-lg font-bold text-secondary-400">
+                              {job.companyName?.charAt(0) || 'C'}
+                            </span>
+                          </div>
+
+                          {/* Status Badge */}
+                          <span className={`inline-flex w-max px-2.5 py-0.5 rounded-full text-xs font-medium mb-3 ${getStatusColor(job.status || '')}`}>
+                            {job.status}
+                          </span>
+
+                          {/* Title & Company */}
+                          <h2 className="text-lg font-semibold text-secondary-900 group-hover:text-primary-600 transition-colors mb-2 line-clamp-2 pr-8">
+                            {job.title}
+                          </h2>
+                          <p className="text-secondary-600 text-sm mb-4 flex-grow">{job.companyName || 'Company'}</p>
+
+                          {/* Description */}
+                          <p className="text-secondary-600 text-sm mb-4 line-clamp-3 flex-grow">
+                            {job.description ? job.description.substring(0, 150) : 'No description available'}
+                            {job.description && job.description.length > 150 && '...'}
+                          </p>
+
+                          {/* Meta Info */}
+                          <div className="flex flex-col gap-2 text-sm mb-4 pt-4 border-t border-secondary-100">
+                            {job.location && (
+                              <span className="flex items-center text-secondary-500">
+                                <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                {job.location}
+                              </span>
+                            )}
+                            {job.jobType && (
+                              <span className="flex items-center text-secondary-500">
+                                <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                {getJobTypeLabel(job.jobType)}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* CTA */}
+                          <div className="pt-4 border-t border-secondary-100">
                             <span className="text-primary-600 font-medium text-sm group-hover:translate-x-1 transition-transform inline-flex items-center">
                               View Details
                               <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -381,72 +456,8 @@ export default function JobsContent() {
                             </span>
                           </div>
                         </div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                // Grid View
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {paginatedJobs.map((job: Job) => (
-                    <Link key={job.id} href={`/jobs/${job.id}`} className="block group">
-                      <div className="bg-white rounded-xl border border-secondary-200 p-6 h-full hover:border-primary-300 hover:shadow-lg transition-all flex flex-col">
-                        {/* Company Logo */}
-                        <div className="w-12 h-12 rounded-lg bg-secondary-100 items-center justify-center flex mb-4">
-                          <span className="text-lg font-bold text-secondary-400">
-                            {job.companyName?.charAt(0) || 'C'}
-                          </span>
-                        </div>
-
-                        {/* Status Badge */}
-                        <span className={`inline-flex w-max px-2.5 py-0.5 rounded-full text-xs font-medium mb-3 ${getStatusColor(job.status || '')}`}>
-                          {job.status}
-                        </span>
-
-                        {/* Title & Company */}
-                        <h2 className="text-lg font-semibold text-secondary-900 group-hover:text-primary-600 transition-colors mb-2 line-clamp-2">
-                          {job.title}
-                        </h2>
-                        <p className="text-secondary-600 text-sm mb-4 flex-grow">{job.companyName || 'Company'}</p>
-
-                        {/* Description */}
-                        <p className="text-secondary-600 text-sm mb-4 line-clamp-3 flex-grow">
-                          {job.description ? job.description.substring(0, 150) : 'No description available'}
-                          {job.description && job.description.length > 150 && '...'}
-                        </p>
-
-                        {/* Meta Info */}
-                        <div className="flex flex-col gap-2 text-sm mb-4 pt-4 border-t border-secondary-100">
-                          {job.location && (
-                            <span className="flex items-center text-secondary-500">
-                              <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                              </svg>
-                              {job.location}
-                            </span>
-                          )}
-                          {job.jobType && (
-                            <span className="flex items-center text-secondary-500">
-                              <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                              </svg>
-                              {getJobTypeLabel(job.jobType)}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* CTA */}
-                        <div className="pt-4 border-t border-secondary-100">
-                          <span className="text-primary-600 font-medium text-sm group-hover:translate-x-1 transition-transform inline-flex items-center">
-                            View Details
-                            <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
-                          </span>
-                        </div>
-                      </div>
-                    </Link>
+                      </Link>
+                    </div>
                   ))}
                 </div>
               )}

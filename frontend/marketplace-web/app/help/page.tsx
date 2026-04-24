@@ -388,7 +388,7 @@ export default function HelpCenterPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <h2 className="text-2xl lg:text-3xl font-bold text-secondary-900 mb-3">
-              Still can't find what you need?
+              Still can&apos;t find what you need?
             </h2>
             <p className="text-secondary-500 max-w-lg mx-auto">
               Our support team is staffed by people who actually use the platform. No scripts,

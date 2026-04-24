@@ -3,12 +3,12 @@
 import { PageLayout } from '@/components/ui'
 import { apiClient } from '@/lib/api-client'
 import { authService } from '@/lib/auth'
-import { CompanyDashboard, getDashboardData } from '@/lib/dashboard'
+import { CompanyDashboard, getDashboardData, JobSummary } from '@/lib/dashboard'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ArrowRight, Briefcase, CheckCircle, Eye, FileText, Loader2, Plus, RefreshCw, Send, TrendingUp, Users, XCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 export default function CompanyDashboardPage() {
   const router = useRouter()
@@ -18,24 +18,24 @@ export default function CompanyDashboardPage() {
   const queryClient = useQueryClient()
 
   // Fetch company's jobs directly using new /jobs/my-jobs endpoint
-  const currentUser = authService.getCurrentUser()
-  const [companyJobs, setCompanyJobs] = useState<any[]>([])
+  const _currentUser = authService.getCurrentUser()
+  const [companyJobs, setCompanyJobs] = useState<JobSummary[]>([])
   const [jobsLoading, setJobsLoading] = useState(true)
   
-  const refetchJobs = async () => {
+  const refetchJobs = useCallback(async () => {
     try {
       const response = await apiClient.get('/companies/me/jobs', {
         params: { page: 0, size: 100 }
       })
       const jobs = response.data?.content || response.data || []
       setCompanyJobs(Array.isArray(jobs) ? jobs : [])
-    } catch (err) {
-      console.error('Error fetching company jobs:', err)
+    } catch (_err) {
+      console.error('Error fetching company jobs:', _err)
       setCompanyJobs([])
     } finally {
       setJobsLoading(false)
     }
-  }
+  }, [])
 
   // Mutations for job status management
   const publishJobMutation = useMutation({
@@ -46,7 +46,7 @@ export default function CompanyDashboardPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['jobs'] })
       refetchJobs()
-      loadDashboardData() // Reload dashboard stats
+      void loadDashboardData() // Reload dashboard stats
     },
   })
 
@@ -73,20 +73,20 @@ export default function CompanyDashboardPage() {
     },
   })
 
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
     try {
       const d = await getDashboardData()
       setData(d as CompanyDashboard)
       setError(null)
-    } catch (err) {
-      console.error('Dashboard API error:', err)
+    } catch (_err) {
+      console.error('Dashboard API error:', _err)
       if (companyJobs && companyJobs.length > 0) {
         setData({
           stats: {
-            openJobs: companyJobs.filter((j: any) => j.status === 'OPEN').length,
+            openJobs: companyJobs.filter((j) => j.status === 'OPEN').length,
             totalJobsPosted: companyJobs.length,
           },
-          openJobs: companyJobs as any,
+          openJobs: companyJobs,
           activeProjects: [],
           completedProjects: [],
           recentProposals: [],
@@ -97,7 +97,7 @@ export default function CompanyDashboardPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [companyJobs])
 
   useEffect(() => {
     if (!authService.isAuthenticated()) {
@@ -107,7 +107,7 @@ export default function CompanyDashboardPage() {
 
     loadDashboardData()
     refetchJobs()
-  }, [router])
+  }, [router, loadDashboardData, refetchJobs])
 
   // Use company jobs from direct fetch if dashboard data is not available
   const displayJobs = data?.openJobs && data.openJobs.length > 0 
@@ -324,7 +324,7 @@ export default function CompanyDashboardPage() {
                     </div>
                   ) : (
                     <div className="divide-y divide-secondary-100">
-                      {displayJobs.map((job: any) => (
+                      {displayJobs.map((job) => (
                         <div key={job.id} className="p-6 hover:bg-secondary-50 transition-colors">
                           <div className="flex items-start justify-between gap-4 mb-4">
                             <div className="flex-1 min-w-0">

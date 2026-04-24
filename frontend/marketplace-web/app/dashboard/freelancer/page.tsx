@@ -31,13 +31,13 @@ export default function FreelancerDashboardPage() {
           try {
             const jobsResp = await dashboardService.getAvailableJobs(0, 5)
             fd.availableJobs = jobsResp?.content || []
-          } catch (e) {
+          } catch {
             // Silently fail fallback
           }
         }
         setData(fd)
-      } catch (err) {
-        console.error(err)
+      } catch (_err) {
+        console.error(_err)
         setError('Failed to load dashboard')
       } finally {
         setLoading(false)
@@ -349,21 +349,21 @@ export default function FreelancerDashboardPage() {
               </div>
             ) : (
               <div className="divide-y divide-secondary-100">
-                {myApplications.slice(0, 5).map((app: any) => {
+                {myApplications.slice(0, 5).map((app: Record<string, unknown>) => {
                   const statusConfig = {
                     PENDING: { bg: 'bg-primary-50 group-hover:bg-primary-100', icon: Clock, badge: 'bg-primary-100 text-primary-800', text: 'Pending Review' },
                     REVIEWING: { bg: 'bg-info-50 group-hover:bg-info-100', icon: AlertCircle, badge: 'bg-info-100 text-info-800', text: 'Under Review' },
                     SHORTLISTED: { bg: 'bg-warning-50 group-hover:bg-warning-100', icon: CheckCircle, badge: 'bg-warning-100 text-warning-800', text: 'Shortlisted' },
                     ACCEPTED: { bg: 'bg-success-50 group-hover:bg-success-100', icon: CheckCheck, badge: 'bg-success-100 text-success-800', text: 'Accepted' },
                     REJECTED: { bg: 'bg-error-50 group-hover:bg-error-100', icon: AlertCircle, badge: 'bg-error-100 text-error-800', text: 'Not Selected' },
-                  } as Record<string, any>;
+                  } as Record<string, {bg: string; icon: typeof Clock; badge: string; text: string}>;
 
-                  const config = statusConfig[app?.status?.toUpperCase()] || statusConfig.PENDING;
+                  const config = statusConfig[(app?.status as string | undefined)?.toUpperCase() || 'PENDING'] || statusConfig.PENDING;
                   const StatusIcon = config.icon;
 
                   return (
                     <Link
-                      key={app?.id}
+                      key={app?.id as string | number}
                       href={`/jobs/${app?.jobId}`}
                       className={`block group transition-colors ${config.bg}`}
                     >
@@ -371,24 +371,24 @@ export default function FreelancerDashboardPage() {
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-3 mb-2">
-                              <h3 className="font-bold text-secondary-900 group-hover:text-primary-600 transition-colors">{app?.jobTitle}</h3>
+                              <h3 className="font-bold text-secondary-900 group-hover:text-primary-600 transition-colors">{app?.jobTitle as string}</h3>
                               <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${config.badge}`}>
                                 <StatusIcon className="w-3.5 h-3.5" />
                                 {config.text}
                               </span>
                             </div>
-                            <p className="text-sm text-secondary-700 font-medium mb-2">{app?.companyName}</p>
-                            {app?.location && (
+                            <p className="text-sm text-secondary-700 font-medium mb-2">{app?.companyName as string}</p>
+                            {Boolean(app?.location) && (
                               <div className="flex items-center gap-1.5 text-sm text-secondary-600">
                                 <MapPin className="w-4 h-4" />
-                                {app?.location}
+                                {app?.location as string}
                               </div>
                             )}
                           </div>
                           <div className="text-right flex-shrink-0">
                             <div className="flex items-center gap-1.5 text-secondary-500 text-xs mb-3">
                               <Calendar className="w-4 h-4" />
-                              {app?.appliedAt ? new Date(app.appliedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'N/A'}
+                              {app?.appliedAt ? new Date(app.appliedAt as string).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'N/A'}
                             </div>
                             <span className="inline-block px-4 py-2 bg-primary-600 text-white text-xs font-semibold rounded-lg group-hover:bg-primary-700 transition-colors shadow-sm">
                               View Job

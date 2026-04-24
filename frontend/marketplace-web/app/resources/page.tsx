@@ -34,7 +34,7 @@ export default function ResourcesPage() {
 
   // Fetch content with filters
   const filters = useMemo(() => {
-    const f: any = {
+    const f: Record<string, unknown> = {
       page,
       limit: pageSize,
       sortBy,
@@ -64,7 +64,7 @@ export default function ResourcesPage() {
         selectedTags,
         searchQuery,
       });
-    } catch (e) {
+    } catch {
       // ignore
     }
   }, [page, pageSize, sortBy, sortOrder, selectedContentType, selectedCategory, selectedTags, searchQuery]);
@@ -179,9 +179,9 @@ export default function ResourcesPage() {
                   className="px-4 py-2 border border-secondary-300 rounded-lg focus:outline-none"
                 >
                   <option value="">All Categories</option>
-                  {categories.map((cat: any) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat?.name ?? 'Unnamed'}
+                  {(categories as Record<string, unknown>[]).map((cat) => (
+                    <option key={cat.id as string | number} value={cat.id as string | number}>
+                      {(cat?.name as string | undefined) ?? 'Unnamed'}
                     </option>
                   ))}
                 </select>
@@ -221,17 +221,17 @@ export default function ResourcesPage() {
               <div className="mt-4">
                 <p className="text-sm text-secondary-600 mb-2">Filter by tags:</p>
                 <div className="flex flex-wrap gap-2">
-                  {tags.slice(0, 15).map((tag: any) => (
+                  {tags.slice(0, 15).map((tag) => (
                     <button
-                      key={tag.id}
-                      onClick={() => handleTagToggle(tag.id)}
+                      key={(tag as Record<string, unknown>).id as string | number}
+                      onClick={() => handleTagToggle(String((tag as Record<string, unknown>).id))}
                       className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                        selectedTags.includes(tag.id)
+                        selectedTags.includes(String((tag as Record<string, unknown>).id))
                           ? 'bg-primary-600 text-white'
                           : 'bg-secondary-200 text-secondary-700 hover:bg-secondary-300'
                       }`}
                     >
-                      {tag?.name ?? 'Tag'}
+                      {(tag as Record<string, unknown>).name as string} ({(tag as Record<string, unknown>).count as number})
                     </button>
                   ))}
                 </div>
@@ -276,17 +276,18 @@ export default function ResourcesPage() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {content.map((item: any) => {
-                    const contentTypeValue = item.type || item.content_type || item.resource_type || '';
+                  {content.map((item) => {
+                    const itemRecord = item as Record<string, unknown>;
+                    const contentTypeValue = (itemRecord.type ?? itemRecord.content_type ?? itemRecord.resource_type ?? '') as string;
                   return (
-                      <Link key={item.id} href={`/resources/${getTypeSlug(contentTypeValue)}/${item.slug}`}>
+                      <Link key={itemRecord.id as number} href={`/resources/${getTypeSlug(contentTypeValue)}/${itemRecord.slug as string}`}>
                         <div className="h-full relative bg-white rounded-lg shadow-sm border border-secondary-200 hover:shadow-lg hover:border-primary-300 transition-all cursor-pointer overflow-hidden group">
                         {/* Featured Image */}
                         <div className="relative h-48 bg-secondary-200">
-                          {item.featuredImageUrl ? (
+                          {itemRecord.featuredImageUrl ? (
                             <Image
-                              src={item.featuredImageUrl}
-                              alt={item.title}
+                              src={itemRecord.featuredImageUrl as string}
+                              alt={itemRecord.title as string}
                               fill
                               className="object-cover group-hover:scale-105 transition-transform duration-300"
                             />
@@ -309,11 +310,11 @@ export default function ResourcesPage() {
                           )}
                           {/* Content Type Badge */}
                           <div className="absolute top-3 left-3">
-                            <span className={`inline-block px-3 py-1 text-xs font-medium rounded-full ${getContentTypeBadge(contentTypeValue).bg} ${getContentTypeBadge(contentTypeValue).text}`}>
+                            <span className={`inline-block px-3 py-1 text-xs font-medium rounded-full ${getContentTypeBadge(contentTypeValue as ContentType).bg} ${getContentTypeBadge(contentTypeValue as ContentType).text}`}>
                               {contentTypeValue}
                             </span>
                           </div>
-                          {item.isFeatured && (
+                          {!!(itemRecord.isFeatured) && (
                             <div className="absolute top-3 right-3">
                               <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-warning-500 text-white">
                                 Featured
@@ -325,19 +326,19 @@ export default function ResourcesPage() {
                         {/* Content */}
                         <div className="p-5">
                           {/* Category */}
-                          {item.category && (
+                          {!!(itemRecord.category) && (
                             <p className="text-xs text-primary-600 font-medium mb-2">
-                              {item.category?.name ?? 'Uncategorized'}
+                              {((itemRecord.category as Record<string, unknown>)?.name ?? 'Uncategorized') as string}
                             </p>
                           )}
 
                           <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">
-                            {item.title}
+                            {itemRecord.title as string}
                           </h3>
 
-                          {item.excerpt && (
+                          {!!(itemRecord.excerpt) && (
                             <p className="text-secondary-600 text-sm mb-4 line-clamp-3">
-                              {item.excerpt}
+                              {itemRecord.excerpt as string}
                             </p>
                           )}
 
@@ -346,17 +347,8 @@ export default function ResourcesPage() {
                           {/* Footer */}
                           <div className="flex justify-between items-center">
                             <div className="flex items-center gap-2">
-                              {item.author?.avatarUrl && (
-                                <Image
-                                  src={item.author.avatarUrl}
-                                  alt={item.author?.bio || 'Author'}
-                                  width={24}
-                                  height={24}
-                                  className="rounded-full"
-                                />
-                              )}
                               <p className="text-xs text-secondary-500">
-                                {item.publishedAt ? formatDate(item.publishedAt) : 'Draft'}
+                                {!!(itemRecord.publishedAt) ? formatDate(itemRecord.publishedAt as string) : 'Draft'}
                               </p>
                             </div>
                             <div className="flex items-center gap-3 text-secondary-400">
@@ -365,34 +357,34 @@ export default function ResourcesPage() {
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                 </svg>
-                                <span className="text-xs">{item.viewCount || 0}</span>
+                                <span className="text-xs">{(itemRecord.viewCount || 0) as number}</span>
                               </div>
                               <div className="flex items-center gap-1">
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                 </svg>
-                                <span className="text-xs">{item.likeCount || 0}</span>
+                                <span className="text-xs">{(itemRecord.likeCount || 0) as number}</span>
                               </div>
-                              {item.readingTimeMinutes && (
-                                <span className="text-xs">{item.readingTimeMinutes} min read</span>
+                              {!!(itemRecord.readingTimeMinutes) && (
+                                <span className="text-xs">{itemRecord.readingTimeMinutes as number} min read</span>
                               )}
                             </div>
                           </div>
 
                           {/* Tags */}
-                          {item.tags && item.tags.length > 0 && (
+                          {!!(itemRecord.tags && Array.isArray(itemRecord.tags) && (itemRecord.tags as unknown[]).length > 0) && (
                             <div className="flex flex-wrap gap-1 mt-3">
-                              {item.tags.slice(0, 3).map((tag: any) => (
+                              {(itemRecord.tags as Record<string, unknown>[]).slice(0, 3).map((tag) => (
                                 <span
-                                  key={tag.id}
+                                  key={tag.id as number}
                                   className="inline-block px-2 py-1 text-xs bg-secondary-100 text-secondary-600 rounded"
                                 >
-                                  {tag?.name ?? 'tag'}
+                                  {(tag?.name ?? 'tag') as string}
                                 </span>
                               ))}
-                              {item.tags.length > 3 && (
+                              {!!(Array.isArray(itemRecord.tags) && (itemRecord.tags as unknown[]).length > 3) && (
                                 <span className="inline-block px-2 py-1 text-xs bg-secondary-100 text-secondary-600 rounded">
-                                  +{item.tags.length - 3}
+                                  +{(itemRecord.tags as unknown[]).length - 3} more
                                 </span>
                               )}
                             </div>
@@ -404,7 +396,7 @@ export default function ResourcesPage() {
                             onClick={(e) => {
                               e.preventDefault();
                               // Open admin dashboard in same window
-                              window.location.href = `http://localhost:3001/admin/resources/${item.id}/edit`;
+                              window.location.href = `http://localhost:3001/admin/resources/${itemRecord.id as number}/edit`;
                             }}
                             className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity px-3 py-1 bg-primary-600 text-white text-xs rounded font-medium hover:bg-primary-700"
                             title="Edit this resource"

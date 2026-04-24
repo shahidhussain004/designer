@@ -10,7 +10,7 @@ if (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined')
       try {
         console.debug('[STORAGE-TRACER] setItem', key, value?.toString?.().slice(0, 80));
         console.trace();
-      } catch (e) {
+      } catch {
         // ignore
       }
       return origSet(key, value);
@@ -20,16 +20,17 @@ if (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined')
       try {
         console.warn('[STORAGE-TRACER] removeItem', key);
         console.trace();
-      } catch (e) {
+      } catch {
         // ignore
       }
       return origRemove(key);
     } as typeof localStorage.removeItem;
-  } catch (e) {
+  } catch (_e) {
     // If anything fails, don't crash the app
     // eslint-disable-next-line no-console
-    console.error('[STORAGE-TRACER] failed to install tracer', e);
+    console.error('[STORAGE-TRACER] failed to install tracer', _e);
   }
 }
 
-export default {};
+const storageTracer = {};
+export default storageTracer;

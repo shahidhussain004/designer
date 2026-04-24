@@ -12,6 +12,8 @@ export interface User {
   portfolioUrl?: string;
   ratingAvg?: number;
   ratingCount?: number;
+  companyName?: string;
+  companyDescription?: string;
 }
 
 export interface Job {
