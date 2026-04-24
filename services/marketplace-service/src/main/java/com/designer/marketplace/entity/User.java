@@ -121,6 +121,13 @@ public class User {
     @Column(name = "stripe_account_id", length = 100)
     private String stripeAccountId;
 
+    // Denormalized references for O(1) permission checks (V23)
+    @Column(name = "company_id")
+    private Long companyId;
+
+    @Column(name = "freelancer_id")
+    private Long freelancerId;
+
     // Timestamps
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)

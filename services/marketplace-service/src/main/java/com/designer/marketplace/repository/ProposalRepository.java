@@ -49,4 +49,14 @@ public interface ProposalRepository extends JpaRepository<Proposal, Long> {
     
     // Admin queries
     long countByStatus(Proposal.ProposalStatus status);
+
+    // ✅ EAGER LOADING METHODS - Prevent LazyInitializationException
+    @Query("SELECT p FROM Proposal p LEFT JOIN FETCH p.project pr LEFT JOIN FETCH pr.company LEFT JOIN FETCH p.freelancer WHERE p.id = :id")
+    Optional<Proposal> findByIdWithRelations(@Param("id") Long id);
+
+    @Query("SELECT p FROM Proposal p LEFT JOIN FETCH p.project pr LEFT JOIN FETCH pr.company LEFT JOIN FETCH p.freelancer WHERE p.project.id = :projectId")
+    Page<Proposal> findByProjectIdWithRelations(@Param("projectId") Long projectId, Pageable pageable);
+
+    @Query("SELECT p FROM Proposal p LEFT JOIN FETCH p.project pr LEFT JOIN FETCH pr.company LEFT JOIN FETCH p.freelancer WHERE p.freelancer.id = :freelancerId")
+    Page<Proposal> findByFreelancerIdWithRelations(@Param("freelancerId") Long freelancerId, Pageable pageable);
 }

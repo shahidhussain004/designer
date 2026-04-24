@@ -54,8 +54,8 @@ public class SavedJobService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
 
-        // Verify job exists
-        Job job = jobRepository.findById(jobId)
+        // Verify job exists (eager load company and category to avoid lazy loading issues)
+        Job job = jobRepository.findByIdWithCompanyAndCategory(jobId)
                 .orElseThrow(() -> new RuntimeException("Job not found with id: " + jobId));
 
         // Create saved job
@@ -85,12 +85,17 @@ public class SavedJobService {
 
     /**
      * Get all saved jobs for a user
-     * @param userId The user ID
+     * SECURITY: Only returns saved jobs for the requesting user
+     * @param userId The user ID (must be authenticated user's own ID)
      * @return List of saved jobs with full job details
      */
     @Transactional(readOnly = true)
     public List<SavedJobResponse> getSavedJobs(Long userId) {
         log.info("Fetching saved jobs for user {}", userId);
+        
+        // Verify user exists
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
         
         List<SavedJob> savedJobs = savedJobRepository.findByUserIdOrderByCreatedAtDesc(userId);
         
@@ -119,7 +124,15 @@ public class SavedJobService {
      */
     @Transactional(readOnly = true)
     public long getSavedJobsCount(Long userId) {
-        return savedJobRepository.countByUserId(userId);
+        log.debug("getSavedJobsCount called for userId: {}", userId);
+        try {
+            long count = savedJobRepository.countByUserId(userId);
+            log.debug("getSavedJobsCount returned {} for userId: {}", count, userId);
+            return count;
+        } catch (Exception e) {
+            log.error("Error in getSavedJobsCount for userId: {}", userId, e);
+            throw new RuntimeException("Failed to get saved jobs count", e);
+        }
     }
 
     /**

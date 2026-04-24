@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -76,11 +77,42 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS with proper config
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints - must be first (without /api prefix, context path handles that)
+                        // Public endpoints - No authentication required
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
-                        // All other endpoints allow public access for now
-                        .anyRequest().permitAll())
+                        
+                        // Public browsing endpoints (GET only)
+                        // Note: context-path="/api" so patterns match AFTER /api prefix
+                        .requestMatchers(HttpMethod.GET, "/jobs/**").permitAll()                    // Public job browsing
+                        .requestMatchers(HttpMethod.GET, "/job-categories/**").permitAll()          // Public job categories
+                        .requestMatchers(HttpMethod.GET, "/companies/**").permitAll()               // Public company profiles
+                        .requestMatchers(HttpMethod.GET, "/reviews/**").permitAll()                 // Public reviews
+                        .requestMatchers(HttpMethod.GET, "/users/freelancers").permitAll()          // Public freelancer listings
+                        .requestMatchers(HttpMethod.GET, "/users/{id}").permitAll()                 // Public user profiles
+                        .requestMatchers(HttpMethod.GET, "/projects/**").permitAll()                // Public project browsing
+                        .requestMatchers(HttpMethod.GET, "/project-categories/**").permitAll()      // Public project categories
+                        .requestMatchers(HttpMethod.GET, "/experience-levels").permitAll()          // Public experience levels
+                        .requestMatchers(HttpMethod.GET, "/skills/**").permitAll()                  // Public skills browsing
+                        
+                        // Authenticated endpoints - Must have valid JWT
+                        .requestMatchers("/saved-jobs/**").authenticated()                          // Saved jobs (private per-user)
+                        .requestMatchers("/users/me/**").authenticated()                            // User profile management
+                        .requestMatchers("/job-applications/**").authenticated()                    // Job applications
+                        .requestMatchers("/proposals/**").authenticated()                           // Proposals
+                        .requestMatchers("/contracts/**").authenticated()                           // Contracts
+                        .requestMatchers("/messages/**").authenticated()                            // Messages
+                        .requestMatchers("/notifications/**").authenticated()                       // Notifications
+                        
+                        // Company-only endpoints - Must have COMPANY role
+                        .requestMatchers("/companies/me/**").hasRole("COMPANY")                     // Company management
+                        
+                        // Admin-only endpoints
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        
+                        // All other endpoints require authentication by default
+                        .anyRequest().authenticated())
+
+
                 .authenticationProvider(authenticationProvider())
                 // Add rate limiting filter before other security filters
                 .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)

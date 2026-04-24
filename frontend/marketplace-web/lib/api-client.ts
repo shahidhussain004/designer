@@ -1,7 +1,16 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { ENV } from './env';
 import logger from './logger';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+const API_URL = ENV.API_URL;
+
+/**
+ * Token refresh singleton to prevent race conditions
+ * When multiple requests fail with 401, only one refresh attempt is made
+ * All other requests wait for the same refresh promise
+ */
+let isRefreshing = false;
+let refreshPromise: Promise<string> | null = null;
 
 // Extend Axios config to include metadata for logging
 declare module 'axios' {
@@ -9,6 +18,8 @@ declare module 'axios' {
     metadata?: {
       startTime: number;
     };
+    _retry?: boolean;
+    _retryCount?: number; // Track retry attempts
   }
 }
 
@@ -123,44 +134,86 @@ apiClient.interceptors.response.use(
       logger.error('API Request Setup Error', error);
     }
 
-    // If 401 and not already retried, attempt token refresh
+    // Production-grade 401 handling with race condition prevention
     if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      logger.info('Attempting token refresh due to 401 response');
+      // If already refreshing, wait for the existing refresh promise
+      if (isRefreshing && refreshPromise) {
+        logger.debug('Token refresh already in progress, waiting...');
+        try {
+          const newAccessToken = await refreshPromise;
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+          return apiClient(originalRequest);
+        } catch {
+          // Refresh failed, will be handled below
+          return Promise.reject(error);
+        }
+      }
 
-      try {
-        const refreshToken = localStorage.getItem('refresh_token');
-        if (refreshToken) {
-          logger.debug('Refresh token found, requesting new access token');
+      // Start new refresh process
+      isRefreshing = true;
+      logger.info('Starting token refresh due to 401 response');
+
+      refreshPromise = (async () => {
+        try {
+          const refreshToken = localStorage.getItem('refresh_token');
+          
+          if (!refreshToken) {
+            logger.warn('No refresh token found - session expired');
+            throw new Error('No refresh token available');
+          }
+
+          logger.debug('Requesting new access token from refresh endpoint');
           
           const { data } = await axios.post(`${API_URL}/auth/refresh`, {
             refreshToken,
           });
 
-          logger.info('Token refresh successful');
+          if (!data.accessToken) {
+            throw new Error('No access token in refresh response');
+          }
 
+          logger.info('✓ Token refresh successful');
+
+          // Update stored token and axios defaults
           localStorage.setItem('access_token', data.accessToken);
           apiClient.defaults.headers.Authorization = `Bearer ${data.accessToken}`;
-          originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+          
+          return data.accessToken;
 
-          return apiClient(originalRequest);
-        } else {
-          logger.warn('No refresh token found, cannot refresh');
+        } catch (refreshError) {
+          // Refresh failed - gracefully logout user
+          logger.error('✗ Token refresh failed - logging out user', refreshError as Error);
+          
+          // Clear tokens and auth state
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+          localStorage.removeItem('user');
+          
+          // Redirect to login with message
+          const currentPath = window.location.pathname + window.location.search;
+          const isAuthPage = currentPath.startsWith('/auth/');
+          
+          if (!isAuthPage) {
+            logger.info(`Redirecting to login (session expired), return path: ${currentPath}`);
+            window.location.href = `/auth/login?redirect=${encodeURIComponent(currentPath)}&message=${encodeURIComponent('Your session has expired. Please log in again.')}`;
+          }
+          
+          throw refreshError;
+        } finally {
+          // Reset refresh state
+          isRefreshing = false;
+          refreshPromise = null;
         }
-      } catch (refreshError) {
-        // Refresh failed, logout user - add debug trace
-        logger.error('Token refresh failed, logging out user', refreshError as Error);
-        try {
+      })();
 
-          console.trace();
-        } catch {
-          // ignore
-        }
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        window.location.href = '/auth/login';
-        return Promise.reject(refreshError);
+      try {
+        const newAccessToken = await refreshPromise;
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        return apiClient(originalRequest);
+      } catch {
+        return Promise.reject(error);
       }
     }
 

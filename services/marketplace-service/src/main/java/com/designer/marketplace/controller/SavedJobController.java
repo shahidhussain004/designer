@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,20 +23,31 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * REST API for saved/favorited jobs
+ * REST API for saved/favorited jobs - AUTHENTICATED ENDPOINTS ONLY
+ * 
+ * SECURITY MODEL:
+ * - All endpoints require JWT authentication
+ * - Users can ONLY access their OWN saved jobs
+ * - No cross-user data access (row-level security)
+ * 
+ * For public job browsing (no auth required), use GET /api/jobs instead
+ * 
+ * Base path: /api/saved-jobs
  */
 @RestController
-@RequestMapping("/api/saved-jobs")
+@RequestMapping("/saved-jobs")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "Saved Jobs", description = "APIs for users to save/favorite jobs they're interested in")
+@PreAuthorize("hasRole('FREELANCER')")
+@Tag(name = "Saved Jobs", description = "APIs for freelancer users to save/favorite jobs they're interested in. Requires FREELANCER role.")
 public class SavedJobController {
 
     private final SavedJobService savedJobService;
 
     /**
-     * Get all saved jobs for the current user
+     * Get all saved jobs for the current freelancer
      * GET /api/saved-jobs
+     * Restricted to FREELANCER users only
      */
     @GetMapping
     @Operation(summary = "Get saved jobs", description = "Get all jobs saved by the current user")
@@ -43,7 +55,8 @@ public class SavedJobController {
         
         log.info("GET /api/saved-jobs - Get all saved jobs");
         
-        Long userId = Long.valueOf(authentication.getName());
+        com.designer.marketplace.security.UserPrincipal userPrincipal = (com.designer.marketplace.security.UserPrincipal) authentication.getPrincipal();
+        Long userId = userPrincipal.getId();
         List<SavedJobResponse> savedJobs = savedJobService.getSavedJobs(userId);
         
         log.info("Returning {} saved jobs for user {}", savedJobs.size(), userId);
@@ -53,6 +66,7 @@ public class SavedJobController {
     /**
      * Get count of saved jobs - MUST be before {jobId} path variable
      * GET /api/saved-jobs/count
+     * Restricted to FREELANCER users only
      */
     @GetMapping("/count")
     @Operation(summary = "Get saved jobs count", description = "Get the total number of jobs saved by the current user")
@@ -60,7 +74,8 @@ public class SavedJobController {
         
         log.info("GET /api/saved-jobs/count - Get saved jobs count");
         
-        Long userId = Long.valueOf(authentication.getName());
+        com.designer.marketplace.security.UserPrincipal userPrincipal = (com.designer.marketplace.security.UserPrincipal) authentication.getPrincipal();
+        Long userId = userPrincipal.getId();
         long count = savedJobService.getSavedJobsCount(userId);
         
         Map<String, Long> response = new HashMap<>();
@@ -82,7 +97,8 @@ public class SavedJobController {
         
         log.info("GET /api/saved-jobs/{}/status - Check saved status", jobId);
         
-        Long userId = Long.valueOf(authentication.getName());
+        com.designer.marketplace.security.UserPrincipal userPrincipal = (com.designer.marketplace.security.UserPrincipal) authentication.getPrincipal();
+        Long userId = userPrincipal.getId();
         boolean isSaved = savedJobService.isSaved(userId, jobId);
         
         Map<String, Boolean> response = new HashMap<>();
@@ -103,7 +119,8 @@ public class SavedJobController {
         
         log.info("POST /api/saved-jobs/{} - Save job request", jobId);
         
-        Long userId = Long.valueOf(authentication.getName());
+        com.designer.marketplace.security.UserPrincipal userPrincipal = (com.designer.marketplace.security.UserPrincipal) authentication.getPrincipal();
+        Long userId = userPrincipal.getId();
         SavedJobResponse response = savedJobService.saveJob(userId, jobId);
         
         log.info("Job {} saved successfully for user {}", jobId, userId);
@@ -122,7 +139,8 @@ public class SavedJobController {
         
         log.info("DELETE /api/saved-jobs/{} - Unsave job request", jobId);
         
-        Long userId = Long.valueOf(authentication.getName());
+        com.designer.marketplace.security.UserPrincipal userPrincipal = (com.designer.marketplace.security.UserPrincipal) authentication.getPrincipal();
+        Long userId = userPrincipal.getId();
         savedJobService.unsaveJob(userId, jobId);
         
         Map<String, String> response = new HashMap<>();

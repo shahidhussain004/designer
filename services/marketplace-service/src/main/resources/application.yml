@@ -107,7 +107,7 @@ server:
     enabled: true
     mime-types: application/json,application/xml,text/html,text/xml,text/plain
   servlet:
-    context-path: /api
+    context-path: "/api"  # All endpoints under /api prefix
     session:
       timeout: 30m
 

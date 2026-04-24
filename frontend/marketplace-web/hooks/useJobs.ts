@@ -180,8 +180,9 @@ export function useMyApplications() {
 /**
  * Fetch current user's company profile
  * Only useful for COMPANY role users
+ * @param enabled - Optional flag to conditionally enable the query (defaults to true)
  */
-export function useMyCompany() {
+export function useMyCompany(enabled = true) {
   return useQuery({
     queryKey: ['my-company'],
     queryFn: async ({ signal }) => {
@@ -190,6 +191,7 @@ export function useMyCompany() {
     },
     staleTime: 10 * 60 * 1000, // 10 minutes
     retry: false, // Don't retry if user isn't a company
+    enabled: enabled, // Only run query if enabled
   });
 }
 

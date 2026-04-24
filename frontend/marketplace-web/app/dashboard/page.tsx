@@ -3,75 +3,53 @@
 import { PageLayout } from '@/components/ui'
 import { authService } from '@/lib/auth'
 import { useAuth } from '@/lib/context/AuthContext'
+import { ENV } from '@/lib/env'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
+/**
+ * Generic dashboard router - redirects to role-specific dashboards.
+ * This page should rarely be hit now that login redirects directly to role-specific dashboards.
+ * Kept as a fallback for any direct /dashboard links.
+ */
 export default function DashboardPage() {
-  const _router = useRouter()
-  const { user, loading: _loading } = useAuth()
+  const router = useRouter()
+  const { user, loading } = useAuth()
 
   useEffect(() => {
-    const checkAuth = async () => {
+    // Don't do anything while auth is loading
+    if (loading) return
 
-      
-      // IMPORTANT: Try both context state AND localStorage to handle different timing scenarios
-      let currentUser = user
-      
-      // If context doesn't have user but localStorage does, and token is valid, use localStorage
-      if (!currentUser && authService.isAuthenticated()) {
-        currentUser = authService.getCurrentUser()
-
-      }
-      
-      if (!currentUser) {
-        // Not authenticated — redirect to login
-
-        _router.replace('/auth/login')
-        return
-      }
-
-      // Role-based redirect
-      if (currentUser.role === 'COMPANY') {
-        _router.replace('/dashboard/company')
-      } else if (currentUser.role === 'FREELANCER') {
-
-        _router.replace('/dashboard/freelancer')
-      } else if (currentUser.role === 'ADMIN') {
-
-        // Pass auth token via cookie (shared across ports on localhost). More secure than URL parameters.
-        const _token = localStorage.getItem('access_token');
-        if (_token) {
-          // Set a short-lived cookie accessible on localhost for port 3001
-          const expires = new Date(Date.now() + 15 * 60 * 1000).toUTCString(); // 15 minutes
-          // Domain is omitted because browsers ignore Domain=localhost; this keeps it valid for both ports on localhost
-          document.cookie = `admin_access_token=${encodeURIComponent(_token)}; Path=/; SameSite=Lax; Expires=${expires}`;
-        }
-        window.location.href = 'http://localhost:3001';
-      }
+    // If no user, get from localStorage as fallback
+    let currentUser = user
+    if (!currentUser && authService.isAuthenticated()) {
+      currentUser = authService.getCurrentUser()
     }
     
-    // Check immediately if we already have user in context
-    if (user) {
-      checkAuth()
+    // Not authenticated - redirect to login
+    if (!currentUser) {
+      router.replace('/auth/login')
       return
     }
-    
-    // If not loading, also check (handles both authenticated and unauthenticated)
-    if (!_loading) {
-      checkAuth()
-      return
+
+    // Redirect to role-specific dashboard
+    if (currentUser.role === 'COMPANY') {
+      router.replace('/dashboard/company')
+    } else if (currentUser.role === 'FREELANCER') {
+      router.replace('/dashboard/freelancer')
+    } else if (currentUser.role === 'ADMIN') {
+      // Set cookie for admin dashboard on different port
+      const token = localStorage.getItem('access_token')
+      if (token) {
+        const expires = new Date(Date.now() + 15 * 60 * 1000).toUTCString()
+        document.cookie = `admin_access_token=${encodeURIComponent(token)}; Path=/; SameSite=Lax; Expires=${expires}`
+      }
+      window.location.href = ENV.ADMIN_DASHBOARD_URL
     }
-    
-    // If still loading, wait a bit then check anyway (prevent infinite loading)
-    const timer = setTimeout(() => {
+  }, [loading, user, router])
 
-      checkAuth()
-    }, 3000)
-    
-    return () => clearTimeout(timer)
-  }, [_loading, user, _router])
-
-  if (_loading) {
+  // Show loading state
+  if (loading) {
     return (
       <PageLayout>
         <div className="max-w-4xl mx-auto py-24 text-center">
@@ -82,8 +60,7 @@ export default function DashboardPage() {
     )
   }
 
-  // If we reach here, user is authenticated but role redirect will happen in useEffect.
-  // Show a brief fallback while replace() runs.
+  // Show fallback while redirect happens
   return (
     <PageLayout>
       <div className="max-w-4xl mx-auto py-24 text-center">

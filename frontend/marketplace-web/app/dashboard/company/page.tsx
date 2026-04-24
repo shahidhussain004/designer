@@ -105,9 +105,12 @@ export default function CompanyDashboardPage() {
       return
     }
 
+    // Load data on mount only - do not include callbacks in dependencies
+    // to prevent infinite loop (refetchJobs updates companyJobs → loadDashboardData recreates → useEffect triggers)
     loadDashboardData()
     refetchJobs()
-  }, [router, loadDashboardData, refetchJobs])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router])
 
   // Use company jobs from direct fetch if dashboard data is not available
   const displayJobs = data?.openJobs && data.openJobs.length > 0 
@@ -370,6 +373,16 @@ export default function CompanyDashboardPage() {
                               <Eye className="w-3.5 h-3.5" />
                               View
                             </Link>
+
+                            {(job.applicationsCount && job.applicationsCount > 0) && (
+                              <Link
+                                href={`/jobs/${job.id}/applications`}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary-100 hover:bg-primary-200 text-primary-700 text-xs font-medium rounded transition-colors"
+                              >
+                                <Users className="w-3.5 h-3.5" />
+                                Applications ({job.applicationsCount})
+                              </Link>
+                            )}
                             
                             {job.status === 'DRAFT' && (
                               <button

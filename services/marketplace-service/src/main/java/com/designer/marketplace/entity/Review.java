@@ -9,6 +9,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import jakarta.persistence.Column;
@@ -75,7 +76,8 @@ public class Review {
      * Reviewer relationship - user who submitted the review
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "reviewer_user_id", nullable = false)
+    @JoinColumn(name = "reviewer_id", nullable = false)
+    @JsonIgnore
     private User reviewer;
 
     /**
@@ -83,6 +85,7 @@ public class Review {
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "reviewed_user_id", nullable = false)
+    @JsonIgnore
     private User reviewedUser;
 
     /**
@@ -90,6 +93,7 @@ public class Review {
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "contract_id", unique = true)
+    @JsonIgnore
     private Contract contract;
 
     /**
@@ -97,6 +101,7 @@ public class Review {
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
+    @JsonIgnore
     private Project project;
 
     /**

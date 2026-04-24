@@ -54,4 +54,14 @@ public interface ContractRepository extends JpaRepository<Contract, Long> {
      */
     @Query("SELECT COUNT(c) FROM Contract c WHERE (c.project.company.id = :userId OR c.freelancer.id = :userId) AND c.status = com.designer.marketplace.entity.Contract.ContractStatus.ACTIVE")
     Long countActiveContractsByUserId(@Param("userId") Long userId);
+
+    // ✅ EAGER LOADING METHODS - Prevent LazyInitializationException
+    @Query("SELECT c FROM Contract c LEFT JOIN FETCH c.project p LEFT JOIN FETCH p.company LEFT JOIN FETCH c.freelancer WHERE c.id = :id")
+    java.util.Optional<Contract> findByIdWithRelations(@Param("id") Long id);
+
+    @Query("SELECT c FROM Contract c LEFT JOIN FETCH c.project p LEFT JOIN FETCH p.company LEFT JOIN FETCH c.freelancer WHERE c.project.company.id = :companyId")
+    List<Contract> findByCompanyIdWithRelations(@Param("companyId") Long companyId);
+
+    @Query("SELECT c FROM Contract c LEFT JOIN FETCH c.project p LEFT JOIN FETCH p.company LEFT JOIN FETCH c.freelancer WHERE c.freelancer.id = :freelancerId")
+    List<Contract> findByFreelancerIdWithRelations(@Param("freelancerId") Long freelancerId);
 }

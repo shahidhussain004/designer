@@ -92,7 +92,7 @@ public class InvoiceController {
     }
 
     @PatchMapping("/{invoiceId}/status")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update invoice status (Admin only)")
     public ResponseEntity<InvoiceResponse> updateInvoiceStatus(
             @PathVariable Long invoiceId,

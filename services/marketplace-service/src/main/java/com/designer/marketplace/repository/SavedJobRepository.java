@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -27,20 +28,25 @@ public interface SavedJobRepository extends JpaRepository<SavedJob, Long> {
     /**
      * Check if a user has saved a specific job
      */
-    boolean existsByUserIdAndJobId(Long userId, Long jobId);
+    @Query("SELECT CASE WHEN COUNT(sj) > 0 THEN true ELSE false END FROM SavedJob sj WHERE sj.user.id = :userId AND sj.job.id = :jobId")
+    boolean existsByUserIdAndJobId(@Param("userId") Long userId, @Param("jobId") Long jobId);
 
     /**
      * Find a saved job by user and job
      */
-    Optional<SavedJob> findByUserIdAndJobId(Long userId, Long jobId);
+    @Query("SELECT sj FROM SavedJob sj WHERE sj.user.id = :userId AND sj.job.id = :jobId")
+    Optional<SavedJob> findByUserIdAndJobId(@Param("userId") Long userId, @Param("jobId") Long jobId);
 
     /**
      * Count how many jobs a user has saved
      */
-    long countByUserId(Long userId);
+    @Query("SELECT COUNT(sj) FROM SavedJob sj WHERE sj.user.id = :userId")
+    long countByUserId(@Param("userId") Long userId);
 
     /**
      * Delete a saved job by user and job
      */
-    void deleteByUserIdAndJobId(Long userId, Long jobId);
+    @Modifying
+    @Query("DELETE FROM SavedJob sj WHERE sj.user.id = :userId AND sj.job.id = :jobId")
+    void deleteByUserIdAndJobId(@Param("userId") Long userId, @Param("jobId") Long jobId);
 }

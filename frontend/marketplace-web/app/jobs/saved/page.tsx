@@ -19,9 +19,15 @@ export default function SavedJobsPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Redirect to login if not authenticated
+    // Only freelancers can access saved jobs
     if (!user) {
       router.push('/auth/login?redirect=/jobs/saved');
+      return;
+    }
+
+    if (user.role !== 'FREELANCER') {
+      // Redirect non-freelancers to jobs page
+      router.push('/jobs');
       return;
     }
 

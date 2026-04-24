@@ -21,9 +21,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.designer.marketplace.dto.CreateJobRequest;
+import com.designer.marketplace.dto.JobApplicationResponse;
 import com.designer.marketplace.dto.JobResponse;
 import com.designer.marketplace.dto.UpdateJobRequest;
 import com.designer.marketplace.security.UserPrincipal;
+import com.designer.marketplace.service.JobApplicationService;
 import com.designer.marketplace.service.JobService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,12 +46,13 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/companies/me/jobs")
 @RequiredArgsConstructor
 @Slf4j
-@PreAuthorize("hasAuthority('COMPANY')")
+@PreAuthorize("hasRole('COMPANY')")
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Company Jobs", description = "Company job management APIs - CRUD operations for company's own jobs")
 public class CompanyJobController {
 
     private final JobService jobService;
+    private final JobApplicationService jobApplicationService;
 
     /**
      * Get all jobs posted by the authenticated company
@@ -199,5 +202,40 @@ public class CompanyJobController {
         
         log.info("Job {} deleted successfully", id);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Get applications for a specific job owned by this company
+     * Returns paginated list of applications with filtering by status
+     * 
+     * GET /companies/me/jobs/{id}/applications
+     */
+    /**
+     * Get applications for a specific job owned by this company
+     * Returns paginated list of applications with filtering by status
+     * 
+     * GET /companies/me/jobs/{id}/applications
+     */
+    @GetMapping("/{id:\\d+}/applications")
+    @Operation(
+        summary = "Get applications for a job",
+        description = "Retrieve all applications for a job owned by this company. Optional status filter."
+    )
+    public ResponseEntity<Page<JobApplicationResponse>> getJobApplications(
+            @PathVariable Long id,
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @AuthenticationPrincipal UserPrincipal currentUser) {
+
+        log.info("Company user {} fetching applications for job: {}", currentUser.getId(), id);
+
+        // JobApplicationService.getJobApplications already validates ownership
+        // by checking if the job belongs to the user's company
+        Pageable pageable = PageRequest.of(page, size, Sort.by("appliedAt").descending());
+        Page<JobApplicationResponse> applications = jobApplicationService.getJobApplications(id, status, pageable);
+        
+        log.info("Retrieved {} applications for job {}", applications.getTotalElements(), id);
+        return ResponseEntity.ok(applications);
     }
 }
