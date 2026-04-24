@@ -125,21 +125,21 @@ function CheckoutContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-secondary-50 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 text-primary-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-500">Setting up checkout...</p>
+          <p className="text-secondary-500">Setting up checkout...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-secondary-50">
       {/* Header */}
-      <div className="bg-gray-900 text-white">
+      <div className="bg-secondary-900 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Link href={returnUrl} className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-4">
+          <Link href={returnUrl} className="inline-flex items-center gap-2 text-secondary-400 hover:text-white mb-4">
             <ArrowLeft className="w-4 h-4" />
             Back
           </Link>
@@ -154,16 +154,16 @@ function CheckoutContent() {
           <div className="lg:col-span-2">
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
-                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
-                  <p className="text-red-700">{error}</p>
+                <div className="p-4 bg-error-50 border border-error-200 rounded-lg flex items-center gap-3">
+                  <AlertCircle className="w-5 h-5 text-error-600 flex-shrink-0" />
+                  <p className="text-error-700">{error}</p>
                 </div>
               )}
 
               {/* Saved Payment Methods */}
               {paymentMethods.length > 0 && !showAddCard && (
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                  <h2 className="font-semibold text-gray-900 mb-4">Payment Method</h2>
+                <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
+                  <h2 className="font-semibold text-secondary-900 mb-4">Payment Method</h2>
                   <div className="space-y-3">
                     {paymentMethods.map((method) => (
                       <label
@@ -171,7 +171,7 @@ function CheckoutContent() {
                         className={`flex items-center gap-4 p-4 rounded-lg border cursor-pointer transition-colors ${
                           selectedPaymentMethod === method.id
                             ? 'border-primary-500 bg-primary-50'
-                            : 'border-gray-200 hover:bg-gray-50'
+                            : 'border-secondary-200 hover:bg-secondary-50'
                         }`}
                       >
                         <input
@@ -182,15 +182,15 @@ function CheckoutContent() {
                           onChange={(e) => setSelectedPaymentMethod(e.target.value)}
                           className="text-primary-600"
                         />
-                        <CreditCard className="w-5 h-5 text-gray-400" />
+                        <CreditCard className="w-5 h-5 text-secondary-400" />
                         <div className="flex-1">
-                          <p className="font-medium text-gray-900">•••• {method.card?.last4}</p>
-                          <p className="text-sm text-gray-500">
+                          <p className="font-medium text-secondary-900">•••• {method.card?.last4}</p>
+                          <p className="text-sm text-secondary-500">
                             Expires {method.card?.expMonth}/{method.card?.expYear}
                           </p>
                         </div>
                         {method.isDefault && (
-                          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">Default</span>
+                          <span className="text-xs text-secondary-500 bg-secondary-100 px-2 py-1 rounded">Default</span>
                         )}
                       </label>
                     ))}
@@ -208,14 +208,14 @@ function CheckoutContent() {
 
               {/* New Card Form */}
               {showAddCard && (
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="font-semibold text-gray-900">Card Details</h2>
+                    <h2 className="font-semibold text-secondary-900">Card Details</h2>
                     {paymentMethods.length > 0 && (
                       <button
                         type="button"
                         onClick={() => setShowAddCard(false)}
-                        className="text-sm text-gray-500 hover:text-gray-700"
+                        className="text-sm text-secondary-500 hover:text-secondary-700"
                       >
                         Cancel
                       </button>
@@ -224,52 +224,52 @@ function CheckoutContent() {
 
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Cardholder Name</label>
+                      <label className="block text-sm font-medium text-secondary-700 mb-1">Cardholder Name</label>
                       <input
                         type="text"
                         value={cardName}
                         onChange={(e) => setCardName(e.target.value)}
                         required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus"
+                        className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus"
                         placeholder="John Doe"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
+                      <label className="block text-sm font-medium text-secondary-700 mb-1">Card Number</label>
                       <input
                         type="text"
                         value={cardNumber}
                         onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
                         maxLength={19}
                         required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus"
+                        className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus"
                         placeholder="4242 4242 4242 4242"
                       />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
+                        <label className="block text-sm font-medium text-secondary-700 mb-1">Expiry Date</label>
                         <input
                           type="text"
                           value={cardExpiry}
                           onChange={(e) => setCardExpiry(formatExpiry(e.target.value))}
                           maxLength={5}
                           required
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus"
+                          className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus"
                           placeholder="MM/YY"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">CVC</label>
+                        <label className="block text-sm font-medium text-secondary-700 mb-1">CVC</label>
                         <input
                           type="text"
                           value={cardCvc}
                           onChange={(e) => setCardCvc(e.target.value.replace(/\D/g, '').slice(0, 4))}
                           maxLength={4}
                           required
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus"
+                          className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-input-focus focus:border-input-focus"
                           placeholder="123"
                         />
                       </div>
@@ -282,7 +282,7 @@ function CheckoutContent() {
                         onChange={(e) => setSaveCard(e.target.checked)}
                         className="rounded text-primary-600"
                       />
-                      <span className="text-sm text-gray-700">Save card for future payments</span>
+                      <span className="text-sm text-secondary-700">Save card for future payments</span>
                     </label>
                   </div>
                 </div>
@@ -298,7 +298,7 @@ function CheckoutContent() {
               </button>
 
               {/* Security Note */}
-              <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+              <div className="flex items-center justify-center gap-2 text-sm text-secondary-500">
                 <Lock className="w-4 h-4" />
                 Secured by Stripe. Your payment information is encrypted.
               </div>
@@ -307,36 +307,36 @@ function CheckoutContent() {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-6">
-              <h2 className="font-semibold text-gray-900 mb-4">Order Summary</h2>
+            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6 sticky top-6">
+              <h2 className="font-semibold text-secondary-900 mb-4">Order Summary</h2>
 
               <div className="space-y-3 mb-4">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">{title}</span>
-                  <span className="font-medium text-gray-900">{formatCurrency(amount)}</span>
+                  <span className="text-secondary-600">{title}</span>
+                  <span className="font-medium text-secondary-900">{formatCurrency(amount)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Processing fee</span>
-                  <span className="text-gray-500">{formatCurrency(0)}</span>
+                  <span className="text-secondary-500">Processing fee</span>
+                  <span className="text-secondary-500">{formatCurrency(0)}</span>
                 </div>
               </div>
 
-              <hr className="border-gray-200 mb-4" />
+              <hr className="border-secondary-200 mb-4" />
 
               <div className="flex justify-between mb-6">
-                <span className="text-lg font-semibold text-gray-900">Total</span>
-                <span className="text-lg font-semibold text-gray-900">{formatCurrency(amount)}</span>
+                <span className="text-lg font-semibold text-secondary-900">Total</span>
+                <span className="text-lg font-semibold text-secondary-900">{formatCurrency(amount)}</span>
               </div>
 
               {/* Payment Protection */}
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-secondary-50 rounded-lg p-4">
                 <div className="flex gap-3">
-                  <Shield className="w-5 h-5 text-green-600 flex-shrink-0" />
+                  <Shield className="w-5 h-5 text-success-600 flex-shrink-0" />
                   <div>
-                    <p className="font-medium text-gray-900 text-sm">
+                    <p className="font-medium text-secondary-900 text-sm">
                       {type === 'milestone' ? 'Escrow Protection' : 'Secure Payment'}
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-secondary-500 mt-1">
                       {type === 'milestone'
                         ? 'Funds are held securely until the milestone is completed and approved.'
                         : 'Your payment is protected by our secure checkout system.'}
@@ -354,10 +354,10 @@ function CheckoutContent() {
 
 function CheckoutLoading() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="min-h-screen bg-secondary-50 flex items-center justify-center">
       <div className="text-center">
         <Loader2 className="w-8 h-8 text-primary-600 animate-spin mx-auto mb-4" />
-        <p className="text-gray-500">Loading checkout...</p>
+        <p className="text-secondary-500">Loading checkout...</p>
       </div>
     </div>
   );

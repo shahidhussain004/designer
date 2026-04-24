@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 
@@ -46,7 +47,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   const isDark = variant === 'dark';
 
   return (
-    <section className={`py-16 lg:py-24 ${isDark ? 'bg-gray-900' : 'bg-white'}`}>
+    <section className={`py-16 lg:py-24 ${isDark ? 'bg-secondary-900' : 'bg-white'}`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto">
           {badge && (
@@ -58,21 +59,21 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </div>
           )}
           
-          <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>
+          <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-secondary-900'}`}>
             {title}
           </h1>
           
           {subtitle && (
-            <p className={`mt-6 text-lg ${isDark ? 'text-gray-300' : 'text-gray-600'} max-w-2xl mx-auto`}>
+            <p className={`mt-6 text-lg ${isDark ? 'text-secondary-300' : 'text-secondary-600'} max-w-2xl mx-auto`}>
               {subtitle}
             </p>
           )}
 
           {showSearch && (
             <form onSubmit={handleSubmit} className="mt-10 max-w-2xl mx-auto">
-              <div className="flex gap-3 p-2 bg-white rounded-xl border border-gray-200 shadow-lg">
+              <div className="flex gap-3 p-2 bg-white rounded-xl border border-secondary-200 shadow-lg">
                 <div className="flex-1 flex items-center gap-2 px-4">
-                  <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-5 h-5 text-secondary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                   <input
@@ -80,7 +81,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder={searchPlaceholder}
-                    className="w-full py-2 bg-transparent border-0 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-0"
+                    className="w-full py-2 bg-transparent border-0 text-secondary-900 placeholder-secondary-500 focus:outline-none focus:ring-0"
                   />
                 </div>
                 <button
@@ -111,8 +112,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                   href={secondaryButton.href}
                   className={`inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-lg border transition-colors ${
                     isDark 
-                      ? 'text-white border-gray-600 hover:bg-gray-800' 
-                      : 'text-gray-700 border-gray-300 hover:bg-gray-50'
+                      ? 'text-white border-secondary-600 hover:bg-secondary-800' 
+                      : 'text-secondary-700 border-secondary-300 hover:bg-secondary-50'
                   }`}
                 >
                   {secondaryButton.label}
@@ -145,7 +146,7 @@ export const StatsSection: React.FC<StatsSectionProps> = ({ stats, variant = 'da
   const isDark = variant === 'dark';
   
   return (
-    <section className={`py-16 ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
+    <section className={`py-16 ${isDark ? 'bg-secondary-900' : 'bg-secondary-50'}`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
           {stats.map((stat, index) => (
@@ -155,10 +156,10 @@ export const StatsSection: React.FC<StatsSectionProps> = ({ stats, variant = 'da
                   <span className="text-primary-500">{stat.icon}</span>
                 </div>
               )}
-              <div className={`text-3xl lg:text-4xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+              <div className={`text-3xl lg:text-4xl font-bold ${isDark ? 'text-white' : 'text-secondary-900'}`}>
                 {stat.value}
               </div>
-              <div className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+              <div className={`text-sm mt-1 ${isDark ? 'text-secondary-400' : 'text-secondary-600'}`}>
                 {stat.label}
               </div>
             </div>
@@ -201,32 +202,32 @@ export const FeatureGrid: React.FC<FeatureGridProps> = ({
   };
 
   return (
-    <section className="py-16 lg:py-20 bg-gray-50">
+    <section className="py-16 lg:py-20 bg-secondary-50">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {(title || subtitle) && (
           <div className="text-center mb-12">
-            {title && <h2 className="text-3xl font-bold text-gray-900">{title}</h2>}
-            {subtitle && <p className="text-gray-600 mt-2">{subtitle}</p>}
+            {title && <h2 className="text-3xl font-bold text-secondary-900">{title}</h2>}
+            {subtitle && <p className="text-secondary-600 mt-2">{subtitle}</p>}
           </div>
         )}
 
         <div className={`grid grid-cols-1 ${gridCols[columns]} gap-6`}>
           {features.map((feature, index) => {
             const content = (
-              <div className="group p-6 bg-white rounded-xl border border-gray-200 hover:border-primary-300 hover:shadow-md transition-all">
+              <div className="group p-6 bg-white rounded-xl border border-secondary-200 hover:border-primary-300 hover:shadow-md transition-all">
                 {feature.icon && (
                   <div className="inline-flex items-center justify-center h-12 w-12 rounded-lg bg-primary-50 text-primary-600 mb-4">
                     {feature.icon}
                   </div>
                 )}
-                <h3 className="font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
+                <h3 className="font-semibold text-secondary-900 group-hover:text-primary-600 transition-colors">
                   {feature.title}
                 </h3>
                 {feature.count && (
-                  <p className="text-sm text-gray-500 mt-1">{feature.count}</p>
+                  <p className="text-sm text-secondary-500 mt-1">{feature.count}</p>
                 )}
                 {feature.description && (
-                  <p className="text-sm text-gray-600 mt-2">{feature.description}</p>
+                  <p className="text-sm text-secondary-600 mt-2">{feature.description}</p>
                 )}
                 {feature.href && (
                   <div className="mt-3 flex items-center text-sm text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -283,7 +284,7 @@ export const CTASection: React.FC<CTASectionProps> = ({
   const isDark = variant === 'dark';
   
   return (
-    <section className={`py-16 lg:py-20 ${isDark ? 'bg-gray-900' : 'bg-primary-600'}`}>
+    <section className={`py-16 lg:py-20 ${isDark ? 'bg-secondary-900' : 'bg-primary-600'}`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
@@ -291,14 +292,14 @@ export const CTASection: React.FC<CTASectionProps> = ({
               {title}
             </h2>
             {description && (
-              <p className="mt-4 text-lg text-gray-300">
+              <p className="mt-4 text-lg text-secondary-300">
                 {description}
               </p>
             )}
             {benefits && benefits.length > 0 && (
               <ul className="mt-8 space-y-3">
                 {benefits.map((benefit, index) => (
-                  <li key={index} className="flex items-center gap-3 text-gray-300">
+                  <li key={index} className="flex items-center gap-3 text-secondary-300">
                     <svg className="w-5 h-5 text-primary-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
@@ -320,7 +321,7 @@ export const CTASection: React.FC<CTASectionProps> = ({
               {secondaryButton && (
                 <Link
                   href={secondaryButton.href}
-                  className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white border border-gray-600 rounded-lg hover:bg-gray-800 transition-colors"
+                  className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white border border-secondary-600 rounded-lg hover:bg-secondary-800 transition-colors"
                 >
                   {secondaryButton.label}
                 </Link>
@@ -328,7 +329,7 @@ export const CTASection: React.FC<CTASectionProps> = ({
             </div>
           </div>
           <div className="relative hidden lg:block">
-            <div className="aspect-square max-w-md mx-auto bg-gray-800/50 rounded-2xl p-8 border border-gray-700">
+            <div className="aspect-square max-w-md mx-auto bg-secondary-800/50 rounded-2xl p-8 border border-secondary-700">
               <div className="w-full h-full bg-gradient-to-br from-primary-500/20 to-primary-700/20 rounded-xl flex items-center justify-center">
                 <svg className="w-24 h-24 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -361,9 +362,9 @@ export const TrustedBySection: React.FC<TrustedBySectionProps> = ({
   companies,
 }) => {
   return (
-    <section className="py-12 bg-white border-y border-gray-100">
+    <section className="py-12 bg-white border-y border-secondary-100">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <p className="text-center text-sm font-medium text-gray-500 uppercase tracking-wider mb-8">
+        <p className="text-center text-sm font-medium text-secondary-500 uppercase tracking-wider mb-8">
           {title}
         </p>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center">
@@ -373,9 +374,9 @@ export const TrustedBySection: React.FC<TrustedBySectionProps> = ({
               className="flex items-center justify-center p-4 grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition-all"
             >
               {company.logo ? (
-                <img src={company.logo} alt={company?.name ?? 'Company'} className="h-8 object-contain" />
+                <Image src={company.logo} alt={company?.name ?? 'Company'} width={120} height={32} className="h-8 object-contain" unoptimized />
               ) : (
-                <span className="text-lg font-bold text-gray-400">{company?.name ?? 'Company'}</span>
+                <span className="text-lg font-bold text-secondary-400">{company?.name ?? 'Company'}</span>
               )}
             </div>
           ))}
@@ -406,19 +407,19 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 }) => {
   const bgClasses = {
     light: 'bg-white',
-    dark: 'bg-gray-900',
+    dark: 'bg-secondary-900',
     gradient: 'bg-gradient-to-r from-primary-600 to-primary-700',
   };
 
   const textClasses = {
-    light: 'text-gray-900',
+    light: 'text-secondary-900',
     dark: 'text-white',
     gradient: 'text-white',
   };
 
   const descClasses = {
-    light: 'text-gray-600',
-    dark: 'text-gray-300',
+    light: 'text-secondary-600',
+    dark: 'text-secondary-300',
     gradient: 'text-primary-100',
   };
 

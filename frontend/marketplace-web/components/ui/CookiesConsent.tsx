@@ -144,9 +144,9 @@ export const CookiesConsent: React.FC<CookiesConsentProps> = ({ onAccept, onReje
         className={cn(
           'fixed bottom-4 left-4 z-40 rounded-full p-3',
           'bg-white shadow-lg hover:shadow-xl transition-shadow',
-          'border border-gray-200 hover:border-gray-300',
-          'text-gray-700 hover:text-gray-900',
-          'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500',
+          'border border-secondary-200 hover:border-secondary-300',
+          'text-secondary-700 hover:text-secondary-900',
+          'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500',
           'md:bottom-6 md:left-6'
         )}
       >
@@ -168,10 +168,10 @@ export const CookiesConsent: React.FC<CookiesConsentProps> = ({ onAccept, onReje
               <Logo size="sm" variant="icon" />
             </div>
             <div className="flex-1 min-w-0">
-              <h1 id="cookies-dialog-title" className="text-2xl md:text-3xl font-bold text-gray-900 mb-0">
+              <h1 id="cookies-dialog-title" className="text-2xl md:text-3xl font-bold text-secondary-900 mb-0">
                 Privacy Preference Center
               </h1>
-              <p className="text-sm text-gray-600 mt-1">Manage your cookie and tracking preferences</p>
+              <p className="text-sm text-secondary-600 mt-1">Manage your cookie and tracking preferences</p>
             </div>
 
             <div className="ml-4 flex-shrink-0">
@@ -181,8 +181,8 @@ export const CookiesConsent: React.FC<CookiesConsentProps> = ({ onAccept, onReje
                 onClick={() => setIsOpen(false)}
                 className={cn(
                   'inline-flex items-center justify-center h-8 w-8 rounded-full',
-                  'text-gray-600 hover:text-gray-900 bg-transparent',
-                  'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+                  'text-secondary-600 hover:text-secondary-900 bg-transparent',
+                  'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500'
                 )}
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cn('w-4 h-4')} aria-hidden="true">
@@ -194,33 +194,33 @@ export const CookiesConsent: React.FC<CookiesConsentProps> = ({ onAccept, onReje
           </div>
 
           <div className="mb-8">
-            <p className="text-gray-700 leading-relaxed mb-4">
+            <p className="text-secondary-700 leading-relaxed mb-4">
               When you use the Designer portal we store small pieces of data (cookies) that help the site work reliably
               and provide a personalised experience. You can change which categories are allowed below; some features
               require cookies to function.
             </p>
-            <a href="/privacy" className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors">More information →</a>
+            <a href="/privacy" className="text-primary-600 hover:text-primary-700 text-sm font-medium transition-colors">More information →</a>
           </div>
 
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">Manage Consent Preferences</h2>
+            <h2 className="text-lg font-semibold text-secondary-900 mb-6">Manage Consent Preferences</h2>
 
             <div className="space-y-4">
               {COOKIE_CATEGORIES.map((c) => (
-                <div key={c.id} className="border border-gray-200 rounded-lg overflow-hidden">
-                  <div className="w-full px-6 py-4 flex items-center justify-between gap-4 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer" onClick={() => toggleExpanded(c.id)} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleExpanded(c.id); }}>
+                <div key={c.id} className="border border-secondary-200 rounded-lg overflow-hidden">
+                  <div className="w-full px-6 py-4 flex items-center justify-between gap-4 bg-secondary-50 hover:bg-secondary-100 transition-colors cursor-pointer" onClick={() => toggleExpanded(c.id)} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleExpanded(c.id); }}>
                     <div className="flex items-start gap-3 flex-1 text-left">
                     
                       <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900 text-base">{c.name}</h3>
-                        <p className="text-xs text-gray-500 mt-1">{c.isRequired ? 'Required for core portal functionality' : 'Click the switch to enable or disable this category'}</p>
+                        <h3 className="font-semibold text-secondary-900 text-base">{c.name}</h3>
+                        <p className="text-xs text-secondary-500 mt-1">{c.isRequired ? 'Required for core portal functionality' : 'Click the switch to enable or disable this category'}</p>
                       </div>
                     </div>
                          
                     <div className="pt-1">
                       {c.isRequired ? (
                         <div className="flex items-center gap-3">
-                          <div className="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
+                          <div className="inline-block px-2 py-1 bg-success-100 text-success-800 text-xs font-medium rounded">
                             Always Active
                           </div>
 
@@ -234,7 +234,7 @@ export const CookiesConsent: React.FC<CookiesConsentProps> = ({ onAccept, onReje
                             aria-checked={preferences[c.id as keyof CookiePreferences]}
                             className={cn(
                               'relative inline-flex items-center h-6 w-11 rounded-full transition-colors focus:outline-none',
-                              preferences[c.id as keyof CookiePreferences] ? 'bg-blue-600' : 'bg-gray-300'
+                              preferences[c.id as keyof CookiePreferences] ? 'bg-primary-600' : 'bg-secondary-300'
                             )}
                             aria-label={`${c.name} toggle`}
                           >
@@ -254,19 +254,19 @@ export const CookiesConsent: React.FC<CookiesConsentProps> = ({ onAccept, onReje
                         onClick={(e) => { e.stopPropagation(); setPref(c.id as keyof CookiePreferences, !preferences[c.id as keyof CookiePreferences]); }}
                         role="switch"
                         aria-checked={preferences[c.id as keyof CookiePreferences]}
-                        className={cn('relative inline-flex items-center h-6 w-11 rounded-full transition-colors focus:outline-none', preferences[c.id as keyof CookiePreferences] ? 'bg-blue-600' : 'bg-gray-300')}
+                        className={cn('relative inline-flex items-center h-6 w-11 rounded-full transition-colors focus:outline-none', preferences[c.id as keyof CookiePreferences] ? 'bg-primary-600' : 'bg-secondary-300')}
                         aria-label={`${c.name} toggle`}
                       >
                         <span className={cn('inline-block w-5 h-5 transform bg-white rounded-full shadow transition-transform', preferences[c.id as keyof CookiePreferences] ? 'translate-x-5' : 'translate-x-0')} />
                       </button>
                     )}
 
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cn('w-5 h-5 text-gray-400 ml-3')}> <polyline points="6 9 12 15 18 9" /></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cn('w-5 h-5 text-secondary-400 ml-3')}> <polyline points="6 9 12 15 18 9" /></svg>
                   </div>
 
                   {expanded.includes(c.id) && (
-                    <div id={`category-${c.id}`} className="px-6 py-4 bg-white border-t border-gray-200">
-                      <p className="text-gray-700 text-sm leading-relaxed">{c.description}</p>
+                    <div id={`category-${c.id}`} className="px-6 py-4 bg-white border-t border-secondary-200">
+                      <p className="text-secondary-700 text-sm leading-relaxed">{c.description}</p>
                     </div>
                   )}
                 </div>
@@ -275,8 +275,8 @@ export const CookiesConsent: React.FC<CookiesConsentProps> = ({ onAccept, onReje
           </div>
           <div className="bg-white p-4 md:p-4 mt-6">
             <div className="flex flex-col-reverse md:flex-row gap-3">
-              <button onClick={handleRejectAll} className={cn('flex-1 px-6 py-3 rounded-lg font-medium text-sm transition-all','border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400','focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500')}>Reject All</button>
-              <button onClick={handleConfirm} className={cn('flex-1 px-6 py-3 rounded-lg font-medium text-sm transition-all','bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800','focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500','shadow-sm')}>Confirm My Choices</button>
+              <button onClick={handleRejectAll} className={cn('flex-1 px-6 py-3 rounded-lg font-medium text-sm transition-all','border border-secondary-300 text-secondary-700 hover:bg-secondary-50 hover:border-secondary-400','focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500')}>Reject All</button>
+              <button onClick={handleConfirm} className={cn('flex-1 px-6 py-3 rounded-lg font-medium text-sm transition-all','bg-primary-600 text-white hover:bg-primary-700 active:bg-blue-800','focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500','shadow-sm')}>Confirm My Choices</button>
             </div>
           </div>
         </div>

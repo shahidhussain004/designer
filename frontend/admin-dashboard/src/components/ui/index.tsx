@@ -4,7 +4,7 @@
  * Tailwind CSS UI Components
  */
 
-import React, { forwardRef, HTMLAttributes, ButtonHTMLAttributes, InputHTMLAttributes } from 'react'
+import React, { ButtonHTMLAttributes, forwardRef, HTMLAttributes, InputHTMLAttributes } from 'react'
 
 function cn(...classes: (string | boolean | undefined)[]) {
   return classes.filter(Boolean).join(' ')
@@ -162,7 +162,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(({
     <div
       ref={ref}
       className={cn(
-        'rounded-lg shadow-sm bg-white border border-gray-200',
+        'rounded-lg shadow-sm bg-white border border-secondary-200',
         paddingMap[padding],
         className
       )}
@@ -178,7 +178,7 @@ export const Divider = forwardRef<HTMLHRElement, HTMLAttributes<HTMLHRElement>>(
   className,
   ...props
 }, ref) => (
-  <hr ref={ref} className={cn('border-t border-gray-200 my-4', className)} {...props} />
+  <hr ref={ref} className={cn('border-t border-secondary-200 my-4', className)} {...props} />
 ))
 Divider.displayName = 'Divider'
 
@@ -220,9 +220,9 @@ export const Text = forwardRef<HTMLElement, TextProps>(({
   }
 
   const colorClasses: Record<string, string> = {
-    primary: 'text-gray-900',
-    secondary: 'text-gray-600',
-    muted: 'text-gray-500',
+    primary: 'text-secondary-900',
+    secondary: 'text-secondary-600',
+    muted: 'text-secondary-500',
   }
 
   return (
@@ -256,11 +256,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
   ...props
 }, ref) => (
   <div className="w-full">
-    {label && <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>}
+    {label && <label className="block text-sm font-medium text-secondary-700 mb-1">{label}</label>}
     <input
       ref={ref}
       className={cn(
-        'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm',
+        'w-full px-3 py-2 border border-secondary-300 rounded-md shadow-sm',
         'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
         className
       )}
@@ -294,9 +294,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   }
 
   const variantClasses: Record<string, string> = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700',
-    secondary: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50',
-    ghost: 'bg-transparent text-gray-700 hover:bg-gray-100',
+    primary: 'bg-primary-600 text-white hover:bg-primary-700',
+    secondary: 'bg-white text-secondary-700 border border-secondary-300 hover:bg-secondary-50',
+    ghost: 'bg-transparent text-secondary-700 hover:bg-secondary-100',
   }
 
   return (
@@ -333,10 +333,10 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(({
   ...props
 }, ref) => {
   const variantClasses: Record<string, string> = {
-    default: 'bg-gray-100 text-gray-800',
-    success: 'bg-green-100 text-green-800',
-    warning: 'bg-yellow-100 text-yellow-800',
-    danger: 'bg-red-100 text-red-800',
+    default: 'bg-secondary-100 text-secondary-800',
+    success: 'bg-success-100 text-success-800',
+    warning: 'bg-warning-100 text-warning-800',
+    danger: 'bg-error-100 text-error-800',
     info: 'bg-blue-100 text-blue-800',
   }
 
@@ -360,7 +360,7 @@ export const Spinner = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>
   className,
   ...props
 }, ref) => (
-  <div ref={ref} className={cn('animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600', className)} {...props} />
+  <div ref={ref} className={cn('animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600', className)} {...props} />
 ))
 Spinner.displayName = 'Spinner'
 

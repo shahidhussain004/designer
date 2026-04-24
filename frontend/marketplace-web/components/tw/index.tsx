@@ -340,13 +340,13 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(({
   }
 
   const variantClasses: Record<string, string> = {
-    primary: 'bg-white border border-gray-200',
-    secondary: 'bg-gray-50 border border-gray-200',
-    tertiary: 'bg-gray-100 border border-gray-200',
-    information: 'bg-blue-50 border border-blue-200',
-    notice: 'bg-yellow-50 border border-yellow-200',
-    positive: 'bg-green-50 border border-green-200',
-    negative: 'bg-red-50 border border-red-200',
+    primary: 'bg-white border border-secondary-200',
+    secondary: 'bg-secondary-50 border border-secondary-200',
+    tertiary: 'bg-secondary-100 border border-secondary-200',
+    information: 'bg-info-50 border border-info-200',
+    notice: 'bg-warning-50 border border-warning-200',
+    positive: 'bg-success-50 border border-success-200',
+    negative: 'bg-error-50 border border-error-200',
   }
 
   return (
@@ -380,7 +380,7 @@ export const Divider = forwardRef<HTMLHRElement, HTMLAttributes<HTMLHRElement> &
 }, ref) => (
   <hr
     ref={ref}
-    className={cn('border-t border-gray-200 my-4', className)}
+    className={cn('border-t border-secondary-200 my-4', className)}
     style={{ opacity: opacity ? parseFloat(opacity) : 1 }}
     {...props}
   />
@@ -415,7 +415,7 @@ export const Text = forwardRef<HTMLElement, TextProps>(({
   'text-align': textAlign,
   'margin-bottom': marginBottom,
   'margin-top': marginTop,
-  ...props
+  ..._props
 }, ref) => {
 
   const fontClasses: Record<string, string> = {
@@ -441,13 +441,13 @@ export const Text = forwardRef<HTMLElement, TextProps>(({
   }
 
   const colorClasses: Record<string, string> = {
-    'neutral-01': 'text-gray-900',
-    'neutral-02': 'text-gray-600',
-    'brand-01': 'text-blue-600',
+    'neutral-01': 'text-secondary-900',
+    'neutral-02': 'text-secondary-600',
+    'brand-01': 'text-primary-600',
     'inversed': 'text-white',
-    'negative-01': 'text-red-600',
-    'positive-01': 'text-green-600',
-    'secondary': 'text-gray-500',
+    'negative-01': 'text-error-600',
+    'positive-01': 'text-success-600',
+    'secondary': 'text-secondary-500',
   }
 
   const Component: React.ElementType = tag as React.ElementType
@@ -493,16 +493,16 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
 }, ref) => (
   <div className="w-full">
     {label && (
-      <label className="block text-sm font-medium text-gray-700 mb-1">
+      <label className="block text-sm font-medium text-secondary-700 mb-1">
         {label}
       </label>
     )}
     <input
       ref={ref}
       className={cn(
-        'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm',
+        'w-full px-3 py-2 border border-secondary-300 rounded-md shadow-sm',
         'focus:outline-none',
-        'disabled:bg-gray-100 disabled:cursor-not-allowed',
+        'disabled:bg-secondary-100 disabled:cursor-not-allowed',
         className
       )}
       onInput={onInput as React.FormEventHandler<HTMLInputElement> | undefined}
@@ -523,16 +523,16 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(({
 }, ref) => (
   <div className="w-full">
     {label && (
-      <label className="block text-sm font-medium text-gray-700 mb-1">
+      <label className="block text-sm font-medium text-secondary-700 mb-1">
         {label}
       </label>
     )}
     <textarea
       ref={ref}
       className={cn(
-        'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm',
+        'w-full px-3 py-2 border border-secondary-300 rounded-md shadow-sm',
         'focus:outline-none',
-        'disabled:bg-gray-100 disabled:cursor-not-allowed',
+        'disabled:bg-secondary-100 disabled:cursor-not-allowed',
         'min-h-[100px]',
         className
       )}
@@ -556,7 +556,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
       ref={ref}
       type="checkbox"
       className={cn(
-        'w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500',
+        'w-4 h-4 text-primary-600 border-secondary-300 rounded focus:ring-primary-500',
         className
       )}
       {...props}
@@ -596,17 +596,17 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   }
 
   const rankClasses: Record<string, string> = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 disabled:bg-gray-400',
-    secondary: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-blue-500 disabled:bg-gray-100',
-    tertiary: 'bg-transparent text-gray-700 hover:bg-gray-100 focus:ring-blue-500 disabled:text-gray-400',
+    primary: 'bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500 disabled:bg-secondary-400',
+    secondary: 'bg-white text-secondary-700 border border-secondary-300 hover:bg-secondary-50 focus:ring-primary-500 disabled:bg-secondary-100',
+    tertiary: 'bg-transparent text-secondary-700 hover:bg-secondary-100 focus:ring-primary-500 disabled:text-secondary-400',
   }
 
   const variantClasses: Record<string, string> = {
-    neutral: 'bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500',
-    positive: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500',
-    negative: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
-    notice: 'bg-yellow-500 text-white hover:bg-yellow-600 focus:ring-yellow-500',
-    brand: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
+    neutral: 'bg-secondary-600 text-white hover:bg-secondary-700 focus:ring-secondary-500',
+    positive: 'bg-success-600 text-white hover:bg-success-700 focus:ring-success-500',
+    negative: 'bg-error-600 text-white hover:bg-error-700 focus:ring-error-500',
+    notice: 'bg-warning-500 text-white hover:bg-warning-600 focus:ring-warning-500',
+    brand: 'bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500',
   }
 
   return (
@@ -643,7 +643,7 @@ export const LinkComponent = forwardRef<HTMLAnchorElement, LinkComponentProps>((
     <a
       ref={ref}
       className={cn(
-        'text-blue-600 hover:text-blue-800',
+        'text-primary-600 hover:text-primary-800',
         textDecoration === 'none' && 'no-underline',
         textDecoration === 'hover:underline' && 'hover:underline',
         className
@@ -671,10 +671,10 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(({
   ...props
 }, ref) => {
   const variantClasses: Record<string, string> = {
-    positive: 'bg-green-50 border-green-200 text-green-800',
-    negative: 'bg-red-50 border-red-200 text-red-800',
-    notice: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-    information: 'bg-blue-50 border-blue-200 text-blue-800',
+    positive: 'bg-success-50 border-success-200 text-success-800',
+    negative: 'bg-error-50 border-error-200 text-error-800',
+    notice: 'bg-warning-50 border-warning-200 text-warning-800',
+    information: 'bg-info-50 border-info-200 text-info-800',
   }
 
   return (
@@ -704,10 +704,10 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(({
   ...props
 }, ref) => {
   const variantClasses: Record<string, string> = {
-    positive: 'bg-green-100 text-green-800',
-    negative: 'bg-red-100 text-red-800',
-    notice: 'bg-yellow-100 text-yellow-800',
-    information: 'bg-blue-100 text-blue-800',
+    positive: 'bg-success-100 text-success-800',
+    negative: 'bg-error-100 text-error-800',
+    notice: 'bg-warning-100 text-warning-800',
+    information: 'bg-info-100 text-info-800',
   }
 
   return (
@@ -733,7 +733,7 @@ export const Spinner = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>
   <div
     ref={ref}
     className={cn(
-      'animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600',
+      'animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600',
       className
     )}
     {...props}
@@ -783,8 +783,8 @@ export const Dialog = forwardRef<HTMLDialogElement, DialogProps>(({
       {...props}
     >
       {heading && (
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">{heading}</h2>
+        <div className="px-6 py-4 border-b border-secondary-200">
+          <h2 className="text-xl font-semibold text-secondary-900">{heading}</h2>
         </div>
       )}
       <div className="p-6">
@@ -826,14 +826,14 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(({ className, label, children, ...props }, ref) => (
   <div className="w-full">
     {label && (
-      <label className="block text-sm font-medium text-gray-700 mb-1">
+      <label className="block text-sm font-medium text-secondary-700 mb-1">
         {label}
       </label>
     )}
     <select
       ref={ref}
       className={cn(
-        'w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white select-with-arrow',
+        'w-full px-4 py-2 border border-secondary-300 rounded-md shadow-sm bg-white select-with-arrow',
         'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
         className
       )}

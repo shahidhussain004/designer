@@ -1,13 +1,14 @@
 "use client";
 
 import { PageLayout } from '@/components/ui';
-import { useApplyForJob, useJob } from '@/hooks/useJobs';
+import { useApplyForJob, useJob, useMyApplications } from '@/hooks/useJobs';
 import { useAuth } from '@/lib/auth';
 import {
-    AlertCircle,
-    ArrowLeft,
-    Send,
-    Upload
+  AlertCircle,
+  ArrowLeft,
+  CheckCircle,
+  Send,
+  Upload
 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -24,6 +25,14 @@ export default function JobApplicationPage() {
 
   // Application mutation
   const applyForJob = useApplyForJob();
+
+  // Check if user has already applied (for FREELANCER users)
+  const { data: myApplications = [] } = useMyApplications();
+  const alreadyApplied = Array.isArray(myApplications) &&
+    myApplications.some((app: Record<string, unknown>) => String(app.jobId) === String(jobId));
+  const existingApplication = Array.isArray(myApplications)
+    ? myApplications.find((app: Record<string, unknown>) => String(app.jobId) === String(jobId))
+    : null;
 
   // Form state
   const [formData, setFormData] = useState({
@@ -163,7 +172,7 @@ export default function JobApplicationPage() {
       <PageLayout>
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
-            <div className="inline-block w-8 h-8 border-4 border-gray-200 border-t-primary-600 rounded-full animate-spin"></div>
+            <div className="inline-block w-8 h-8 border-4 border-secondary-200 border-t-primary-600 rounded-full animate-spin"></div>
           </div>
         </div>
       </PageLayout>
@@ -174,9 +183,9 @@ export default function JobApplicationPage() {
     return (
       <PageLayout>
         <div className="max-w-2xl mx-auto py-12 text-center">
-          <AlertCircle className="w-12 h-12 mx-auto mb-4 text-gray-400" aria-hidden="true" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Job Not Found</h1>
-          <p className="text-gray-600 mb-6">The job posting you&apos;re looking for doesn&apos;t exist or has been removed.</p>
+          <AlertCircle className="w-12 h-12 mx-auto mb-4 text-secondary-400" aria-hidden="true" />
+          <h1 className="text-2xl font-bold text-secondary-900 mb-2">Job Not Found</h1>
+          <p className="text-secondary-600 mb-6">The job posting you&apos;re looking for doesn&apos;t exist or has been removed.</p>
           <Link
             href="/jobs"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary-600 text-white hover:bg-primary-700 font-semibold transition-colors"
@@ -195,9 +204,9 @@ export default function JobApplicationPage() {
       <PageLayout>
         <div className="max-w-2xl mx-auto py-12">
           <div className="text-center">
-            <AlertCircle className="w-12 h-12 mx-auto mb-4 text-gray-400" aria-hidden="true" />
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Cannot Apply</h1>
-            <p className="text-gray-600 mb-6">
+            <AlertCircle className="w-12 h-12 mx-auto mb-4 text-secondary-400" aria-hidden="true" />
+            <h1 className="text-2xl font-bold text-secondary-900 mb-2">Cannot Apply</h1>
+            <p className="text-secondary-600 mb-6">
               {!user
                 ? 'You need to be signed in to apply.'
                 : user.role !== 'FREELANCER'
@@ -219,6 +228,44 @@ export default function JobApplicationPage() {
     );
   }
 
+  // Show "already applied" screen
+  if (alreadyApplied && existingApplication) {
+    return (
+      <PageLayout>
+        <div className="max-w-2xl mx-auto py-12">
+          <div className="text-center">
+            <CheckCircle className="w-16 h-16 mx-auto mb-4 text-green-500" aria-hidden="true" />
+            <h1 className="text-2xl font-bold text-secondary-900 mb-2">Already Applied</h1>
+            <p className="text-secondary-600 mb-2">
+              You have already submitted an application for <strong>{job.title}</strong>.
+            </p>
+            <p className="text-secondary-500 text-sm mb-6">
+              Status: <span className="font-semibold capitalize">{existingApplication.status?.toLowerCase().replace('_', ' ')}</span>
+              {existingApplication.appliedAt && (
+                <> &middot; Applied {new Date(existingApplication.appliedAt).toLocaleDateString()}</>
+              )}
+            </p>
+            <div className="flex justify-center gap-4">
+              <Link
+                href={`/jobs/${jobId}`}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-secondary-300 text-secondary-700 hover:bg-secondary-50 font-semibold transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+                Back to Job
+              </Link>
+              <Link
+                href="/dashboard/freelancer"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary-600 text-white hover:bg-primary-700 font-semibold transition-colors"
+              >
+                My Applications
+              </Link>
+            </div>
+          </div>
+        </div>
+      </PageLayout>
+    );
+  }
+
   return (
     <PageLayout>
       <div className="max-w-2xl mx-auto py-8">
@@ -232,9 +279,9 @@ export default function JobApplicationPage() {
             Back to Job
           </Link>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">{job.title}</h1>
-            <div className="flex flex-wrap gap-4 text-gray-600">
+          <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6">
+            <h1 className="text-2xl font-bold text-secondary-900 mb-2">{job.title}</h1>
+            <div className="flex flex-wrap gap-4 text-secondary-600">
               {job.jobType && <span>{job.jobType}</span>}
               {job.location && <span>–</span>}
               {job.location && <span>{job.location}</span>}
@@ -252,13 +299,13 @@ export default function JobApplicationPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Error Alert */}
           {submissionError && (
-            <div className="bg-red-50 rounded-xl border border-red-200 p-6">
+            <div className="bg-error-50 rounded-xl border border-error-200 p-6">
               <div className="flex items-start gap-4">
-                <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                <AlertCircle className="w-6 h-6 text-error-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
                 <div>
-                  <h3 className="text-lg font-bold text-red-900 mb-1">Application Failed</h3>
-                  <p className="text-red-700">{submissionError}</p>
-                  <p className="text-sm text-red-600 mt-2">
+                  <h3 className="text-lg font-bold text-error-900 mb-1">Application Failed</h3>
+                  <p className="text-error-700">{submissionError}</p>
+                  <p className="text-sm text-error-600 mt-2">
                     Please check your information and try again. If the problem persists, please try again later.
                   </p>
                 </div>
@@ -267,22 +314,22 @@ export default function JobApplicationPage() {
           )}
 
           {/* Submit Instructions */}
-          <div className="bg-blue-50 rounded-xl border border-blue-200 p-6">
+          <div className="bg-primary-50 rounded-xl border border-primary-200 p-6">
             <h2 className="text-lg font-bold text-blue-900 mb-2">Submit your application</h2>
             <p className="text-blue-800">Complete the following information to apply for this position</p>
           </div>
 
           {/* Candidate Information */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Candidate Information</h2>
+          <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6">
+            <h2 className="text-xl font-bold text-secondary-900 mb-6">Candidate Information</h2>
 
             <div className="space-y-6">
               {/* Resume Upload */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-secondary-700 mb-2">
                   Resume/CV
                 </label>
-                <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary-400 transition-colors cursor-pointer">
+                <div className="relative border-2 border-dashed border-secondary-300 rounded-lg p-6 text-center hover:border-primary-400 transition-colors cursor-pointer">
                   <input
                     type="file"
                     accept=".pdf,.doc,.docx"
@@ -293,20 +340,20 @@ export default function JobApplicationPage() {
                     }}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   />
-                  <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" aria-hidden="true" />
-                  <p className="text-sm text-gray-600">
+                  <Upload className="w-8 h-8 mx-auto mb-2 text-secondary-400" aria-hidden="true" />
+                  <p className="text-sm text-secondary-600">
                     {formData.resume ? formData.resume.name : 'Attach Resume'}
                   </p>
                   {!formData.resume && (
-                    <p className="text-xs text-gray-500 mt-1">No file chosen</p>
+                    <p className="text-xs text-secondary-500 mt-1">No file chosen</p>
                   )}
                 </div>
               </div>
 
               {/* Full Name */}
               <div>
-                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
-                  Full name <span className="text-red-500">*</span>
+                <label htmlFor="fullName" className="block text-sm font-medium text-secondary-700 mb-2">
+                  Full name <span className="text-error-500">*</span>
                 </label>
                 <input
                   id="fullName"
@@ -322,18 +369,18 @@ export default function JobApplicationPage() {
                       });
                     }
                   }}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   aria-invalid={!!fieldErrors.fullName}
                 />
                 {fieldErrors.fullName && (
-                  <p className="text-sm text-red-600 mt-1">{fieldErrors.fullName}</p>
+                  <p className="text-sm text-error-600 mt-1">{fieldErrors.fullName}</p>
                 )}
               </div>
 
               {/* Work Email */}
               <div>
-                <label htmlFor="workEmail" className="block text-sm font-medium text-gray-700 mb-2">
-                  Work email <span className="text-red-500">*</span>
+                <label htmlFor="workEmail" className="block text-sm font-medium text-secondary-700 mb-2">
+                  Work email <span className="text-error-500">*</span>
                 </label>
                 <input
                   id="workEmail"
@@ -349,18 +396,18 @@ export default function JobApplicationPage() {
                       });
                     }
                   }}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   aria-invalid={!!fieldErrors.workEmail}
                 />
                 {fieldErrors.workEmail && (
-                  <p className="text-sm text-red-600 mt-1">{fieldErrors.workEmail}</p>
+                  <p className="text-sm text-error-600 mt-1">{fieldErrors.workEmail}</p>
                 )}
               </div>
 
               {/* Phone */}
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone <span className="text-red-500">*</span>
+                <label htmlFor="phone" className="block text-sm font-medium text-secondary-700 mb-2">
+                  Phone <span className="text-error-500">*</span>
                 </label>
                 <input
                   id="phone"
@@ -376,17 +423,17 @@ export default function JobApplicationPage() {
                       });
                     }
                   }}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   aria-invalid={!!fieldErrors.phone}
                 />
                 {fieldErrors.phone && (
-                  <p className="text-sm text-red-600 mt-1">{fieldErrors.phone}</p>
+                  <p className="text-sm text-error-600 mt-1">{fieldErrors.phone}</p>
                 )}
               </div>
 
               {/* Current Location */}
               <div>
-                <label htmlFor="currentLocation" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="currentLocation" className="block text-sm font-medium text-secondary-700 mb-2">
                   Current Location
                 </label>
                 <input
@@ -394,13 +441,13 @@ export default function JobApplicationPage() {
                   type="text"
                   value={formData.currentLocation}
                   onChange={(e) => setFormData(prev => ({ ...prev, currentLocation: e.target.value }))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
 
               {/* Current Company */}
               <div>
-                <label htmlFor="currentCompany" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="currentCompany" className="block text-sm font-medium text-secondary-700 mb-2">
                   Current Company
                 </label>
                 <input
@@ -408,20 +455,20 @@ export default function JobApplicationPage() {
                   type="text"
                   value={formData.currentCompany}
                   onChange={(e) => setFormData(prev => ({ ...prev, currentCompany: e.target.value }))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
             </div>
           </div>
 
           {/* Links */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Links</h2>
+          <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6">
+            <h2 className="text-xl font-bold text-secondary-900 mb-6">Links</h2>
 
             <div className="space-y-6">
               {/* LinkedIn URL */}
               <div>
-                <label htmlFor="linkedInUrl" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="linkedInUrl" className="block text-sm font-medium text-secondary-700 mb-2">
                   LinkedIn URL
                 </label>
                 <input
@@ -430,13 +477,13 @@ export default function JobApplicationPage() {
                   value={formData.linkedInUrl}
                   onChange={(e) => setFormData(prev => ({ ...prev, linkedInUrl: e.target.value }))}
                   placeholder="https://linkedin.com/in/yourprofile"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
 
               {/* GitHub URL */}
               <div>
-                <label htmlFor="githubUrl" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="githubUrl" className="block text-sm font-medium text-secondary-700 mb-2">
                   GitHub URL
                 </label>
                 <input
@@ -445,18 +492,18 @@ export default function JobApplicationPage() {
                   value={formData.githubUrl}
                   onChange={(e) => setFormData(prev => ({ ...prev, githubUrl: e.target.value }))}
                   placeholder="https://github.com/yourprofile"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
             </div>
           </div>
 
           {/* Demographic Survey */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6">
             <div className="space-y-8">
               {/* Location Selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-sm font-medium text-secondary-700 mb-3">
                   What is your location?
                 </label>
                 <div className="space-y-2">
@@ -470,7 +517,7 @@ export default function JobApplicationPage() {
                         onChange={(e) => setFormData(prev => ({ ...prev, surveyLocation: e.target.value }))}
                         className="w-4 h-4"
                       />
-                      <span className="text-gray-700">{location}</span>
+                      <span className="text-secondary-700">{location}</span>
                     </label>
                   ))}
                 </div>
@@ -479,16 +526,16 @@ export default function JobApplicationPage() {
               {/* Show rest of survey only if location is selected */}
               {formData.surveyLocation && (
                 <>
-                  <div className="pt-6 border-t border-gray-200">
-                    <h2 className="text-xl font-bold text-gray-900 mb-2">Demographic Survey</h2>
-                    <p className="text-sm text-gray-600 mb-6">
+                  <div className="pt-6 border-t border-secondary-200">
+                    <h2 className="text-xl font-bold text-secondary-900 mb-2">Demographic Survey</h2>
+                    <p className="text-sm text-secondary-600 mb-6">
                       As part of our commitment to inclusion and diversity, we invite you to participate in a survey. Your feedback will help us enhance our job ads and improve our inclusion & diversity efforts. Rest assured that your responses will be kept secure, confidential, and completely separate from your name or job application.
                     </p>
                   </div>
 
                   {/* Where did you find the job */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                    <label className="block text-sm font-medium text-secondary-700 mb-3">
                       From where did you first get information about this job?
                     </label>
                     <div className="space-y-2">
@@ -502,7 +549,7 @@ export default function JobApplicationPage() {
                             onChange={(e) => setFormData(prev => ({ ...prev, jobSource: e.target.value }))}
                             className="w-4 h-4"
                           />
-                          <span className="text-gray-700">{source}</span>
+                          <span className="text-secondary-700">{source}</span>
                         </label>
                       ))}
                     </div>
@@ -510,10 +557,10 @@ export default function JobApplicationPage() {
 
                   {/* Reasons for applying */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                    <label className="block text-sm font-medium text-secondary-700 mb-3">
                       What were the biggest reasons for applying to this position?
                     </label>
-                    <p className="text-xs text-gray-600 mb-3">Select all that apply</p>
+                    <p className="text-xs text-secondary-600 mb-3">Select all that apply</p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {applyReasonsList.map(reason => (
                         <label key={reason} className="flex items-center gap-3 cursor-pointer">
@@ -523,7 +570,7 @@ export default function JobApplicationPage() {
                             onChange={() => handleReasonToggle(reason)}
                             className="w-4 h-4 rounded"
                           />
-                          <span className="text-gray-700">{reason}</span>
+                          <span className="text-secondary-700">{reason}</span>
                         </label>
                       ))}
                     </div>
@@ -531,7 +578,7 @@ export default function JobApplicationPage() {
 
                   {/* Gender */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                    <label className="block text-sm font-medium text-secondary-700 mb-3">
                       What gender do you identify as?
                     </label>
                     <div className="space-y-2">
@@ -545,7 +592,7 @@ export default function JobApplicationPage() {
                             onChange={(e) => setFormData(prev => ({ ...prev, gender: e.target.value }))}
                             className="w-4 h-4"
                           />
-                          <span className="text-gray-700">{option}</span>
+                          <span className="text-secondary-700">{option}</span>
                         </label>
                       ))}
                     </div>
@@ -553,7 +600,7 @@ export default function JobApplicationPage() {
 
                   {/* Age */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                    <label className="block text-sm font-medium text-secondary-700 mb-3">
                       What is your age?
                     </label>
                     <div className="space-y-2">
@@ -567,7 +614,7 @@ export default function JobApplicationPage() {
                             onChange={(e) => setFormData(prev => ({ ...prev, age: e.target.value }))}
                             className="w-4 h-4"
                           />
-                          <span className="text-gray-700">{range}</span>
+                          <span className="text-secondary-700">{range}</span>
                         </label>
                       ))}
                     </div>
@@ -578,7 +625,7 @@ export default function JobApplicationPage() {
           </div>
 
           {/* Privacy & Consent */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6">
             <div className="space-y-4">
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
@@ -587,7 +634,7 @@ export default function JobApplicationPage() {
                   onChange={(e) => setFormData(prev => ({ ...prev, messageConsent: e.target.checked }))}
                   className="w-4 h-4 mt-1"
                 />
-                <span className="text-sm text-gray-700">
+                <span className="text-sm text-secondary-700">
                   I agree to receive messages about my application and job opportunities from the company
                 </span>
               </label>
@@ -600,12 +647,12 @@ export default function JobApplicationPage() {
                   className="w-4 h-4 mt-1"
                   aria-invalid={!!fieldErrors.privacyConsent}
                 />
-                <span className="text-sm text-gray-700">
-                  I have read and accept the privacy policy and terms & conditions <span className="text-red-500">*</span>
+                <span className="text-sm text-secondary-700">
+                  I have read and accept the privacy policy and terms & conditions <span className="text-error-500">*</span>
                 </span>
               </label>
               {fieldErrors.privacyConsent && (
-                <p className="text-sm text-red-600">{fieldErrors.privacyConsent}</p>
+                <p className="text-sm text-error-600">{fieldErrors.privacyConsent}</p>
               )}
             </div>
           </div>

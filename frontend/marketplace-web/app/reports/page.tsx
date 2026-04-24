@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-type Summary = any;
+type Summary = Record<string, unknown>;
 
 export default function ReportsPage() {
   const [data, setData] = useState<Summary | null>(null);
@@ -18,7 +18,7 @@ export default function ReportsPage() {
       .catch((e) => setError(String(e)));
   }, []);
 
-  if (error) return (<div className="p-8"><h2 className="text-xl font-semibold">Reports</h2><p className="text-red-600">Failed to load: {error}</p></div>);
+  if (error) return (<div className="p-8"><h2 className="text-xl font-semibold">Reports</h2><p className="text-error-600">Failed to load: {error}</p></div>);
   if (!data) return (<div className="p-8">Loading reports...</div>);
 
   return (
@@ -28,10 +28,10 @@ export default function ReportsPage() {
       <section className="mb-6">
         <h2 className="text-lg font-semibold">Orphan checks</h2>
         <ul className="list-disc pl-6">
-          <li>orphan_reviews: {data.orphan_checks.orphan_reviews}</li>
-          <li>orphan_time_entries: {data.orphan_checks.orphan_time_entries}</li>
-          <li>orphan_job_applications: {data.orphan_checks.orphan_job_applications}</li>
-          <li>orphan_portfolio_items: {data.orphan_checks.orphan_portfolio_items}</li>
+          <li>orphan_reviews: {(data.orphan_checks as Record<string, unknown>).orphan_reviews as number}</li>
+          <li>orphan_time_entries: {(data.orphan_checks as Record<string, unknown>).orphan_time_entries as number}</li>
+          <li>orphan_job_applications: {(data.orphan_checks as Record<string, unknown>).orphan_job_applications as number}</li>
+          <li>orphan_portfolio_items: {(data.orphan_checks as Record<string, unknown>).orphan_portfolio_items as number}</li>
         </ul>
       </section>
 
@@ -45,10 +45,10 @@ export default function ReportsPage() {
             </tr>
           </thead>
           <tbody>
-            {data.top_companies_by_jobs_posted.map((c: any) => (
-              <tr key={c.company}>
-                <td className="py-2">{c.company}</td>
-                <td className="py-2">{c.jobs_posted}</td>
+            {(data.top_companies_by_jobs_posted as Record<string, unknown>[]).map((c) => (
+              <tr key={c.company as string}>
+                <td className="py-2">{c.company as string}</td>
+                <td className="py-2">{c.jobs_posted as number}</td>
               </tr>
             ))}
           </tbody>
@@ -66,11 +66,11 @@ export default function ReportsPage() {
             </tr>
           </thead>
           <tbody>
-            {data.top_freelancers_by_contracts_count.map((f: any) => (
-              <tr key={f.username}>
-                <td className="py-2">{f.username}</td>
-                <td className="py-2">{f.contracts}</td>
-                <td className="py-2">${(f.total_paid).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+            {(data.top_freelancers_by_contracts_count as Record<string, unknown>[]).map((f) => (
+              <tr key={f.username as string}>
+                <td className="py-2">{f.username as string}</td>
+                <td className="py-2">{f.contracts as number}</td>
+                <td className="py-2">${(f.total_paid as number).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
               </tr>
             ))}
           </tbody>
@@ -80,30 +80,30 @@ export default function ReportsPage() {
       <section className="mb-6">
         <h2 className="text-lg font-semibold">Jobs by category (top)</h2>
         <ul className="list-disc pl-6">
-          {data.jobs_by_category.map((j: any) => <li key={j.category}>{j.category} — {j.count}</li>)}
+          {(data.jobs_by_category as Record<string, unknown>[]).map((j) => <li key={j.category as string}>{j.category as string} — {j.count as number}</li>)}
         </ul>
       </section>
 
       <section className="mb-6">
         <h2 className="text-lg font-semibold">Contracts by status</h2>
         <ul className="list-disc pl-6">
-          {Object.entries(data.contracts_by_status).map(([k,v]: [string, unknown]) => <li key={k}>{k}: {String(v)}</li>)}
+          {Object.entries(data.contracts_by_status as Record<string, unknown>).map(([k,v]: [string, unknown]) => <li key={k}>{k}: {String(v)}</li>)}
         </ul>
       </section>
 
       <section className="mb-6">
         <h2 className="text-lg font-semibold">Freelancers with zero portfolio (sample)</h2>
-        <p>{data.freelancers_with_zero_portfolio_sample.join(', ')}</p>
+        <p>{(data.freelancers_with_zero_portfolio_sample as string[]).join(', ')}</p>
       </section>
 
       <section className="mb-6">
         <h2 className="text-lg font-semibold">Samples</h2>
-        <p>{data.sample_recent_reviews}</p>
-        <p>{data.sample_recent_time_entries}</p>
-        <p>{data.sample_recent_job_applications}</p>
+        <p>{data.sample_recent_reviews as string}</p>
+        <p>{data.sample_recent_time_entries as string}</p>
+        <p>{data.sample_recent_job_applications as string}</p>
       </section>
 
-      <footer className="text-sm text-gray-500 mt-8">This page is public and static; to update the data, replace <code>/public/reports/summary.json</code> with a new JSON export.</footer>
+      <footer className="text-sm text-secondary-500 mt-8">This page is public and static; to update the data, replace <code>/public/reports/summary.json</code> with a new JSON export.</footer>
     </div>
   );
 }

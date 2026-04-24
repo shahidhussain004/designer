@@ -55,7 +55,7 @@ export default function ContractDetailPage() {
     return (
       <PageLayout>
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
         </div>
       </PageLayout>
     )
@@ -66,9 +66,9 @@ export default function ContractDetailPage() {
       <PageLayout>
         <div className="max-w-4xl mx-auto px-4 py-16 text-center">
           <h2 className="text-2xl font-semibold">Contract Not Found</h2>
-          <p className="text-gray-600 mt-2">This contract may not exist or you do not have access to view it.</p>
+          <p className="text-secondary-600 mt-2">This contract may not exist or you do not have access to view it.</p>
             <div className="mt-6">
-            <button onClick={() => router.push('/dashboards')} className="px-4 py-2 bg-blue-600 text-white rounded-lg">Back to Dashboard</button>
+            <button onClick={() => router.push('/dashboards')} className="px-4 py-2 bg-primary-600 text-white rounded-lg">Back to Dashboard</button>
           </div>
         </div>
       </PageLayout>
@@ -91,38 +91,38 @@ export default function ContractDetailPage() {
 
         <div className="mb-6">
           <h1 className="text-3xl font-bold">{contract.title}</h1>
-          <p className="text-gray-600 mt-2">{contract.job?.title}</p>
+          <p className="text-secondary-600 mt-2">{contract.job?.title}</p>
         </div>
 
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <p className="text-sm text-gray-500">Company</p>
-              <p className="font-medium text-gray-900">{contract.company?.fullName ?? '—'}</p>
+              <p className="text-sm text-secondary-500">Company</p>
+              <p className="font-medium text-secondary-900">{contract.company?.fullName ?? '—'}</p>
 
-              <p className="text-sm text-gray-500 mt-4">Freelancer</p>
-              <p className="font-medium text-gray-900">{contract.freelancer?.fullName ?? '—'}</p>
+              <p className="text-sm text-secondary-500 mt-4">Freelancer</p>
+              <p className="font-medium text-secondary-900">{contract.freelancer?.fullName ?? '—'}</p>
             </div>
 
             <div>
-              <p className="text-sm text-gray-500">Amount</p>
-              <p className="font-medium text-gray-900">{typeof contract.totalAmount === 'number' ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(contract.totalAmount) : '—'}</p>
+              <p className="text-sm text-secondary-500">Amount</p>
+              <p className="font-medium text-secondary-900">{typeof contract.totalAmount === 'number' ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(contract.totalAmount) : '—'}</p>
 
-              <p className="text-sm text-gray-500 mt-4">Status</p>
-              <p className="font-medium text-gray-900">{contract.status ?? '—'}</p>
+              <p className="text-sm text-secondary-500 mt-4">Status</p>
+              <p className="font-medium text-secondary-900">{contract.status ?? '—'}</p>
             </div>
           </div>
         </div>
 
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold mb-4">Description</h2>
-          <p className="text-gray-700">{contract.description}</p>
+          <p className="text-secondary-700">{contract.description}</p>
 
             <div className="mt-6 flex gap-3">
-            <button onClick={() => router.push(`/dashboard/freelancer/time-tracking?contractId=${contract.id}`)} className="px-4 py-2 bg-blue-600 text-white rounded-lg">Log Time</button>
+            <button onClick={() => router.push(`/dashboard/freelancer/time-tracking?contractId=${contract.id}`)} className="px-4 py-2 bg-primary-600 text-white rounded-lg">Log Time</button>
             <button
               onClick={() => contract.freelancer?.id ? router.push(`/freelancers/${contract.freelancer.id}/portfolio`) : undefined}
-              className="px-4 py-2 bg-gray-100 text-gray-800 rounded-lg"
+              className="px-4 py-2 bg-secondary-100 text-secondary-800 rounded-lg"
               disabled={!contract.freelancer?.id}
             >
               View Freelancer

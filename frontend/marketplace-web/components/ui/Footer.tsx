@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import React from 'react';
+import React, { useState } from 'react';
 import { Logo } from './Icons';
 
 // =============================================================================
@@ -14,9 +14,9 @@ const footerLinks = {
     links: [
       { label: 'Browse Jobs', href: '/jobs' },
       { label: 'Browse Projects', href: '/projects' },
-      { label: 'Create Portfolio', href: '/portfolio' },
+      { label: 'My Portfolio', href: '/portfolio' },
       { label: 'Skills Assessment', href: '/skills' },
-      { label: 'Freelancer Resources', href: '/resources' },
+      { label: 'Design/Tech Resources', href: '/resources' },
     ],
   },
   forCompanies: {
@@ -111,27 +111,64 @@ export interface FooterProps extends React.HTMLAttributes<HTMLElement> {
 export const Footer = React.forwardRef<HTMLElement, FooterProps>(
   ({ className, minimal = false, ...props }, ref) => {
     const currentYear = new Date().getFullYear();
+    const [email, setEmail] = useState('')
+    const [loading, setLoading] = useState(false)
+    const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+
+    const handleSubscribe = async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault()
+      
+      if (!email.trim()) {
+        setMessage({ type: 'error', text: 'Please enter an email address' })
+        return
+      }
+
+      setLoading(true)
+      setMessage(null)
+
+      try {
+        const response = await fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        })
+
+        const result = await response.json()
+
+        if (response.ok) {
+          setMessage({ type: 'success', text: 'Thanks for subscribing! Check your email.' })
+          setEmail('')
+        } else {
+          setMessage({ type: 'error', text: result.error || 'Failed to subscribe' })
+        }
+      } catch (err) {
+        console.error(err)
+        setMessage({ type: 'error', text: 'An error occurred. Please try again.' })
+      } finally {
+        setLoading(false)
+      }
+    }
 
     if (minimal) {
       return (
         <footer
           ref={ref}
-          className={`w-full bg-gray-900 py-6 ${className || ''}`}
+          className={`w-full bg-secondary-900 py-6 ${className || ''}`}
           {...props}
         >
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-secondary-400">
                 © {currentYear} Designer Marketplace. All rights reserved.
               </p>
               <div className="flex items-center gap-6">
-                <Link href="/privacy" className="text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href="/privacy" className="text-sm text-secondary-400 hover:text-white transition-colors">
                   Privacy
                 </Link>
-                <Link href="/terms" className="text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href="/terms" className="text-sm text-secondary-400 hover:text-white transition-colors">
                   Terms
                 </Link>
-                <Link href="/cookies" className="text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href="/cookies" className="text-sm text-secondary-400 hover:text-white transition-colors">
                   Cookies
                 </Link>
               </div>
@@ -144,21 +181,21 @@ export const Footer = React.forwardRef<HTMLElement, FooterProps>(
     return (
       <footer
         ref={ref}
-        className={`w-full bg-gray-900 ${className || ''}`}
+        className={`w-full bg-secondary-900 ${className || ''}`}
         {...props}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Main footer content */}
-          <div className="py-12 lg:py-16 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
+          <div className="py-12 lg:py-16 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-12">
             {/* Brand column */}
             <div className="col-span-2 md:col-span-3 lg:col-span-1 mb-4 lg:mb-0">
-              <Link href="/" className="flex items-center gap-2 mb-4 justify-start">
+              <Link href="/" className="flex items-center gap-2 mb-6 justify-start">
                 <div className="w-[50px] h-[50px] flex-shrink-0 flex items-center justify-center">
                   <Logo variant="icon" theme="white" size="lg" className="h-[40px] w-[40px]" />
                 </div>
                 <span className="hidden sm:inline text-lg font-extralight text-white">Designer</span>
               </Link>
-              <p className="text-sm text-gray-400 mb-6 max-w-xs leading-relaxed">
+              <p className="text-sm text-secondary-400 mb-8 max-w-xs leading-relaxed">
                 The premier platform connecting talented designers and developers with innovative companies worldwide.
               </p>
               {/* Social links */}
@@ -169,7 +206,7 @@ export const Footer = React.forwardRef<HTMLElement, FooterProps>(
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-primary-500 transition-colors"
+                    className="text-secondary-400 hover:text-primary-500 transition-colors"
                     aria-label={social.name ?? 'social'}
                   >
                     {social.icon}
@@ -180,8 +217,8 @@ export const Footer = React.forwardRef<HTMLElement, FooterProps>(
 
             {/* Link columns */}
             {Object.values(footerLinks).map((section) => (
-              <div key={section.title}>
-                <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">
+              <div key={section.title} className="space-y-2">
+                <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-6">
                   {section.title}
                 </h3>
                 <ul className="space-y-3">
@@ -189,7 +226,7 @@ export const Footer = React.forwardRef<HTMLElement, FooterProps>(
                     <li key={link.href}>
                       <Link
                         href={link.href}
-                        className="text-sm text-gray-400 hover:text-primary-500 transition-colors"
+                        className="text-sm text-secondary-400 hover:text-primary-500 transition-colors"
                       >
                         {link.label}
                       </Link>
@@ -201,48 +238,59 @@ export const Footer = React.forwardRef<HTMLElement, FooterProps>(
           </div>
 
           {/* Newsletter signup */}
-          <div className="py-8 border-t border-gray-800">
+          <div className="py-8 border-t border-secondary-800">
             <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
               <div className="text-center lg:text-left">
                 <h3 className="text-lg font-semibold text-white mb-1">Stay up to date</h3>
-                <p className="text-sm text-gray-400">Get the latest jobs, tutorials, and platform updates.</p>
+                <p className="text-sm text-secondary-400">Get the latest jobs, tutorials, and platform updates.</p>
               </div>
-              <form className="flex gap-3 w-full max-w-md">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="flex-1 px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none"
-                />
-                <button
-                  type="submit"
-                  className="px-5 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors"
-                >
-                  Subscribe
-                </button>
-              </form>
+              <div className="flex-1 max-w-md">
+                <form onSubmit={handleSubscribe} className="flex gap-3 w-full">
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={loading}
+                    className="flex-1 px-4 py-2.5 bg-secondary-800 border border-secondary-700 rounded-lg text-white placeholder-secondary-500 text-sm focus:outline-none focus:border-primary-500 disabled:opacity-50"
+                  />
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="px-5 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? 'Subscribing...' : 'Subscribe'}
+                  </button>
+                </form>
+                {message && (
+                  <p className={`mt-3 text-xs ${message.type === 'success' ? 'text-success-400' : 'text-error-400'}`}>
+                    {message.text}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
 
           {/* Bottom bar */}
-          <div className="py-6 border-t border-gray-800">
+          <div className="py-6 border-t border-secondary-800">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-secondary-500">
                 © {currentYear} Designer Marketplace. All rights reserved.
               </p>
               <div className="flex flex-wrap justify-center gap-6">
-                <Link href="/privacy" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
+                <Link href="/privacy" className="text-sm text-secondary-500 hover:text-secondary-300 transition-colors">
                   Privacy Policy
                 </Link>
-                <Link href="/terms" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
+                <Link href="/terms" className="text-sm text-secondary-500 hover:text-secondary-300 transition-colors">
                   Terms of Service
                 </Link>
-                <Link href="/cookies" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
+                <Link href="/cookies" className="text-sm text-secondary-500 hover:text-secondary-300 transition-colors">
                   Cookie Policy
                 </Link>
-                <Link href="/accessibility" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
+                <Link href="/accessibility" className="text-sm text-secondary-500 hover:text-secondary-300 transition-colors">
                   Accessibility
                 </Link>
-                <Link href="/design-system" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
+                <Link href="/design-system" className="text-sm text-secondary-500 hover:text-secondary-300 transition-colors">
                   Design System
                 </Link>
               </div>

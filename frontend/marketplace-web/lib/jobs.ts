@@ -172,3 +172,55 @@ export async function getJobs(options?: GetJobsOptions): Promise<JobsResponse> {
 }
 
 export default getJobs;
+
+// ============================================================================
+// Saved Jobs API Functions
+// ============================================================================
+
+export type SavedJobResponse = {
+  savedJobId: number;
+  savedAt: string;
+  job: JobItem;
+};
+
+/**
+ * Save/favorite a job
+ * @param jobId - The ID of the job to save
+ */
+export async function saveJob(jobId: string | number): Promise<SavedJobResponse> {
+  const response = await apiClient.post(`/saved-jobs/${jobId}`);
+  return response.data;
+}
+
+/**
+ * Unsave/unfavorite a job
+ * @param jobId - The ID of the job to unsave
+ */
+export async function unsaveJob(jobId: string | number): Promise<void> {
+  await apiClient.delete(`/saved-jobs/${jobId}`);
+}
+
+/**
+ * Get all saved jobs for the current user
+ */
+export async function getSavedJobs(): Promise<SavedJobResponse[]> {
+  const response = await apiClient.get('/saved-jobs');
+  return response.data;
+}
+
+/**
+ * Check if a job is saved
+ * @param jobId - The ID of the job to check
+ */
+export async function checkSavedStatus(jobId: string | number): Promise<boolean> {
+  const response = await apiClient.get(`/saved-jobs/${jobId}/status`);
+  return response.data.isSaved;
+}
+
+/**
+ * Get count of saved jobs
+ */
+export async function getSavedJobsCount(): Promise<number> {
+  const response = await apiClient.get('/saved-jobs/count');
+  return response.data.count;
+}

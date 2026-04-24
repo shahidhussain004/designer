@@ -4,10 +4,10 @@ export default function AdminFooter() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="bg-gray-900 text-gray-300 border-t border-gray-800 mt-12">
+    <footer className="bg-secondary-950 text-secondary-400 border-t border-secondary-800 mt-12">
       <Flex flex-direction="column" className="max-w-7xl mx-auto" padding="l">
         {/* Top Section */}
-        <Flex justify-content="space-between" align-items="flex-start" gap="l" className="mb-8 pb-8 border-b border-gray-800">
+        <Flex justify-content="space-between" align-items="flex-start" gap="l" className="mb-8 pb-8 border-b border-secondary-800">
           {/* Company Info */}
           <div className="flex-1">
             <Text className="text-white font-bold text-lg mb-2">Designer Marketplace</Text>
@@ -15,7 +15,7 @@ export default function AdminFooter() {
           </div>
 
           {/* Quick Links */}
-          <div>
+          <div className="ml-4">
             <Text className="text-white font-semibold mb-4">Quick Links</Text>
             <Flex flex-direction="column" gap="s" className="text-sm">
               <a href="#" className="hover:text-white transition">Dashboard</a>
@@ -25,7 +25,7 @@ export default function AdminFooter() {
           </div>
 
           {/* Resources */}
-          <div>
+          <div className="ml-4">
             <Text className="text-white font-semibold mb-4">Resources</Text>
             <Flex flex-direction="column" gap="s" className="text-sm">
               <a href="#" className="hover:text-white transition">API Docs</a>
@@ -35,7 +35,7 @@ export default function AdminFooter() {
           </div>
 
           {/* Legal */}
-          <div>
+          <div className="ml-4">
             <Text className="text-white font-semibold mb-4">Legal</Text>
             <Flex flex-direction="column" gap="s" className="text-sm">
               <a href="#" className="hover:text-white transition">Privacy</a>

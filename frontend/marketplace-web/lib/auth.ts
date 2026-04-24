@@ -1,3 +1,4 @@
+import type { User } from '@/types';
 import { useEffect, useState } from 'react';
 import { apiClient } from './api-client';
 
@@ -24,6 +25,21 @@ export interface AuthResponse {
     fullName: string;
     role: string;
   };
+}
+
+/**
+ * Returned by `authService.oauthLogin()`.
+ * When `requiresRoleSelection` is true the other auth fields are absent and
+ * the caller should show a role picker, then re-call with the chosen role.
+ */
+export interface OAuthLoginResult {
+  requiresRoleSelection?: boolean;
+  email?: string;
+  fullName?: string;
+  pictureUrl?: string;
+  accessToken?: string;
+  refreshToken?: string;
+  user?: AuthResponse['user'];
 }
 
 /**
@@ -86,7 +102,7 @@ export const authService = {
       try {
 
         console.trace();
-      } catch (e) {
+      } catch {
         // ignore
       }
 
@@ -131,7 +147,7 @@ export const authService = {
       // Try to fetch current user profile to verify token
       await apiClient.get('/users/me');
       return true;
-    } catch (error) {
+    } catch {
       // Token is invalid, clear it
       this.logout();
       return false;
@@ -155,6 +171,39 @@ export const authService = {
     const user = this.getCurrentUser();
     return user?.role === 'INSTRUCTOR' || user?.role === 'ADMIN';
   },
+
+  /**
+   * Sign in / sign up via a third-party OAuth provider (Google, Microsoft).
+   *
+   * The backend returns HTTP 200 when login is complete or HTTP 202 when the
+   * account is new and still needs a role selection.  In both cases the
+   * Axios interceptor will resolve the promise with `data`, so we inspect
+   * `requiresRoleSelection` to tell the two apart.
+   */
+  async oauthLogin(
+    provider: string,
+    token: string,
+    role?: string,
+  ): Promise<OAuthLoginResult> {
+    const payload: { provider: string; token: string; role?: string } = { provider, token };
+    if (role) payload.role = role;
+
+    // Allow 202 through without throwing
+    const { data } = await apiClient.post<OAuthLoginResult>('/auth/oauth-login', payload, {
+      validateStatus: (status) => status === 200 || status === 202,
+    });
+
+    if (!data.requiresRoleSelection && data.accessToken && data.refreshToken && data.user) {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('access_token', data.accessToken);
+        localStorage.setItem('refresh_token', data.refreshToken);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        apiClient.defaults.headers.Authorization = `Bearer ${data.accessToken}`;
+      }
+    }
+
+    return data;
+  },
 };
 
 /**
@@ -162,7 +211,7 @@ export const authService = {
  * Returns `{ user, setUser }` for simple usage in client components.
  */
 export function useAuth() {
-  const [user, setUser] = useState<any>(() => {
+  const [user, setUser] = useState<User | null>(() => {
     if (typeof window !== 'undefined') {
       const userStr = localStorage.getItem('user');
       return userStr ? JSON.parse(userStr) : null;

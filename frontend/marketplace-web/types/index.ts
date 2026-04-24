@@ -12,6 +12,8 @@ export interface User {
   portfolioUrl?: string;
   ratingAvg?: number;
   ratingCount?: number;
+  companyName?: string;
+  companyDescription?: string;
 }
 
 export interface Job {
@@ -35,6 +37,7 @@ export interface Job {
   companyId: number;
   viewCount?: number;
   proposalCount?: number;
+  isOwner?: boolean;  // Indicates if current user owns this job
   createdAt: string;
   updatedAt: string;
 }

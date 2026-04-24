@@ -17,7 +17,7 @@ const SuccessFeaturesSection = () => {
         </svg>
       ),
       imagePlaceholder: (
-        <div className="w-full h-full bg-gradient-to-br from-red-50 to-orange-50 rounded-2xl flex items-center justify-center relative overflow-hidden">
+        <div className="w-full h-full bg-gradient-to-br from-error-50 to-orange-50 rounded-2xl flex items-center justify-center relative overflow-hidden">
           <div className="absolute inset-0 opacity-10">
             <svg className="w-full h-full" viewBox="0 0 400 300" fill="none">
               <rect x="80" y="60" width="240" height="180" rx="8" fill="#E74C3C" opacity="0.3"/>
@@ -33,11 +33,11 @@ const SuccessFeaturesSection = () => {
                 <circle cx="24" cy="26" r="5" stroke="#1A2332" strokeWidth="2"/>
               </svg>
             </div>
-            <p className="text-sm font-semibold text-gray-600">Project Briefcase</p>
+            <p className="text-sm font-semibold text-secondary-600">Project Briefcase</p>
           </div>
         </div>
       ),
-      gradient: "from-red-50/50 to-orange-50/50"
+      gradient: "from-error-50/50 to-orange-50/50"
     },
     {
       id: 2,
@@ -52,7 +52,7 @@ const SuccessFeaturesSection = () => {
         </svg>
       ),
       imagePlaceholder: (
-        <div className="w-full h-full bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl flex items-center justify-center relative overflow-hidden">
+        <div className="w-full h-full bg-gradient-to-br from-primary-50 to-primary-50 rounded-2xl flex items-center justify-center relative overflow-hidden">
           <div className="absolute inset-0 opacity-10">
             <svg className="w-full h-full" viewBox="0 0 400 300" fill="none">
               <circle cx="120" cy="120" r="40" fill="#1A2332" opacity="0.2"/>
@@ -67,11 +67,11 @@ const SuccessFeaturesSection = () => {
                 <path d="M12 38C12 32 16 28 24 28C32 28 36 32 36 38" stroke="#1A2332" strokeWidth="2" strokeLinecap="round"/>
               </svg>
             </div>
-            <p className="text-sm font-semibold text-gray-600">Talent Profiles</p>
+            <p className="text-sm font-semibold text-secondary-600">Talent Profiles</p>
           </div>
         </div>
       ),
-      gradient: "from-blue-50/50 to-indigo-50/50"
+      gradient: "from-primary-50/50 to-primary-50/50"
     },
     {
       id: 3,
@@ -86,7 +86,7 @@ const SuccessFeaturesSection = () => {
         </svg>
       ),
       imagePlaceholder: (
-        <div className="w-full h-full bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl flex items-center justify-center relative overflow-hidden">
+        <div className="w-full h-full bg-gradient-to-br from-success-50 to-success-50 rounded-2xl flex items-center justify-center relative overflow-hidden">
           <div className="absolute inset-0 opacity-10">
             <svg className="w-full h-full" viewBox="0 0 400 300" fill="none">
               <rect x="80" y="80" width="240" height="140" rx="8" fill="#1A2332" opacity="0.2"/>
@@ -101,11 +101,11 @@ const SuccessFeaturesSection = () => {
                 <path d="M20 24L23 27L29 21" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
-            <p className="text-sm font-semibold text-gray-600">Job Opportunities</p>
+            <p className="text-sm font-semibold text-secondary-600">Job Opportunities</p>
           </div>
         </div>
       ),
-      gradient: "from-green-50/50 to-emerald-50/50"
+      gradient: "from-success-50/50 to-success-50/50"
     },
     {
       id: 4,
@@ -119,7 +119,7 @@ const SuccessFeaturesSection = () => {
         </svg>
       ),
       imagePlaceholder: (
-        <div className="w-full h-full bg-gradient-to-br from-amber-50 to-yellow-50 rounded-2xl flex items-center justify-center relative overflow-hidden">
+        <div className="w-full h-full bg-gradient-to-br from-warning-50 to-warning-50 rounded-2xl flex items-center justify-center relative overflow-hidden">
           <div className="absolute inset-0 opacity-10">
             <svg className="w-full h-full" viewBox="0 0 400 300" fill="none">
               <path d="M100 150L200 100L300 150V230L200 280L100 230V150Z" fill="#F59E0B" opacity="0.2"/>
@@ -134,23 +134,23 @@ const SuccessFeaturesSection = () => {
                 <circle cx="24" cy="22" r="4" stroke="#1A2332" strokeWidth="2"/>
               </svg>
             </div>
-            <p className="text-sm font-semibold text-gray-600">Learning Hub</p>
+            <p className="text-sm font-semibold text-secondary-600">Learning Hub</p>
           </div>
         </div>
       ),
-      gradient: "from-amber-50/50 to-yellow-50/50"
+      gradient: "from-warning-50/50 to-warning-50/50"
     }
   ];
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-slate-100 py-20 px-4">
+    <div className="w-full min-h-screen bg-gradient-to-br from-secondary-50 via-secondary-100 to-slate-100 py-20 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-20">
-          <h2 className="text-5xl font-normal text-gray-900 mb-6 tracking-tight">
+          <h2 className="text-5xl font-normal text-secondary-900 mb-6 tracking-tight">
             Everything You Need to Succeed
           </h2>
-          <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl md:text-2xl text-secondary-600 max-w-3xl mx-auto">
             Whether you&apos;re hiring or looking for work, we&apos;ve got you covered
           </p>
         </div>
@@ -163,7 +163,7 @@ const SuccessFeaturesSection = () => {
               className={`group relative ${index % 2 === 0 ? '' : 'lg:flex-row-reverse'}`}
             >
               {/* Card with horizontal layout */}
-              <div className={`relative bg-white rounded-3xl p-8 lg:p-16 transition-all duration-500 hover:shadow-2xl border border-gray-200 overflow-hidden`}>
+              <div className={`relative bg-white rounded-3xl p-8 lg:p-16 transition-all duration-500 hover:shadow-2xl border border-secondary-200 overflow-hidden`}>
                 <div className={`flex flex-col lg:flex-row items-center gap-12 lg:gap-20 ${index % 2 === 0 ? '' : 'lg:flex-row-reverse'}`}>
                   {/* Left Content */}
                   <div className="flex-1 space-y-6">
@@ -174,15 +174,15 @@ const SuccessFeaturesSection = () => {
 
                     {/* Text Content */}
                     <div className="space-y-4">
-                      <h3 className="text-3xl lg:text-4xl font-bold text-gray-900">
+                      <h3 className="text-3xl lg:text-4xl font-bold text-secondary-900">
                         {feature.title}
                       </h3>
-                      <p className="text-gray-600 leading-relaxed text-lg max-w-xl">
+                      <p className="text-secondary-600 leading-relaxed text-lg max-w-xl">
                         {feature.description}
                       </p>
 
                       {/* CTA */}
-                      <button className="inline-flex items-center gap-3 text-red-600 font-semibold text-lg group/btn transition-all duration-300 hover:gap-5 pt-2">
+                      <button className="inline-flex items-center gap-3 text-error-600 font-semibold text-lg group/btn transition-all duration-300 hover:gap-5 pt-2">
                         Get Started
                         <ArrowRight className="w-6 h-6 transition-transform duration-300 group-hover/btn:translate-x-2" strokeWidth={2.5} />
                       </button>
@@ -195,7 +195,7 @@ const SuccessFeaturesSection = () => {
                       {/* Outer white border with shadow - rotated */}
                       <div className="absolute inset-0 rounded-3xl bg-white p-2 shadow-xl transition-transform duration-500 group-hover:scale-105 rotate-[8deg] group-hover:rotate-[5deg]">
                         {/* Inner red border - slightly less rotated for depth */}
-                        <div className="w-full h-full rounded-2xl border-[5px] border-red-500 overflow-hidden -rotate-[4deg]">
+                        <div className="w-full h-full rounded-2xl border-[5px] border-error-500 overflow-hidden -rotate-[4deg]">
                           {/* Image container - counter-rotate to make image straight */}
                           <div className="w-full h-full rotate-[4deg] scale-110">
                             {/* Image or Placeholder */}
@@ -226,9 +226,9 @@ const SuccessFeaturesSection = () => {
 
         {/* Bottom CTA Section */}
         <div className="mt-24 text-center">
-          <div className="inline-flex items-center gap-6 bg-gradient-to-r from-gray-50 via-white to-red-50 rounded-full px-10 py-5 border-2 border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300">
-            <span className="text-gray-700 font-semibold text-lg">Ready to get started?</span>
-            <button className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-full font-bold transition-all duration-300 hover:scale-105 hover:shadow-xl text-lg" onClick={() => window.location.href = '/auth/register'}>
+          <div className="inline-flex items-center gap-6 bg-gradient-to-r from-secondary-50 via-white to-error-50 rounded-full px-10 py-5 border-2 border-secondary-200 shadow-lg hover:shadow-xl transition-all duration-300">
+            <span className="text-secondary-700 font-semibold text-lg">Ready to get started?</span>
+            <button className="bg-error-600 hover:bg-error-700 text-white px-8 py-3 rounded-full font-bold transition-all duration-300 hover:scale-105 hover:shadow-xl text-lg" onClick={() => window.location.href = '/auth/register'}>
               Join Now
             </button>
           </div>

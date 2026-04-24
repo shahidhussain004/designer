@@ -113,7 +113,7 @@ export default function ReviewsPage() {
           <Star
             key={star}
             size={size}
-            className={star <= rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}
+            className={star <= rating ? 'fill-warning-400 text-warning-400' : 'text-secondary-300'}
           />
         ))}
       </div>
@@ -127,7 +127,7 @@ export default function ReviewsPage() {
   ) => {
     return (
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+        <label className="block text-sm font-medium text-secondary-700 mb-2">{label}</label>
         <div className="flex gap-2">
           {[1, 2, 3, 4, 5].map((star) => (
             <button
@@ -140,13 +140,13 @@ export default function ReviewsPage() {
                 size={24}
                 className={
                   star <= value
-                    ? 'fill-yellow-400 text-yellow-400 hover:scale-110 transition'
-                    : 'text-gray-300 hover:text-yellow-200 transition'
+                    ? 'fill-warning-400 text-warning-400 hover:scale-110 transition'
+                    : 'text-secondary-300 hover:text-warning-200 transition'
                 }
               />
             </button>
           ))}
-          <span className="ml-2 text-sm text-gray-600">({value}/5)</span>
+          <span className="ml-2 text-sm text-secondary-600">({value}/5)</span>
         </div>
       </div>
     );
@@ -203,13 +203,13 @@ export default function ReviewsPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Reviews & Ratings</h1>
-            <p className="text-gray-600 mt-2">Manage feedback from your projects</p>
+            <h1 className="text-3xl font-bold text-secondary-900">Reviews & Ratings</h1>
+            <p className="text-secondary-600 mt-2">Manage feedback from your projects</p>
           </div>
           {contracts.length > 0 && (
             <button
               onClick={() => setShowForm(!showForm)}
-              className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+              className="flex items-center gap-2 bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition"
             >
               <MessageSquare size={20} />
               Write Review
@@ -221,17 +221,17 @@ export default function ReviewsPage() {
         <div className="bg-white rounded-lg shadow p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
-              <p className="text-sm text-gray-600 mb-2">Average Rating</p>
-              <p className="text-4xl font-bold text-gray-900 mb-2">{avgRating}</p>
+              <p className="text-sm text-secondary-600 mb-2">Average Rating</p>
+              <p className="text-4xl font-bold text-secondary-900 mb-2">{avgRating}</p>
               {renderStars(parseFloat(avgRating), 20)}
             </div>
             <div className="text-center">
-              <p className="text-sm text-gray-600 mb-2">Reviews Received</p>
-              <p className="text-4xl font-bold text-blue-600">{receivedReviews.length}</p>
+              <p className="text-sm text-secondary-600 mb-2">Reviews Received</p>
+              <p className="text-4xl font-bold text-primary-600">{receivedReviews.length}</p>
             </div>
             <div className="text-center">
-              <p className="text-sm text-gray-600 mb-2">Reviews Given</p>
-              <p className="text-4xl font-bold text-green-600">{givenReviews.length}</p>
+              <p className="text-sm text-secondary-600 mb-2">Reviews Given</p>
+              <p className="text-4xl font-bold text-success-600">{givenReviews.length}</p>
             </div>
           </div>
         </div>
@@ -241,14 +241,14 @@ export default function ReviewsPage() {
             <h2 className="text-xl font-semibold mb-4">Write a Review</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-secondary-700 mb-2">
                   Select Contract *
                 </label>
                 <select
                   required
                   value={formData.contractId}
                   onChange={(e) => setFormData({ ...formData, contractId: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 >
                   <option value="">Choose a completed contract...</option>
                   {contracts.map((contract) => (
@@ -260,7 +260,7 @@ export default function ReviewsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-secondary-700 mb-2">
                   Reviewee ID * (Company User ID)
                 </label>
                 <input
@@ -268,7 +268,7 @@ export default function ReviewsPage() {
                   required
                   value={formData.revieweeId}
                   onChange={(e) => setFormData({ ...formData, revieweeId: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Enter company user ID..."
                 />
               </div>
@@ -293,7 +293,7 @@ export default function ReviewsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-secondary-700 mb-2">
                   Review Comment *
                 </label>
                 <textarea
@@ -301,7 +301,7 @@ export default function ReviewsPage() {
                   value={formData.comment}
                   onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
                   rows={4}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Share your experience working with this company..."
                 />
               </div>
@@ -312,9 +312,9 @@ export default function ReviewsPage() {
                   id="anonymous"
                   checked={formData.isAnonymous}
                   onChange={(e) => setFormData({ ...formData, isAnonymous: e.target.checked })}
-                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                  className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
                 />
-                <label htmlFor="anonymous" className="text-sm text-gray-700">
+                <label htmlFor="anonymous" className="text-sm text-secondary-700">
                   Post anonymously (your name will be hidden)
                 </label>
               </div>
@@ -322,14 +322,14 @@ export default function ReviewsPage() {
               <div className="flex gap-3 pt-4">
                 <button
                   type="submit"
-                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
+                  className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition"
                 >
                   Submit Review
                 </button>
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition"
+                  className="bg-secondary-200 text-secondary-700 px-6 py-2 rounded-lg hover:bg-secondary-300 transition"
                 >
                   Cancel
                 </button>
@@ -344,8 +344,8 @@ export default function ReviewsPage() {
             onClick={() => setActiveTab('received')}
             className={`pb-3 px-4 font-medium transition ${
               activeTab === 'received'
-                ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'text-primary-600 border-b-2 border-primary-600'
+                : 'text-secondary-600 hover:text-secondary-900'
             }`}
           >
             Received Reviews ({receivedReviews.length})
@@ -354,8 +354,8 @@ export default function ReviewsPage() {
             onClick={() => setActiveTab('given')}
             className={`pb-3 px-4 font-medium transition ${
               activeTab === 'given'
-                ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'text-primary-600 border-b-2 border-primary-600'
+                : 'text-secondary-600 hover:text-secondary-900'
             }`}
           >
             Given Reviews ({givenReviews.length})
@@ -366,9 +366,9 @@ export default function ReviewsPage() {
         <div className="space-y-4">
           {activeTab === 'received' && receivedReviews.length === 0 && (
             <div className="bg-white rounded-lg shadow p-12 text-center">
-              <MessageSquare size={48} className="mx-auto text-gray-400 mb-4" />
-              <p className="text-gray-600">No reviews received yet</p>
-              <p className="text-sm text-gray-500 mt-2">
+              <MessageSquare size={48} className="mx-auto text-secondary-400 mb-4" />
+              <p className="text-secondary-600">No reviews received yet</p>
+              <p className="text-sm text-secondary-500 mt-2">
                 Complete projects to receive reviews from companies
               </p>
             </div>
@@ -376,9 +376,9 @@ export default function ReviewsPage() {
 
           {activeTab === 'given' && givenReviews.length === 0 && (
             <div className="bg-white rounded-lg shadow p-12 text-center">
-              <MessageSquare size={48} className="mx-auto text-gray-400 mb-4" />
-              <p className="text-gray-600">No reviews given yet</p>
-              <p className="text-sm text-gray-500 mt-2">
+              <MessageSquare size={48} className="mx-auto text-secondary-400 mb-4" />
+              <p className="text-secondary-600">No reviews given yet</p>
+              <p className="text-sm text-secondary-500 mt-2">
                 Complete a contract and write a review for your company
               </p>
             </div>
@@ -390,22 +390,22 @@ export default function ReviewsPage() {
             <div key={r.id} className="bg-white rounded-lg shadow p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-start gap-4">
-                  <div className="bg-gray-100 rounded-full p-3">
-                    <User size={24} className="text-gray-600" />
+                  <div className="bg-secondary-100 rounded-full p-3">
+                    <User size={24} className="text-secondary-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">
+                    <h3 className="font-semibold text-secondary-900">
                       {r.isAnonymous
                         ? 'Anonymous'
                         : activeTab === 'received'
                         ? r.reviewer?.username || 'Unknown'
                         : r.reviewee?.username || 'Unknown'}
                     </h3>
-                    <p className="text-sm text-gray-600">{r.contract?.title}</p>
-                    <p className="text-xs text-gray-500 mt-1">{r.createdAt ? formatDate(r.createdAt) : ''}</p>
+                    <p className="text-sm text-secondary-600">{r.contract?.title}</p>
+                    <p className="text-xs text-secondary-500 mt-1">{r.createdAt ? formatDate(r.createdAt) : ''}</p>
                   </div>
                 </div>
-                <button className="text-gray-400 hover:text-red-600 transition">
+                <button className="text-secondary-400 hover:text-error-600 transition">
                   <Flag size={20} />
                 </button>
               </div>
@@ -413,19 +413,19 @@ export default function ReviewsPage() {
               <div className="mb-3">
                 <div className="flex items-center gap-2 mb-2">
                     {renderStars(r.rating ?? 0, 18)}
-                    <span className="text-sm font-medium text-gray-700">
+                    <span className="text-sm font-medium text-secondary-700">
                       {(r.rating ?? 0).toFixed(1)}/5.0
                   </span>
                 </div>
               </div>
 
-                <p className="text-gray-700 mb-4">{r.comment}</p>
+                <p className="text-secondary-700 mb-4">{r.comment}</p>
 
                 {r.categoryRatings && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t">
                     {Object.entries(r.categoryRatings).map(([category, rating]) => (
                     <div key={category}>
-                      <p className="text-xs text-gray-500 mb-1 capitalize">{category}</p>
+                      <p className="text-xs text-secondary-500 mb-1 capitalize">{category}</p>
                       {renderStars(rating as number, 14)}
                     </div>
                   ))}

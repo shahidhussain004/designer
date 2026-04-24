@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.designer.marketplace.dto.AuthResponse;
 import com.designer.marketplace.dto.LoginRequest;
+import com.designer.marketplace.dto.OAuthLoginRequest;
+import com.designer.marketplace.dto.OAuthLoginResponse;
 import com.designer.marketplace.dto.RefreshTokenRequest;
 import com.designer.marketplace.dto.RegisterRequest;
 import com.designer.marketplace.security.LoginAttemptService;
@@ -146,6 +148,38 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ErrorResponse(message));
         }
+    }
+
+    /**
+     * POST /api/auth/oauth-login
+     * Sign in (or sign up) using an OAuth provider token.
+     *
+     * Returns HTTP 200 with a full AuthResponse when the account is known or
+     * has just been created.  Returns HTTP 202 with a body that includes
+     * requiresRoleSelection=true when the email is new and no role was supplied;
+     * the client should show a role-picker and re-POST with the chosen role.
+     */
+    @PostMapping("/oauth-login")
+    public ResponseEntity<?> oauthLogin(@Valid @RequestBody OAuthLoginRequest request,
+                                        HttpServletRequest httpRequest) {
+        String companyIp = getCompanyIp(httpRequest);
+        log.info("==== POST /api/auth/oauth-login - provider: {} ====", request.getProvider());
+
+        OAuthLoginResponse result = authService.oauthLogin(
+                request.getProvider(), request.getToken(), request.getRole());
+
+        if (result.isRequiresRoleSelection()) {
+            return ResponseEntity.status(202).body(result);
+        }
+
+        AuthResponse authResponse = result.getAuthResponse();
+        securityAuditService.logLoginSuccess(
+                authResponse.getUser().getId(),
+                authResponse.getUser().getEmail(),
+                companyIp);
+
+        log.info("==== OAuth login successful for: {} ====", authResponse.getUser().getEmail());
+        return ResponseEntity.ok(authResponse);
     }
 
     /**

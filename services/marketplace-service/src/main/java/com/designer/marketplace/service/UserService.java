@@ -58,7 +58,7 @@ public class UserService {
         }
 
         String username = authentication.getName();
-        return userRepository.findByUsername(username)
+        return userRepository.findByUsernameIgnoreCase(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
     }
 
@@ -104,7 +104,7 @@ public class UserService {
         // Update fields if provided
         if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
             // Check if email already exists
-            if (userRepository.existsByEmail(request.getEmail())) {
+            if (userRepository.existsByEmailIgnoreCase(request.getEmail())) {
                 throw new RuntimeException("Email already in use");
             }
             user.setEmail(request.getEmail());
@@ -236,7 +236,7 @@ public class UserService {
      */
     @Transactional
     public void processForgotPasswordRequest(String email) {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmailIgnoreCase(email)
                 .orElse(null);
 
         if (user == null) {
@@ -294,5 +294,26 @@ public class UserService {
         passwordResetTokenRepository.save(resetToken);
 
         log.info("Password reset successfully for user: {}", user.getUsername());
+    }
+
+    /**
+     * Change password for the current authenticated user.
+     */
+    @Transactional
+    public void changePassword(String currentPassword, String newPassword) {
+        User currentUser = getCurrentUser();
+
+        if (!passwordEncoder.matches(currentPassword, currentUser.getPasswordHash())) {
+            throw new IllegalArgumentException("Current password is incorrect");
+        }
+
+        if (passwordEncoder.matches(newPassword, currentUser.getPasswordHash())) {
+            throw new IllegalArgumentException("New password must be different from current password");
+        }
+
+        currentUser.setPasswordHash(passwordEncoder.encode(newPassword));
+        userRepository.save(currentUser);
+
+        log.info("Password changed successfully for user: {}", currentUser.getUsername());
     }
 }

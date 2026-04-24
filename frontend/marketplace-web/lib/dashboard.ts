@@ -18,6 +18,9 @@ export interface DashboardStats {
   completedProjects?: number;
   totalEarnings?: number;
   avgRating?: number;
+  activeContracts?: number;
+  jobsApplied?: number;
+  averageRating?: number;
 }
 
 export interface JobSummary {
@@ -30,6 +33,9 @@ export interface JobSummary {
   status: string;
   proposalCount: number;
   createdAt: string;
+  isFeatured?: boolean;
+  applicationsCount?: number;
+  viewsCount?: number;
 }
 
 export interface ProjectSummary {

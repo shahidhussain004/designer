@@ -11,6 +11,8 @@ import com.designer.marketplace.entity.Company;
 @Repository
 public interface CompanyRepository extends JpaRepository<Company, Long> {
     Optional<Company> findByUserId(Long userId);
+    @Query("select c from Company c left join fetch c.user where c.user.id = :userId")
+    Optional<Company> findByUserIdWithUser(@org.springframework.data.repository.query.Param("userId") Long userId);
     @Query("select c from Company c left join fetch c.user where c.id = :id")
     Optional<Company> findByIdWithUser(@org.springframework.data.repository.query.Param("id") Long id);
 }

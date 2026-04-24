@@ -40,10 +40,10 @@ export default function CourseEnrollmentSuccessPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-secondary-50 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 text-primary-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-500">Loading...</p>
+          <p className="text-secondary-500">Loading...</p>
         </div>
       </div>
     );
@@ -51,24 +51,24 @@ export default function CourseEnrollmentSuccessPage() {
 
   return (
     <PageLayout>
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
+      <div className="min-h-screen bg-secondary-50 flex items-center justify-center py-12 px-4">
         <div className="max-w-lg w-full">
           {/* Success Card */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 text-center">
+          <div className="bg-white rounded-2xl shadow-lg border border-secondary-200 p-8 text-center">
             {/* Success Icon */}
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="w-10 h-10 text-green-600" />
+            <div className="w-20 h-20 bg-success-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="w-10 h-10 text-success-600" />
             </div>
 
             {/* Success Title */}
-            <h1 className="text-3xl font-bold text-gray-900 mb-3">
+            <h1 className="text-3xl font-bold text-secondary-900 mb-3">
               Enrollment Successful!
             </h1>
 
             {/* Success Message */}
-            <p className="text-gray-600 text-lg mb-6">
+            <p className="text-secondary-600 text-lg mb-6">
               {course ? (
-                <>You&apos;re now enrolled in <span className="font-semibold text-gray-900">{course.title}</span>. Welcome to your learning journey!</>
+                <>You&apos;re now enrolled in <span className="font-semibold text-secondary-900">{course.title}</span>. Welcome to your learning journey!</>
               ) : (
                 <>Your enrollment has been confirmed. Start learning right away!</>
               )}
@@ -76,9 +76,9 @@ export default function CourseEnrollmentSuccessPage() {
 
             {/* Course Preview Card */}
             {course && (
-              <div className="bg-gray-50 rounded-xl p-4 mb-6">
+              <div className="bg-secondary-50 rounded-xl p-4 mb-6">
                 <div className="flex items-start gap-4">
-                  <div className="relative w-24 h-20 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
+                  <div className="relative w-24 h-20 rounded-lg overflow-hidden bg-secondary-200 flex-shrink-0">
                     {course.thumbnailUrl ? (
                       <Image
                         src={course.thumbnailUrl}
@@ -88,13 +88,13 @@ export default function CourseEnrollmentSuccessPage() {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <PlayCircle className="w-8 h-8 text-gray-400" />
+                        <PlayCircle className="w-8 h-8 text-secondary-400" />
                       </div>
                     )}
                   </div>
                   <div className="flex-1 text-left">
-                    <h3 className="font-semibold text-gray-900 text-sm mb-2">{course.title}</h3>
-                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                    <h3 className="font-semibold text-secondary-900 text-sm mb-2">{course.title}</h3>
+                    <div className="flex items-center gap-4 text-xs text-secondary-500">
                       <span className="flex items-center gap-1">
                         <BookOpen className="w-3 h-3" />
                         {course.lessonsCount} lessons
@@ -121,19 +121,19 @@ export default function CourseEnrollmentSuccessPage() {
               
               <Link 
                 href="/dashboard"
-                className="flex items-center justify-center w-full py-3 px-6 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                className="flex items-center justify-center w-full py-3 px-6 border border-secondary-300 text-secondary-700 rounded-lg hover:bg-secondary-50 transition-colors font-medium"
               >
                 Go to Dashboard
               </Link>
             </div>
 
             {/* Confirmation Message */}
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
-                <CheckCircle className="w-4 h-4 text-green-500" />
+            <div className="mt-6 pt-6 border-t border-secondary-200">
+              <div className="flex items-center justify-center gap-2 text-sm text-secondary-500">
+                <CheckCircle className="w-4 h-4 text-success-500" />
                 Receipt sent to your email
               </div>
-              <p className="text-xs text-gray-400 mt-2">
+              <p className="text-xs text-secondary-400 mt-2">
                 You can access your course anytime from your dashboard
               </p>
             </div>

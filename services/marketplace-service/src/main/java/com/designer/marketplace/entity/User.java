@@ -107,6 +107,13 @@ public class User {
     @Column(name = "rating_count", nullable = false)
     private Integer ratingCount = 0;
 
+    // OAuth / social sign-in
+    @Column(name = "oauth_provider", length = 50)
+    private String oauthProvider;
+
+    @Column(name = "oauth_provider_id", length = 255)
+    private String oauthProviderId;
+
     // Stripe integration
     @Column(name = "stripe_customer_id", length = 100)
     private String stripeCustomerId;

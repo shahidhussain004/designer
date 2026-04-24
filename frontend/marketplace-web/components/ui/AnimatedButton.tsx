@@ -35,7 +35,7 @@ export default function AnimatedButton({
 
   const variantClasses = {
     default: "bg-white text-black",
-    outline: "border border-gray-300 bg-transparent",
+    outline: "border border-secondary-300 bg-transparent",
     ghost: "bg-transparent",
     slim: "bg-white text-black px-6 py-2 text-sm",
   }

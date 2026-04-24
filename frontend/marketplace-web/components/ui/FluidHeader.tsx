@@ -21,7 +21,14 @@ const navItems: NavItem[] = [
 
 export const FluidLogo: React.FC = () => (
   <Link href="/" className="navbar-brand flex items-center">
-    <Image src="/logo-reverse-designer.png" alt="Designer Marketplace" width={160} height={36} className="object-contain" />
+    <Image 
+    src="/logo-reverse-designer.png" 
+    alt="Designer Marketplace" 
+    width={160} 
+    height={36} 
+    className="object-contain"
+    style={{ width: 'auto', height: 'auto', maxWidth: '140px' }} 
+    />
   </Link>
 );
 

@@ -14,34 +14,49 @@
 // =============================================================================
 
 export const colors = {
-  // Primary Brand Colors - Blue
+  // Primary Brand Colors — Carmine (Swiss/Bauhaus red)
   primary: {
-    50: '#EFF6FF',   // Lightest - backgrounds
-    100: '#DBEAFE',  // Light backgrounds
-    200: '#BFDBFE',  // Borders, hover states
-    300: '#93C5FD',  // Disabled states
-    400: '#60A5FA',  // Icons
-    500: '#3B82F6',  // Default brand color
-    600: '#2563EB',  // Primary buttons, links (AA compliant on white)
-    700: '#1D4ED8',  // Hover states
-    800: '#1E40AF',  // Active states
-    900: '#1E3A8A',  // Text on light backgrounds
-    950: '#172554',  // Darkest - headers
+    50:  '#FEF1F1',
+    100: '#FDE3E3',
+    200: '#FBC5C5',
+    300: '#F89797',
+    400: '#F26262',
+    500: '#E33232',   // Default brand color
+    600: '#C21C1C',   // Primary buttons, links (AA compliant on white)
+    700: '#9E1616',   // Hover states
+    800: '#821313',   // Active states
+    900: '#6B1010',   // Text on light backgrounds
+    950: '#3D0909',   // Darkest
   },
 
-  // Secondary Colors - Slate/Gray
+  // Blue — Nordic Cobalt (deep European authority · pairs with Carmine)
+  blue: {
+    50:  '#EEF4FB',
+    100: '#D5E7F7',
+    200: '#AACFEE',
+    300: '#74AFE1',
+    400: '#3D8BD1',
+    500: '#1F6ABA',
+    600: '#155398',
+    700: '#103F75',
+    800: '#0C2E56',
+    900: '#071E39',
+    950: '#040E1C',
+  },
+
+  // Secondary Colors — Stone (warm neutral)
   secondary: {
-    50: '#F8FAFC',
-    100: '#F1F5F9',
-    200: '#E2E8F0',
-    300: '#CBD5E1',
-    400: '#94A3B8',
-    500: '#64748B',
-    600: '#475569',   // Body text (AA compliant)
-    700: '#334155',   // Headings
-    800: '#1E293B',   // Strong text
-    900: '#0F172A',   // Maximum contrast
-    950: '#020617',
+    50:  '#FAF9F7',
+    100: '#F5F3F0',
+    200: '#E8E4DE',
+    300: '#D5CFC6',
+    400: '#B0A898',
+    500: '#8C8272',
+    600: '#6E6456',   // Body text (AA compliant)
+    700: '#564E42',   // Headings
+    800: '#3D372F',   // Strong text
+    900: '#282420',   // Maximum contrast
+    950: '#151311',
   },
 
   // Success - Green (for positive actions, success states)
@@ -72,18 +87,19 @@ export const colors = {
     900: '#78350F',
   },
 
-  // Error - Red (for destructive actions, errors)
+  // Error — Signal Red (pure alarm · distinct from Carmine)
   error: {
-    50: '#FEF2F2',
-    100: '#FEE2E2',
-    200: '#FECACA',
-    300: '#FCA5A5',
-    400: '#F87171',
-    500: '#EF4444',   // Error badges
-    600: '#DC2626',   // Error buttons (AA compliant)
-    700: '#B91C1C',
-    800: '#991B1B',
-    900: '#7F1D1D',
+    50:  '#FFF1F0',
+    100: '#FFE0DE',
+    200: '#FFC7C2',
+    300: '#FFA097',
+    400: '#FF6F61',
+    500: '#F04438',   // Error badges
+    600: '#D92D20',   // Error buttons (AA compliant)
+    700: '#B42318',
+    800: '#912018',
+    900: '#7A271A',
+    950: '#430D09',
   },
 
   // Info - Cyan (for informational content)
@@ -103,28 +119,28 @@ export const colors = {
   // Neutral backgrounds
   background: {
     primary: '#FFFFFF',
-    secondary: '#F8FAFC',
-    tertiary: '#F1F5F9',
-    inverse: '#0F172A',
+    secondary: '#FAF9F7',
+    tertiary: '#F5F3F0',
+    inverse: '#282420',
   },
 
   // Text colors
   text: {
-    primary: '#0F172A',     // 21:1 contrast on white
-    secondary: '#475569',   // 7.1:1 contrast on white (AA compliant)
-    tertiary: '#64748B',    // 4.6:1 contrast on white (AA compliant)
-    disabled: '#94A3B8',    // Use only for disabled text with indicators
-    inverse: '#FFFFFF',     // For dark backgrounds
-    link: '#2563EB',        // 4.5:1 contrast on white
-    linkHover: '#1D4ED8',
+    primary: '#282420',     // Stone 900 — high contrast on white
+    secondary: '#6E6456',   // Stone 600 — AA compliant
+    tertiary: '#8C8272',    // Stone 500 — AA compliant
+    disabled: '#B0A898',    // Stone 400
+    inverse: '#FFFFFF',
+    link: '#155398',        // Nordic Cobalt 600 — AA on white
+    linkHover: '#103F75',   // Nordic Cobalt 700
   },
 
   // Border colors
   border: {
-    light: '#E2E8F0',
-    default: '#CBD5E1',
-    strong: '#94A3B8',
-    focus: '#2563EB',       // Focus rings
+    light: '#E8E4DE',       // Stone 200
+    default: '#D5CFC6',     // Stone 300
+    strong: '#B0A898',      // Stone 400
+    focus: '#0C2E56',       // Nordic Cobalt 800
   },
 
   // Overlay colors
@@ -258,8 +274,8 @@ export const shadows = {
   '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)',
   inner: 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
   // Focus rings for accessibility
-  focusRing: '0 0 0 2px #FFFFFF, 0 0 0 4px #2563EB',
-  focusRingError: '0 0 0 2px #FFFFFF, 0 0 0 4px #DC2626',
+  focusRing: '0 0 0 2px #FFFFFF, 0 0 0 4px #0C2E56',
+  focusRingError: '0 0 0 2px #FFFFFF, 0 0 0 4px #D92D20',
 } as const;
 
 // =============================================================================

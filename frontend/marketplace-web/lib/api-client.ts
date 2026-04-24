@@ -39,7 +39,7 @@ apiClient.interceptors.request.use(
       // Debug: log whether Authorization header will be sent
       try {
 
-      } catch (_e) {
+      } catch {
         // ignore
       }
     }
@@ -154,7 +154,7 @@ apiClient.interceptors.response.use(
         try {
 
           console.trace();
-        } catch (_e) {
+        } catch {
           // ignore
         }
         localStorage.removeItem('access_token');

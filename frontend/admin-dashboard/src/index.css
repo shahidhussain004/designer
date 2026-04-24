@@ -16,24 +16,24 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: #f3f4f6;
+  background-color: #faf9f7;
 }
 
-/* Basic dark-mode overrides to make theme toggle visible when Tailwind dark class is present */
+/* Basic dark-mode overrides aligned with Stone + Nordic Cobalt palette */
 .dark body {
-  background-color: #0b1220;
-  color: #e6eef8;
+  background-color: #151311;
+  color: #e8e4de;
 }
 
-.dark .bg-white { background-color: #0f1724 !important; }
-.dark .bg-gray-50 { background-color: #071226 !important; }
-.dark .bg-gray-100 { background-color: #0b1220 !important; }
-.dark .text-gray-900 { color: #e6eef8 !important; }
-.dark .text-gray-600 { color: #cbd5e1 !important; }
-.dark .text-gray-500 { color: #94a3b8 !important; }
-.dark .border-gray-200 { border-color: #1f2937 !important; }
-.dark .border-gray-300 { border-color: #374151 !important; }
-.dark .bg-indigo-600 { background-color: #2563eb !important; }
+.dark .bg-white { background-color: #282420 !important; }
+.dark .bg-secondary-50 { background-color: #1a1815 !important; }
+.dark .bg-secondary-100 { background-color: #151311 !important; }
+.dark .text-secondary-900 { color: #e8e4de !important; }
+.dark .text-secondary-600 { color: #d5cfc6 !important; }
+.dark .text-secondary-500 { color: #b0a898 !important; }
+.dark .border-secondary-200 { border-color: #3d372f !important; }
+.dark .border-secondary-300 { border-color: #564e42 !important; }
+.dark .bg-blue-800 { background-color: #155398 !important; }
 
 
 /* Custom scrollbar */

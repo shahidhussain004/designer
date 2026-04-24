@@ -5,22 +5,22 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import {
-    analyticsApi,
-    categoriesApi,
-    commentsApi,
-    contentApi,
-    searchApi,
-    tagsApi,
+  analyticsApi,
+  categoriesApi,
+  commentsApi,
+  contentApi,
+  searchApi,
+  tagsApi,
 } from './content-api';
 import type {
-    Category,
-    CategoryWithChildren,
-    CommentWithReplies,
-    ContentFilters,
-    ContentWithRelations,
-    PaginationMeta,
-    SearchParams,
-    Tag,
+  Category,
+  CategoryWithChildren,
+  CommentWithReplies,
+  ContentFilters,
+  ContentWithRelations,
+  PaginationMeta,
+  SearchParams,
+  Tag,
 } from './content-types';
 
 // ============================================================================
@@ -48,7 +48,7 @@ export function useContentList(filters: ContentFilters = {}) {
     } finally {
       setLoading(false);
     }
-  }, [JSON.stringify(filters)]);
+  }, [filters]);
 
   useEffect(() => {
     fetchContent();
@@ -370,7 +370,7 @@ export function useSearch(params: SearchParams) {
 
     const debounceTimer = setTimeout(searchContent, 300);
     return () => clearTimeout(debounceTimer);
-  }, [JSON.stringify(params)]);
+  }, [params]);
 
   return { results, meta, loading, error };
 }
@@ -439,7 +439,7 @@ export function useInfiniteContent(filters: Omit<ContentFilters, 'page'>) {
     } finally {
       setLoading(false);
     }
-  }, [JSON.stringify(filters)]);
+  }, [filters]);
 
   useEffect(() => {
     setPage(1);

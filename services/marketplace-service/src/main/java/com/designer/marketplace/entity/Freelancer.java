@@ -74,18 +74,18 @@ public class Freelancer {
     @Column(name = "linkedin_url", length = 500)
     private String linkedinUrl;
 
-    // Skills & Certifications (JSONB)
+    // Skills & Certifications (JSONB) — default to empty arrays to satisfy NOT NULL DB constraint
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "jsonb")
-    private JsonNode skills;
+    @Column(columnDefinition = "jsonb NOT NULL DEFAULT '[]'::jsonb")
+    private JsonNode skills = com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.arrayNode();
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "jsonb")
-    private JsonNode certifications;
+    @Column(columnDefinition = "jsonb NOT NULL DEFAULT '[]'::jsonb")
+    private JsonNode certifications = com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.arrayNode();
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "jsonb")
-    private JsonNode languages;
+    @Column(columnDefinition = "jsonb NOT NULL DEFAULT '[]'::jsonb")
+    private JsonNode languages = com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.arrayNode();
 
     // Performance Metrics
     @Column(name = "completion_rate", precision = 5, scale = 2)

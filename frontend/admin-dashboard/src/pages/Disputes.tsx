@@ -51,52 +51,52 @@ function ResolutionModal({ isOpen, onClose, dispute, onSubmit, isLoading }: Reso
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-        <div className="px-6 py-4 border-b border-gray-200 sticky top-0 bg-white">
-          <h2 className="text-xl font-bold text-gray-900">Resolve Dispute - {dispute.jobTitle}</h2>
+        <div className="px-6 py-4 border-b border-secondary-200 sticky top-0 bg-white">
+          <h2 className="text-xl font-bold text-secondary-900">Resolve Dispute - {dispute.jobTitle}</h2>
         </div>
 
         <div className="p-6 space-y-6">
           {/* Dispute Details */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-sm text-gray-600">Client</p>
-              <p className="font-medium text-gray-900">{dispute.clientName}</p>
+              <p className="text-sm text-secondary-600">Client</p>
+              <p className="font-medium text-secondary-900">{dispute.clientName}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Freelancer</p>
-              <p className="font-medium text-gray-900">{dispute.freelancerName}</p>
+              <p className="text-sm text-secondary-600">Freelancer</p>
+              <p className="font-medium text-secondary-900">{dispute.freelancerName}</p>
             </div>
           </div>
 
           <div>
-            <p className="text-sm text-gray-600">Reason</p>
-            <p className="text-gray-900 mt-1">{dispute.reason}</p>
+            <p className="text-sm text-secondary-600">Reason</p>
+            <p className="text-secondary-900 mt-1">{dispute.reason}</p>
           </div>
 
           <div>
-            <p className="text-sm text-gray-600">Description</p>
-            <p className="text-gray-900 mt-1">{dispute.description}</p>
+            <p className="text-sm text-secondary-600">Description</p>
+            <p className="text-secondary-900 mt-1">{dispute.description}</p>
           </div>
 
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <p className="text-sm text-gray-600">Disputed Amount</p>
-            <p className="text-2xl font-bold text-blue-600 mt-1">${dispute.amount.toLocaleString()}</p>
+          <div className="bg-primary-50 p-4 rounded-lg">
+            <p className="text-sm text-secondary-600">Disputed Amount</p>
+            <p className="text-2xl font-bold text-primary-600 mt-1">${dispute.amount.toLocaleString()}</p>
           </div>
 
           {/* Resolution Input */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Resolution Notes</label>
+            <label className="block text-sm font-medium text-secondary-700 mb-2">Resolution Notes</label>
             <textarea
               value={resolution}
               onChange={(e) => setResolution(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full px-3 py-2 border border-secondary-300 rounded-lg text-sm focus:ring-primary-500 focus:border-primary-500"
               rows={4}
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Refund Amount to Client</label>
+            <label className="block text-sm font-medium text-secondary-700 mb-2">Refund Amount to Client</label>
             <div className="flex items-center gap-2">
               <span className="text-lg font-medium">$</span>
               <input
@@ -105,33 +105,33 @@ function ResolutionModal({ isOpen, onClose, dispute, onSubmit, isLoading }: Reso
                 onChange={(e) => setRefundAmount(Number(e.target.value))}
                 min={0}
                 max={dispute.amount}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                className="flex-1 px-3 py-2 border border-secondary-300 rounded-lg text-sm focus:ring-primary-500 focus:border-primary-500"
               />
             </div>
-            <p className="text-sm text-gray-600 mt-2">
+            <p className="text-sm text-secondary-600 mt-2">
               Freelancer will receive: ${(dispute.amount - refundAmount).toLocaleString()}
             </p>
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3 pt-4 border-t border-gray-200">
+          <div className="flex gap-3 pt-4 border-t border-secondary-200">
             <button
               onClick={onClose}
-              className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 font-medium text-sm"
+              className="flex-1 px-4 py-2 text-secondary-700 bg-secondary-100 rounded-lg hover:bg-secondary-200 font-medium text-sm"
             >
               Cancel
             </button>
             <button
               onClick={() => handleSubmit(false)}
               disabled={isLoading}
-              className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-sm disabled:opacity-50"
+              className="flex-1 px-4 py-2 bg-success-600 text-white rounded-lg hover:bg-success-700 font-medium text-sm disabled:opacity-50"
             >
               {isLoading ? 'Resolving...' : 'Favor Freelancer'}
             </button>
             <button
               onClick={() => handleSubmit(true)}
               disabled={isLoading}
-              className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium text-sm disabled:opacity-50"
+              className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-medium text-sm disabled:opacity-50"
             >
               {isLoading ? 'Resolving...' : `Favor Client ($${refundAmount})`}
             </button>
@@ -196,15 +196,15 @@ export default function Disputes() {
   const getStatusBadgeColor = (status: string): string => {
     switch (status) {
       case 'PENDING':
-        return 'bg-yellow-100 text-yellow-800'
+        return 'bg-warning-100 text-warning-800'
       case 'UNDER_REVIEW':
-        return 'bg-blue-100 text-blue-800'
+        return 'bg-primary-100 text-blue-800'
       case 'RESOLVED':
-        return 'bg-green-100 text-green-800'
+        return 'bg-success-100 text-success-800'
       case 'REJECTED':
-        return 'bg-red-100 text-red-800'
+        return 'bg-error-100 text-error-800'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-secondary-100 text-secondary-800'
     }
   }
 
@@ -233,56 +233,56 @@ export default function Disputes() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Disputes Management</h1>
-        <p className="text-gray-600 mt-1">Handle payment disputes and resolutions</p>
+        <h1 className="text-3xl font-bold text-secondary-900">Disputes Management</h1>
+        <p className="text-secondary-600 mt-1">Handle payment disputes and resolutions</p>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white rounded-lg shadow-sm p-4">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-yellow-100 rounded-lg">
-              <ClockIcon className="w-6 h-6 text-yellow-600" />
+            <div className="p-3 bg-warning-100 rounded-lg">
+              <ClockIcon className="w-6 h-6 text-warning-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Pending</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.pending}</p>
+              <p className="text-sm text-secondary-600">Pending</p>
+              <p className="text-2xl font-bold text-secondary-900">{stats.pending}</p>
             </div>
           </div>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm p-4">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <ExclamationTriangleIcon className="w-6 h-6 text-blue-600" />
+            <div className="p-3 bg-primary-100 rounded-lg">
+              <ExclamationTriangleIcon className="w-6 h-6 text-primary-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Under Review</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.underReview}</p>
+              <p className="text-sm text-secondary-600">Under Review</p>
+              <p className="text-2xl font-bold text-secondary-900">{stats.underReview}</p>
             </div>
           </div>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm p-4">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-green-100 rounded-lg">
-              <CheckCircleIcon className="w-6 h-6 text-green-600" />
+            <div className="p-3 bg-success-100 rounded-lg">
+              <CheckCircleIcon className="w-6 h-6 text-success-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Resolved</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.resolved}</p>
+              <p className="text-sm text-secondary-600">Resolved</p>
+              <p className="text-2xl font-bold text-secondary-900">{stats.resolved}</p>
             </div>
           </div>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm p-4">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-indigo-100 rounded-lg">
-              <span className="text-xl font-bold text-indigo-600">$</span>
+            <div className="p-3 bg-primary-100 rounded-lg">
+              <span className="text-xl font-bold text-primary-700">$</span>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Total Disputed</p>
-              <p className="text-2xl font-bold text-gray-900">${stats.totalAmount.toLocaleString()}</p>
+              <p className="text-sm text-secondary-600">Total Disputed</p>
+              <p className="text-2xl font-bold text-secondary-900">${stats.totalAmount.toLocaleString()}</p>
             </div>
           </div>
         </div>
@@ -300,7 +300,7 @@ export default function Disputes() {
                 setSearch(e.target.value)
                 setPage(0)
               }}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full px-4 py-2 border border-secondary-300 rounded-lg text-sm focus:ring-primary-500 focus:border-primary-500"
             />
           </div>
           <select
@@ -309,7 +309,7 @@ export default function Disputes() {
               setStatusFilter(e.target.value)
               setPage(0)
             }}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500"
+            className="px-4 py-2 border border-secondary-300 rounded-lg text-sm focus:ring-primary-500 focus:border-primary-500"
           >
             <option value="">All Status</option>
             <option value="PENDING">Pending</option>
@@ -323,11 +323,11 @@ export default function Disputes() {
       {/* Disputes List */}
       <div className="space-y-3">
         {isLoading ? (
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
+          <div className="bg-white rounded-lg shadow-sm p-8 text-center text-secondary-500">
             Loading disputes...
           </div>
         ) : filteredDisputes.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
+          <div className="bg-white rounded-lg shadow-sm p-8 text-center text-secondary-500">
             No disputes found
           </div>
         ) : (
@@ -335,22 +335,22 @@ export default function Disputes() {
             <div key={dispute.id} className="bg-white rounded-lg shadow-sm p-4 md:p-6 hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div className="flex items-start gap-3 flex-1 min-w-0">
-                  <div className="flex-shrink-0 mt-1 text-gray-400">
+                  <div className="flex-shrink-0 mt-1 text-secondary-400">
                     {getStatusIcon(dispute.status)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 truncate">{dispute.jobTitle}</h3>
-                    <p className="text-sm text-gray-600 mt-1">
-                      {dispute.clientName} <span className="text-gray-400">vs</span> {dispute.freelancerName}
+                    <h3 className="font-semibold text-secondary-900 truncate">{dispute.jobTitle}</h3>
+                    <p className="text-sm text-secondary-600 mt-1">
+                      {dispute.clientName} <span className="text-secondary-400">vs</span> {dispute.freelancerName}
                     </p>
-                    <p className="text-sm text-gray-600 mt-2">{dispute.reason}</p>
-                    <p className="text-xs text-gray-500 mt-1">{dispute.description}</p>
-                    <p className="text-xs text-gray-400 mt-2">Filed {new Date(dispute.createdAt).toLocaleDateString()}</p>
+                    <p className="text-sm text-secondary-600 mt-2">{dispute.reason}</p>
+                    <p className="text-xs text-secondary-500 mt-1">{dispute.description}</p>
+                    <p className="text-xs text-secondary-400 mt-2">Filed {new Date(dispute.createdAt).toLocaleDateString()}</p>
                   </div>
                 </div>
 
                 <div className="flex-shrink-0 text-right">
-                  <p className="text-xl font-bold text-indigo-600">${dispute.amount.toLocaleString()}</p>
+                  <p className="text-xl font-bold text-primary-700">${dispute.amount.toLocaleString()}</p>
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeColor(dispute.status)} mt-2`}>
                     {dispute.status.replace('_', ' ')}
                   </span>
@@ -358,10 +358,10 @@ export default function Disputes() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-2 mt-4 pt-4 border-t border-gray-200 flex-wrap">
+              <div className="flex gap-2 mt-4 pt-4 border-t border-secondary-200 flex-wrap">
                 <button
                   onClick={() => setSelectedDispute(dispute)}
-                  className="px-3 py-2 text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors text-sm font-medium"
+                  className="px-3 py-2 text-primary-700 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors text-sm font-medium"
                 >
                   View Details
                 </button>
@@ -370,13 +370,13 @@ export default function Disputes() {
                     <button
                       onClick={() => escalateMutation.mutate(dispute.id)}
                       disabled={escalateMutation.isPending}
-                      className="px-3 py-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium disabled:opacity-50"
+                      className="px-3 py-2 text-primary-600 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors text-sm font-medium disabled:opacity-50"
                     >
                       Escalate
                     </button>
                     <button
                       onClick={() => setSelectedDispute(dispute)}
-                      className="px-3 py-2 text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition-colors text-sm font-medium"
+                      className="px-3 py-2 text-success-600 bg-success-50 rounded-lg hover:bg-success-100 transition-colors text-sm font-medium"
                     >
                       Resolve
                     </button>
@@ -394,15 +394,15 @@ export default function Disputes() {
           <button
             onClick={() => setPage(Math.max(0, page - 1))}
             disabled={page === 0}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 border border-secondary-300 rounded-lg text-sm font-medium text-secondary-700 hover:bg-secondary-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             ← Previous
           </button>
-          <span className="px-4 py-2 text-sm text-gray-700">Page {page + 1}</span>
+          <span className="px-4 py-2 text-sm text-secondary-700">Page {page + 1}</span>
           <button
             onClick={() => setPage(page + 1)}
             disabled={data?.last}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 border border-secondary-300 rounded-lg text-sm font-medium text-secondary-700 hover:bg-secondary-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next →
           </button>

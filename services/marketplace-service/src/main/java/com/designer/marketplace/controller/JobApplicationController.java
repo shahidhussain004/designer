@@ -55,6 +55,18 @@ public class JobApplicationController {
     }
 
     /**
+     * Check if current user has already applied to a specific job
+     * GET /api/job-applications/check?jobId={jobId}
+     */
+    @GetMapping("/check")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<java.util.Map<String, Object>> checkApplication(@RequestParam Long jobId) {
+        log.info("Checking application for job: {}", jobId);
+        var result = applicationService.checkUserApplication(jobId);
+        return ResponseEntity.ok(result);
+    }
+
+    /**
      * Get current user's job applications
      * GET /api/job-applications/my-applications
      */

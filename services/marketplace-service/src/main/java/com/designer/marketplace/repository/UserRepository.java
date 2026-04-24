@@ -19,13 +19,13 @@ import com.designer.marketplace.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    Optional<User> findByEmail(String email);
+    Optional<User> findByEmailIgnoreCase(String email);
 
-    Optional<User> findByUsername(String username);
+    Optional<User> findByUsernameIgnoreCase(String username);
 
-    boolean existsByEmail(String email);
+    boolean existsByEmailIgnoreCase(String email);
 
-    boolean existsByUsername(String username);
+    boolean existsByUsernameIgnoreCase(String username);
     
     // Admin dashboard queries
     long countByRole(User.UserRole role);
@@ -49,4 +49,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     
     @Query("SELECT u FROM User u ORDER BY u.createdAt DESC")
     List<User> findRecentUsers(Pageable pageable);
+
+    /** Look up a user by the OAuth provider + provider-issued subject identifier. */
+    Optional<User> findByOauthProviderAndOauthProviderId(String oauthProvider, String oauthProviderId);
 }

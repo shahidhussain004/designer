@@ -159,16 +159,16 @@ const HowItWorksCarousel = () => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50 py-20 px-4 relative overflow-hidden">
+    <div className="w-full min-h-screen bg-gradient-to-br from-slate-50 via-white to-secondary-50 py-20 px-4 relative overflow-hidden">
       {/* Decorative background elements */}
-      <div className="absolute top-20 left-10 w-72 h-72 bg-red-100 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
-      <div className="absolute bottom-20 right-10 w-72 h-72 bg-gray-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{animationDelay: '1s'}}></div>
+      <div className="absolute top-20 left-10 w-72 h-72 bg-error-100 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
+      <div className="absolute bottom-20 right-10 w-72 h-72 bg-secondary-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{animationDelay: '1s'}}></div>
       
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
         <div className="text-center mb-20">
-          <h2 className="text-5xl font-normal text-gray-900 mb-6 tracking-tight">How It Works</h2>
-          <p className="text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <h2 className="text-5xl font-normal text-secondary-900 mb-6 tracking-tight">How It Works</h2>
+          <p className="text-2xl text-secondary-600 max-w-3xl mx-auto leading-relaxed">
             From project posting to payment — a seamless journey for companies and designers
           </p>
         </div>
@@ -178,10 +178,10 @@ const HowItWorksCarousel = () => {
           {/* Left Button */}
           <button
             onClick={prevSlide}
-            className="flex-shrink-0 w-16 h-16 rounded-full bg-white shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center group hover:scale-110 border border-gray-200 hover:border-red-200 z-20"
+            className="flex-shrink-0 w-16 h-16 rounded-full bg-white shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center group hover:scale-110 border border-secondary-200 hover:border-error-200 z-20"
             aria-label="Previous slide"
           >
-            <ChevronLeft className="w-7 h-7 text-gray-700 group-hover:text-red-500 transition-colors" strokeWidth={2.5} />
+            <ChevronLeft className="w-7 h-7 text-secondary-700 group-hover:text-error-500 transition-colors" strokeWidth={2.5} />
           </button>
 
           {/* Cards Container */}
@@ -196,11 +196,11 @@ const HowItWorksCarousel = () => {
                       : 'scale-90 opacity-40 blur-[2px]'
                   }`}
                 >
-                  <div className={`bg-white rounded-3xl p-10 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 h-full flex flex-col items-center text-center group ${
+                  <div className={`bg-white rounded-3xl p-10 shadow-lg hover:shadow-2xl transition-all duration-500 border border-secondary-100 h-full flex flex-col items-center text-center group ${
                     step.position === 1 ? 'hover:scale-105' : ''
                   }`}>
                     {/* Step Number */}
-                    <div className="text-sm font-bold text-red-500 mb-6 tracking-wider">
+                    <div className="text-sm font-bold text-error-500 mb-6 tracking-wider">
                       STEP {step.id}
                     </div>
 
@@ -210,10 +210,10 @@ const HowItWorksCarousel = () => {
                     </div>
 
                     {/* Content */}
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4 leading-tight">
+                    <h3 className="text-2xl font-bold text-secondary-900 mb-4 leading-tight">
                       {step.title}
                     </h3>
-                    <p className="text-gray-600 leading-relaxed text-base">
+                    <p className="text-secondary-600 leading-relaxed text-base">
                       {step.description}
                     </p>
                   </div>
@@ -225,10 +225,10 @@ const HowItWorksCarousel = () => {
           {/* Right Button */}
           <button
             onClick={nextSlide}
-            className="flex-shrink-0 w-16 h-16 rounded-full bg-white shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center group hover:scale-110 border border-gray-200 hover:border-red-200 z-20"
+            className="flex-shrink-0 w-16 h-16 rounded-full bg-white shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center group hover:scale-110 border border-secondary-200 hover:border-error-200 z-20"
             aria-label="Next slide"
           >
-            <ChevronRight className="w-7 h-7 text-gray-700 group-hover:text-red-500 transition-colors" strokeWidth={2.5} />
+            <ChevronRight className="w-7 h-7 text-secondary-700 group-hover:text-error-500 transition-colors" strokeWidth={2.5} />
           </button>
         </div>
 
@@ -240,8 +240,8 @@ const HowItWorksCarousel = () => {
               onClick={() => setCurrentIndex(idx)}
               className={`transition-all duration-300 rounded-full flex items-center justify-center ${
                 idx === currentIndex
-                  ? 'bg-red-500 w-10 h-10 shadow-lg'
-                  : 'bg-gray-300 hover:bg-gray-400 w-3 h-3'
+                  ? 'bg-error-500 w-10 h-10 shadow-lg'
+                  : 'bg-secondary-300 hover:bg-secondary-400 w-3 h-3'
               }`}
               aria-label={`Go to step ${idx + 1}`}
             >

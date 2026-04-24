@@ -19,6 +19,7 @@ import com.designer.marketplace.dto.NotificationPreferenceRequest;
 import com.designer.marketplace.dto.NotificationPreferenceResponse;
 import com.designer.marketplace.dto.UserResponse;
 import com.designer.marketplace.dto.UserUpdateRequest;
+import com.designer.marketplace.dto.request.ChangePasswordRequest;
 import com.designer.marketplace.dto.request.ForgotPasswordRequest;
 import com.designer.marketplace.dto.request.ResetPasswordRequest;
 import com.designer.marketplace.entity.User.UserRole;
@@ -141,6 +142,19 @@ public class UserController {
         log.info("Processing password reset with token");
         userService.resetPassword(request.getToken(), request.getNewPassword());
         return ResponseEntity.ok(new MessageResponse("Password reset successfully"));
+    }
+
+    /**
+     * Change password for authenticated user.
+     * POST /api/users/change-password
+     */
+    @PostMapping("/change-password")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<MessageResponse> changePassword(
+            @Valid @RequestBody ChangePasswordRequest request) {
+        log.info("Changing password for current user");
+        userService.changePassword(request.getCurrentPassword(), request.getNewPassword());
+        return ResponseEntity.ok(new MessageResponse("Password changed successfully"));
     }
 
     /**

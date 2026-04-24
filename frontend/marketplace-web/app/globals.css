@@ -18,34 +18,49 @@
 @layer base {
   :root {
     /* --------------------------------------------------------------------------
-       COLOR PALETTE - Primary (Red-Pink Blend: Dark Red Base #C41E3A with #FF1B6D Accent)
+       COLOR PALETTE - Primary (Carmine — Swiss/Bauhaus red)
        -------------------------------------------------------------------------- */
-    --color-primary-50: 255 240 245;
-    --color-primary-100: 255 192 220;
-    --color-primary-200: 255 176 216;
-    --color-primary-300: 255 127 181;
-    --color-primary-400: 255 77 150;
-    --color-primary-500: 255 27 109;
-    --color-primary-600: 196 30 58;
-    --color-primary-700: 160 22 51;
-    --color-primary-800: 122 17 40;
-    --color-primary-900: 74 10 22;
-    --color-primary-950: 45 7 13;
+    --color-primary-50: 254 241 241;
+    --color-primary-100: 253 227 227;
+    --color-primary-200: 251 197 197;
+    --color-primary-300: 248 151 151;
+    --color-primary-400: 242 98 98;
+    --color-primary-500: 227 50 50;
+    --color-primary-600: 194 28 28;
+    --color-primary-700: 158 22 22;
+    --color-primary-800: 130 19 19;
+    --color-primary-900: 107 16 16;
+    --color-primary-950: 61 9 9;
 
     /* --------------------------------------------------------------------------
-       COLOR PALETTE - Secondary (Neutral)
+       COLOR PALETTE - Blue (Nordic Cobalt — deep European authority)
        -------------------------------------------------------------------------- */
-    --color-secondary-50: 248 250 252;
-    --color-secondary-100: 241 245 249;
-    --color-secondary-200: 226 232 240;
-    --color-secondary-300: 203 213 225;
-    --color-secondary-400: 148 163 184;
-    --color-secondary-500: 100 116 139;
-    --color-secondary-600: 71 85 105;
-    --color-secondary-700: 51 65 85;
-    --color-secondary-800: 30 41 59;
-    --color-secondary-900: 15 23 42;
-    --color-secondary-950: 2 6 23;
+    --color-blue-50: 238 244 251;
+    --color-blue-100: 213 231 247;
+    --color-blue-200: 170 207 238;
+    --color-blue-300: 116 175 225;
+    --color-blue-400: 61 139 209;
+    --color-blue-500: 31 106 186;
+    --color-blue-600: 21 83 152;
+    --color-blue-700: 16 63 117;
+    --color-blue-800: 12 46 86;
+    --color-blue-900: 7 30 57;
+    --color-blue-950: 4 14 28;
+
+    /* --------------------------------------------------------------------------
+       COLOR PALETTE - Secondary (Stone — warm neutral)
+       -------------------------------------------------------------------------- */
+    --color-secondary-50: 250 249 247;
+    --color-secondary-100: 245 243 240;
+    --color-secondary-200: 232 228 222;
+    --color-secondary-300: 213 207 198;
+    --color-secondary-400: 176 168 152;
+    --color-secondary-500: 140 130 114;
+    --color-secondary-600: 110 100 86;
+    --color-secondary-700: 86 78 66;
+    --color-secondary-800: 61 55 47;
+    --color-secondary-900: 40 36 32;
+    --color-secondary-950: 21 19 17;
 
     /* --------------------------------------------------------------------------
        COLOR PALETTE - Success (Green)
@@ -76,18 +91,19 @@
     --color-warning-900: 120 53 15;
 
     /* --------------------------------------------------------------------------
-       COLOR PALETTE - Error (Red)
+       COLOR PALETTE - Error (Signal Red — pure alarm, distinct from Carmine)
        -------------------------------------------------------------------------- */
-    --color-error-50: 255 240 245;
-    --color-error-100: 255 192 220;
-    --color-error-200: 255 176 216;
-    --color-error-300: 255 127 181;
-    --color-error-400: 255 77 150;
-    --color-error-500: 255 27 109;
-    --color-error-600: 196 30 58;
-    --color-error-700: 160 22 51;
-    --color-error-800: 122 17 40;
-    --color-error-900: 74 10 22;
+    --color-error-50: 255 241 240;
+    --color-error-100: 255 224 222;
+    --color-error-200: 255 199 194;
+    --color-error-300: 255 160 151;
+    --color-error-400: 255 111 97;
+    --color-error-500: 240 68 56;
+    --color-error-600: 217 45 32;
+    --color-error-700: 180 35 24;
+    --color-error-800: 145 32 24;
+    --color-error-900: 122 39 26;
+    --color-error-950: 67 13 9;
 
     /* --------------------------------------------------------------------------
        COLOR PALETTE - Info (Cyan)
@@ -236,7 +252,7 @@
 
   /* Focus styles for accessibility */
   :focus-visible {
-    outline: 2px solid #102a3f;
+    outline: 2px solid #0c2e56;
     outline-offset: 2px;
   }
 
@@ -285,11 +301,11 @@
     @apply bg-white text-secondary-900 placeholder:text-secondary-400;
     @apply transition-all duration-200;
     outline: none;
-    box-shadow: 0 0 0 0 rgba(16,42,63,0);
+    box-shadow: 0 0 0 0 rgba(12,46,86,0);
     transition: box-shadow 0.15s ease-in-out, border-color 0.15s ease-in-out;
     &:focus {
-      box-shadow: 0 0 0 4px rgba(16,42,63,0.12);
-      border-color: #102a3f;
+      box-shadow: 0 0 0 4px rgba(12,46,86,0.12);
+      border-color: #0c2e56;
     }
     @apply hover:border-secondary-400;
     @apply disabled:bg-secondary-50 disabled:text-secondary-500 disabled:cursor-not-allowed;
@@ -315,8 +331,8 @@
   .input:not([aria-invalid="true"]):focus,
   .focus-input:not([aria-invalid="true"]):focus {
     outline: none;
-    box-shadow: 0 0 0 4px rgba(16,42,63,0.12) !important;
-    border-color: #102a3f !important;
+    box-shadow: 0 0 0 4px rgba(12,46,86,0.12) !important;
+    border-color: #0c2e56 !important;
   }
 
   /* Custom select styling: hide native arrow and use an inline SVG positioned
@@ -342,12 +358,12 @@
     background-position: right 1rem center;
     background-size: 1rem;
     padding-right: 1rem;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M6 8l4 4 4-4' stroke='%23102a3f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M6 8l4 4 4-4' stroke='%230c2e56' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   }
 
   /* Utility helper class for input focus using brand neutral color */
   .focus-input {
-    --input-focus-color: #102a3f;
+    --input-focus-color: #0c2e56;
   }
 
   /* Card base styles */

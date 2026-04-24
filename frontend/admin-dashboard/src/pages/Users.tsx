@@ -31,11 +31,17 @@ interface User {
 interface AddUserModalProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (data: { email: string; fullName: string; role: string }) => void
+  onSubmit: (data: { email: string; username: string; password: string; fullName: string; role: string }) => void
 }
 
 function AddUserModal({ isOpen, onClose, onSubmit }: AddUserModalProps) {
-  const [formData, setFormData] = useState({ email: '', fullName: '', role: 'COMPANY' })
+  const [formData, setFormData] = useState({ 
+    email: '', 
+    username: '', 
+    password: '', 
+    fullName: '', 
+    role: 'COMPANY' 
+  })
 
   if (!isOpen) return null
 
@@ -50,20 +56,38 @@ function AddUserModal({ isOpen, onClose, onSubmit }: AddUserModalProps) {
             type="email"
             value={formData.email}
             onInput={(e) => setFormData({...formData, email: (e.target as HTMLInputElement).value})}
+            placeholder="user@example.com"
+          />
+          
+          <Input
+            label="Username"
+            value={formData.username}
+            onInput={(e) => setFormData({...formData, username: (e.target as HTMLInputElement).value})}
+            placeholder="Username (letters, numbers, underscores only)"
           />
           
           <Input
             label="Full Name"
             value={formData.fullName}
             onInput={(e) => setFormData({...formData, fullName: (e.target as HTMLInputElement).value})}
+            placeholder="John Doe"
           />
+          
+          <Input
+            label="Initial Password"
+            type="password"
+            value={formData.password}
+            onInput={(e) => setFormData({...formData, password: (e.target as HTMLInputElement).value})}
+            placeholder="Minimum 8 characters"
+          />
+          <Text className="text-xs text-secondary-600 -mt-2">User will receive this password to login initially</Text>
           
           <div>
             <label className="block text-sm font-medium mb-2">Role</label>
             <select
               value={formData.role}
               onChange={(e) => setFormData({...formData, role: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              className="w-full px-3 py-2 border border-secondary-300 rounded-lg"
             >
               <option value="COMPANY">Company</option>
               <option value="FREELANCER">Freelancer</option>
@@ -75,7 +99,7 @@ function AddUserModal({ isOpen, onClose, onSubmit }: AddUserModalProps) {
             <Button rank="secondary" onClick={onClose}>Cancel</Button>
             <Button onClick={() => {
               onSubmit(formData)
-              setFormData({ email: '', fullName: '', role: 'COMPANY' })
+              setFormData({ email: '', username: '', password: '', fullName: '', role: 'COMPANY' })
             }}>Add User</Button>
           </Flex>
         </Flex>
@@ -120,6 +144,20 @@ export default function Users() {
     },
   })
 
+  const createUserMutation = useMutation({
+    mutationFn: (userData: { email: string; username: string; password: string; fullName: string; role: string }) =>
+      usersApi.create(userData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+      toast.success('User created successfully')
+      setShowAddModal(false)
+    },
+    onError: (error: any) => {
+      const errorMessage = error?.response?.data?.message || 'Failed to create user'
+      toast.error(errorMessage)
+    },
+  })
+
   const filteredUsers = (data?.content || []).filter((user: User) => {
     const matchesSearch = user.fullName?.toLowerCase().includes(search.toLowerCase()) ||
       user.email?.toLowerCase().includes(search.toLowerCase()) ||
@@ -132,10 +170,10 @@ export default function Users() {
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
-      case 'ADMIN': return 'bg-yellow-100 text-yellow-800 border-yellow-300'
-      case 'COMPANY': return 'bg-blue-100 text-blue-800 border-blue-300'
-      case 'FREELANCER': return 'bg-green-100 text-green-800 border-green-300'
-      default: return 'bg-gray-100 text-gray-800 border-gray-300'
+      case 'ADMIN': return 'bg-warning-100 text-warning-800 border-warning-300'
+      case 'COMPANY': return 'bg-primary-100 text-blue-800 border-primary-300'
+      case 'FREELANCER': return 'bg-success-100 text-success-800 border-success-300'
+      default: return 'bg-secondary-100 text-secondary-800 border-secondary-300'
     }
   }
 
@@ -144,20 +182,20 @@ export default function Users() {
       {/* Header */}
       <Flex justify-content="space-between" align-items="center" className="mb-4">
         <div>
-          <Text className="text-3xl font-bold text-gray-900">User Management</Text>
-          <Text className="text-gray-600 mt-1">Manage platform users, roles, and permissions</Text>
+          <Text className="text-3xl font-bold text-secondary-900">User Management</Text>
+          <Text className="text-secondary-600 mt-1">Manage platform users, roles, and permissions</Text>
         </div>
-        <Button onClick={() => setShowAddModal(true)} className="bg-indigo-600 hover:bg-indigo-700 text-white">
+        <Button onClick={() => setShowAddModal(true)} className="bg-primary-600 hover:bg-primary-700 text-white">
           <PlusIcon width={20} height={20} className="mr-2" />
           Add User
         </Button>
       </Flex>
 
       {/* Filters & Search */}
-      <Card className="bg-gray-50 border border-gray-200">
+      <Card className="bg-secondary-50 border border-secondary-200">
         <Flex gap="m" align-items="flex-end" padding="m" flex-wrap="wrap">
           <div className="flex-1 min-w-xs">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+            <label className="block text-sm font-medium text-secondary-700 mb-1">Search</label>
             <Input
               placeholder="Search by name, email, or username..."
               value={search}
@@ -166,11 +204,11 @@ export default function Users() {
             />
           </div>
           <div className="w-40">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Role Filter</label>
+            <label className="block text-sm font-medium text-secondary-700 mb-1">Role Filter</label>
             <select
               value={roleFilter}
               onChange={(e) => { setRoleFilter(e.target.value); setPage(0) }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-secondary-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="">All Roles</option>
               <option value="COMPANY">Company</option>
@@ -179,21 +217,21 @@ export default function Users() {
             </select>
           </div>
           <div className="w-48">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <label className="block text-sm font-medium text-secondary-700 mb-1">Status</label>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => { setStatusFilter(''); setPage(0) }}
-                className={`px-3 py-2 rounded text-sm ${statusFilter === '' ? 'bg-indigo-600 text-white' : 'bg-white border border-gray-300'}`}>
+                className={`px-3 py-2 rounded text-sm ${statusFilter === '' ? 'bg-primary-600 text-white' : 'bg-white border border-secondary-300'}`}>
                 All
               </button>
               <button
                 onClick={() => { setStatusFilter('active'); setPage(0) }}
-                className={`px-3 py-2 rounded text-sm ${statusFilter === 'active' ? 'bg-indigo-600 text-white' : 'bg-white border border-gray-300'}`}>
+                className={`px-3 py-2 rounded text-sm ${statusFilter === 'active' ? 'bg-primary-600 text-white' : 'bg-white border border-secondary-300'}`}>
                 Active
               </button>
               <button
                 onClick={() => { setStatusFilter('inactive'); setPage(0) }}
-                className={`px-3 py-2 rounded text-sm ${statusFilter === 'inactive' ? 'bg-indigo-600 text-white' : 'bg-white border border-gray-300'}`}>
+                className={`px-3 py-2 rounded text-sm ${statusFilter === 'inactive' ? 'bg-primary-600 text-white' : 'bg-white border border-secondary-300'}`}>
                 Inactive
               </button>
             </div>
@@ -202,41 +240,41 @@ export default function Users() {
       </Card>
 
       {/* Users List */}
-      <Card className="border border-gray-200 shadow-sm">
+      <Card className="border border-secondary-200 shadow-sm">
         {isLoading ? (
           <Flex justify-content="center" align-items="center" padding="3xl">
             <Spinner />
           </Flex>
         ) : filteredUsers.length === 0 ? (
           <Flex justify-content="center" align-items="center" padding="3xl" flex-direction="column" gap="m">
-            <Text className="text-gray-500">No users found</Text>
+            <Text className="text-secondary-500">No users found</Text>
           </Flex>
         ) : (
           <>
             {/* Desktop Table View - Only shown on larger screens */}
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gradient-to-r from-gray-100 to-gray-50 border-b border-gray-200">
+                <thead className="bg-gradient-to-r from-secondary-100 to-secondary-50 border-b border-secondary-200">
                   <tr>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-700">User Info</th>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-700">Role</th>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-700">Status</th>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-700">Email Verified</th>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-700">Joined</th>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-700">Actions</th>
+                    <th className="px-6 py-3 text-left font-semibold text-secondary-700">User Info</th>
+                    <th className="px-6 py-3 text-left font-semibold text-secondary-700">Role</th>
+                    <th className="px-6 py-3 text-left font-semibold text-secondary-700">Status</th>
+                    <th className="px-6 py-3 text-left font-semibold text-secondary-700">Email Verified</th>
+                    <th className="px-6 py-3 text-left font-semibold text-secondary-700">Joined</th>
+                    <th className="px-6 py-3 text-left font-semibold text-secondary-700">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredUsers.map((user: User, idx: number) => (
-                    <tr key={user.id} className={`${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'} border-b border-gray-200 hover:bg-indigo-50 transition`}>
+                    <tr key={user.id} className={`${idx % 2 === 0 ? 'bg-white' : 'bg-secondary-50'} border-b border-secondary-200 hover:bg-primary-50 transition`}>
                       <td className="px-6 py-4">
                         <Flex align-items="center" gap="m">
-                          <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                          <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center">
                             <Text className="text-white font-bold">{user.fullName?.charAt(0) || 'U'}</Text>
                           </div>
                           <div>
-                            <Text className="font-medium text-gray-900">{user.fullName}</Text>
-                            <Text className="text-xs text-gray-500">@{user.username}</Text>
+                            <Text className="font-medium text-secondary-900">{user.fullName}</Text>
+                            <Text className="text-xs text-secondary-500">@{user.username}</Text>
                           </div>
                         </Flex>
                       </td>
@@ -249,26 +287,26 @@ export default function Users() {
                         <Flex align-items="center" gap="s">
                           {user.active ? (
                             <>
-                              <CheckCircleIcon width={16} height={16} className="text-green-600" />
-                              <Text className="text-green-600 font-medium">Active</Text>
+                              <CheckCircleIcon width={16} height={16} className="text-success-600" />
+                              <Text className="text-success-600 font-medium">Active</Text>
                             </>
                           ) : (
                             <>
-                              <XCircleIcon width={16} height={16} className="text-red-600" />
-                              <Text className="text-red-600 font-medium">Inactive</Text>
+                              <XCircleIcon width={16} height={16} className="text-error-600" />
+                              <Text className="text-error-600 font-medium">Inactive</Text>
                             </>
                           )}
                         </Flex>
                       </td>
                       <td className="px-6 py-4">
                         {user.emailVerified ? (
-                          <Badge className="bg-green-100 text-green-800 border-green-300 px-2 py-1 rounded text-xs font-medium border">✓ Verified</Badge>
+                          <Badge className="bg-success-100 text-success-800 border-success-300 px-2 py-1 rounded text-xs font-medium border">✓ Verified</Badge>
                         ) : (
-                          <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300 px-2 py-1 rounded text-xs font-medium border">Pending</Badge>
+                          <Badge className="bg-warning-100 text-warning-800 border-warning-300 px-2 py-1 rounded text-xs font-medium border">Pending</Badge>
                         )}
                       </td>
                       <td className="px-6 py-4">
-                        <Text className="text-gray-600">{new Date(user.createdAt).toLocaleDateString()}</Text>
+                        <Text className="text-secondary-600">{new Date(user.createdAt).toLocaleDateString()}</Text>
                       </td>
                       <td className="px-6 py-4">
                         <Flex gap="xs">
@@ -276,7 +314,7 @@ export default function Users() {
                             size="small"
                             rank="tertiary"
                             title="Edit user"
-                            className="text-indigo-600 hover:text-indigo-700"
+                            className="text-primary-700 hover:text-blue-800"
                           >
                             <PencilSquareIcon width={16} height={16} />
                           </Button>
@@ -285,7 +323,7 @@ export default function Users() {
                             rank="tertiary"
                             onClick={() => updateStatusMutation.mutate({ id: user.id, isActive: !user.active })}
                             title={user.active ? 'Deactivate' : 'Activate'}
-                            className={user.active ? 'text-yellow-600 hover:text-yellow-700' : 'text-green-600 hover:text-green-700'}
+                            className={user.active ? 'text-warning-600 hover:text-warning-700' : 'text-success-600 hover:text-success-700'}
                           >
                             {user.active ? '✕' : '✓'}
                           </Button>
@@ -298,7 +336,7 @@ export default function Users() {
                               }
                             }}
                             title="Delete user"
-                            className="text-red-600 hover:text-red-700"
+                            className="text-error-600 hover:text-error-700"
                           >
                             <TrashIcon width={16} height={16} />
                           </Button>
@@ -313,16 +351,16 @@ export default function Users() {
             {/* Mobile Card View - Only shown on small screens */}
             <div className="md:hidden space-y-3 p-4">
               {filteredUsers.map((user: User) => (
-                <Card key={user.id} className="bg-white border border-gray-200">
+                <Card key={user.id} className="bg-white border border-secondary-200">
                   <Flex flex-direction="column" gap="m" padding="m">
                     <Flex justify-content="space-between" align-items="start">
                       <Flex align-items="center" gap="m" flex="1">
-                        <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                        <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center flex-shrink-0">
                           <Text className="text-white font-bold">{user.fullName?.charAt(0) || 'U'}</Text>
                         </div>
                         <div>
-                          <Text className="font-semibold text-gray-900">{user.fullName}</Text>
-                          <Text className="text-xs text-gray-500">{user.email}</Text>
+                          <Text className="font-semibold text-secondary-900">{user.fullName}</Text>
+                          <Text className="text-xs text-secondary-500">{user.email}</Text>
                         </div>
                       </Flex>
                       <Badge className={`${getRoleBadgeColor(user.role)} px-2 py-1 rounded text-xs font-medium border`}>
@@ -331,13 +369,13 @@ export default function Users() {
                     </Flex>
 
                     <Flex justify-content="space-between" align-items="center" text-size="sm">
-                      <Text className="text-gray-600">
+                      <Text className="text-secondary-600">
                         {user.active ? 'Active' : 'Inactive'} • {user.emailVerified ? 'Email verified' : 'Email pending'}
                       </Text>
                     </Flex>
 
                     <Flex gap="xs" justify-content="space-around">
-                      <Button size="small" rank="tertiary" className="flex-1 text-indigo-600">Edit</Button>
+                      <Button size="small" rank="tertiary" className="flex-1 text-primary-700">Edit</Button>
                       <Button
                         size="small"
                         rank="secondary"
@@ -354,7 +392,7 @@ export default function Users() {
                             deleteMutation.mutate(user.id)
                           }
                         }}
-                        className="flex-1 text-red-600"
+                        className="flex-1 text-error-600"
                       >
                         Delete
                       </Button>
@@ -367,7 +405,7 @@ export default function Users() {
             {/* Pagination */}
             <Divider />
             <Flex justify-content="space-between" align-items="center" padding="m">
-              <Text className="text-sm text-gray-600">
+              <Text className="text-sm text-secondary-600">
                 Page {page + 1} of {data?.totalPages || 1} • Showing {filteredUsers.length} of {data?.totalElements || 0} users
               </Text>
               <Flex gap="s">
@@ -380,7 +418,7 @@ export default function Users() {
                 >
                   ← Previous
                 </Button>
-                <Text className="px-3 py-2 text-sm text-gray-700">{page + 1}</Text>
+                <Text className="px-3 py-2 text-sm text-secondary-700">{page + 1}</Text>
                 <Button
                   rank="secondary"
                   size="small"
@@ -400,10 +438,24 @@ export default function Users() {
       <AddUserModal
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
-        onSubmit={() => {
-
-          toast.success('User added successfully (feature coming soon)')
-          setShowAddModal(false)
+        onSubmit={(userData) => {
+          // Validate required fields
+          if (!userData.email || !userData.username || !userData.password || !userData.fullName) {
+            toast.error('Please fill in all required fields')
+            return
+          }
+          
+          if (userData.password.length < 8) {
+            toast.error('Password must be at least 8 characters')
+            return
+          }
+          
+          if (!/^[a-zA-Z0-9_]+$/.test(userData.username)) {
+            toast.error('Username can only contain letters, numbers, and underscores')
+            return
+          }
+          
+          createUserMutation.mutate(userData)
         }}
       />
     </Flex>

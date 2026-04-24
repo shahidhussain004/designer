@@ -22,15 +22,36 @@ interface User {
   ratingCount?: number;
 }
 
+interface PortfolioImage {
+  url: string;
+  caption?: string;
+  order?: number;
+}
+
 interface PortfolioItem {
   id: number;
   title: string;
   description: string;
+  // Primary image & gallery
   imageUrl?: string;
+  thumbnailUrl?: string;
+  images?: PortfolioImage[];
+  // Links
   projectUrl?: string;
+  liveUrl?: string;
+  githubUrl?: string;
+  sourceUrl?: string;
+  // Classification
+  projectCategory?: string;
   technologies?: string[];
+  toolsUsed?: string[];
+  skillsDemonstrated?: string[];
+  // Dates
+  startDate?: string;
   completionDate?: string;
+  // Display
   displayOrder: number;
+  highlightOrder?: number;
   isVisible: boolean;
   userId: number;
   createdAt: string;
@@ -43,8 +64,15 @@ interface TimeEntry {
   freelancerId: number;
   date: string;
   hoursLogged: number;
+  hoursWorked: number;
+  ratePerHour: number;
   description: string;
-  status: 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED';
+  status: 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'PENDING' | 'PAID';
+  rejectionReason?: string;
+  paidAt?: string;
+  contract?: {
+    title: string;
+  };
 }
 
 interface Review {
@@ -72,12 +100,27 @@ interface Contract {
 interface CreatePortfolioInput {
   title: string;
   description: string;
+  // Primary image & gallery
   imageUrl?: string;
+  thumbnailUrl?: string;
+  images?: PortfolioImage[];
+  // Links
   projectUrl?: string;
+  liveUrl?: string;
+  githubUrl?: string;
+  sourceUrl?: string;
+  // Classification
+  projectCategory?: string;
   technologies?: string[];
+  toolsUsed?: string[];
+  skillsDemonstrated?: string[];
+  // Dates
+  startDate?: string;
   completionDate?: string;
+  // Display
   isVisible?: boolean;
   displayOrder?: number;
+  highlightOrder?: number;
 }
 
 interface UpdateUserInput {
@@ -272,14 +315,18 @@ export function useUserSearch(searchQuery: string, options?: { role?: string }) 
 /**
  * Fetch user's portfolio items
  */
-export function useUserPortfolio(userId: string | number | null) {
+export function useUserPortfolio(userId: string | number | null, includeHidden?: boolean) {
   return useQuery({
-    queryKey: ['user', userId, 'portfolio'],
+    queryKey: ['user', userId, 'portfolio', includeHidden],
     queryFn: async ({ signal }) => {
       if (!userId) throw new Error('User ID is required');
+      
       const { data } = await apiClient.get<PortfolioItem[] | PaginatedResponse<PortfolioItem>>(
         `/users/${userId}/portfolio-items`,
-        { signal }
+        { 
+          signal,
+          params: includeHidden ? { includeHidden: true } : {}
+        }
       );
       return normalizeArrayResponse(data);
     },
@@ -353,14 +400,14 @@ export function useUpdatePortfolio() {
       itemId: number; 
       input: Partial<CreatePortfolioInput>;
     }) => {
-      const { data } = await apiClient.patch<PortfolioItem>(
-        `/users/${userId}/portfolio/${itemId}`,
-        input
+      const { data } = await apiClient.put<PortfolioItem>(
+        `/portfolio-items/${itemId}`,
+        { ...input, userId }
       );
       return data;
     },
-    onSuccess: (updatedItem) => {
-      queryClient.invalidateQueries({ queryKey: ['user', updatedItem.userId, 'portfolio'] });
+    onSuccess: (_updatedItem, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['user', variables.userId, 'portfolio'] });
     },
   });
 }
@@ -373,7 +420,7 @@ export function useDeletePortfolio() {
 
   return useMutation({
     mutationFn: async ({ userId, itemId }: { userId: number; itemId: number }) => {
-      await apiClient.delete(`/users/${userId}/portfolio/${itemId}`);
+      await apiClient.delete(`/portfolio-items/${itemId}`, { params: { userId } });
       return { userId, itemId };
     },
     onSuccess: ({ userId }) => {

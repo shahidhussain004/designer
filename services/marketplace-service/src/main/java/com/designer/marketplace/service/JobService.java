@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.designer.marketplace.dto.CreateJobRequest;
 import com.designer.marketplace.dto.JobResponse;
+import com.designer.marketplace.dto.UpdateJobRequest;
 import com.designer.marketplace.entity.Company;
 import com.designer.marketplace.entity.Job;
 import com.designer.marketplace.entity.JobCategory;
@@ -35,6 +36,56 @@ public class JobService {
     private final JobRepository jobRepository;
     private final JobCategoryRepository categoryRepository;
     private final CompanyRepository companyRepository;
+
+    /**
+     * Enrich JobResponse with ownership information
+     * Sets the isOwner flag based on whether the given userId owns the job
+     * 
+     * @param jobResponse The job response to enrich
+     * @param userId The current user's ID (null if not authenticated)
+     * @return The enriched job response
+     */
+    public JobResponse enrichWithOwnership(JobResponse jobResponse, Long userId) {
+        if (jobResponse == null) {
+            return null;
+        }
+
+        // If no user is logged in, they don't own anything
+        if (userId == null) {
+            jobResponse.setIsOwner(false);
+            return jobResponse;
+        }
+
+        // Check if this user's company owns this job
+        try {
+            Company company = companyRepository.findByUserId(userId).orElse(null);
+            if (company != null && jobResponse.getCompanyId() != null) {
+                jobResponse.setIsOwner(company.getId().equals(jobResponse.getCompanyId()));
+            } else {
+                jobResponse.setIsOwner(false);
+            }
+        } catch (Exception e) {
+            log.warn("Error checking ownership for user {} on job {}: {}", 
+                    userId, jobResponse.getId(), e.getMessage());
+            jobResponse.setIsOwner(false);
+        }
+
+        return jobResponse;
+    }
+
+    /**
+     * Enrich a page of JobResponses with ownership information
+     */
+    public Page<JobResponse> enrichPageWithOwnership(Page<JobResponse> jobs, Long userId) {
+        if (userId == null) {
+            // If no user, just set all to false
+            jobs.forEach(job -> job.setIsOwner(false));
+            return jobs;
+        }
+        
+        jobs.forEach(job -> enrichWithOwnership(job, userId));
+        return jobs;
+    }
 
     /**
      * Get all open jobs with filters
@@ -221,6 +272,7 @@ public class JobService {
         
         // Application details
         job.setApplicationDeadline(request.getApplicationDeadline());
+        job.setApplicationEmail(request.getApplicationEmail());
         job.setApplicationUrl(request.getApplicationUrl());
         job.setApplyInstructions(request.getApplyInstructions());
         job.setStartDate(request.getStartDate());
@@ -334,4 +386,262 @@ public class JobService {
         jobRepository.delete(job);
         log.info("Deleted job with id: {}", jobId);
     }
+
+    /**
+     * Get current user's company jobs (all statuses including DRAFT)
+     */
+    @Transactional(readOnly = true)
+    public Page<JobResponse> getMyJobs(Long userId, Pageable pageable) {
+        // Get the company for this user
+        Company company = companyRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Company profile not found for user: " + userId));
+
+        // Get all jobs for this company using the query that FETCH JOINs company to avoid LazyInitializationException
+        // Use a safe pageable without sorting to avoid JPQL issues
+        PageRequest safePageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Job> jobs = jobRepository.findByCompanyIdWithCompany(company.getId(), safePageable);
+
+        log.info("Retrieved {} jobs for company {} (user: {})",
+                jobs.getTotalElements(), company.getId(), userId);
+
+        return jobs.map(job -> {
+            JobResponse response = JobResponse.fromEntity(job);
+            response.setIsOwner(true); // All jobs here are owned by this company
+            return response;
+        });
+    }
+
+    /**
+     * Update job as owner (with ownership verification)
+     */
+    @Transactional
+    public JobResponse updateJobAsOwner(Long userId, Long jobId, UpdateJobRequest request) {
+        // Get the company for this user
+        Company company = companyRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Company profile not found for user: " + userId));
+
+        // Get the job and verify ownership
+        Job job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new ResourceNotFoundException("Job not found with id: " + jobId));
+
+        if (!job.getCompany().getId().equals(company.getId())) {
+            throw new SecurityException("You do not have permission to update this job");
+        }
+
+        // Update fields (only non-null values)
+        if (request.getCategoryId() != null) {
+            JobCategory category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + request.getCategoryId()));
+            job.setCategory(category);
+        }
+
+        if (request.getTitle() != null) {
+            job.setTitle(request.getTitle());
+        }
+        if (request.getDescription() != null) {
+            job.setDescription(request.getDescription());
+        }
+        if (request.getResponsibilities() != null) {
+            job.setResponsibilities(request.getResponsibilities());
+        }
+        if (request.getRequirements() != null) {
+            job.setRequirements(request.getRequirements());
+        }
+        if (request.getJobType() != null) {
+            try {
+                job.setJobType(Job.JobType.valueOf(request.getJobType()));
+            } catch (Exception e) {
+                log.warn("Invalid job type: {}", request.getJobType());
+            }
+        }
+        if (request.getExperienceLevel() != null) {
+            try {
+                job.setExperienceLevel(Job.ExperienceLevel.valueOf(request.getExperienceLevel()));
+            } catch (Exception e) {
+                log.warn("Invalid experience level: {}", request.getExperienceLevel());
+            }
+        }
+        if (request.getLocation() != null) {
+            job.setLocation(request.getLocation());
+        }
+        if (request.getCity() != null) {
+            job.setCity(request.getCity());
+        }
+        if (request.getState() != null) {
+            job.setState(request.getState());
+        }
+        if (request.getCountry() != null) {
+            job.setCountry(request.getCountry());
+        }
+        if (request.getIsRemote() != null) {
+            job.setIsRemote(request.getIsRemote());
+        }
+        if (request.getRemoteType() != null) {
+            try {
+                job.setRemoteType(Job.RemoteType.valueOf(request.getRemoteType()));
+            } catch (Exception e) {
+                log.warn("Invalid remote type: {}", request.getRemoteType());
+            }
+        }
+        if (request.getSalaryMinCents() != null) {
+            job.setSalaryMinCents(request.getSalaryMinCents());
+        }
+        if (request.getSalaryMaxCents() != null) {
+            job.setSalaryMaxCents(request.getSalaryMaxCents());
+        }
+        if (request.getSalaryCurrency() != null) {
+            job.setSalaryCurrency(request.getSalaryCurrency());
+        }
+        if (request.getSalaryPeriod() != null) {
+            try {
+                job.setSalaryPeriod(Job.SalaryPeriod.valueOf(request.getSalaryPeriod()));
+            } catch (Exception e) {
+                log.warn("Invalid salary period: {}", request.getSalaryPeriod());
+            }
+        }
+        if (request.getShowSalary() != null) {
+            job.setShowSalary(request.getShowSalary());
+        }
+        if (request.getBenefits() != null) {
+            job.setBenefits(request.getBenefits());
+        }
+        if (request.getPerks() != null) {
+            job.setPerks(request.getPerks());
+        }
+        if (request.getRequiredSkills() != null) {
+            job.setRequiredSkills(request.getRequiredSkills());
+        }
+        if (request.getPreferredSkills() != null) {
+            job.setPreferredSkills(request.getPreferredSkills());
+        }
+        if (request.getEducationLevel() != null) {
+            try {
+                job.setEducationLevel(Job.EducationLevel.valueOf(request.getEducationLevel()));
+            } catch (Exception e) {
+                log.warn("Invalid education level: {}", request.getEducationLevel());
+            }
+        }
+        if (request.getCertifications() != null) {
+            job.setCertifications(request.getCertifications());
+        }
+        if (request.getApplicationDeadline() != null) {
+            job.setApplicationDeadline(request.getApplicationDeadline());
+        }
+        if (request.getApplicationUrl() != null) {
+            job.setApplicationUrl(request.getApplicationUrl());
+        }
+        if (request.getApplyInstructions() != null) {
+            job.setApplyInstructions(request.getApplyInstructions());
+        }
+        if (request.getStartDate() != null) {
+            job.setStartDate(request.getStartDate());
+        }
+        if (request.getPositionsAvailable() != null) {
+            job.setPositionsAvailable(request.getPositionsAvailable());
+        }
+        if (request.getTravelRequirement() != null) {
+            try {
+                job.setTravelRequirement(Job.TravelRequirement.valueOf(request.getTravelRequirement()));
+            } catch (Exception e) {
+                log.warn("Invalid travel requirement: {}", request.getTravelRequirement());
+            }
+        }
+        if (request.getSecurityClearanceRequired() != null) {
+            job.setSecurityClearanceRequired(request.getSecurityClearanceRequired());
+        }
+        if (request.getVisaSponsorship() != null) {
+            job.setVisaSponsorship(request.getVisaSponsorship());
+        }
+        if (request.getStatus() != null) {
+            try {
+                Job.JobStatus newStatus = Job.JobStatus.valueOf(request.getStatus());
+                job.setStatus(newStatus);
+                // If changing to OPEN, set publishedAt
+                if (newStatus == Job.JobStatus.OPEN && job.getPublishedAt() == null) {
+                    job.setPublishedAt(LocalDateTime.now());
+                }
+            } catch (Exception e) {
+                log.warn("Invalid status: {}", request.getStatus());
+            }
+        }
+
+        Job saved = jobRepository.save(job);
+        log.info("Updated job {} by company {}", jobId, company.getId());
+
+        return JobResponse.fromEntity(saved);
+    }
+
+    /**
+     * Publish job as owner (with ownership verification)
+     */
+    @Transactional
+    public JobResponse publishJobAsOwner(Long userId, Long jobId) {
+        // Get the company for this user
+        Company company = companyRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Company profile not found for user: " + userId));
+
+        // Get the job and verify ownership
+        Job job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new ResourceNotFoundException("Job not found with id: " + jobId));
+
+        if (!job.getCompany().getId().equals(company.getId())) {
+            throw new SecurityException("You do not have permission to publish this job");
+        }
+
+        job.setStatus(Job.JobStatus.OPEN);
+        job.setPublishedAt(LocalDateTime.now());
+
+        Job saved = jobRepository.save(job);
+        log.info("Published job {} by company {}", jobId, company.getId());
+
+        return JobResponse.fromEntity(saved);
+    }
+
+    /**
+     * Close job as owner (with ownership verification)
+     */
+    @Transactional
+    public JobResponse closeJobAsOwner(Long userId, Long jobId) {
+        // Get the company for this user
+        Company company = companyRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Company profile not found for user: " + userId));
+
+        // Get the job and verify ownership
+        Job job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new ResourceNotFoundException("Job not found with id: " + jobId));
+
+        if (!job.getCompany().getId().equals(company.getId())) {
+            throw new SecurityException("You do not have permission to close this job");
+        }
+
+        job.setStatus(Job.JobStatus.CLOSED);
+        job.setClosedAt(LocalDateTime.now());
+
+        Job saved = jobRepository.save(job);
+        log.info("Closed job {} by company {}", jobId, company.getId());
+
+        return JobResponse.fromEntity(saved);
+    }
+
+    /**
+     * Delete job as owner (with ownership verification)
+     */
+    @Transactional
+    public void deleteJobAsOwner(Long userId, Long jobId) {
+        // Get the company for this user
+        Company company = companyRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Company profile not found for user: " + userId));
+
+        // Get the job and verify ownership
+        Job job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new ResourceNotFoundException("Job not found with id: " + jobId));
+
+        if (!job.getCompany().getId().equals(company.getId())) {
+            throw new SecurityException("You do not have permission to delete this job");
+        }
+
+        jobRepository.delete(job);
+        log.info("Deleted job {} by company {}", jobId, company.getId());
+    }
 }
+

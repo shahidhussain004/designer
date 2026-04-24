@@ -39,6 +39,35 @@ public class JobApplicationService {
     private final CompanyRepository companyRepository;
 
     /**
+     * Check if the current user has applied to a specific job
+     */
+    @Transactional(readOnly = true)
+    public java.util.Map<String, Object> checkUserApplication(Long jobId) {
+        User currentUser = userService.getCurrentUser();
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+
+        var freelancerOpt = freelancerRepository.findByUserId(currentUser.getId());
+        if (freelancerOpt.isEmpty()) {
+            result.put("applied", false);
+            return result;
+        }
+
+        Freelancer freelancer = freelancerOpt.get();
+        boolean hasApplied = applicationRepository.existsByJobIdAndApplicantId(jobId, freelancer.getId());
+        result.put("applied", hasApplied);
+
+        if (hasApplied) {
+            var applications = applicationRepository.findByApplicantIdOrderByCreatedAtDesc(freelancer.getId());
+            applications.stream()
+                    .filter(a -> a.getJob() != null && jobId.equals(a.getJob().getId()))
+                    .findFirst()
+                    .ifPresent(a -> result.put("application", JobApplicationResponse.fromEntity(a)));
+        }
+
+        return result;
+    }
+
+    /**
      * Get applications for a specific job (company only)
      */
     @Transactional(readOnly = true)
@@ -48,9 +77,9 @@ public class JobApplicationService {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new RuntimeException("Job not found with id: " + jobId));
 
-        // Check if current user is the job company
+        // Check if current user is the job company owner (compare user.id, not company.id)
         User currentUser = userService.getCurrentUser();
-        if (!job.getCompany().getId().equals(currentUser.getId())) {
+        if (!job.getCompany().getUser().getId().equals(currentUser.getId())) {
             throw new RuntimeException("You can only view applications for your own jobs");
         }
 
@@ -74,9 +103,15 @@ public class JobApplicationService {
         log.info("Getting applications for user: {}", currentUser.getUsername());
 
         // Get the freelancer profile for the current user
-        Freelancer freelancer = freelancerRepository.findByUserId(currentUser.getId())
-                .orElseThrow(() -> new RuntimeException("Freelancer profile not found for user: " + currentUser.getUsername()));
+        var freelancerOptional = freelancerRepository.findByUserId(currentUser.getId());
+        
+        // If user is not a freelancer (e.g., COMPANY user), return empty page
+        if (freelancerOptional.isEmpty()) {
+            log.debug("User {} is not a freelancer, returning empty applications page", currentUser.getUsername());
+            return Page.empty(pageable);
+        }
 
+        Freelancer freelancer = freelancerOptional.get();
         // Query applications by freelancer ID (applicant)
         Page<JobApplication> applications = applicationRepository.findByApplicantId(freelancer.getId(), pageable);
         return applications.map(JobApplicationResponse::fromEntity);
@@ -179,8 +214,8 @@ public class JobApplicationService {
 
         User currentUser = userService.getCurrentUser();
 
-        // Check if current user is the company
-        if (!application.getJob().getCompany().getId().equals(currentUser.getId())) {
+        // Check if current user owns the company (compare user.id, not company.id)
+        if (!application.getJob().getCompany().getUser().getId().equals(currentUser.getId())) {
             throw new RuntimeException("Only the company can update application status");
         }
 
@@ -280,7 +315,11 @@ public class JobApplicationService {
         JobApplication application = applicationRepository.findById(applicationId)
                 .orElseThrow(() -> new RuntimeException("Application not found with id: " + applicationId));
         User currentUser = userService.getCurrentUser();
-        return application.getApplicant().getId().equals(currentUser.getId());
+        // Applicant.id is freelancer.id; compare via applicant.user.id
+        if (application.getApplicant() != null && application.getApplicant().getUser() != null) {
+            return application.getApplicant().getUser().getId().equals(currentUser.getId());
+        }
+        return false;
     }
 
     /**
@@ -291,7 +330,8 @@ public class JobApplicationService {
         JobApplication application = applicationRepository.findById(applicationId)
                 .orElseThrow(() -> new RuntimeException("Application not found with id: " + applicationId));
         User currentUser = userService.getCurrentUser();
-        return application.getJob().getCompany().getId().equals(currentUser.getId());
+        // Compare user.id (owner of company), not company.id
+        return application.getJob().getCompany().getUser().getId().equals(currentUser.getId());
     }
 }
 

@@ -2,7 +2,6 @@ package com.designer.marketplace;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 /**
  * Main application class for Designer Marketplace Service
@@ -15,7 +14,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
  * @since December 2025
  */
 @SpringBootApplication
-@EnableJpaAuditing
 public class MarketplaceApplication {
 
     public static void main(String[] args) {

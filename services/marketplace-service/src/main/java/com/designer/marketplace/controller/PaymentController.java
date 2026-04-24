@@ -143,7 +143,7 @@ public class PaymentController {
             return ((com.designer.marketplace.security.UserPrincipal) userDetails).getId();
         }
         // Fallback to username lookup
-        return userRepository.findByUsername(userDetails.getUsername())
+        return userRepository.findByUsernameIgnoreCase(userDetails.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"))
                 .getId();
     }

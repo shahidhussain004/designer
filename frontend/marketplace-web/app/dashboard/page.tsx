@@ -7,8 +7,8 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
 export default function DashboardPage() {
-  const router = useRouter()
-  const { user, loading, refreshUser } = useAuth()
+  const _router = useRouter()
+  const { user, loading: _loading } = useAuth()
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -26,25 +26,25 @@ export default function DashboardPage() {
       if (!currentUser) {
         // Not authenticated — redirect to login
 
-        router.replace('/auth/login')
+        _router.replace('/auth/login')
         return
       }
 
       // Role-based redirect
       if (currentUser.role === 'COMPANY') {
-        router.replace('/dashboard/company')
+        _router.replace('/dashboard/company')
       } else if (currentUser.role === 'FREELANCER') {
 
-        router.replace('/dashboard/freelancer')
+        _router.replace('/dashboard/freelancer')
       } else if (currentUser.role === 'ADMIN') {
 
         // Pass auth token via cookie (shared across ports on localhost). More secure than URL parameters.
-        const token = localStorage.getItem('access_token');
-        if (token) {
+        const _token = localStorage.getItem('access_token');
+        if (_token) {
           // Set a short-lived cookie accessible on localhost for port 3001
           const expires = new Date(Date.now() + 15 * 60 * 1000).toUTCString(); // 15 minutes
           // Domain is omitted because browsers ignore Domain=localhost; this keeps it valid for both ports on localhost
-          document.cookie = `admin_access_token=${encodeURIComponent(token)}; Path=/; SameSite=Lax; Expires=${expires}`;
+          document.cookie = `admin_access_token=${encodeURIComponent(_token)}; Path=/; SameSite=Lax; Expires=${expires}`;
         }
         window.location.href = 'http://localhost:3001';
       }
@@ -57,7 +57,7 @@ export default function DashboardPage() {
     }
     
     // If not loading, also check (handles both authenticated and unauthenticated)
-    if (!loading) {
+    if (!_loading) {
       checkAuth()
       return
     }
@@ -69,14 +69,14 @@ export default function DashboardPage() {
     }, 3000)
     
     return () => clearTimeout(timer)
-  }, [loading, user, router])
+  }, [_loading, user, _router])
 
-  if (loading) {
+  if (_loading) {
     return (
       <PageLayout>
         <div className="max-w-4xl mx-auto py-24 text-center">
           <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
-          <p className="text-gray-700">Loading your account…</p>
+          <p className="text-secondary-700">Loading your account…</p>
         </div>
       </PageLayout>
     )
@@ -88,7 +88,7 @@ export default function DashboardPage() {
     <PageLayout>
       <div className="max-w-4xl mx-auto py-24 text-center">
         <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
-        <p className="text-gray-700 mb-8">Redirecting to your dashboard…</p>
+        <p className="text-secondary-700 mb-8">Redirecting to your dashboard…</p>
       </div>
     </PageLayout>
   )

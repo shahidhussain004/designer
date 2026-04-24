@@ -1,13 +1,15 @@
 package com.designer.marketplace.security;
 
-import com.designer.marketplace.entity.User;
-import com.designer.marketplace.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.designer.marketplace.entity.User;
+import com.designer.marketplace.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * Custom UserDetailsService implementation
@@ -22,8 +24,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(usernameOrEmail)
-                .or(() -> userRepository.findByUsername(usernameOrEmail))
+        User user = userRepository.findByEmailIgnoreCase(usernameOrEmail)
+                .or(() -> userRepository.findByUsernameIgnoreCase(usernameOrEmail))
                 .orElseThrow(() -> new UsernameNotFoundException(
                         "User not found with email or username: " + usernameOrEmail));
 

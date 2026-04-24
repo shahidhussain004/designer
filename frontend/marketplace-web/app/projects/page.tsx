@@ -53,9 +53,9 @@ function ProjectsPageContent() {
   const searchParams = useSearchParams();
   
   // View and Sort states
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [_viewMode, _setViewMode] = useState<ViewMode>('grid');
   const [sortBy, setSortBy] = useState<SortBy>('recent');
-  const [filtersOpen, setFiltersOpen] = useState(true);
+  const [_filtersOpen, _setFiltersOpen] = useState(true);
   const [layoutMode, setLayoutMode] = useState<LayoutMode>('grid');
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
@@ -77,7 +77,7 @@ function ProjectsPageContent() {
 
   // Sort projects based on selection
   const sortedProjects = useMemo(() => {
-    return [...projects].sort((a: any, b: any) => {
+    return [...projects].sort((a, b) => {
       switch (sortBy) {
         case 'budget-high':
           return b.budget - a.budget;
@@ -128,7 +128,7 @@ function ProjectsPageContent() {
     return (
       <div
         key={project.id}
-        className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-lg hover:border-primary-300 transition-all cursor-pointer group"
+        className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6 hover:shadow-lg hover:border-secondary-300 transition-all cursor-pointer group"
         onClick={() => router.push(`/projects/${project.id}`)}
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && router.push(`/projects/${project.id}`)}
         role="button"
@@ -136,11 +136,11 @@ function ProjectsPageContent() {
       >
         <div className="flex flex-col h-full">
           <div className="flex justify-between items-start mb-3">
-            <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-primary-100 text-primary-700">
+            <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-secondary-400 text-white">
               {project.category?.name ?? 'Uncategorized'}
             </span>
             <span className={`inline-block px-3 py-1 text-xs font-medium rounded-full ${
-              project.status === 'OPEN' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+              project.status === 'OPEN' ? 'bg-success-100 text-success-700' : 'bg-primary-100 text-primary-700'
             }`}>
               {project.status}
             </span>
@@ -150,28 +150,28 @@ function ProjectsPageContent() {
             {project.title}
           </h4>
           
-          <p className="text-sm text-gray-500 mb-3">
+          <p className="text-sm text-secondary-500 mb-3">
             Posted by {project.company?.fullName || 'Unknown'} • {formatDate(project.createdAt)}
           </p>
           
-          <p className="text-gray-600 text-sm line-clamp-3 mb-4 flex-grow">
+          <p className="text-secondary-600 text-sm line-clamp-3 mb-4 flex-grow">
             {project.description}
           </p>
           
-          <div className="border-t border-gray-200 pt-4 mt-auto">
+          <div className="border-t border-secondary-200 pt-4 mt-auto">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-gray-500">Budget</span>
-              <span className="text-lg font-bold text-green-600">${project.budget?.toLocaleString() || '0'}</span>
+              <span className="text-sm text-secondary-500">Budget</span>
+              <span className="text-lg font-bold text-success-600">${project.budget?.toLocaleString() || '0'}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-500">Level</span>
-              <span className="text-sm text-gray-700">{project.experienceLevel?.name ?? 'Any'}</span>
+              <span className="text-sm text-secondary-500">Level</span>
+              <span className="text-sm text-secondary-700">{project.experienceLevel?.name ?? 'Any'}</span>
             </div>
           </div>
           
           <button
             onClick={(e) => { e.stopPropagation(); router.push(`/projects/${project.id}`); }}
-            className="mt-4 w-full py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors group-hover:border-primary-300 group-hover:text-primary-600"
+            className="mt-4 w-full py-2 px-4 border border-secondary-300 rounded-lg text-sm font-medium hover:bg-secondary-50 transition-colors group-hover:border-secondary-300 group-hover:text-primary-600"
           >
             View Details →
           </button>
@@ -182,12 +182,12 @@ function ProjectsPageContent() {
 
   return (
     <PageLayout>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-secondary-50">
         {/* Page Header */}
-        <div className="bg-gray-900 text-white py-16 lg:py-20">
+        <div className="bg-secondary-900 text-white py-16 lg:py-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <h1 className="text-4xl font-bold mb-4">Discover Your Next Project</h1>
-            <p className="text-gray-300 text-lg max-w-2xl">
+            <p className="text-secondary-300 text-lg max-w-2xl">
               Explore {projects.length} curated project{projects.length !== 1 ? 's' : ''} matched to your expertise.
             </p>
           </div>
@@ -195,7 +195,7 @@ function ProjectsPageContent() {
 
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
           {/* Search and Filter Bar */}
-          <div className="sticky top-0 z-10 bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-8">
+          <div className="sticky top-0 z-10 bg-white rounded-lg shadow-sm border border-secondary-200 p-4 mb-8">
             <div className="flex flex-col lg:flex-row gap-4">
               <div className="flex-1">
                 <input
@@ -203,13 +203,13 @@ function ProjectsPageContent() {
                   placeholder="Search by project title, skills, or keywords..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
+                  className="w-full px-4 py-2 border border-secondary-300 rounded-lg focus:outline-none"
                 />
               </div>
               <select
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
-                className="select-with-arrow px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
+                className="select-with-arrow px-4 py-2 border border-secondary-300 rounded-lg focus:outline-none"
               >
                 <option value="">All Categories</option>
                 {categories.map((cat) => (
@@ -221,7 +221,7 @@ function ProjectsPageContent() {
               <select
                 value={experienceLevelId}
                 onChange={(e) => setExperienceLevelId(e.target.value)}
-                className="select-with-arrow px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
+                className="select-with-arrow px-4 py-2 border border-secondary-300 rounded-lg focus:outline-none"
               >
                 <option value="">All Levels</option>
                 {experienceLevels.map((level) => (
@@ -233,7 +233,7 @@ function ProjectsPageContent() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as SortBy)}
-                className="select-with-arrow px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
+                className="select-with-arrow px-4 py-2 border border-secondary-300 rounded-lg focus:outline-none"
               >
                 <option value="recent">Most Recent</option>
                 <option value="budget-high">Highest Budget</option>
@@ -241,13 +241,13 @@ function ProjectsPageContent() {
               </select>
 
               {/* Layout Toggle */}
-              <div className="flex gap-2 border border-gray-300 rounded-lg p-1 w-fit h-fit">
+              <div className="flex gap-2 border border-secondary-300 rounded-lg p-1 w-fit h-fit">
                 <button
                   onClick={() => setLayoutMode('list')}
                   className={`p-2 rounded transition-colors ${
                     layoutMode === 'list'
-                      ? 'bg-primary-100 text-primary-600'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-secondary-200 text-secondary-900'
+                      : 'text-secondary-600 hover:text-secondary-900'
                   }`}
                   title="List View"
                 >
@@ -257,8 +257,8 @@ function ProjectsPageContent() {
                   onClick={() => setLayoutMode('grid')}
                   className={`p-2 rounded transition-colors ${
                     layoutMode === 'grid'
-                      ? 'bg-primary-100 text-primary-600'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-secondary-200 text-secondary-900'
+                      : 'text-secondary-600 hover:text-secondary-900'
                   }`}
                   title="Grid View"
                 >
@@ -275,7 +275,7 @@ function ProjectsPageContent() {
               {activeFilterCount > 0 && (
                 <button
                   onClick={handleClearFilters}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 border border-secondary-300 rounded-lg hover:bg-secondary-50 transition-colors"
                 >
                   Clear
                 </button>
@@ -287,18 +287,18 @@ function ProjectsPageContent() {
           {isLoading ? (
             <JobsSkeleton />
           ) : error ? (
-            <div className="bg-white rounded-lg shadow-sm border border-red-200 p-8">
+            <div className="bg-white rounded-lg shadow-sm border border-error-200 p-8">
               <ErrorMessage message={(error as Error).message} retry={refetch} />
             </div>
           ) : sortedProjects.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-              <p className="text-xl text-gray-500 mb-4">No projects found</p>
-              <p className="text-gray-400 mb-6 max-w-sm mx-auto">
+            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-12 text-center">
+              <p className="text-xl text-secondary-500 mb-4">No projects found</p>
+              <p className="text-secondary-400 mb-6 max-w-sm mx-auto">
                 Try adjusting your search filters or check back later for new opportunities
               </p>
               <button
                 onClick={handleClearFilters}
-                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-6 py-2 border border-secondary-300 rounded-lg hover:bg-secondary-50 transition-colors"
               >
                 Clear All Filters
               </button>
@@ -306,7 +306,7 @@ function ProjectsPageContent() {
           ) : (
             <>
               {/* Pagination Info */}
-              <div className="mb-6 text-sm text-gray-600">
+              <div className="mb-6 text-sm text-secondary-600">
                 Showing {sortedProjects.length > 0 ? ((currentPage - 1) * ITEMS_PER_PAGE) + 1 : 0} to {Math.min(currentPage * ITEMS_PER_PAGE, sortedProjects.length)} of {sortedProjects.length} projects
               </div>
 
@@ -318,7 +318,7 @@ function ProjectsPageContent() {
                     .map((project) => (
                       <div
                         key={project.id}
-                        className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-lg hover:border-primary-300 transition-all cursor-pointer group"
+                        className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6 hover:shadow-lg hover:border-secondary-300 transition-all cursor-pointer group"
                         onClick={() => router.push(`/projects/${project.id}`)}
                       >
                         <div className="flex items-start justify-between gap-6 mb-4">
@@ -328,33 +328,33 @@ function ProjectsPageContent() {
                                 <h4 className="text-lg font-semibold group-hover:text-primary-600 transition-colors">
                                   {project.title}
                                 </h4>
-                                <p className="text-sm text-gray-500 mt-1">
+                                <p className="text-sm text-secondary-500 mt-1">
                                   Posted by {project.company?.fullName || 'Unknown'} • {formatDate(project.createdAt)}
                                 </p>
                               </div>
                               <div className="flex-shrink-0">
-                                <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-primary-100 text-primary-700">
+                                <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-secondary-400 text-white">
                                   {project.category?.name ?? 'Uncategorized'}
                                 </span>
                               </div>
                             </div>
-                            <p className="text-gray-600 text-sm mb-4">
+                            <p className="text-secondary-600 text-sm mb-4">
                               {project.description}
                             </p>
                           </div>
                           <div className="flex-shrink-0 text-right">
-                            <div className="text-2xl font-bold text-green-600 mb-2">
+                            <div className="text-2xl font-bold text-success-600 mb-2">
                               ${project.budget?.toLocaleString() || '0'}
                             </div>
                             <span className={`inline-block px-3 py-1 text-xs font-medium rounded-full ${
-                              project.status === 'OPEN' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                              project.status === 'OPEN' ? 'bg-success-100 text-success-700' : 'bg-primary-100 text-primary-700'
                             }`}>
                               {project.status}
                             </span>
                           </div>
                         </div>
-                        <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                          <span className="text-sm text-gray-500">Level: {project.experienceLevel?.name ?? 'Any'}</span>
+                        <div className="flex items-center justify-between pt-4 border-t border-secondary-200">
+                          <span className="text-sm text-secondary-500">Level: {project.experienceLevel?.name ?? 'Any'}</span>
                           <span className="text-primary-600 font-medium text-sm group-hover:translate-x-1 transition-transform inline-flex items-center">
                             View Details →
                           </span>
@@ -375,12 +375,12 @@ function ProjectsPageContent() {
 
               {/* Pagination Controls */}
               {Math.ceil(sortedProjects.length / ITEMS_PER_PAGE) > 1 && (
-                <div className="mt-12 pt-8 border-t border-gray-200">
+                <div className="mt-12 pt-8 border-t border-secondary-200">
                   <div className="flex items-center justify-center gap-2 flex-wrap">
                     <button
                       onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                       disabled={currentPage === 1}
-                      className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="inline-flex items-center gap-2 px-4 py-2 border border-secondary-300 rounded-lg text-sm font-medium text-secondary-700 hover:bg-secondary-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -405,7 +405,7 @@ function ProjectsPageContent() {
 
                       if (isEllipsis) {
                         return (
-                          <span key={`ellipsis-${idx}`} className="px-2 py-2 text-gray-600">
+                          <span key={`ellipsis-${idx}`} className="px-2 py-2 text-secondary-600">
                             ...
                           </span>
                         );
@@ -420,7 +420,7 @@ function ProjectsPageContent() {
                           className={`w-10 h-10 rounded-lg font-medium transition-colors ${
                             pageNum === currentPage
                               ? 'bg-primary-600 text-white'
-                              : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+                              : 'border border-secondary-300 text-secondary-700 hover:bg-secondary-50'
                           }`}
                         >
                           {pageNum}
@@ -431,7 +431,7 @@ function ProjectsPageContent() {
                     <button
                       onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(sortedProjects.length / ITEMS_PER_PAGE)))}
                       disabled={currentPage === Math.ceil(sortedProjects.length / ITEMS_PER_PAGE)}
-                      className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="inline-flex items-center gap-2 px-4 py-2 border border-secondary-300 rounded-lg text-sm font-medium text-secondary-700 hover:bg-secondary-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       Next
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
