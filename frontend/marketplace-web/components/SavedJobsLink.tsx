@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 
 /**
  * Saved Jobs link with count badge for navbar
+ * Only shown for FREELANCER users
  */
 export function SavedJobsLink() {
   const { user } = useAuth();
@@ -15,7 +16,8 @@ export function SavedJobsLink() {
   const [_isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (user) {
+    // Only load saved jobs for freelancers
+    if (user?.role === 'FREELANCER') {
       loadCount();
     } else {
       setCount(0);
@@ -35,8 +37,8 @@ export function SavedJobsLink() {
     }
   };
 
-  // Don't show if user not logged in
-  if (!user) {
+  // Only show for authenticated FREELANCER users
+  if (!user || user.role !== 'FREELANCER') {
     return null;
   }
 
@@ -47,7 +49,6 @@ export function SavedJobsLink() {
       title="Saved Jobs"
     >
       <Heart className="w-5 h-5" />
-      <span className="hidden xl:inline">Saved Jobs</span>
       {count > 0 && (
         <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-semibold text-white bg-primary-600 rounded-full">
           {count > 99 ? '99+' : count}

@@ -137,6 +137,43 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Handle: SecurityException (Access Denied)
+     * HTTP Status: 403 Forbidden
+     * User is authenticated but doesn't have permission
+     */
+    @ExceptionHandler(SecurityException.class)
+    public ResponseEntity<ApiErrorResponse> handleSecurityException(SecurityException ex) {
+        log.warn("Access denied: {}", ex.getMessage());
+        
+        ApiErrorResponse error = ApiErrorResponse.builder()
+                .status(HttpStatus.FORBIDDEN.value())
+                .error("FORBIDDEN")
+                .message(ex.getMessage())
+                .timestamp(System.currentTimeMillis())
+                .build();
+        
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
+
+    /**
+     * Handle: ResourceNotFoundException
+     * HTTP Status: 404 Not Found
+     */
+    @ExceptionHandler(com.designer.marketplace.exception.ResourceNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleResourceNotFound(com.designer.marketplace.exception.ResourceNotFoundException ex) {
+        log.warn("Resource not found: {}", ex.getMessage());
+        
+        ApiErrorResponse error = ApiErrorResponse.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .error("NOT_FOUND")
+                .message(ex.getMessage())
+                .timestamp(System.currentTimeMillis())
+                .build();
+        
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    /**
      * Handle: Uncaught exceptions
      * HTTP Status: 500 Internal Server Error
      */

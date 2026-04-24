@@ -45,7 +45,7 @@ export default function JobDetailsPage() {
   const { data: job, isLoading: jobLoading, error: jobError, refetch } = useJob(jobId);
   
   // Fetch user's company profile (only for COMPANY users, to determine job ownership)
-  const { data: myCompany } = useMyCompany();
+  const { data: myCompany } = useMyCompany(user?.role === 'COMPANY');
   
   // Fetch user's applications to check if already applied
   const { data: myApplications = [] } = useMyApplications();
@@ -170,7 +170,7 @@ export default function JobDetailsPage() {
     ).join(' ');
   };
 
-  const parseJsonArray = (data: unknown): string[] => {
+  const parseJsonArray = (data: unknown): unknown[] => {
     if (!data) return [];
     if (Array.isArray(data)) return data;
     if (typeof data === 'string') {
@@ -182,6 +182,16 @@ export default function JobDetailsPage() {
       }
     }
     return [];
+  };
+
+  // Helper to render skill (handle both string and object)
+  const renderSkillText = (skill: unknown): string => {
+    if (typeof skill === 'string') return skill;
+    if (typeof skill === 'object' && skill !== null) {
+      const skillObj = skill as Record<string, unknown>;
+      return skillObj.skill ? String(skillObj.skill) : 'Unnamed Skill';
+    }
+    return 'Unnamed Skill';
   };
 
   return (
@@ -339,12 +349,12 @@ export default function JobDetailsPage() {
                     <div className="mb-6">
                       <h3 className="text-sm font-semibold text-secondary-700 text-uppercase tracking-wide mb-3">Required</h3>
                       <div className="flex flex-wrap gap-2">
-                        {parseJsonArray(job.requiredSkills).map((skill: string, idx: number) => (
+                        {parseJsonArray(job.requiredSkills).map((skill: unknown, idx: number) => (
                           <span
                             key={idx}
                             className="inline-flex items-center px-3 py-1.5 rounded-full bg-secondary-100 text-secondary-800 text-sm font-medium"
                           >
-                            {skill}
+                            {renderSkillText(skill)}
                           </span>
                         ))}
                       </div>
@@ -355,12 +365,12 @@ export default function JobDetailsPage() {
                     <div>
                       <h3 className="text-sm font-semibold text-secondary-700 text-uppercase tracking-wide mb-3">Nice to have</h3>
                       <div className="flex flex-wrap gap-2">
-                        {parseJsonArray(job.preferredSkills).map((skill: string, idx: number) => (
+                        {parseJsonArray(job.preferredSkills).map((skill: unknown, idx: number) => (
                           <span
                             key={idx}
                             className="inline-flex items-center px-3 py-1.5 rounded-full bg-secondary-50 text-secondary-700 text-sm"
                           >
-                            {skill}
+                            {renderSkillText(skill)}
                           </span>
                         ))}
                       </div>
@@ -377,10 +387,10 @@ export default function JobDetailsPage() {
                   {job.benefits && parseJsonArray(job.benefits).length > 0 && (
                     <div className="mb-6">
                       <ul className="space-y-3">
-                        {parseJsonArray(job.benefits).map((benefit: string, idx: number) => (
+                        {parseJsonArray(job.benefits).map((benefit: unknown, idx: number) => (
                           <li key={idx} className="flex items-start gap-3 text-secondary-700">
                             <CheckCircle className="w-5 h-5 text-primary-600 mt-0.5 flex-shrink-0" aria-hidden="true" />
-                            <span>{benefit}</span>
+                            <span>{renderSkillText(benefit)}</span>
                           </li>
                         ))}
                       </ul>
@@ -390,10 +400,10 @@ export default function JobDetailsPage() {
                   {job.perks && parseJsonArray(job.perks).length > 0 && (
                     <div>
                       <ul className="space-y-3">
-                        {parseJsonArray(job.perks).map((perk: string, idx: number) => (
+                        {parseJsonArray(job.perks).map((perk: unknown, idx: number) => (
                           <li key={idx} className="flex items-start gap-3 text-secondary-700">
                             <CheckCircle className="w-5 h-5 text-primary-600 mt-0.5 flex-shrink-0" aria-hidden="true" />
-                            <span>{perk}</span>
+                            <span>{renderSkillText(perk)}</span>
                           </li>
                         ))}
                       </ul>
@@ -418,13 +428,13 @@ export default function JobDetailsPage() {
                     <div>
                       <p className="text-sm text-secondary-600 mb-3">Certifications</p>
                       <div className="flex flex-wrap gap-2">
-                        {parseJsonArray(job.certifications).map((cert: string, idx: number) => (
+                        {parseJsonArray(job.certifications).map((cert: unknown, idx: number) => (
                           <span
                             key={idx}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary-100 text-secondary-800 text-sm font-medium"
                           >
                             <Award className="w-4 h-4" aria-hidden="true" />
-                            {cert}
+                            {renderSkillText(cert)}
                           </span>
                         ))}
                       </div>
@@ -619,8 +629,22 @@ export default function JobDetailsPage() {
                         )}
 
                         {userApplication.status?.toUpperCase() === 'REJECTED' && (
-                          <div className="pt-3 border-t border-error-200 bg-error-50 rounded -m-4 p-4">
+                          <div className="pt-3 border-t border-error-200 bg-error-50 rounded -m-4 p-4 space-y-3">
                             <p className="text-error-700 font-medium text-sm">This application was not selected. Check out other opportunities!</p>
+                            
+                            {userApplication.rejectionReason && (
+                              <div className="bg-white rounded p-3 border border-error-200">
+                                <p className="text-xs text-secondary-600 uppercase tracking-wide font-semibold mb-1">Feedback from Company</p>
+                                <p className="text-secondary-900 text-sm">{userApplication.rejectionReason}</p>
+                              </div>
+                            )}
+
+                            {userApplication.companyNotes && (
+                              <div className="bg-white rounded p-3 border border-error-200">
+                                <p className="text-xs text-secondary-600 uppercase tracking-wide font-semibold mb-1">Additional Notes</p>
+                                <p className="text-secondary-900 text-sm">{userApplication.companyNotes}</p>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>

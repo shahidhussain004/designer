@@ -6,6 +6,7 @@ import { PageLayout } from '@/components/ui';
 import { useCategories, useContent, useTags } from '@/hooks/useContent';
 import type { ContentType } from '@/lib/content-types';
 import { useAuth } from '@/lib/context/AuthContext';
+import { ENV } from '@/lib/env';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useMemo, useState } from 'react';
@@ -396,7 +397,7 @@ export default function ResourcesPage() {
                             onClick={(e) => {
                               e.preventDefault();
                               // Open admin dashboard in same window
-                              window.location.href = `http://localhost:3001/admin/resources/${itemRecord.id as number}/edit`;
+                              window.location.href = `${ENV.ADMIN_DASHBOARD_URL}/admin/resources/${itemRecord.id as number}/edit`;
                             }}
                             className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity px-3 py-1 bg-primary-600 text-white text-xs rounded font-medium hover:bg-primary-700"
                             title="Edit this resource"

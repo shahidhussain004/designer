@@ -37,28 +37,28 @@ public class PayoutController {
     private final PayoutService payoutService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Create a payout for a freelancer (Admin only)")
     public ResponseEntity<PayoutResponse> createPayout(@Valid @RequestBody CreatePayoutRequest request) {
         return ResponseEntity.ok(payoutService.createPayout(request));
     }
 
     @PostMapping("/{payoutId}/initiate")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Initiate payout processing (Admin only)")
     public ResponseEntity<PayoutResponse> initiatePayout(@PathVariable Long payoutId) {
         return ResponseEntity.ok(payoutService.initiatePayout(payoutId));
     }
 
     @PostMapping("/{payoutId}/complete")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Mark payout as completed (Admin only)")
     public ResponseEntity<PayoutResponse> completePayout(@PathVariable Long payoutId) {
         return ResponseEntity.ok(payoutService.completePayout(payoutId));
     }
 
     @PostMapping("/{payoutId}/fail")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Mark payout as failed (Admin only)")
     public ResponseEntity<PayoutResponse> failPayout(
             @PathVariable Long payoutId,

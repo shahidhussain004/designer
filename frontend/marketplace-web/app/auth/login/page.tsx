@@ -3,12 +3,14 @@
 import { PageLayout, SocialAuthButtons } from '@/components/ui'
 import { authService } from '@/lib/auth'
 import { useAuth } from '@/lib/context/AuthContext'
+import { getAuthRedirectTarget } from '@/lib/redirect-utils'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense, useEffect, useState } from 'react'
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { user, loading, refreshUser } = useAuth()
   const [formData, setFormData] = useState({
     emailOrUsername: '',
@@ -18,24 +20,30 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
 
+  // Get redirect path from query params
+  const redirectPath = searchParams.get('redirect')
+  const sessionMessage = searchParams.get('message')
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setIsSubmitting(true)
 
     try {
-      console.log('[Login] Submitting credentials...');
-      await authService.login(formData)
-      console.log('[Login] Login successful');
+      const response = await authService.login(formData)
       
-      // Ensure AuthProvider reads the newly stored user/token
-      console.log('[Login] Calling refreshUser...');
+      // Refresh auth context
       await refreshUser()
-      console.log('[Login] refreshUser completed, redirecting to /dashboard');
       
-      router.push('/dashboard')
+      // Smart redirect using utility
+      const targetPath = getAuthRedirectTarget({
+        userRole: response.user.role as 'COMPANY' | 'FREELANCER' | 'ADMIN',
+        redirectPath
+      })
+      
+      console.log(`[Login] Redirecting to: ${targetPath}`)
+      router.push(targetPath)
     } catch (err) {
-
       const error = err as { response?: { data?: { message?: string } } }
       setError(error.response?.data?.message || 'Login failed. Please check your credentials.')
     } finally {
@@ -43,13 +51,16 @@ export default function LoginPage() {
     }
   }
 
-  // Redirect already-authenticated users to dashboard
+  // Redirect already-authenticated users
   useEffect(() => {
     if (!loading && user) {
-      // Use replace to avoid back-navigation to login
-      router.replace('/dashboard')
+      const targetPath = getAuthRedirectTarget({
+        userRole: user.role as 'COMPANY' | 'FREELANCER' | 'ADMIN',
+        redirectPath
+      })
+      router.replace(targetPath)
     }
-  }, [loading, user, router])
+  }, [loading, user, router, redirectPath])
 
   return (
     <PageLayout>
@@ -66,6 +77,13 @@ export default function LoginPage() {
                 </Link>
               </p>
             </div>
+
+            {/* Session expiration or info message */}
+            {sessionMessage && (
+              <div className="mb-6 p-4 bg-warning-50 border border-warning-200 rounded-lg">
+                <p className="text-warning-800 text-sm">{sessionMessage}</p>
+              </div>
+            )}
 
             {error && (
               <div className="mb-6 p-4 bg-error-50 border border-error-200 rounded-lg">
@@ -160,4 +178,25 @@ export default function LoginPage() {
       </div>
     </PageLayout>
   )
+}
+// Wrap with Suspense to handle useSearchParams()
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <PageLayout>
+        <div className="min-h-screen bg-secondary-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-md w-full">
+            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-8">
+              <div className="text-center mb-8">
+                <h1 className="text-2xl font-bold text-secondary-900">Sign in to your account</h1>
+                <p className="mt-2 text-secondary-600">Loading...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </PageLayout>
+    }>
+      <LoginForm />
+    </Suspense>
+  );
 }

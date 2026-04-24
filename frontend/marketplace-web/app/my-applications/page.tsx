@@ -4,16 +4,16 @@ import { PageLayout } from '@/components/ui';
 import { useMyApplications } from '@/hooks/useJobs';
 import { useAuth } from '@/lib/auth';
 import {
-    ArrowLeft,
-    Briefcase,
-    Calendar,
-    CheckCircle,
-    Clock,
-    Filter,
-    MapPin,
-    Search,
-    Trash2,
-    X
+  ArrowLeft,
+  Briefcase,
+  Calendar,
+  CheckCircle,
+  Clock,
+  Filter,
+  MapPin,
+  Search,
+  Trash2,
+  X
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -33,6 +33,8 @@ interface Application {
   appliedAt: string;
   coverLetter?: string;
   resumeUrl?: string;
+  rejectionReason?: string;
+  companyNotes?: string;
 }
 
 export default function MyApplicationsPage() {
@@ -361,9 +363,12 @@ export default function MyApplicationsPage() {
 
                         {/* Action Buttons */}
                         <div className="flex gap-3">
-                          <button className="px-4 py-2 border border-secondary-300 text-secondary-700 rounded-lg hover:bg-secondary-100 transition-colors font-medium text-sm">
+                          <Link
+                            href={`/jobs/${application.jobId}`}
+                            className="px-4 py-2 border border-secondary-300 text-secondary-700 rounded-lg hover:bg-secondary-100 transition-colors font-medium text-sm inline-block"
+                          >
                             View Details
-                          </button>
+                          </Link>
                           {application.status === 'PENDING' && (
                             <button className="px-4 py-2 text-error-600 hover:bg-error-50 rounded-lg transition-colors font-medium text-sm">
                               <Trash2 className="w-4 h-4 inline mr-1" />
@@ -390,6 +395,29 @@ export default function MyApplicationsPage() {
                         <div>Offer</div>
                       </div>
                     </div>
+
+                    {/* Rejection Feedback */}
+                    {application.status === 'REJECTED' && (
+                      <div className="mt-4 pt-4 border-t border-error-200 space-y-3">
+                        {(application as any).rejectionReason && (
+                          <div className="bg-white rounded p-3 border border-error-200">
+                            <p className="text-xs text-secondary-600 uppercase tracking-wide font-semibold mb-1">Feedback from Company</p>
+                            <p className="text-secondary-900 text-sm">{(application as any).rejectionReason}</p>
+                          </div>
+                        )}
+
+                        {(application as any).companyNotes && (
+                          <div className="bg-white rounded p-3 border border-error-200">
+                            <p className="text-xs text-secondary-600 uppercase tracking-wide font-semibold mb-1">Additional Notes</p>
+                            <p className="text-secondary-900 text-sm">{(application as any).companyNotes}</p>
+                          </div>
+                        )}
+
+                        {!(application as any).rejectionReason && !(application as any).companyNotes && (
+                          <p className="text-error-600 text-sm italic">No feedback provided by the company.</p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 );
               })}

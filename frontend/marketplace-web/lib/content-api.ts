@@ -30,7 +30,9 @@ import type {
 } from './content-types';
 import logger from './logger';
 
-const CONTENT_API_URL = process.env.NEXT_PUBLIC_CONTENT_API_URL || 'http://localhost:8083/api/v1';
+import { ENV } from './env';
+
+const CONTENT_API_URL = ENV.CONTENT_API_URL;
 
 // Extend Axios config for metadata
 declare module 'axios' {

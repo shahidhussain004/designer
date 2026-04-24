@@ -42,4 +42,11 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     @Query("SELECT COALESCE(SUM(p.amountCents), 0) FROM Payment p WHERE p.status = 'COMPLETED' AND p.createdAt > :date")
     Long sumTotalAmountAfter(@Param("date") LocalDateTime date);
+
+    // ✅ EAGER LOADING METHODS - Prevent LazyInitializationException
+    @Query("SELECT p FROM Payment p LEFT JOIN FETCH p.company LEFT JOIN FETCH p.freelancer LEFT JOIN FETCH p.contract WHERE p.id = :id")
+    Optional<Payment> findByIdWithRelations(@Param("id") Long id);
+
+    @Query("SELECT p FROM Payment p LEFT JOIN FETCH p.company LEFT JOIN FETCH p.freelancer LEFT JOIN FETCH p.contract WHERE p.contract.id = :contractId")
+    List<Payment> findByContractIdWithRelations(@Param("contractId") Long contractId);
 }

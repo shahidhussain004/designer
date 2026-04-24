@@ -24,6 +24,8 @@ public class JobApplicationResponse {
     private Long id;
     private Long jobId;
     private String jobTitle;
+    private String companyName;
+    private String location;
     private Long applicantId;
     private String applicantName;
     private String fullName;
@@ -76,6 +78,8 @@ public class JobApplicationResponse {
                 .id(application.getId())
                 .jobId(application.getJob() != null ? application.getJob().getId() : null)
                 .jobTitle(application.getJob() != null ? application.getJob().getTitle() : null)
+                .companyName(application.getJob() != null && application.getJob().getCompany() != null ? application.getJob().getCompany().getCompanyName() : null)
+                .location(application.getJob() != null ? application.getJob().getLocation() : null)
                 .applicantId(application.getApplicant() != null ? application.getApplicant().getId() : null)
                 .applicantName(applicantName)
                 .fullName(application.getFullName())

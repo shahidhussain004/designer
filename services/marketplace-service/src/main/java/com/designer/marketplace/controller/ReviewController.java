@@ -52,7 +52,7 @@ import lombok.extern.slf4j.Slf4j;
  * 500 - Internal Server Error
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("")
 @RequiredArgsConstructor
 @Slf4j
 public class ReviewController {

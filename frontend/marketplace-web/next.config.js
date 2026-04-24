@@ -6,8 +6,14 @@ const nextConfig = {
   outputFileTracingRoot: path.join(__dirname, '..', '..'),
   reactStrictMode: true,
   env: {
+    // Core API services
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api',
     NEXT_PUBLIC_CONTENT_API_URL: process.env.NEXT_PUBLIC_CONTENT_API_URL || 'http://localhost:8083/api/v1',
+    NEXT_PUBLIC_LMS_SERVICE_URL: process.env.NEXT_PUBLIC_LMS_SERVICE_URL || 'http://localhost:8082/api',
+    
+    // Dashboard URLs
+    NEXT_PUBLIC_ADMIN_DASHBOARD_URL: process.env.NEXT_PUBLIC_ADMIN_DASHBOARD_URL || 'http://localhost:3001',
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3002',
   },
   images: {
     remotePatterns: [

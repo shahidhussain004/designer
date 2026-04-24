@@ -18,9 +18,11 @@ import com.designer.marketplace.dto.UpdateJobRequest;
 import com.designer.marketplace.entity.Company;
 import com.designer.marketplace.entity.Job;
 import com.designer.marketplace.entity.JobCategory;
+import com.designer.marketplace.entity.User;
 import com.designer.marketplace.repository.CompanyRepository;
 import com.designer.marketplace.repository.JobCategoryRepository;
 import com.designer.marketplace.repository.JobRepository;
+import com.designer.marketplace.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +38,7 @@ public class JobService {
     private final JobRepository jobRepository;
     private final JobCategoryRepository categoryRepository;
     private final CompanyRepository companyRepository;
+    private final UserRepository userRepository;
 
     /**
      * Enrich JobResponse with ownership information
@@ -346,7 +349,7 @@ public class JobService {
      */
     @Transactional
     public JobResponse publishJob(Long jobId) {
-        Job job = jobRepository.findById(jobId)
+        Job job = jobRepository.findByIdWithCompanyAndCategory(jobId)
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found with id: " + jobId));
 
         job.setStatus(Job.JobStatus.OPEN);
@@ -363,7 +366,7 @@ public class JobService {
      */
     @Transactional
     public JobResponse closeJob(Long jobId) {
-        Job job = jobRepository.findById(jobId)
+        Job job = jobRepository.findByIdWithCompanyAndCategory(jobId)
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found with id: " + jobId));
 
         job.setStatus(Job.JobStatus.CLOSED);
@@ -380,7 +383,7 @@ public class JobService {
      */
     @Transactional
     public void deleteJob(Long jobId) {
-        Job job = jobRepository.findById(jobId)
+        Job job = jobRepository.findByIdWithCompanyAndCategory(jobId)
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found with id: " + jobId));
 
         jobRepository.delete(job);
@@ -413,20 +416,42 @@ public class JobService {
 
     /**
      * Update job as owner (with ownership verification)
+     * OPTIMIZED: Uses denormalized company_id for O(1) permission check (no JOINs)
      */
     @Transactional
     public JobResponse updateJobAsOwner(Long userId, Long jobId, UpdateJobRequest request) {
-        // Get the company for this user
-        Company company = companyRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Company profile not found for user: " + userId));
+        log.info("updateJobAsOwner called - userId: {}, jobId: {}", userId, jobId);
+        
+        // ✅ FAST: Get user with denormalized company_id (single query, no JOIN)
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.error("User not found: {}", userId);
+                    return new ResourceNotFoundException("User not found with id: " + userId);
+                });
 
-        // Get the job and verify ownership
-        Job job = jobRepository.findById(jobId)
+        // ✅ INSTANT CHECK: Denormalized company_id is directly on user
+        if (user.getCompanyId() == null) {
+            log.error("User {} has no company profile - cannot update jobs", userId);
+            throw new SecurityException("No company profile associated with your account. Please create a company profile first.");
+        }
+
+        Long companyId = user.getCompanyId();
+        log.info("Found user {} with company_id: {}", userId, companyId);
+
+        // Get the job WITH company relationship EAGERLY LOADED (avoid LazyInitializationException)
+        Job job = jobRepository.findByIdWithCompanyAndCategory(jobId)
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found with id: " + jobId));
 
-        if (!job.getCompany().getId().equals(company.getId())) {
+        log.info("Found job: {} (id: {}), company_id: {}", job.getTitle(), job.getId(), job.getCompany().getId());
+
+        // ✅ DIRECT COMPARISON: No database query needed!
+        if (!job.getCompany().getId().equals(companyId)) {
+            log.error("Permission denied: User {} (company {}) tried to update job {} (company {})", 
+                    userId, companyId, jobId, job.getCompany().getId());
             throw new SecurityException("You do not have permission to update this job");
         }
+        
+        log.info("Permission check passed - user {} can update job {}", userId, jobId);
 
         // Update fields (only non-null values)
         if (request.getCategoryId() != null) {
@@ -565,26 +590,38 @@ public class JobService {
             }
         }
 
-        Job saved = jobRepository.save(job);
-        log.info("Updated job {} by company {}", jobId, company.getId());
-
-        return JobResponse.fromEntity(saved);
+        try {
+            log.info("Before save - requiredSkills: {}, benefits: {}, perks: {}", 
+                    job.getRequiredSkills(), job.getBenefits(), job.getPerks());
+            Job saved = jobRepository.save(job);
+            log.info("Updated job {} by user {} (company {})", jobId, userId, user.getCompanyId());
+            return JobResponse.fromEntity(saved);
+        } catch (Exception e) {
+            log.error("Error saving job during update", e);
+            throw e;
+        }
     }
 
     /**
      * Publish job as owner (with ownership verification)
+     * OPTIMIZED: Uses denormalized company_id for O(1) permission check
      */
     @Transactional
     public JobResponse publishJobAsOwner(Long userId, Long jobId) {
-        // Get the company for this user
-        Company company = companyRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Company profile not found for user: " + userId));
+        // ✅ FAST: Get user with denormalized company_id
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
-        // Get the job and verify ownership
-        Job job = jobRepository.findById(jobId)
+        if (user.getCompanyId() == null) {
+            throw new SecurityException("No company profile associated with your account");
+        }
+
+        // Get the job WITH company relationship EAGERLY LOADED
+        Job job = jobRepository.findByIdWithCompanyAndCategory(jobId)
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found with id: " + jobId));
 
-        if (!job.getCompany().getId().equals(company.getId())) {
+        // ✅ DIRECT COMPARISON: No database query needed!
+        if (!job.getCompany().getId().equals(user.getCompanyId())) {
             throw new SecurityException("You do not have permission to publish this job");
         }
 
@@ -592,25 +629,31 @@ public class JobService {
         job.setPublishedAt(LocalDateTime.now());
 
         Job saved = jobRepository.save(job);
-        log.info("Published job {} by company {}", jobId, company.getId());
+        log.info("Published job {} by user {} (company {})", jobId, userId, user.getCompanyId());
 
         return JobResponse.fromEntity(saved);
     }
 
     /**
      * Close job as owner (with ownership verification)
+     * OPTIMIZED: Uses denormalized company_id for O(1) permission check
      */
     @Transactional
     public JobResponse closeJobAsOwner(Long userId, Long jobId) {
-        // Get the company for this user
-        Company company = companyRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Company profile not found for user: " + userId));
+        // ✅ FAST: Get user with denormalized company_id
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
-        // Get the job and verify ownership
-        Job job = jobRepository.findById(jobId)
+        if (user.getCompanyId() == null) {
+            throw new SecurityException("No company profile associated with your account");
+        }
+
+        // Get the job WITH company relationship EAGERLY LOADED
+        Job job = jobRepository.findByIdWithCompanyAndCategory(jobId)
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found with id: " + jobId));
 
-        if (!job.getCompany().getId().equals(company.getId())) {
+        // ✅ DIRECT COMPARISON: No database query needed!
+        if (!job.getCompany().getId().equals(user.getCompanyId())) {
             throw new SecurityException("You do not have permission to close this job");
         }
 
@@ -618,30 +661,36 @@ public class JobService {
         job.setClosedAt(LocalDateTime.now());
 
         Job saved = jobRepository.save(job);
-        log.info("Closed job {} by company {}", jobId, company.getId());
+        log.info("Closed job {} by user {} (company {})", jobId, userId, user.getCompanyId());
 
         return JobResponse.fromEntity(saved);
     }
 
     /**
      * Delete job as owner (with ownership verification)
+     * OPTIMIZED: Uses denormalized company_id for O(1) permission check
      */
     @Transactional
     public void deleteJobAsOwner(Long userId, Long jobId) {
-        // Get the company for this user
-        Company company = companyRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Company profile not found for user: " + userId));
+        // ✅ FAST: Get user with denormalized company_id
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
-        // Get the job and verify ownership
-        Job job = jobRepository.findById(jobId)
+        if (user.getCompanyId() == null) {
+            throw new SecurityException("No company profile associated with your account");
+        }
+
+        // Get the job WITH company relationship EAGERLY LOADED
+        Job job = jobRepository.findByIdWithCompanyAndCategory(jobId)
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found with id: " + jobId));
 
-        if (!job.getCompany().getId().equals(company.getId())) {
+        // ✅ DIRECT COMPARISON: No database query needed!
+        if (!job.getCompany().getId().equals(user.getCompanyId())) {
             throw new SecurityException("You do not have permission to delete this job");
         }
 
         jobRepository.delete(job);
-        log.info("Deleted job {} by company {}", jobId, company.getId());
+        log.info("Deleted job {} by user {} (company {})", jobId, userId, user.getCompanyId());
     }
 }
 

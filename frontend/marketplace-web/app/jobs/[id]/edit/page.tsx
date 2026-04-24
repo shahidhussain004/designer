@@ -12,11 +12,36 @@ import { useEffect, useState } from 'react';
 
 const parseJsonArrayToString = (data: unknown): string => {
   if (!data) return '';
-  if (Array.isArray(data)) return data.join(', ');
+  if (Array.isArray(data)) {
+    // Handle array of objects - extract "skill" or "name" property, or convert to string
+    return data
+      .map((item: unknown) => {
+        if (typeof item === 'string') return item;
+        if (item && typeof item === 'object') {
+          const obj = item as Record<string, unknown>;
+          // Try to extract skill name from various possible property names
+          return (obj.skill || obj.name || obj.text || String(item)).toString();
+        }
+        return String(item);
+      })
+      .join(', ');
+  }
   if (typeof data === 'string') {
     try {
       const parsed = JSON.parse(data);
-      return Array.isArray(parsed) ? parsed.join(', ') : data;
+      if (Array.isArray(parsed)) {
+        return parsed
+          .map((item: unknown) => {
+            if (typeof item === 'string') return item;
+            if (item && typeof item === 'object') {
+              const obj = item as Record<string, unknown>;
+              return (obj.skill || obj.name || obj.text || String(item)).toString();
+            }
+            return String(item);
+          })
+          .join(', ');
+      }
+      return data;
     } catch {
       return data;
     }
@@ -36,7 +61,7 @@ export default function EditJobPage() {
   const jobId = params.id as string;
 
   const { data: job, isLoading: jobLoading } = useJob(jobId);
-  const { data: myCompany, isLoading: companyLoading } = useMyCompany();
+  const { data: myCompany, isLoading: companyLoading } = useMyCompany(user?.role === 'COMPANY');
   const { data: categories = [] } = useCategories();
   const updateJobMutation = useUpdateJob();
 

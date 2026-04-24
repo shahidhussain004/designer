@@ -229,6 +229,11 @@ public class JobApplicationService {
             application.setCompanyNotes(request.getCompanyNotes());
         }
 
+        // Set rejection reason if status is being changed to REJECTED
+        if (newStatus == JobApplication.ApplicationStatus.REJECTED && request.getRejectionReason() != null) {
+            application.setRejectionReason(request.getRejectionReason());
+        }
+
         application.setUpdatedAt(LocalDateTime.now());
 
         // Send notification based on status
@@ -252,6 +257,9 @@ public class JobApplicationService {
             notificationTitle = "Application Update";
             notificationMessage = String.format("Thank you for applying to '%s'. We've decided to move forward with other candidates.",
                     application.getJob().getTitle());
+            if (request.getRejectionReason() != null && !request.getRejectionReason().isEmpty()) {
+                notificationMessage += " The company provided the following feedback: " + request.getRejectionReason();
+            }
         }
 
         notificationService.createNotification(

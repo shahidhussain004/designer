@@ -65,4 +65,11 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             "LOWER(p.projectCategory.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" +
             "))")
     Page<Project> searchProjects(@Param("searchTerm") String searchTerm, Pageable pageable);
+
+    // ✅ EAGER LOADING METHODS - Prevent LazyInitializationException
+    @Query("SELECT p FROM Project p LEFT JOIN FETCH p.company c WHERE p.id = :id")
+    java.util.Optional<Project> findByIdWithCompany(@Param("id") Long id);
+
+    @Query("SELECT p FROM Project p LEFT JOIN FETCH p.company c LEFT JOIN FETCH p.projectCategory pc WHERE p.id = :id")
+    java.util.Optional<Project> findByIdWithCompanyAndCategory(@Param("id") Long id);
 }

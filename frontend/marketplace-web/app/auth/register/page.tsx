@@ -2,12 +2,16 @@
 
 import { PageLayout, SocialAuthButtons } from '@/components/ui';
 import { authService } from '@/lib/auth';
+import { getAuthRedirectTarget } from '@/lib/redirect-utils';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import React, { Suspense, useState } from 'react';
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectPath = searchParams.get('redirect');
+  
   const [formData, setFormData] = useState<{
     email: string;
     username: string;
@@ -30,8 +34,15 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      await authService.register(formData);
-      router.push('/dashboard');
+      const response = await authService.register(formData);
+      
+      // Smart redirect using utility
+      const targetPath = getAuthRedirectTarget({
+        userRole: response.user.role as 'COMPANY' | 'FREELANCER' | 'ADMIN',
+        redirectPath
+      });
+      
+      router.push(targetPath);
     } catch (err) {
       const error = err as { response?: { data?: { message?: string } } };
       setError(error.response?.data?.message || 'Registration failed. Please try again.');
@@ -203,5 +214,27 @@ export default function RegisterPage() {
         </div>
       </div>
     </PageLayout>
+  );
+}
+
+// Wrap with Suspense to handle useSearchParams()
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <PageLayout>
+        <div className="min-h-screen bg-secondary-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-md w-full">
+            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-8">
+              <div className="text-center mb-8">
+                <h1 className="text-2xl font-bold text-secondary-900">Create your account</h1>
+                <p className="mt-2 text-secondary-600">Loading...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </PageLayout>
+    }>
+      <RegisterForm />
+    </Suspense>
   );
 }

@@ -16,6 +16,7 @@ interface JobSaveButtonProps {
 /**
  * Button to save/favorite a job
  * Shows heart icon that fills when saved
+ * Only shown and functional for FREELANCER users
  */
 export function JobSaveButton({ 
   jobId, 
@@ -28,13 +29,24 @@ export function JobSaveButton({
   const { user } = useAuth();
   const router = useRouter();
 
+  // Only show for freelancers
+  if (user && user.role !== 'FREELANCER') {
+    return null;
+  }
+
   const handleClick = async (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigation when clicking on the button
     e.stopPropagation(); // Stop event from bubbling to parent Link
 
-    // Require login
+    // Require freelancer login
     if (!user) {
       router.push('/auth/login?redirect=/jobs');
+      return;
+    }
+
+    // Only freelancers can save jobs
+    if (user.role !== 'FREELANCER') {
+      console.warn('Only freelancers can save jobs');
       return;
     }
 

@@ -6,6 +6,8 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tansta
 import { useRouter } from 'next/navigation';
 
 // Types
+import { ENV } from '@/lib/env';
+
 interface Course {
   id: string;
   slug?: string;
@@ -107,7 +109,7 @@ export function useCourse(courseId: string | number | null) {
       
       if (isSlug) {
         // Use LMS service for slug-based lookup
-        const lmsServiceUrl = process.env.NEXT_PUBLIC_LMS_SERVICE_URL || 'http://localhost:8082/api';
+        const lmsServiceUrl = ENV.LMS_SERVICE_URL;
         const response = await fetch(`${lmsServiceUrl}/courses/slug/${courseId}`, { signal });
         if (!response.ok) throw new Error('Failed to fetch course');
         return response.json();
@@ -150,7 +152,7 @@ export function useCourseCurriculum(courseId: string | number | null) {
       
       if (isSlug) {
         // Use LMS service for slug-based lookup
-        const lmsServiceUrl = process.env.NEXT_PUBLIC_LMS_SERVICE_URL || 'http://localhost:8082/api';
+        const lmsServiceUrl = ENV.LMS_SERVICE_URL;
         const response = await fetch(`${lmsServiceUrl}/courses/slug/${courseId}/curriculum`, { signal });
         if (!response.ok) throw new Error('Failed to fetch lessons');
         return response.json();

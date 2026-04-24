@@ -18,11 +18,15 @@ import com.designer.marketplace.dto.OAuthLoginResponse;
 import com.designer.marketplace.dto.RegisterRequest;
 import com.designer.marketplace.dto.UserDto;
 import com.designer.marketplace.entity.Company;
+import com.designer.marketplace.entity.CompanyUser;
 import com.designer.marketplace.entity.Freelancer;
 import com.designer.marketplace.entity.User;
+import com.designer.marketplace.entity.UserRole;
 import com.designer.marketplace.repository.CompanyRepository;
+import com.designer.marketplace.repository.CompanyUserRepository;
 import com.designer.marketplace.repository.FreelancerRepository;
 import com.designer.marketplace.repository.UserRepository;
+import com.designer.marketplace.repository.UserRoleRepository;
 import com.designer.marketplace.security.JwtTokenProvider;
 import com.designer.marketplace.security.UserPrincipal;
 
@@ -39,6 +43,8 @@ public class AuthService {
     private final UserRepository userRepository;
     private final FreelancerRepository freelancerRepository;
     private final CompanyRepository companyRepository;
+    private final UserRoleRepository userRoleRepository;
+    private final CompanyUserRepository companyUserRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider tokenProvider;
@@ -71,19 +77,41 @@ public class AuthService {
 
         user = userRepository.save(user);
 
-        // Create role-specific profile
+        // Create role-specific profile with back-references (V23 denormalization)
         if ("FREELANCER".equals(request.getRole())) {
             Freelancer freelancer = new Freelancer();
             freelancer.setUser(user);
             freelancer.setExperienceYears(0);
-            freelancerRepository.save(freelancer);
+            freelancer = freelancerRepository.save(freelancer);
+            
+            // ✅ SET BACK-REFERENCE for O(1) lookups
+            user.setFreelancerId(freelancer.getId());
+            user = userRepository.save(user);
+            
         } else if ("COMPANY".equals(request.getRole())) {
             Company company = new Company();
             company.setUser(user);
             company.setCompanyName(user.getUsername() + "'s Company");
             company.setTotalJobsPosted(0);
-            companyRepository.save(company);
+            company = companyRepository.save(company);
+            
+            // ✅ SET BACK-REFERENCE for O(1) lookups
+            user.setCompanyId(company.getId());
+            user = userRepository.save(user);
+            
+            // ✅ CREATE COMPANY MEMBERSHIP as OWNER (V24 RBAC)
+            CompanyUser companyUser = new CompanyUser();
+            companyUser.setCompanyId(company.getId());
+            companyUser.setUserId(user.getId());
+            companyUser.setRole(CompanyUser.CompanyRole.OWNER.name());
+            companyUserRepository.save(companyUser);
         }
+        
+        // ✅ CREATE USER ROLE (V24 RBAC) - supports multi-role users
+        UserRole userRole = new UserRole();
+        userRole.setUserId(user.getId());
+        userRole.setRole(request.getRole());
+        userRoleRepository.save(userRole);
 
         // Generate tokens
         String accessToken = generateAccessToken(user);
