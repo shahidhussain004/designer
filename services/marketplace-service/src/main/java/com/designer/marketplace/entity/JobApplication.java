@@ -103,6 +103,43 @@ public class JobApplication {
     @Column(name = "rejection_reason", columnDefinition = "TEXT")
     private String rejectionReason;
 
+    // Offer details (populated when status is OFFERED)
+    @Column(name = "offered_salary_cents")
+    private Long offeredSalaryCents; // Salary in cents
+
+    @Column(name = "offered_salary_currency", length = 3)
+    private String offeredSalaryCurrency; // USD, EUR, SEK, etc.
+
+    @Column(name = "offered_salary_period", length = 20)
+    private String offeredSalaryPeriod; // HOURLY, MONTHLY, YEARLY
+
+    @Column(name = "offered_start_date")
+    private LocalDateTime offeredStartDate; // Proposed start date
+
+    @Column(name = "offer_expiration_date")
+    private LocalDateTime offerExpirationDate; // When does the offer expire?
+
+    @Column(name = "contract_type", length = 50)
+    private String contractType; // FULL_TIME, PART_TIME, CONTRACT, FREELANCE
+
+    @Column(name = "contract_duration_months")
+    private Integer contractDurationMonths; // For fixed-term contracts
+
+    @Column(name = "offer_benefits", columnDefinition = "TEXT")
+    private String offerBenefits; // Health insurance, vacation days, etc.
+
+    @Column(name = "offer_additional_terms", columnDefinition = "TEXT")
+    private String offerAdditionalTerms; // Remote policy, equipment, probation, etc.
+
+    @Column(name = "offer_document_url", columnDefinition = "TEXT")
+    private String offerDocumentUrl; // Link to formal offer letter PDF
+
+    @Column(name = "offer_made_at")
+    private LocalDateTime offerMadeAt; // When was the offer made?
+
+    @Column(name = "offer_responded_at")
+    private LocalDateTime offerRespondedAt; // When did freelancer respond?
+
     @Column(name = "applied_at")
     private LocalDateTime appliedAt;
 

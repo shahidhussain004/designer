@@ -399,21 +399,21 @@ export default function MyApplicationsPage() {
                     {/* Rejection Feedback */}
                     {application.status === 'REJECTED' && (
                       <div className="mt-4 pt-4 border-t border-error-200 space-y-3">
-                        {(application as any).rejectionReason && (
+                        {application.rejectionReason && (
                           <div className="bg-white rounded p-3 border border-error-200">
                             <p className="text-xs text-secondary-600 uppercase tracking-wide font-semibold mb-1">Feedback from Company</p>
-                            <p className="text-secondary-900 text-sm">{(application as any).rejectionReason}</p>
+                            <p className="text-secondary-900 text-sm">{application.rejectionReason}</p>
                           </div>
                         )}
 
-                        {(application as any).companyNotes && (
+                        {application.companyNotes && (
                           <div className="bg-white rounded p-3 border border-error-200">
                             <p className="text-xs text-secondary-600 uppercase tracking-wide font-semibold mb-1">Additional Notes</p>
-                            <p className="text-secondary-900 text-sm">{(application as any).companyNotes}</p>
+                            <p className="text-secondary-900 text-sm">{application.companyNotes}</p>
                           </div>
                         )}
 
-                        {!(application as any).rejectionReason && !(application as any).companyNotes && (
+                        {!application.rejectionReason && !application.companyNotes && (
                           <p className="text-error-600 text-sm italic">No feedback provided by the company.</p>
                         )}
                       </div>

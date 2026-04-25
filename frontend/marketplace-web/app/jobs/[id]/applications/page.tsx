@@ -1,20 +1,21 @@
 "use client";
 
+import { MakeOfferModal } from "@/components/MakeOfferModal";
 import { PageLayout } from "@/components/ui";
 import { useJob, useJobApplicationsForCompany, useUpdateApplicationStatus } from "@/hooks/useJobs";
 import { useAuth } from "@/lib/auth";
 import {
-    ArrowLeft,
-    Briefcase,
-    CheckCircle,
-    ChevronDown,
-    ExternalLink,
-    FileText,
-    Linkedin,
-    Mail,
-    Phone,
-    User,
-    XCircle,
+  ArrowLeft,
+  Briefcase,
+  CheckCircle,
+  ChevronDown,
+  ExternalLink,
+  FileText,
+  Linkedin,
+  Mail,
+  Phone,
+  User,
+  XCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -56,7 +57,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
 
 const FILTER_TABS = ["ALL", "PENDING", "REVIEWING", "SHORTLISTED", "INTERVIEWING", "OFFERED", "ACCEPTED", "REJECTED"];
 
-const NEXT_STATUS_ACTIONS: Record<string, { label: string; status: string; variant: "primary" | "success" | "warning" | "danger" }[]> = {
+const NEXT_STATUS_ACTIONS: Record<string, { label: string; status: string; variant: "primary" | "success" | "warning" | "danger"; action?: "offer" }[]> = {
   PENDING: [
     { label: "Start Reviewing", status: "REVIEWING", variant: "primary" },
     { label: "Reject", status: "REJECTED", variant: "danger" },
@@ -70,7 +71,7 @@ const NEXT_STATUS_ACTIONS: Record<string, { label: string; status: string; varia
     { label: "Reject", status: "REJECTED", variant: "danger" },
   ],
   INTERVIEWING: [
-    { label: "Make Offer", status: "OFFERED", variant: "success" },
+    { label: "Make Offer", status: "OFFERED", variant: "success", action: "offer" },
     { label: "Reject", status: "REJECTED", variant: "danger" },
   ],
   OFFERED: [
@@ -124,19 +125,24 @@ function RejectionModal({
 function ApplicationCard({
   app,
   onAction,
+  jobTitle,
 }: {
   app: Application;
   onAction: (id: number, status: string, rejectionReason?: string) => void;
+  jobTitle: string;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<string | null>(null);
+  const [showOfferModal, setShowOfferModal] = useState(false);
 
   const actions = NEXT_STATUS_ACTIONS[app.status] ?? [];
   const cfg = STATUS_CONFIG[app.status] ?? { label: app.status, color: "bg-secondary-100 text-secondary-600" };
 
-  const handleAction = (status: string) => {
+  const handleAction = (status: string, action?: "offer") => {
     if (status === "REJECTED") {
       setPendingStatus("REJECTED");
+    } else if (action === "offer") {
+      setShowOfferModal(true);
     } else {
       onAction(app.id, status);
     }
@@ -151,6 +157,19 @@ function ApplicationCard({
             onAction(app.id, "REJECTED", reason);
           }}
           onCancel={() => setPendingStatus(null)}
+        />
+      )}
+
+      {showOfferModal && (
+        <MakeOfferModal
+          applicationId={app.id}
+          candidateName={app.fullName || app.applicantName || "Applicant"}
+          jobTitle={jobTitle}
+          onClose={() => setShowOfferModal(false)}
+          onSuccess={() => {
+            setShowOfferModal(false);
+            // The query will be invalidated automatically by the mutation
+          }}
         />
       )}
 
@@ -284,7 +303,7 @@ function ApplicationCard({
               return (
                 <button
                   key={action.status}
-                  onClick={() => handleAction(action.status)}
+                  onClick={() => handleAction(action.status, action.action)}
                   className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${btnClass}`}
                 >
                   {action.label}
@@ -450,7 +469,7 @@ export default function JobApplicationsPage() {
         {!isLoading && !appsError && filteredApps.length > 0 && (
           <div className="space-y-4">
             {filteredApps.map((app) => (
-              <ApplicationCard key={app.id} app={app} onAction={handleAction} />
+              <ApplicationCard key={app.id} app={app} onAction={handleAction} jobTitle={job?.title || "this position"} />
             ))}
           </div>
         )}

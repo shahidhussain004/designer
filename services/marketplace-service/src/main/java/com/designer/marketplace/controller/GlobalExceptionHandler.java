@@ -156,6 +156,24 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Handle: InvalidTokenException (Invalid password reset token)
+     * HTTP Status: 400 Bad Request
+     */
+    @ExceptionHandler(com.designer.marketplace.exception.InvalidTokenException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidToken(com.designer.marketplace.exception.InvalidTokenException ex) {
+        log.warn("Invalid token: {}", ex.getMessage());
+        
+        ApiErrorResponse error = ApiErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Invalid Token")
+                .message(ex.getMessage())
+                .timestamp(System.currentTimeMillis())
+                .build();
+        
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
      * Handle: ResourceNotFoundException
      * HTTP Status: 404 Not Found
      */

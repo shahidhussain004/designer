@@ -81,6 +81,10 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
                         
+                        // Password reset endpoints (must be public)
+                        .requestMatchers("/users/forgot-password").permitAll()
+                        .requestMatchers("/users/reset-password").permitAll()
+                        
                         // Public browsing endpoints (GET only)
                         // Note: context-path="/api" so patterns match AFTER /api prefix
                         .requestMatchers(HttpMethod.GET, "/jobs/**").permitAll()                    // Public job browsing

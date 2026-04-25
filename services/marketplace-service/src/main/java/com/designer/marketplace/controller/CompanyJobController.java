@@ -1,7 +1,5 @@
 package com.designer.marketplace.controller;
 
-import jakarta.validation.Valid;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +29,7 @@ import com.designer.marketplace.service.JobService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -179,6 +178,32 @@ public class CompanyJobController {
         
         log.info("Job {} closed successfully", id);
         return ResponseEntity.ok(closedJob);
+    }
+
+    /**
+     * Mark job as filled
+     * Changes status to FILLED, indicating the position has been successfully filled
+     * Optionally links to the application that resulted in the hire
+     * 
+     * POST /companies/me/jobs/{id}/mark-filled?applicationId=123
+     */
+    @PostMapping("/{id:\\d+}/mark-filled")
+    @Operation(
+        summary = "Mark job as filled",
+        description = "Mark a job as filled, indicating a successful hire. Optionally specify which application resulted in the hire."
+    )
+    public ResponseEntity<JobResponse> markJobAsFilled(
+            @PathVariable Long id,
+            @RequestParam(required = false) Long applicationId,
+            @AuthenticationPrincipal UserPrincipal currentUser) {
+
+        log.info("Company user {} marking job {} as filled (application: {})", 
+                currentUser.getId(), id, applicationId);
+
+        JobResponse filledJob = jobService.markJobAsFilledAsOwner(currentUser.getId(), id, applicationId);
+        
+        log.info("Job {} marked as filled successfully", id);
+        return ResponseEntity.ok(filledJob);
     }
 
     /**

@@ -197,6 +197,12 @@ public class Job {
     @Column(name = "closed_at")
     private LocalDateTime closedAt;
 
+    @Column(name = "filled_at")
+    private LocalDateTime filledAt;
+
+    @Column(name = "filled_by_application_id")
+    private Long filledByApplicationId;
+
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 

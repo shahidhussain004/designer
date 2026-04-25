@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.designer.marketplace.dto.CreateJobApplicationRequest;
 import com.designer.marketplace.dto.JobApplicationResponse;
+import com.designer.marketplace.dto.MakeOfferRequest;
+import com.designer.marketplace.dto.RespondToOfferRequest;
 import com.designer.marketplace.dto.UpdateJobApplicationStatusRequest;
 import com.designer.marketplace.service.JobApplicationService;
 
@@ -118,6 +120,38 @@ public class JobApplicationController {
 
         log.info("Updating application status: {}", id);
         JobApplicationResponse application = applicationService.updateApplicationStatus(id, request);
+        return ResponseEntity.ok(application);
+    }
+
+    /**
+     * Make a formal job offer to a candidate (company only)
+     * POST /api/job-applications/{id}/offer
+     * Includes salary, start date, benefits, and all offer terms
+     */
+    @PostMapping("/{id}/offer")
+    @PreAuthorize("isAuthenticated() and @jobApplicationService.isCompanyForApplication(#id)")
+    public ResponseEntity<JobApplicationResponse> makeOffer(
+            @PathVariable Long id,
+            @Valid @RequestBody MakeOfferRequest request) {
+
+        log.info("Making offer for application: {}", id);
+        JobApplicationResponse application = applicationService.makeOffer(id, request);
+        return ResponseEntity.ok(application);
+    }
+
+    /**
+     * Respond to a job offer (freelancer/applicant only)
+     * POST /api/job-applications/{id}/respond
+     * Allows the applicant to accept or reject a job offer
+     */
+    @PostMapping("/{id}/respond")
+    @PreAuthorize("isAuthenticated() and @jobApplicationService.isApplicationOwner(#id)")
+    public ResponseEntity<JobApplicationResponse> respondToOffer(
+            @PathVariable Long id,
+            @Valid @RequestBody RespondToOfferRequest request) {
+
+        log.info("Freelancer responding to offer: {}", id);
+        JobApplicationResponse application = applicationService.respondToOffer(id, request);
         return ResponseEntity.ok(application);
     }
 
