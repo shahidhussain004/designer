@@ -41,7 +41,11 @@ public class ProposalService {
         User currentUser = userService.getCurrentUser();
         log.info("Getting proposals for user: {}", currentUser.getUsername());
 
-        Page<Proposal> proposals = proposalRepository.findByFreelancerId(currentUser.getId(), pageable);
+        // Get freelancer profile to use proper freelancer ID
+        Freelancer freelancer = freelancerRepository.findByUserId(currentUser.getId())
+                .orElseThrow(() -> new RuntimeException("Freelancer profile not found for user: " + currentUser.getUsername()));
+
+        Page<Proposal> proposals = proposalRepository.findByFreelancerId(freelancer.getId(), pageable);
         return proposals.map(ProposalResponse::fromEntity);
     }
 
@@ -87,13 +91,14 @@ public class ProposalService {
             throw new RuntimeException("Cannot submit proposal to a closed project");
         }
 
-        // Task 3.16: Business rule - one proposal per project+freelancer
-        if (proposalRepository.existsByProjectIdAndFreelancerId(request.getProjectId(), currentUser.getId())) {
-            throw new RuntimeException("You have already submitted a proposal for this project");
-        }
-
+        // Get freelancer profile first
         Freelancer freelancer = freelancerRepository.findByUserId(currentUser.getId())
                 .orElseThrow(() -> new RuntimeException("Freelancer profile not found for user: " + currentUser.getUsername()));
+
+        // Task 3.16: Business rule - one proposal per project+freelancer
+        if (proposalRepository.existsByProjectIdAndFreelancerId(request.getProjectId(), freelancer.getId())) {
+            throw new RuntimeException("You have already submitted a proposal for this project");
+        }
 
         Proposal proposal = new Proposal();
         proposal.setProject(project);

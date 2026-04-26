@@ -68,13 +68,11 @@ public class Proposal {
     @Column(name = "estimated_hours", precision = 10, scale = 2)
     private BigDecimal estimatedHours;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "attachments", columnDefinition = "jsonb")
-    private JsonNode attachments;
+    @Column(name = "attachments", columnDefinition = "text[]")
+    private String[] attachments = new String[]{};
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "portfolio_links", columnDefinition = "jsonb")
-    private JsonNode portfolioLinks;
+    @Column(name = "portfolio_links", columnDefinition = "text[]")
+    private String[] portfolioLinks = new String[]{};
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "answers", columnDefinition = "jsonb")
