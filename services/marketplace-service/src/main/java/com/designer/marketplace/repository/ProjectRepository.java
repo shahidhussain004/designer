@@ -72,4 +72,11 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     @Query("SELECT p FROM Project p LEFT JOIN FETCH p.company c LEFT JOIN FETCH p.projectCategory pc WHERE p.id = :id")
     java.util.Optional<Project> findByIdWithCompanyAndCategory(@Param("id") Long id);
+
+    /**
+     * Check if a project is owned by a specific user (via company relationship)
+     * Used for @PreAuthorize authorization - avoids lazy loading issues
+     */
+    @Query("SELECT COUNT(p) > 0 FROM Project p WHERE p.id = :projectId AND p.company.user.id = :userId")
+    boolean existsByIdAndCompanyUserId(@Param("projectId") Long projectId, @Param("userId") Long userId);
 }

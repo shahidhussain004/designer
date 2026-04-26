@@ -135,7 +135,7 @@ public class ProjectService {
                 .orElseThrow(() -> new RuntimeException("Project not found with id: " + id));
 
         User currentUser = userService.getCurrentUser();
-        if (!project.getCompany().getId().equals(currentUser.getId())) {
+        if (!project.getCompany().getUser().getId().equals(currentUser.getId())) {
             throw new RuntimeException("You can only update your own projects");
         }
 
@@ -249,7 +249,7 @@ public class ProjectService {
                 .orElseThrow(() -> new RuntimeException("Project not found with id: " + id));
 
         User currentUser = userService.getCurrentUser();
-        if (!project.getCompany().getId().equals(currentUser.getId())) {
+        if (!project.getCompany().getUser().getId().equals(currentUser.getId())) {
             throw new RuntimeException("You can only delete your own projects");
         }
 
@@ -265,18 +265,32 @@ public class ProjectService {
         return projects.map(ProjectResponse::fromEntity);
     }
 
+    /**
+     * Check if current user owns the project (via their company profile)
+     * Used for @PreAuthorize annotations - uses efficient DB query to avoid lazy loading issues
+     */
     public boolean isProjectOwner(Long projectId) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Project not found with id: " + projectId));
         User currentUser = userService.getCurrentUser();
-        return project.getCompany().getId().equals(currentUser.getId());
+        log.info("isProjectOwner check: projectId={}, userId={}, username={}", 
+                projectId, currentUser.getId(), currentUser.getUsername());
+        
+        // Use efficient EXISTS query that checks ownership via company.user relationship
+        boolean result = projectRepository.existsByIdAndCompanyUserId(projectId, currentUser.getId());
+        log.info("isProjectOwner result: {}", result);
+        return result;
     }
 
     @Transactional(readOnly = true)
     public Page<ProjectResponse> getMyProjects(Pageable pageable) {
         User currentUser = userService.getCurrentUser();
         log.info("Getting projects for user: {}", currentUser.getUsername());
-        Page<Project> projects = projectRepository.findByCompanyId(currentUser.getId(), pageable);
+        
+        // First, get the Company associated with this user
+        Company company = companyRepository.findByUserId(currentUser.getId())
+                .orElseThrow(() -> new RuntimeException("Company profile not found for user: " + currentUser.getUsername()));
+        
+        // Then query projects by the Company ID (not User ID)
+        Page<Project> projects = projectRepository.findByCompanyId(company.getId(), pageable);
         return projects.map(ProjectResponse::fromEntity);
     }
 
@@ -286,7 +300,9 @@ public class ProjectService {
                 .orElseThrow(() -> new RuntimeException("Project not found with id: " + id));
 
         User currentUser = userService.getCurrentUser();
-        if (!project.getCompany().getId().equals(currentUser.getId())) {
+        
+        // Compare the User ID of the company owner
+        if (!project.getCompany().getUser().getId().equals(currentUser.getId())) {
             throw new RuntimeException("You can only update your own projects");
         }
 

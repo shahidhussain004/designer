@@ -49,14 +49,36 @@ public class Contract {
     private Project project;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id", nullable = false)
+    private Company company;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "freelancer_id", nullable = false)
     private Freelancer freelancer;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "proposal_id")
+    private Proposal proposal;
 
     @Column(name = "title", nullable = false, length = 255)
     private String title;
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "contract_type", nullable = false, length = 20)
+    private ContractType contractType;
+
+    @Column(name = "amount_cents", nullable = false)
+    private Long amountCents;
+
+    @Column(name = "currency", nullable = false, length = 3)
+    private String currency = "USD";
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_schedule", length = 20)
+    private PaymentSchedule paymentSchedule;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 50)
@@ -68,14 +90,14 @@ public class Contract {
     @Column(name = "end_date")
     private LocalDateTime endDate;
 
-    @Column(name = "amount_cents", nullable = false)
-    private Long amountCents;
-
     @Column(name = "milestone_count")
     private Integer milestoneCount = 0;
 
     @Column(name = "completion_percentage")
     private Integer completionPercentage = 0;
+
+    @Column(name = "completed_at")
+    private LocalDateTime completedAt;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -87,10 +109,25 @@ public class Contract {
 
     public enum ContractStatus {
         DRAFT,
+        PENDING,
         ACTIVE,
         PAUSED,
         COMPLETED,
         CANCELLED,
         DISPUTED
+    }
+
+    public enum ContractType {
+        FIXED_PRICE,
+        HOURLY,
+        MILESTONE_BASED
+    }
+
+    public enum PaymentSchedule {
+        UPFRONT,
+        ON_COMPLETION,
+        MILESTONE_BASED,
+        WEEKLY,
+        MONTHLY
     }
 }

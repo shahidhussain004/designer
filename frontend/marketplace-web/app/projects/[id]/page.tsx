@@ -54,6 +54,15 @@ interface ProposalRequest {
   estimatedDuration?: number;
 }
 
+interface ExistingProposal {
+  id: number;
+  status: string;
+  proposedRate: number;
+  estimatedDuration: number;
+  coverLetter: string;
+  createdAt: string;
+}
+
 export default function ProjectDetailsPage() {
   const params = useParams();
   const projectId = params.id as string;
@@ -72,6 +81,36 @@ export default function ProjectDetailsPage() {
   const [proposalSuccess, setProposalSuccess] = useState(false);
   const [proposalError, setProposalError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<{ coverLetter?: string; proposedRate?: string; estimatedDuration?: string }>({});
+  const [existingProposal, setExistingProposal] = useState<ExistingProposal | null>(null);
+  const [checkingProposal, setCheckingProposal] = useState(false);
+
+  // Check if user has already submitted a proposal
+  useEffect(() => {
+    const checkExistingProposal = async () => {
+      if (user && user.role === 'FREELANCER' && projectId) {
+        setCheckingProposal(true);
+        try {
+          const response = await fetch(`http://localhost:8080/api/projects/${projectId}/proposals/my-proposal`, {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            }
+          });
+          if (response.ok) {
+            const proposal = await response.json();
+            setExistingProposal(proposal);
+          } else if (response.status === 404) {
+            // No proposal found - that's fine
+            setExistingProposal(null);
+          }
+        } catch (err) {
+          logger.error('Error checking existing proposal:', err);
+        } finally {
+          setCheckingProposal(false);
+        }
+      }
+    };
+    checkExistingProposal();
+  }, [user, projectId]);
 
   useEffect(() => {
     if (project) {
@@ -115,6 +154,21 @@ export default function ProjectDetailsPage() {
       setProposalSuccess(true);
       setProposalOpen(false);
       setProposalData({ projectId: project!.id, coverLetter: '', proposedRate: 0, estimatedDuration: 30 });
+
+      // Refresh the proposal status
+      try {
+        const response = await fetch(`http://localhost:8080/api/projects/${projectId}/proposals/my-proposal`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          }
+        });
+        if (response.ok) {
+          const proposal = await response.json();
+          setExistingProposal(proposal);
+        }
+      } catch (refreshErr) {
+        logger.error('Error refreshing proposal:', refreshErr);
+      }
 
       setTimeout(() => setProposalSuccess(false), 5000);
     } catch (err: unknown) {
@@ -440,26 +494,60 @@ export default function ProjectDetailsPage() {
                   </Link>
                 </div>
               ) : user && user.role === 'FREELANCER' ? (
-                <button
-                  onClick={() => {
-                    if (!proposalOpen) {
-                      setProposalData({
-                        projectId: project!.id,
-                        coverLetter: '',
-                        proposedRate: 0,
-                        estimatedDuration: 30
-                      });
-                    }
-                    setProposalOpen(!proposalOpen);
-                  }}
-                  className={`w-full py-3 px-4 rounded-lg font-semibold transition-all ${
-                    proposalOpen 
-                      ? 'bg-white/20 text-white border border-white/40 hover:bg-white/30'
-                      : 'bg-white text-primary-600 hover:bg-primary-50 shadow-lg'
-                  }`}
-                >
-                  {proposalOpen ? 'Cancel' : 'Send Proposal'}
-                </button>
+                existingProposal ? (
+                  <div className="space-y-3">
+                    <div className="p-4 bg-white/10 border border-white/20 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-sm text-primary-100 font-semibold">Your Proposal</p>
+                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          existingProposal.status === 'ACCEPTED' ? 'bg-success-500 text-white' :
+                          existingProposal.status === 'REJECTED' ? 'bg-error-500 text-white' :
+                          existingProposal.status === 'SHORTLISTED' ? 'bg-warning-500 text-white' :
+                          'bg-info-500 text-white'
+                        }`}>
+                          {existingProposal.status}
+                        </span>
+                      </div>
+                      <div className="text-white space-y-1">
+                        <p className="text-sm">Rate: <span className="font-bold">${existingProposal.proposedRate}</span></p>
+                        <p className="text-sm">Duration: <span className="font-bold">{existingProposal.estimatedDuration} days</span></p>
+                        <p className="text-xs text-primary-100 mt-2">Submitted: {new Date(existingProposal.createdAt).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+                    <Link
+                      href="/dashboard/freelancer"
+                      className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-white text-primary-600 rounded-lg hover:bg-primary-50 transition-colors font-semibold"
+                    >
+                      <MessageSquare className="w-4 h-4" />
+                      View My Proposals
+                    </Link>
+                  </div>
+                ) : checkingProposal ? (
+                  <div className="w-full py-3 px-4 bg-white/20 text-white rounded-lg text-center">
+                    <span className="text-sm">Checking...</span>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      if (!proposalOpen) {
+                        setProposalData({
+                          projectId: project!.id,
+                          coverLetter: '',
+                          proposedRate: 0,
+                          estimatedDuration: 30
+                        });
+                      }
+                      setProposalOpen(!proposalOpen);
+                    }}
+                    className={`w-full py-3 px-4 rounded-lg font-semibold transition-all ${
+                      proposalOpen 
+                        ? 'bg-white/20 text-white border border-white/40 hover:bg-white/30'
+                        : 'bg-white text-primary-600 hover:bg-primary-50 shadow-lg'
+                    }`}
+                  >
+                    {proposalOpen ? 'Cancel' : 'Send Proposal'}
+                  </button>
+                )
               ) : user && user.role === 'COMPANY' ? (
                 <div className="p-3 bg-white/10 border border-white/20 rounded-lg text-center">
                   <p className="text-sm text-primary-100">

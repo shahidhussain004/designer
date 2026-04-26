@@ -193,10 +193,10 @@ public class JobApplicationService {
         JobApplication application = applicationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Application not found with id: " + id));
 
-        // Check authorization
+        // Check authorization - compare User IDs, not Company ID
         User currentUser = userService.getCurrentUser();
         boolean isApplicant = application.getApplicant().getId().equals(currentUser.getId());
-        boolean isCompany = application.getJob().getCompany().getId().equals(currentUser.getId());
+        boolean isCompany = application.getJob().getCompany().getUser().getId().equals(currentUser.getId());
 
         if (!isApplicant && !isCompany) {
             throw new RuntimeException("You don't have permission to view this application");
