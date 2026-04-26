@@ -2,6 +2,8 @@ package com.designer.marketplace.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -68,11 +70,13 @@ public class Proposal {
     @Column(name = "estimated_hours", precision = 10, scale = 2)
     private BigDecimal estimatedHours;
 
-    @Column(name = "attachments", columnDefinition = "text[]")
-    private String[] attachments = new String[]{};
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "attachments", columnDefinition = "jsonb")
+    private List<String> attachments = new ArrayList<>();
 
-    @Column(name = "portfolio_links", columnDefinition = "text[]")
-    private String[] portfolioLinks = new String[]{};
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "portfolio_links", columnDefinition = "jsonb")
+    private List<String> portfolioLinks = new ArrayList<>();
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "answers", columnDefinition = "jsonb")

@@ -194,15 +194,24 @@ public class GlobalExceptionHandler {
     /**
      * Handle: Uncaught exceptions
      * HTTP Status: 500 Internal Server Error
+     * Include exception message for debugging
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleGlobalException(Exception ex) {
-        log.error("Uncaught exception", ex);
+        log.error("Uncaught exception occurred", ex);
+        
+        // For debugging, include the actual error message (not in production ideally, but helpful for development)
+        String message = "An unexpected error occurred";
+        if (ex.getMessage() != null && !ex.getMessage().isBlank()) {
+            message = ex.getMessage();
+        } else if (ex.getCause() != null && ex.getCause().getMessage() != null) {
+            message = "Caused by: " + ex.getCause().getMessage();
+        }
         
         ApiErrorResponse error = ApiErrorResponse.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .error("INTERNAL_ERROR")
-                .message("An unexpected error occurred")
+                .message(message)
                 .timestamp(System.currentTimeMillis())
                 .build();
         

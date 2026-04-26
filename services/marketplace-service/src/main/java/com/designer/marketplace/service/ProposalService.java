@@ -95,6 +95,8 @@ public class ProposalService {
         Freelancer freelancer = freelancerRepository.findByUserId(currentUser.getId())
                 .orElseThrow(() -> new RuntimeException("Freelancer profile not found for user: " + currentUser.getUsername()));
 
+        log.info("Freelancer found: id={}, userId={}", freelancer.getId(), currentUser.getId());
+
         // Task 3.16: Business rule - one proposal per project+freelancer
         if (proposalRepository.existsByProjectIdAndFreelancerId(request.getProjectId(), freelancer.getId())) {
             throw new RuntimeException("You have already submitted a proposal for this project");
@@ -104,27 +106,48 @@ public class ProposalService {
         proposal.setProject(project);
         proposal.setFreelancer(freelancer);
         proposal.setCoverLetter(request.getCoverLetter());
-        proposal.setSuggestedBudgetCents(request.getProposedRate() != null ? (long)(request.getProposedRate() * 100) : null);
-        proposal.setEstimatedHours(request.getEstimatedDuration() != null ? java.math.BigDecimal.valueOf(request.getEstimatedDuration().doubleValue()) : null);
+        
+        // Convert proposed rate (dollars) to cents for storage
+        if (request.getProposedRate() != null && request.getProposedRate() > 0) {
+            proposal.setSuggestedBudgetCents((long)(request.getProposedRate() * 100));
+        }
+        
+        // Convert estimated duration (days) to hours for storage
+        if (request.getEstimatedDuration() != null && request.getEstimatedDuration() > 0) {
+            proposal.setEstimatedHours(java.math.BigDecimal.valueOf(request.getEstimatedDuration()));
+        }
+        
         proposal.setStatus(Proposal.ProposalStatus.SUBMITTED);
 
+        log.info("Saving proposal: projectId={}, freelancerId={}", proposal.getProject().getId(), proposal.getFreelancer().getId());
         Proposal savedProposal = proposalRepository.save(proposal);
+        log.info("Proposal saved with id: {}. Database trigger will handle proposal_count increment.", savedProposal.getId());
 
-        // Update project proposal count
-        project.setProposalCount(project.getProposalCount() + 1);
-        projectRepository.save(project);
+        // NOTE: Database trigger (trg_increment_project_proposal_count) automatically increments project.proposal_count
+        // No manual increment needed - this is handled by: CREATE TRIGGER trg_increment_project_proposal_count
+        // See V8__create_proposals_table.sql for trigger definition
 
-        // Create notification for project owner
-        notificationService.createNotification(
-                project.getCompany(),
-                Notification.NotificationType.PROPOSAL_RECEIVED,
-                "New Proposal Received",
-                String.format("%s submitted a proposal for your project: %s",
-                        currentUser.getFullName(), project.getTitle()),
-                "PROPOSAL",
-                savedProposal.getId());
+        // Create notification for project owner - ensure company is not null
+        try {
+            if (project.getCompany() != null) {
+                notificationService.createNotification(
+                        project.getCompany(),
+                        Notification.NotificationType.PROPOSAL_RECEIVED,
+                        "New Proposal Received",
+                        String.format("%s submitted a proposal for your project: %s",
+                                currentUser.getFullName(), project.getTitle()),
+                        "PROPOSAL",
+                        savedProposal.getId());
+                log.info("Notification created for project owner");
+            } else {
+                log.warn("Project company is null for projectId: {}", project.getId());
+            }
+        } catch (Exception e) {
+            log.error("Failed to create notification for proposal: {}", savedProposal.getId(), e);
+            // Don't re-throw - notification failure shouldn't block proposal creation
+        }
 
-        log.info("Proposal created with id: {}", savedProposal.getId());
+        log.info("Proposal created successfully with id: {}", savedProposal.getId());
 
         return ProposalResponse.fromEntity(savedProposal);
     }
