@@ -1,5 +1,7 @@
 package com.designer.marketplace.service;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -8,11 +10,13 @@ import org.springframework.transaction.annotation.Transactional;
 import com.designer.marketplace.dto.CreateProposalRequest;
 import com.designer.marketplace.dto.ProposalResponse;
 import com.designer.marketplace.dto.UpdateProposalStatusRequest;
+import com.designer.marketplace.entity.Contract;
 import com.designer.marketplace.entity.Freelancer;
 import com.designer.marketplace.entity.Notification;
 import com.designer.marketplace.entity.Project;
 import com.designer.marketplace.entity.Proposal;
 import com.designer.marketplace.entity.User;
+import com.designer.marketplace.repository.ContractRepository;
 import com.designer.marketplace.repository.FreelancerRepository;
 import com.designer.marketplace.repository.ProjectRepository;
 import com.designer.marketplace.repository.ProposalRepository;
@@ -33,6 +37,7 @@ public class ProposalService {
     private final UserService userService;
     private final NotificationService notificationService;
     private final FreelancerRepository freelancerRepository;
+    private final ContractRepository contractRepository;
 
     /**
      * Task 3.12: Get user's proposals
@@ -41,26 +46,29 @@ public class ProposalService {
         User currentUser = userService.getCurrentUser();
         log.info("Getting proposals for user: {}", currentUser.getUsername());
 
-        Page<Proposal> proposals = proposalRepository.findByFreelancerId(currentUser.getId(), pageable);
+        // Get freelancer profile to use proper freelancer ID
+        Freelancer freelancer = freelancerRepository.findByUserId(currentUser.getId())
+                .orElseThrow(() -> new RuntimeException("Freelancer profile not found for user: " + currentUser.getUsername()));
+
+        Page<Proposal> proposals = proposalRepository.findByFreelancerId(freelancer.getId(), pageable);
         return proposals.map(ProposalResponse::fromEntity);
     }
 
     /**
      * Task 3.13: Get proposals for a project
      */
+    @Transactional(readOnly = true)
     public Page<ProposalResponse> getProjectProposals(Long projectId, Pageable pageable) {
         log.info("Getting proposals for project: {}", projectId);
 
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Project not found with id: " + projectId));
-
-        // Check if current user is the project owner
-        User currentUser = userService.getCurrentUser();
-        if (!project.getCompany().getId().equals(currentUser.getId())) {
-            throw new RuntimeException("You can only view proposals for your own projects");
+        // Authorization is handled by @PreAuthorize on the controller
+        // Just verify project exists and fetch proposals
+        if (!projectRepository.existsById(projectId)) {
+            throw new RuntimeException("Project not found with id: " + projectId);
         }
 
         Page<Proposal> proposals = proposalRepository.findByProjectId(projectId, pageable);
+        log.info("Found {} proposals for project {}", proposals.getTotalElements(), projectId);
         return proposals.map(ProposalResponse::fromEntity);
     }
 
@@ -87,39 +95,63 @@ public class ProposalService {
             throw new RuntimeException("Cannot submit proposal to a closed project");
         }
 
-        // Task 3.16: Business rule - one proposal per project+freelancer
-        if (proposalRepository.existsByProjectIdAndFreelancerId(request.getProjectId(), currentUser.getId())) {
-            throw new RuntimeException("You have already submitted a proposal for this project");
-        }
-
+        // Get freelancer profile first
         Freelancer freelancer = freelancerRepository.findByUserId(currentUser.getId())
                 .orElseThrow(() -> new RuntimeException("Freelancer profile not found for user: " + currentUser.getUsername()));
+
+        log.info("Freelancer found: id={}, userId={}", freelancer.getId(), currentUser.getId());
+
+        // Task 3.16: Business rule - one proposal per project+freelancer
+        if (proposalRepository.existsByProjectIdAndFreelancerId(request.getProjectId(), freelancer.getId())) {
+            throw new RuntimeException("You have already submitted a proposal for this project");
+        }
 
         Proposal proposal = new Proposal();
         proposal.setProject(project);
         proposal.setFreelancer(freelancer);
         proposal.setCoverLetter(request.getCoverLetter());
-        proposal.setSuggestedBudgetCents(request.getProposedRate() != null ? (long)(request.getProposedRate() * 100) : null);
-        proposal.setEstimatedHours(request.getEstimatedDuration() != null ? java.math.BigDecimal.valueOf(request.getEstimatedDuration().doubleValue()) : null);
+        
+        // Convert proposed rate (dollars) to cents for storage
+        if (request.getProposedRate() != null && request.getProposedRate() > 0) {
+            proposal.setSuggestedBudgetCents((long)(request.getProposedRate() * 100));
+        }
+        
+        // Convert estimated duration (days) to hours for storage
+        if (request.getEstimatedDuration() != null && request.getEstimatedDuration() > 0) {
+            proposal.setEstimatedHours(java.math.BigDecimal.valueOf(request.getEstimatedDuration()));
+        }
+        
         proposal.setStatus(Proposal.ProposalStatus.SUBMITTED);
 
+        log.info("Saving proposal: projectId={}, freelancerId={}", proposal.getProject().getId(), proposal.getFreelancer().getId());
         Proposal savedProposal = proposalRepository.save(proposal);
+        log.info("Proposal saved with id: {}. Database trigger will handle proposal_count increment.", savedProposal.getId());
 
-        // Update project proposal count
-        project.setProposalCount(project.getProposalCount() + 1);
-        projectRepository.save(project);
+        // NOTE: Database trigger (trg_increment_project_proposal_count) automatically increments project.proposal_count
+        // No manual increment needed - this is handled by: CREATE TRIGGER trg_increment_project_proposal_count
+        // See V8__create_proposals_table.sql for trigger definition
 
-        // Create notification for project owner
-        notificationService.createNotification(
-                project.getCompany(),
-                Notification.NotificationType.PROPOSAL_RECEIVED,
-                "New Proposal Received",
-                String.format("%s submitted a proposal for your project: %s",
-                        currentUser.getFullName(), project.getTitle()),
-                "PROPOSAL",
-                savedProposal.getId());
+        // Create notification for project owner - ensure company is not null
+        try {
+            if (project.getCompany() != null) {
+                notificationService.createNotification(
+                        project.getCompany(),
+                        Notification.NotificationType.PROPOSAL_RECEIVED,
+                        "New Proposal Received",
+                        String.format("%s submitted a proposal for your project: %s",
+                                currentUser.getFullName(), project.getTitle()),
+                        "PROPOSAL",
+                        savedProposal.getId());
+                log.info("Notification created for project owner");
+            } else {
+                log.warn("Project company is null for projectId: {}", project.getId());
+            }
+        } catch (Exception e) {
+            log.error("Failed to create notification for proposal: {}", savedProposal.getId(), e);
+            // Don't re-throw - notification failure shouldn't block proposal creation
+        }
 
-        log.info("Proposal created with id: {}", savedProposal.getId());
+        log.info("Proposal created successfully with id: {}", savedProposal.getId());
 
         return ProposalResponse.fromEntity(savedProposal);
     }
@@ -134,8 +166,8 @@ public class ProposalService {
 
         User currentUser = userService.getCurrentUser();
 
-        // Check if current user is the project owner
-        if (!proposal.getProject().getCompany().getId().equals(currentUser.getId())) {
+        // Check if current user is the project owner (compare User IDs, not Company ID)
+        if (!proposal.getProject().getCompany().getUser().getId().equals(currentUser.getId())) {
             throw new RuntimeException("Only the project owner can update proposal status");
         }
 
@@ -149,19 +181,38 @@ public class ProposalService {
             proposal.setCompanyNotes(request.getCompanyMessage());
         }
 
-        // If accepting a proposal, mark project as in progress
+        // If accepting a proposal, mark project as in progress and create contract
         if (newStatus == Proposal.ProposalStatus.ACCEPTED) {
             Project project = proposal.getProject();
             project.setStatus(Project.ProjectStatus.IN_PROGRESS);
             projectRepository.save(project);
             log.info("Project {} marked as IN_PROGRESS", project.getId());
 
+            // Create contract for this project and freelancer
+            Contract contract = new Contract();
+            contract.setProject(project);
+            contract.setCompany(project.getCompany());
+            contract.setFreelancer(proposal.getFreelancer());
+            contract.setProposal(proposal);
+            contract.setTitle("Contract for: " + project.getTitle());
+            contract.setDescription("This contract is for the project: " + project.getTitle());
+            contract.setContractType(Contract.ContractType.FIXED_PRICE);
+            contract.setStatus(Contract.ContractStatus.ACTIVE);
+            contract.setStartDate(LocalDateTime.now());
+            contract.setAmountCents(proposal.getSuggestedBudgetCents() != null ? proposal.getSuggestedBudgetCents() : 0L);
+            contract.setCurrency("USD");
+            contract.setPaymentSchedule(Contract.PaymentSchedule.ON_COMPLETION);
+            contract.setMilestoneCount(0);
+            contract.setCompletionPercentage(0);
+            contractRepository.save(contract);
+            log.info("Contract created for proposal {} - Contract ID: {}", proposalId, contract.getId());
+
             // Notify freelancer
             notificationService.createNotification(
                     proposal.getFreelancer(),
                     Notification.NotificationType.PROPOSAL_ACCEPTED,
                     "Proposal Accepted!",
-                    String.format("Your proposal for '%s' has been accepted!", project.getTitle()),
+                    String.format("Your proposal for '%s' has been accepted! A contract has been created.", project.getTitle()),
                     "PROPOSAL",
                     proposalId);
         } else if (newStatus == Proposal.ProposalStatus.REJECTED) {
@@ -191,25 +242,37 @@ public class ProposalService {
     }
 
     /**
-     * Check if user is owner of the proposal
+     * Get current user's proposal for a specific project (if exists)
      */
-    @Transactional(readOnly = true)
-    public boolean isProposalOwner(Long proposalId) {
-        Proposal proposal = proposalRepository.findById(proposalId)
-                .orElseThrow(() -> new RuntimeException("Proposal not found with id: " + proposalId));
+    public ProposalResponse getMyProposalForProject(Long projectId) {
         User currentUser = userService.getCurrentUser();
-        return proposal.getFreelancer().getId().equals(currentUser.getId());
+        
+        // Get freelancer profile
+        Freelancer freelancer = freelancerRepository.findByUserId(currentUser.getId())
+                .orElseThrow(() -> new RuntimeException("Freelancer profile not found"));
+        
+        // Find proposal by project and freelancer with eager loading
+        return proposalRepository.findByProjectIdAndFreelancerIdWithRelations(projectId, freelancer.getId())
+                .map(ProposalResponse::fromEntity)
+                .orElse(null);
+    }
+
+    /**
+     * Check if user is owner of the proposal (the freelancer who submitted it)
+     * Uses efficient EXISTS query to avoid lazy loading issues
+     */
+    public boolean isProposalOwner(Long proposalId) {
+        User currentUser = userService.getCurrentUser();
+        return proposalRepository.existsByIdAndFreelancerUserId(proposalId, currentUser.getId());
     }
 
     /**
      * Check if user is owner of the project associated with the proposal
+     * Uses efficient EXISTS query to avoid lazy loading issues
      */
-    @Transactional(readOnly = true)
     public boolean isProjectOwnerForProposal(Long proposalId) {
-        Proposal proposal = proposalRepository.findById(proposalId)
-                .orElseThrow(() -> new RuntimeException("Proposal not found with id: " + proposalId));
         User currentUser = userService.getCurrentUser();
-        return proposal.getProject().getCompany().getId().equals(currentUser.getId());
+        return proposalRepository.existsByIdAndProjectCompanyUserId(proposalId, currentUser.getId());
     }
 
     /**

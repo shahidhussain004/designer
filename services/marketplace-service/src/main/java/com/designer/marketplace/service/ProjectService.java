@@ -135,12 +135,13 @@ public class ProjectService {
                 .orElseThrow(() -> new RuntimeException("Project not found with id: " + id));
 
         User currentUser = userService.getCurrentUser();
-        if (!project.getCompany().getId().equals(currentUser.getId())) {
+        if (!project.getCompany().getUser().getId().equals(currentUser.getId())) {
             throw new RuntimeException("You can only update your own projects");
         }
 
         log.info("Updating project: {}", id);
 
+        // Basic information
         if (request.getTitle() != null) {
             project.setTitle(request.getTitle());
         }
@@ -149,25 +150,61 @@ public class ProjectService {
             project.setDescription(request.getDescription());
         }
 
+        if (request.getScopeOfWork() != null) {
+            project.setScopeOfWork(request.getScopeOfWork());
+        }
+
         if (request.getCategoryId() != null) {
             project.setProjectCategory(categoryService.getCategoryEntityById(request.getCategoryId()));
         }
 
+        // Skills
         if (request.getRequiredSkills() != null && !request.getRequiredSkills().isEmpty()) {
             project.setRequiredSkills(objectMapper.valueToTree(request.getRequiredSkills()));
         }
 
-        if (request.getBudget() != null) {
-            project.setBudgetMinCents((long)(request.getBudget() * 100));
-            project.setBudgetMaxCents((long)(request.getBudget() * 100));
+        if (request.getPreferredSkills() != null && !request.getPreferredSkills().isEmpty()) {
+            project.setPreferredSkills(objectMapper.valueToTree(request.getPreferredSkills()));
         }
 
+        // Budget
         if (request.getBudgetType() != null) {
             project.setBudgetType(Project.BudgetType.valueOf(request.getBudgetType().toUpperCase()));
         }
 
-        if (request.getDuration() != null) {
-            project.setEstimatedDurationDays(request.getDuration());
+        if (request.getBudgetAmountCents() != null && request.getBudgetAmountCents() > 0) {
+            project.setBudgetMaxCents(request.getBudgetAmountCents());
+            project.setBudgetMinCents(request.getBudgetAmountCents());
+        }
+
+        if (request.getBudgetMinCents() != null && request.getBudgetMinCents() > 0) {
+            project.setBudgetMinCents(request.getBudgetMinCents());
+        }
+
+        if (request.getBudgetMaxCents() != null && request.getBudgetMaxCents() > 0) {
+            project.setBudgetMaxCents(request.getBudgetMaxCents());
+        }
+
+        if (request.getCurrency() != null) {
+            project.setCurrency(request.getCurrency());
+        }
+
+        // Timeline & Duration
+        if (request.getTimeline() != null) {
+            project.setTimeline(request.getTimeline());
+        }
+
+        if (request.getEstimatedDurationDays() != null) {
+            project.setEstimatedDurationDays(request.getEstimatedDurationDays());
+        }
+
+        if (request.getEstimatedHours() != null) {
+            project.setEstimatedDurationDays(request.getEstimatedHours());
+        }
+
+        // Experience & Project Type
+        if (request.getExperienceLevel() != null) {
+            project.setExperienceLevel(request.getExperienceLevel());
         }
 
         if (request.getExperienceLevelId() != null) {
@@ -175,8 +212,29 @@ public class ProjectService {
             project.setExperienceLevel(level.getCode());
         }
 
+        if (request.getProjectType() != null) {
+            project.setProjectType(request.getProjectType());
+        }
+
+        if (request.getPriorityLevel() != null) {
+            project.setPriorityLevel(request.getPriorityLevel());
+        }
+
+        // Status & Visibility
         if (request.getStatus() != null) {
             project.setStatus(Project.ProjectStatus.valueOf(request.getStatus().toUpperCase()));
+        }
+
+        if (request.getVisibility() != null) {
+            project.setVisibility(request.getVisibility());
+        }
+
+        if (request.getIsFeatured() != null) {
+            project.setIsFeatured(request.getIsFeatured());
+        }
+
+        if (request.getIsUrgent() != null) {
+            project.setIsUrgent(request.getIsUrgent());
         }
 
         Project updatedProject = projectRepository.save(project);
@@ -191,7 +249,7 @@ public class ProjectService {
                 .orElseThrow(() -> new RuntimeException("Project not found with id: " + id));
 
         User currentUser = userService.getCurrentUser();
-        if (!project.getCompany().getId().equals(currentUser.getId())) {
+        if (!project.getCompany().getUser().getId().equals(currentUser.getId())) {
             throw new RuntimeException("You can only delete your own projects");
         }
 
@@ -207,18 +265,51 @@ public class ProjectService {
         return projects.map(ProjectResponse::fromEntity);
     }
 
+    /**
+     * Check if current user owns the project (via their company profile)
+     * Used for @PreAuthorize annotations - uses efficient DB query to avoid lazy loading issues
+     */
     public boolean isProjectOwner(Long projectId) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Project not found with id: " + projectId));
         User currentUser = userService.getCurrentUser();
-        return project.getCompany().getId().equals(currentUser.getId());
+        log.info("isProjectOwner check: projectId={}, userId={}, username={}", 
+                projectId, currentUser.getId(), currentUser.getUsername());
+        
+        // Use efficient EXISTS query that checks ownership via company.user relationship
+        boolean result = projectRepository.existsByIdAndCompanyUserId(projectId, currentUser.getId());
+        log.info("isProjectOwner result: {}", result);
+        return result;
     }
 
     @Transactional(readOnly = true)
     public Page<ProjectResponse> getMyProjects(Pageable pageable) {
         User currentUser = userService.getCurrentUser();
         log.info("Getting projects for user: {}", currentUser.getUsername());
-        Page<Project> projects = projectRepository.findByCompanyId(currentUser.getId(), pageable);
+        
+        // First, get the Company associated with this user
+        Company company = companyRepository.findByUserId(currentUser.getId())
+                .orElseThrow(() -> new RuntimeException("Company profile not found for user: " + currentUser.getUsername()));
+        
+        // Then query projects by the Company ID (not User ID)
+        Page<Project> projects = projectRepository.findByCompanyId(company.getId(), pageable);
         return projects.map(ProjectResponse::fromEntity);
+    }
+
+    @Transactional
+    public ProjectResponse updateProjectStatus(Long id, String status) {
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Project not found with id: " + id));
+
+        User currentUser = userService.getCurrentUser();
+        
+        // Compare the User ID of the company owner
+        if (!project.getCompany().getUser().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("You can only update your own projects");
+        }
+
+        log.info("Updating project {} status to: {}", id, status);
+        project.setStatus(Project.ProjectStatus.valueOf(status.toUpperCase()));
+
+        Project updatedProject = projectRepository.save(project);
+        return ProjectResponse.fromEntity(updatedProject);
     }
 }

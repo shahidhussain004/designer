@@ -25,6 +25,9 @@ public interface ProposalRepository extends JpaRepository<Proposal, Long> {
 
     Optional<Proposal> findByProjectIdAndFreelancerId(Long projectId, Long freelancerId);
 
+    @Query("SELECT p FROM Proposal p LEFT JOIN FETCH p.project pr LEFT JOIN FETCH pr.company LEFT JOIN FETCH p.freelancer f LEFT JOIN FETCH f.user WHERE p.project.id = :projectId AND p.freelancer.id = :freelancerId")
+    Optional<Proposal> findByProjectIdAndFreelancerIdWithRelations(@Param("projectId") Long projectId, @Param("freelancerId") Long freelancerId);
+
     boolean existsByProjectIdAndFreelancerId(Long projectId, Long freelancerId);
 
     // Dashboard queries
@@ -59,4 +62,18 @@ public interface ProposalRepository extends JpaRepository<Proposal, Long> {
 
     @Query("SELECT p FROM Proposal p LEFT JOIN FETCH p.project pr LEFT JOIN FETCH pr.company LEFT JOIN FETCH p.freelancer WHERE p.freelancer.id = :freelancerId")
     Page<Proposal> findByFreelancerIdWithRelations(@Param("freelancerId") Long freelancerId, Pageable pageable);
+
+    /**
+     * Check if a proposal belongs to a project owned by a specific user
+     * Used for @PreAuthorize authorization - avoids lazy loading issues
+     */
+    @Query("SELECT COUNT(p) > 0 FROM Proposal p WHERE p.id = :proposalId AND p.project.company.user.id = :userId")
+    boolean existsByIdAndProjectCompanyUserId(@Param("proposalId") Long proposalId, @Param("userId") Long userId);
+
+    /**
+     * Check if a proposal was submitted by a specific freelancer (via user ID)
+     * Used for @PreAuthorize authorization
+     */
+    @Query("SELECT COUNT(p) > 0 FROM Proposal p WHERE p.id = :proposalId AND p.freelancer.user.id = :userId")
+    boolean existsByIdAndFreelancerUserId(@Param("proposalId") Long proposalId, @Param("userId") Long userId);
 }

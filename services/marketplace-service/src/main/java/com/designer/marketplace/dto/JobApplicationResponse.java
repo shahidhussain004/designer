@@ -1,8 +1,6 @@
 package com.designer.marketplace.dto;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.designer.marketplace.entity.JobApplication;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -44,6 +42,20 @@ public class JobApplicationResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime reviewedAt;
+
+    // Offer details (populated when status is OFFERED)
+    private Long offeredSalaryCents;
+    private String offeredSalaryCurrency;
+    private String offeredSalaryPeriod;
+    private LocalDateTime offeredStartDate;
+    private LocalDateTime offerExpirationDate;
+    private String contractType;
+    private Integer contractDurationMonths;
+    private String offerBenefits;
+    private String offerAdditionalTerms;
+    private String offerDocumentUrl;
+    private LocalDateTime offerMadeAt;
+    private LocalDateTime offerRespondedAt;
 
     /**
      * Nested DTO for applicant information
@@ -98,6 +110,18 @@ public class JobApplicationResponse {
                 .createdAt(application.getCreatedAt())
                 .updatedAt(application.getUpdatedAt())
                 .reviewedAt(application.getReviewedAt())
+                .offeredSalaryCents(application.getOfferedSalaryCents())
+                .offeredSalaryCurrency(application.getOfferedSalaryCurrency())
+                .offeredSalaryPeriod(application.getOfferedSalaryPeriod())
+                .offeredStartDate(application.getOfferedStartDate())
+                .offerExpirationDate(application.getOfferExpirationDate())
+                .contractType(application.getContractType())
+                .contractDurationMonths(application.getContractDurationMonths())
+                .offerBenefits(application.getOfferBenefits())
+                .offerAdditionalTerms(application.getOfferAdditionalTerms())
+                .offerDocumentUrl(application.getOfferDocumentUrl())
+                .offerMadeAt(application.getOfferMadeAt())
+                .offerRespondedAt(application.getOfferRespondedAt())
                 .build();
     }
 }

@@ -156,6 +156,24 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Handle: InvalidTokenException (Invalid password reset token)
+     * HTTP Status: 400 Bad Request
+     */
+    @ExceptionHandler(com.designer.marketplace.exception.InvalidTokenException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidToken(com.designer.marketplace.exception.InvalidTokenException ex) {
+        log.warn("Invalid token: {}", ex.getMessage());
+        
+        ApiErrorResponse error = ApiErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Invalid Token")
+                .message(ex.getMessage())
+                .timestamp(System.currentTimeMillis())
+                .build();
+        
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
      * Handle: ResourceNotFoundException
      * HTTP Status: 404 Not Found
      */
@@ -176,15 +194,24 @@ public class GlobalExceptionHandler {
     /**
      * Handle: Uncaught exceptions
      * HTTP Status: 500 Internal Server Error
+     * Include exception message for debugging
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleGlobalException(Exception ex) {
-        log.error("Uncaught exception", ex);
+        log.error("Uncaught exception occurred", ex);
+        
+        // For debugging, include the actual error message (not in production ideally, but helpful for development)
+        String message = "An unexpected error occurred";
+        if (ex.getMessage() != null && !ex.getMessage().isBlank()) {
+            message = ex.getMessage();
+        } else if (ex.getCause() != null && ex.getCause().getMessage() != null) {
+            message = "Caused by: " + ex.getCause().getMessage();
+        }
         
         ApiErrorResponse error = ApiErrorResponse.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .error("INTERNAL_ERROR")
-                .message("An unexpected error occurred")
+                .message(message)
                 .timestamp(System.currentTimeMillis())
                 .build();
         

@@ -63,6 +63,12 @@ public class ProposalResponse {
 
         FreelancerInfo freelancerInfo = null;
         if (proposal.getFreelancer() != null && proposal.getFreelancer().getUser() != null) {
+            // Parse skills from JsonNode array to List<String>
+            List<String> skillsList = new java.util.ArrayList<>();
+            if (proposal.getFreelancer().getSkills() != null && proposal.getFreelancer().getSkills().isArray()) {
+                proposal.getFreelancer().getSkills().forEach(node -> skillsList.add(node.asText()));
+            }
+            
             freelancerInfo = FreelancerInfo.builder()
                     .id(proposal.getFreelancer().getId())
                     .username(proposal.getFreelancer().getUser().getUsername())
@@ -71,7 +77,7 @@ public class ProposalResponse {
                     .location(proposal.getFreelancer().getUser().getLocation())
                     .bio(proposal.getFreelancer().getUser().getBio())
                     .hourlyRate(proposal.getFreelancer().getHourlyRateCents() != null ? proposal.getFreelancer().getHourlyRateCents().doubleValue() / 100.0 : null)
-                    .skills(proposal.getFreelancer().getSkills() != null ? java.util.Arrays.asList(proposal.getFreelancer().getSkills().asText().split(",")) : new java.util.ArrayList<>())
+                    .skills(skillsList)
                     .portfolioUrl(proposal.getFreelancer().getPortfolioUrl())
                     .ratingAvg(proposal.getFreelancer().getUser().getRatingAvg() != null ? proposal.getFreelancer().getUser().getRatingAvg() : BigDecimal.ZERO)
                     .ratingCount(proposal.getFreelancer().getUser().getRatingCount() != null ? proposal.getFreelancer().getUser().getRatingCount() : 0)

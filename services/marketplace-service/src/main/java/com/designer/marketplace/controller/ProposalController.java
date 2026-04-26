@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.designer.marketplace.dto.CreateProposalRequest;
 import com.designer.marketplace.dto.ProposalResponse;
 import com.designer.marketplace.dto.UpdateProposalStatusRequest;
+import com.designer.marketplace.service.ProjectService;
 import com.designer.marketplace.service.ProposalService;
 
 import jakarta.validation.Valid;
@@ -41,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ProposalController {
 
     private final ProposalService proposalService;
+    private final ProjectService projectService;
 
     /**
      * Task 3.12: Get user's proposals
@@ -63,13 +65,19 @@ public class ProposalController {
      * GET /api/projects/{projectId}/proposals?page=0&size=20
      */
     @GetMapping("/projects/{projectId}/proposals")
-    @PreAuthorize("isAuthenticated() and @projectService.isProjectOwner(#projectId)")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Page<ProposalResponse>> getProjectProposals(
             @PathVariable Long projectId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
 
         log.info("Getting proposals for project: {}", projectId);
+        
+        // Explicit ownership check - replaces @PreAuthorize annotation
+        if (!projectService.isProjectOwner(projectId)) {
+            throw new org.springframework.security.access.AccessDeniedException("You don't own this project");
+        }
+        
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<ProposalResponse> proposals = proposalService.getProjectProposals(projectId, pageable);
         return ResponseEntity.ok(proposals);
@@ -111,6 +119,21 @@ public class ProposalController {
     public ResponseEntity<ProposalResponse> getProposalById(@PathVariable Long id) {
         log.info("Getting proposal by id: {}", id);
         ProposalResponse proposal = proposalService.getProposalById(id);
+        return ResponseEntity.ok(proposal);
+    }
+
+    /**
+     * Check if current user has submitted a proposal for a project
+     * GET /api/projects/{projectId}/proposals/my-proposal
+     */
+    @GetMapping("/projects/{projectId}/proposals/my-proposal")
+    @PreAuthorize("hasRole('FREELANCER')")
+    public ResponseEntity<ProposalResponse> getMyProposalForProject(@PathVariable Long projectId) {
+        log.info("Checking for user's proposal on project: {}", projectId);
+        ProposalResponse proposal = proposalService.getMyProposalForProject(projectId);
+        if (proposal == null) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(proposal);
     }
 

@@ -178,6 +178,22 @@ export function useMyApplications() {
 }
 
 /**
+ * Fetch a single job application by ID
+ */
+export function useApplication(applicationId: string | number | null) {
+  return useQuery({
+    queryKey: ['job-application', applicationId],
+    queryFn: async ({ signal }) => {
+      if (!applicationId) throw new Error('Application ID is required');
+      const { data } = await apiClient.get(`/job-applications/${applicationId}`, { signal });
+      return data;
+    },
+    enabled: !!applicationId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+}
+
+/**
  * Fetch current user's company profile
  * Only useful for COMPANY role users
  * @param enabled - Optional flag to conditionally enable the query (defaults to true)
@@ -315,6 +331,30 @@ export function useCloseJob() {
 }
 
 /**
+ * Mark job as filled (change status to FILLED)
+ */
+export function useMarkJobAsFilled() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, applicationId }: { id: string | number; applicationId?: number }) => {
+      const url = applicationId 
+        ? `/companies/me/jobs/${id}/mark-filled?applicationId=${applicationId}`
+        : `/companies/me/jobs/${id}/mark-filled`;
+      const { data } = await apiClient.post<Job>(url);
+      return data;
+    },
+    onSuccess: (updatedJob) => {
+      // Update specific job in cache
+      queryClient.setQueryData(['job', updatedJob.id], updatedJob);
+      
+      // Invalidate jobs list
+      queryClient.invalidateQueries({ queryKey: ['jobs'] });
+    },
+  });
+}
+
+/**
  * Apply for a job
  */
 export function useApplyForJob() {
@@ -388,6 +428,95 @@ export function useUpdateApplicationStatus() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['company-job-applications'] });
+      queryClient.invalidateQueries({ queryKey: ['job-applications'] });
+      queryClient.invalidateQueries({ queryKey: ['job-application'] });
+    },
+  });
+}
+
+/**
+ * Respond to a job offer (freelancer only)
+ * Allows freelancer to accept or reject an offer
+ */
+export function useRespondToOffer() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      id,
+      response,
+      notes,
+    }: {
+      id: number;
+      response: 'ACCEPTED' | 'REJECTED';
+      notes?: string;
+    }) => {
+      const { data } = await apiClient.post(`/job-applications/${id}/respond`, {
+        response,
+        notes,
+      });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['job-applications'] });
+      queryClient.invalidateQueries({ queryKey: ['job-applications', 'my'] });
+      queryClient.invalidateQueries({ queryKey: ['job-application'] });
+    },
+  });
+}
+
+/**
+ * Make a formal job offer to a candidate (company only)
+ * Includes salary, start date, benefits, and all offer terms
+ */
+export function useMakeOffer() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      id,
+      offeredSalaryCents,
+      offeredSalaryCurrency,
+      offeredSalaryPeriod,
+      offeredStartDate,
+      offerExpirationDate,
+      contractType,
+      contractDurationMonths,
+      offerBenefits,
+      offerAdditionalTerms,
+      offerDocumentUrl,
+      companyNotes,
+    }: {
+      id: number;
+      offeredSalaryCents: number;
+      offeredSalaryCurrency: string;
+      offeredSalaryPeriod: string;
+      offeredStartDate: string;
+      offerExpirationDate: string;
+      contractType: string;
+      contractDurationMonths?: number;
+      offerBenefits?: string;
+      offerAdditionalTerms?: string;
+      offerDocumentUrl?: string;
+      companyNotes?: string;
+    }) => {
+      const { data } = await apiClient.post(`/job-applications/${id}/offer`, {
+        offeredSalaryCents,
+        offeredSalaryCurrency,
+        offeredSalaryPeriod,
+        offeredStartDate,
+        offerExpirationDate,
+        contractType,
+        contractDurationMonths,
+        offerBenefits,
+        offerAdditionalTerms,
+        offerDocumentUrl,
+        companyNotes,
+      });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['company-job-applications'] });
+      queryClient.invalidateQueries({ queryKey: ['job-applications'] });
+      queryClient.invalidateQueries({ queryKey: ['job-application'] });
     },
   });
 }

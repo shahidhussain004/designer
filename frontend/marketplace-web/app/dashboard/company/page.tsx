@@ -1,11 +1,12 @@
 "use client"
 
 import { PageLayout } from '@/components/ui'
+import { useDeleteProject, useUpdateProjectStatus, type Project } from '@/hooks/useProjects'
 import { apiClient } from '@/lib/api-client'
 import { authService } from '@/lib/auth'
 import { CompanyDashboard, getDashboardData, JobSummary } from '@/lib/dashboard'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { ArrowRight, Briefcase, CheckCircle, Eye, FileText, Loader2, Plus, RefreshCw, Send, TrendingUp, Users, XCircle } from 'lucide-react'
+import { ArrowRight, Briefcase, CheckCircle, Edit, Eye, FileText, Loader2, Plus, RefreshCw, Send, TrendingUp, Users, XCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
@@ -21,6 +22,8 @@ export default function CompanyDashboardPage() {
   const _currentUser = authService.getCurrentUser()
   const [companyJobs, setCompanyJobs] = useState<JobSummary[]>([])
   const [jobsLoading, setJobsLoading] = useState(true)
+  const [companyProjects, setCompanyProjects] = useState<Project[]>([])
+  const [projectsLoading, setProjectsLoading] = useState(true)
   
   const refetchJobs = useCallback(async () => {
     try {
@@ -34,6 +37,21 @@ export default function CompanyDashboardPage() {
       setCompanyJobs([])
     } finally {
       setJobsLoading(false)
+    }
+  }, [])
+
+  const refetchProjects = useCallback(async () => {
+    try {
+      const response = await apiClient.get('/projects/my-projects', {
+        params: { page: 0, size: 100 }
+      })
+      const projects = response.data?.content || response.data || []
+      setCompanyProjects(Array.isArray(projects) ? projects : [])
+    } catch (_err) {
+      console.error('Error fetching company projects:', _err)
+      setCompanyProjects([])
+    } finally {
+      setProjectsLoading(false)
     }
   }, [])
 
@@ -73,6 +91,10 @@ export default function CompanyDashboardPage() {
     },
   })
 
+  // Project management hooks
+  const deleteProjectMutation = useDeleteProject()
+  const updateProjectStatusMutation = useUpdateProjectStatus()
+
   const loadDashboardData = useCallback(async () => {
     try {
       const d = await getDashboardData()
@@ -105,6 +127,7 @@ export default function CompanyDashboardPage() {
       return
     }
 
+    refetchProjects()
     // Load data on mount only - do not include callbacks in dependencies
     // to prevent infinite loop (refetchJobs updates companyJobs → loadDashboardData recreates → useEffect triggers)
     loadDashboardData()
@@ -117,7 +140,9 @@ export default function CompanyDashboardPage() {
     ? data.openJobs 
     : (companyJobs || [])
 
-  if (loading || jobsLoading) return (
+  const displayProjects = companyProjects || []
+
+  if (loading || jobsLoading || projectsLoading) return (
     <PageLayout>
       <div className="max-w-4xl mx-auto py-24 text-center">
         <Loader2 className="w-8 h-8 text-primary-600 animate-spin mx-auto" />
@@ -145,7 +170,6 @@ export default function CompanyDashboardPage() {
 
   const {
     stats,
-    activeProjects = [],
     completedProjects = [],
     recentProposals = [],
     recentApplications = []
@@ -166,6 +190,29 @@ export default function CompanyDashboardPage() {
   const handleDelete = async (jobId: number, jobTitle: string) => {
     if (confirm(`Delete "${jobTitle}"? This action cannot be undone.`)) {
       await deleteJobMutation.mutateAsync(jobId)
+    }
+  }
+
+  // Project management handlers
+  const handleDeleteProject = async (projectId: number, projectTitle: string) => {
+    if (confirm(`Delete "${projectTitle}"? This action cannot be undone.`)) {
+      try {
+        await deleteProjectMutation.mutateAsync(projectId)
+        refetchProjects()
+        loadDashboardData()
+      } catch (error) {
+        console.error('Failed to delete project:', error)
+      }
+    }
+  }
+
+  const handleProjectStatusChange = async (projectId: number, newStatus: string) => {
+    try {
+      await updateProjectStatusMutation.mutateAsync({ id: projectId, status: newStatus })
+      refetchProjects()
+      loadDashboardData()
+    } catch (error) {
+      console.error('Failed to update project status:', error)
     }
   }
 
@@ -478,28 +525,40 @@ export default function CompanyDashboardPage() {
 
             {/* PROJECTS SECTION */}
             <div>
-              {/* Active Projects */}
+              {/* All Projects Posted */}
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <h2 className="text-2xl font-bold text-secondary-900">Active Projects</h2>
-                    <p className="text-sm text-secondary-500 mt-1">{activeProjects.length} in progress</p>
+                    <h2 className="text-2xl font-bold text-secondary-900">Your Project Postings</h2>
+                    <p className="text-sm text-secondary-500 mt-1">
+                      {displayProjects.length} total project{displayProjects.length !== 1 ? 's' : ''}
+                    </p>
                   </div>
-                  <Link
-                    href="/projects/create"
-                    className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-semibold text-sm group"
-                  >
-                    Post Project
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => refetchProjects()}
+                      className="inline-flex items-center gap-1 text-secondary-600 hover:text-secondary-900 text-sm"
+                      title="Refresh projects"
+                    >
+                      <RefreshCw className="w-4 h-4" />
+                    </button>
+                    <Link
+                      href="/projects/create"
+                      className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-semibold text-sm group"
+                    >
+                      Post Project
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                  </div>
                 </div>
+
                 <div className="bg-white rounded-xl shadow-sm border border-secondary-200 overflow-hidden">
-                  {activeProjects.length === 0 ? (
+                  {displayProjects.length === 0 ? (
                     <div className="p-12 text-center">
                       <div className="w-16 h-16 bg-secondary-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <TrendingUp className="w-8 h-8 text-secondary-400" />
                       </div>
-                      <h3 className="font-semibold text-secondary-900 mb-2">No active projects yet</h3>
+                      <h3 className="font-semibold text-secondary-900 mb-2">No projects posted yet</h3>
                       <p className="text-sm text-secondary-500 mb-6">Start posting projects to collaborate with freelancers</p>
                       <Link
                         href="/projects/create"
@@ -511,25 +570,111 @@ export default function CompanyDashboardPage() {
                     </div>
                   ) : (
                     <div className="divide-y divide-secondary-100">
-                      {activeProjects.map((project) => (
-                        <Link key={project.id} href={`/projects/${project.id}`} className="block group hover:bg-secondary-50 transition-colors">
-                          <div className="p-6">
-                            <div className="flex items-start justify-between gap-4">
-                              <div className="flex-1 min-w-0">
-                                <h3 className="font-bold text-secondary-900 group-hover:text-primary-600 transition-colors line-clamp-1">{project.title}</h3>
-                                <p className="text-sm text-secondary-600 mt-2">${project.budget?.toLocaleString() || 'TBD'}</p>
-                                <div className="mt-3">
-                                  <span className="inline-flex items-center px-2.5 py-1 bg-warning-100 text-warning-700 rounded-full text-xs font-medium">
-                                    {project.status}
-                                  </span>
+                      {displayProjects.map((project: Project) => (
+                        <div key={project.id} className="p-6 hover:bg-secondary-50 transition-colors">
+                          <div className="flex items-start justify-between gap-4 mb-4">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start gap-3">
+                                <div className="flex-1">
+                                  <Link 
+                                    href={`/projects/${project.id}`}
+                                    className="font-bold text-secondary-900 hover:text-primary-600 transition-colors line-clamp-1 block"
+                                  >
+                                    {project.title}
+                                  </Link>
+                                  <div className="flex items-center gap-2 mt-2">
+                                    <span className={`text-xs px-3 py-1 rounded-full font-semibold ${getStatusColor(project.status)}`}>
+                                      {project.status}
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
-                              <span className="inline-block px-4 py-2 bg-primary-600 text-white text-xs font-semibold rounded-lg group-hover:bg-primary-700 transition-colors shadow-sm">
-                                Manage
-                              </span>
+                              <div className="flex items-center gap-4 mt-3 text-xs text-secondary-500">
+                                <span className="flex items-center gap-1">
+                                  <Users className="w-3.5 h-3.5" />
+                                  {project.proposalCount || 0} proposal{project.proposalCount !== 1 ? 's' : ''}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <Eye className="w-3.5 h-3.5" />
+                                  {project.viewsCount || 0} views
+                                </span>
+                              </div>
                             </div>
                           </div>
-                        </Link>
+
+                          {/* Action Buttons */}
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <Link
+                              href={`/projects/${project.id}`}
+                              className="inline-flex items-center gap-1 px-3 py-1.5 bg-secondary-100 hover:bg-secondary-200 text-secondary-700 text-xs font-medium rounded transition-colors"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                              View
+                            </Link>
+
+                            <Link
+                              href={`/projects/${project.id}/edit`}
+                              className="inline-flex items-center gap-1 px-3 py-1.5 bg-info-100 hover:bg-info-200 text-info-700 text-xs font-medium rounded transition-colors"
+                            >
+                              <Edit className="w-3.5 h-3.5" />
+                              Edit
+                            </Link>
+
+                            {(project.proposalCount && project.proposalCount > 0) && (
+                              <Link
+                                href={`/projects/${project.id}/proposals`}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary-100 hover:bg-primary-200 text-primary-700 text-xs font-medium rounded transition-colors"
+                              >
+                                <Users className="w-3.5 h-3.5" />
+                                Proposals ({project.proposalCount})
+                              </Link>
+                            )}
+                            
+                            {project.status === 'DRAFT' && (
+                              <button
+                                onClick={() => handleProjectStatusChange(Number(project.id), 'OPEN')}
+                                disabled={updateProjectStatusMutation.isPending}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-success-100 hover:bg-success-200 text-success-700 text-xs font-medium rounded transition-colors disabled:opacity-50"
+                              >
+                                <CheckCircle className="w-3.5 h-3.5" />
+                                Publish
+                              </button>
+                            )}
+
+                            {project.status === 'OPEN' && (
+                              <button
+                                onClick={() => handleProjectStatusChange(Number(project.id), 'CLOSED')}
+                                disabled={updateProjectStatusMutation.isPending}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-warning-100 hover:bg-warning-200 text-warning-700 text-xs font-medium rounded transition-colors disabled:opacity-50"
+                              >
+                                <XCircle className="w-3.5 h-3.5" />
+                                Close
+                              </button>
+                            )}
+
+                            {project.status === 'CLOSED' && (
+                              <button
+                                onClick={() => handleProjectStatusChange(Number(project.id), 'OPEN')}
+                                disabled={updateProjectStatusMutation.isPending}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-success-100 hover:bg-success-200 text-success-700 text-xs font-medium rounded transition-colors disabled:opacity-50"
+                              >
+                                <CheckCircle className="w-3.5 h-3.5" />
+                                Reopen
+                              </button>
+                            )}
+
+                            {(project.status === 'DRAFT' || project.status === 'CLOSED') && (
+                              <button
+                                onClick={() => handleDeleteProject(Number(project.id), project.title)}
+                                disabled={deleteProjectMutation.isPending}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-error-100 hover:bg-error-200 text-error-700 text-xs font-medium rounded transition-colors disabled:opacity-50"
+                              >
+                                <XCircle className="w-3.5 h-3.5" />
+                                Delete
+                              </button>
+                            )}
+                          </div>
+                        </div>
                       ))}
                     </div>
                   )}

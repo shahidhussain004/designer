@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.designer.marketplace.dto.CreateJobApplicationRequest;
 import com.designer.marketplace.dto.JobApplicationResponse;
+import com.designer.marketplace.dto.MakeOfferRequest;
 import com.designer.marketplace.dto.UpdateJobApplicationStatusRequest;
 import com.designer.marketplace.entity.Freelancer;
 import com.designer.marketplace.entity.Job;
@@ -192,10 +193,10 @@ public class JobApplicationService {
         JobApplication application = applicationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Application not found with id: " + id));
 
-        // Check authorization
+        // Check authorization - compare User IDs, not Company ID
         User currentUser = userService.getCurrentUser();
         boolean isApplicant = application.getApplicant().getId().equals(currentUser.getId());
-        boolean isCompany = application.getJob().getCompany().getId().equals(currentUser.getId());
+        boolean isCompany = application.getJob().getCompany().getUser().getId().equals(currentUser.getId());
 
         if (!isApplicant && !isCompany) {
             throw new RuntimeException("You don't have permission to view this application");
@@ -272,6 +273,192 @@ public class JobApplicationService {
 
         JobApplication updatedApplication = applicationRepository.save(application);
         log.info("Application status updated: {}", updatedApplication.getId());
+
+        return JobApplicationResponse.fromEntity(updatedApplication);
+    }
+
+    /**
+     * Make a formal job offer to a candidate (company only)
+     * Includes all offer details: salary, start date, benefits, terms
+     */
+    @Transactional
+    public JobApplicationResponse makeOffer(Long id, MakeOfferRequest request) {
+        JobApplication application = applicationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Application not found with id: " + id));
+
+        User currentUser = userService.getCurrentUser();
+
+        // Check if current user owns the company
+        if (!application.getJob().getCompany().getUser().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Only the company can make offers");
+        }
+
+        // Validate current status (can only make offer from SHORTLISTED or INTERVIEWING)
+        if (application.getStatus() != JobApplication.ApplicationStatus.SHORTLISTED &&
+            application.getStatus() != JobApplication.ApplicationStatus.INTERVIEWING) {
+            throw new RuntimeException("Can only make offer to shortlisted or interviewing candidates. Current status: " + application.getStatus());
+        }
+
+        // Validate offer expiration date is in the future
+        if (request.getOfferExpirationDate().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Offer expiration date must be in the future");
+        }
+
+        // Validate start date is after current date
+        if (request.getOfferedStartDate().isBefore(LocalDateTime.now().minusDays(1))) {
+            throw new RuntimeException("Start date must be in the future or today");
+        }
+
+        // Validate contract duration if contract type is CONTRACT
+        if ("CONTRACT".equals(request.getContractType()) && 
+            (request.getContractDurationMonths() == null || request.getContractDurationMonths() <= 0)) {
+            throw new RuntimeException("Contract duration is required for CONTRACT type");
+        }
+
+        log.info("Making formal offer for application: {} with salary: {} {}", 
+                id, request.getOfferedSalaryCents(), request.getOfferedSalaryCurrency());
+
+        // Update status to OFFERED
+        application.setStatus(JobApplication.ApplicationStatus.OFFERED);
+
+        // Set all offer details
+        application.setOfferedSalaryCents(request.getOfferedSalaryCents());
+        application.setOfferedSalaryCurrency(request.getOfferedSalaryCurrency());
+        application.setOfferedSalaryPeriod(request.getOfferedSalaryPeriod());
+        application.setOfferedStartDate(request.getOfferedStartDate());
+        application.setOfferExpirationDate(request.getOfferExpirationDate());
+        application.setContractType(request.getContractType());
+        application.setContractDurationMonths(request.getContractDurationMonths());
+        application.setOfferBenefits(request.getOfferBenefits());
+        application.setOfferAdditionalTerms(request.getOfferAdditionalTerms());
+        application.setOfferDocumentUrl(request.getOfferDocumentUrl());
+        application.setOfferMadeAt(LocalDateTime.now());
+
+        // Add company notes if provided
+        if (request.getCompanyNotes() != null && !request.getCompanyNotes().isEmpty()) {
+            application.setCompanyNotes(request.getCompanyNotes());
+        }
+
+        application.setUpdatedAt(LocalDateTime.now());
+
+        // Format salary for notification
+        String formattedSalary = formatSalary(
+                request.getOfferedSalaryCents(),
+                request.getOfferedSalaryCurrency(),
+                request.getOfferedSalaryPeriod()
+        );
+
+        // Send notification to applicant
+        String notificationTitle = "🎉 Job Offer Received!";
+        String notificationMessage = String.format(
+                "Congratulations! %s has made you a formal job offer for '%s'.\n\n" +
+                "Salary: %s\n" +
+                "Start Date: %s\n" +
+                "Contract Type: %s\n" +
+                "Offer expires: %s\n\n" +
+                "Review the full offer details and respond before it expires.",
+                application.getJob().getCompany().getCompanyName(),
+                application.getJob().getTitle(),
+                formattedSalary,
+                request.getOfferedStartDate().toLocalDate().toString(),
+                request.getContractType(),
+                request.getOfferExpirationDate().toLocalDate().toString()
+        );
+
+        notificationService.createNotification(
+                application.getApplicant(),
+                Notification.NotificationType.JOB_APPLICATION_STATUS_CHANGED,
+                notificationTitle,
+                notificationMessage,
+                "JOB_APPLICATION",
+                id);
+
+        JobApplication updatedApplication = applicationRepository.save(application);
+        log.info("Formal offer made: {} - Salary: {} {}", updatedApplication.getId(), formattedSalary, request.getOfferedSalaryCurrency());
+
+        return JobApplicationResponse.fromEntity(updatedApplication);
+    }
+
+    /**
+     * Helper method to format salary for display
+     */
+    private String formatSalary(Long cents, String currency, String period) {
+        if (cents == null) return "Not specified";
+        
+        double amount = cents / 100.0;
+        String periodLabel = period != null ? "/" + period.toLowerCase().replace("ly", "") : "";
+        
+        return String.format("%s %.2f%s", currency, amount, periodLabel);
+    }
+
+    /**
+     * Respond to a job offer (freelancer only)
+     * Allows freelancer to accept or reject an offer
+     */
+    @Transactional
+    public JobApplicationResponse respondToOffer(Long id, com.designer.marketplace.dto.RespondToOfferRequest request) {
+        JobApplication application = applicationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Application not found with id: " + id));
+
+        User currentUser = userService.getCurrentUser();
+
+        // Check if current user is the applicant
+        if (application.getApplicant() == null || 
+            application.getApplicant().getUser() == null || 
+            !application.getApplicant().getUser().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("You can only respond to your own job offers");
+        }
+
+        // Check if application status is OFFERED
+        if (application.getStatus() != JobApplication.ApplicationStatus.OFFERED) {
+            throw new RuntimeException("You can only respond to applications with OFFERED status. Current status: " + application.getStatus());
+        }
+
+        // Check if offer has expired
+        if (application.getOfferExpirationDate() != null && 
+            application.getOfferExpirationDate().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("This offer has expired. Expiration date was: " + application.getOfferExpirationDate());
+        }
+
+        log.info("Freelancer responding to offer: {} with response: {}", id, request.getResponse());
+
+        // Update status based on response
+        JobApplication.ApplicationStatus newStatus = JobApplication.ApplicationStatus.valueOf(request.getResponse().toUpperCase());
+        application.setStatus(newStatus);
+        application.setOfferRespondedAt(LocalDateTime.now());
+
+        // Add freelancer notes if provided
+        if (request.getNotes() != null && !request.getNotes().isEmpty()) {
+            String existingNotes = application.getCompanyNotes() != null ? application.getCompanyNotes() : "";
+            application.setCompanyNotes(existingNotes + "\n\nFreelancer Response Notes: " + request.getNotes());
+        }
+
+        application.setUpdatedAt(LocalDateTime.now());
+
+        // Send notification to company
+        String notificationTitle = newStatus == JobApplication.ApplicationStatus.ACCEPTED 
+            ? "🎉 Offer Accepted!" 
+            : "Offer Declined";
+        
+        String notificationMessage = String.format("%s has %s your job offer for '%s'",
+                currentUser.getFullName(),
+                newStatus == JobApplication.ApplicationStatus.ACCEPTED ? "accepted" : "declined",
+                application.getJob().getTitle());
+
+        if (request.getNotes() != null && !request.getNotes().isEmpty()) {
+            notificationMessage += "\n\nNotes: " + request.getNotes();
+        }
+
+        notificationService.createNotification(
+                application.getJob().getCompany(),
+                Notification.NotificationType.JOB_APPLICATION_STATUS_CHANGED,
+                notificationTitle,
+                notificationMessage,
+                "JOB_APPLICATION",
+                id);
+
+        JobApplication updatedApplication = applicationRepository.save(application);
+        log.info("Offer response recorded: {} - Status: {}", updatedApplication.getId(), newStatus);
 
         return JobApplicationResponse.fromEntity(updatedApplication);
     }

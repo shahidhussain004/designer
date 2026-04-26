@@ -4,11 +4,13 @@ import { apiClient } from '@/lib/api-client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 // Types
-interface Project {
-  id: string;
+export interface Project {
+  id: string | number;
+  companyId?: number;
   title: string;
   description: string;
-  category: {
+  scopeOfWork?: string;
+  category?: {
     id: number;
     name: string;
     slug: string;
@@ -16,7 +18,15 @@ interface Project {
     icon: string;
     displayOrder: number;
   };
-  experienceLevel: {
+  projectCategory?: {
+    id: number;
+    name: string;
+    slug: string;
+    description: string;
+    icon: string;
+    displayOrder: number;
+  };
+  experienceLevel?: {
     id: number;
     name: string;
     code: string;
@@ -25,17 +35,39 @@ interface Project {
     yearsMax: number;
     displayOrder: number;
   };
-  budget: number;
+  experienceLevelCode?: string;
+  projectType?: string;
+  priorityLevel?: string;
+  timeline?: string;
+  estimatedDurationDays?: number;
+  budget?: number;
+  budgetAmountCents?: number;
+  budgetMinCents?: number;
+  budgetMaxCents?: number;
+  minBudget?: number;
+  maxBudget?: number;
+  budgetType?: string;
+  currency?: string;
+  requiredSkills?: string[];
+  preferredSkills?: string[];
   status: string;
+  visibility?: string;
+  isUrgent?: boolean;
+  isFeatured?: boolean;
+  viewsCount?: number;
+  proposalCount?: number;
   createdAt: string;
-  company: {
+  updatedAt?: string;
+  publishedAt?: string;
+  closedAt?: string;
+  company?: {
     id: number;
     username: string;
     fullName: string;
     profileImageUrl: string | null;
     location: string | null;
-    ratingAvg: number;
-    ratingCount: number;
+    ratingAvg?: number;
+    ratingCount?: number;
   };
 }
 
@@ -97,7 +129,7 @@ export function useProjects(filters?: ProjectFilters) {
   return useQuery({
     queryKey: ['projects', filters],
     queryFn: async ({ signal }) => {
-      const params: Record<string, any> = {};
+      const params: Record<string, string | number> = {};
       if (filters?.categoryId) params.categoryId = filters.categoryId;
       if (filters?.experienceLevelId) params.experienceLevelId = filters.experienceLevelId;
       if (filters?.minBudget) params.minBudget = filters.minBudget;
@@ -206,6 +238,28 @@ export function useDeleteProject() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['my-projects'] });
+    },
+  });
+}
+
+/**
+ * Update project status (OPEN, CLOSED, IN_PROGRESS, etc.)
+ */
+export function useUpdateProjectStatus() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, status }: { id: number; status: string }) => {
+      const { data } = await apiClient.patch(`/projects/${id}/status`, null, {
+        params: { status }
+      });
+      return data;
+    },
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['project', id] });
+      queryClient.invalidateQueries({ queryKey: ['my-projects'] });
     },
   });
 }
@@ -224,5 +278,152 @@ export function useSubmitProposal() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['proposals'] });
     },
+  });
+}
+
+// ============================================================================
+// Proposal Types
+// ============================================================================
+
+interface FreelancerInfo {
+  id: number;
+  username: string;
+  fullName: string;
+  profileImageUrl: string | null;
+  location: string | null;
+  bio: string | null;
+  hourlyRate: number | null;
+  skills: string[];
+  portfolioUrl: string | null;
+  ratingAvg: number;
+  ratingCount: number;
+}
+
+interface Proposal {
+  id: number;
+  projectId: number;
+  projectTitle: string;
+  freelancer: FreelancerInfo;
+  coverLetter: string;
+  proposedRate: number;
+  estimatedDuration: number;
+  status: 'SUBMITTED' | 'REVIEWING' | 'SHORTLISTED' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN';
+  companyMessage: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ============================================================================
+// Proposal Hooks (for Company)
+// ============================================================================
+
+/**
+ * Fetch proposals for a specific project (company view)
+ */
+export function useProjectProposals(projectId: string | number | null) {
+  return useQuery({
+    queryKey: ['project-proposals', projectId],
+    queryFn: async ({ signal }) => {
+      if (!projectId) throw new Error('Project ID is required');
+      const { data } = await apiClient.get(`/projects/${projectId}/proposals`, { 
+        params: { page: 0, size: 100 },
+        signal 
+      });
+      // Extract content array from Spring Data Page response
+      if (data?.content && Array.isArray(data.content)) {
+        return data.content as Proposal[];
+      }
+      // Fallback: if response is directly an array
+      if (Array.isArray(data)) {
+        return data as Proposal[];
+      }
+      // Default to empty array
+      return [];
+    },
+    enabled: !!projectId,
+    staleTime: 1 * 60 * 1000, // 1 minute
+  });
+}
+
+/**
+ * Update proposal status (accept, reject, shortlist)
+ */
+export function useUpdateProposalStatus() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ 
+      proposalId, 
+      status, 
+      companyMessage 
+    }: { 
+      proposalId: number; 
+      status: string; 
+      companyMessage?: string;
+    }) => {
+      const { data } = await apiClient.put(`/proposals/${proposalId}/status`, {
+        status,
+        companyMessage,
+      });
+      return data;
+    },
+    onSuccess: (_, { proposalId }) => {
+      queryClient.invalidateQueries({ queryKey: ['project-proposals'] });
+      queryClient.invalidateQueries({ queryKey: ['proposal', proposalId] });
+    },
+  });
+}
+
+/**
+ * Accept a proposal (convenience hook)
+ */
+export function useAcceptProposal() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (proposalId: number) => {
+      const { data } = await apiClient.put(`/proposals/${proposalId}/accept`);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['project-proposals'] });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+    },
+  });
+}
+
+/**
+ * Reject a proposal (convenience hook)
+ */
+export function useRejectProposal() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ proposalId, reason }: { proposalId: number; reason?: string }) => {
+      const { data } = await apiClient.put(`/proposals/${proposalId}/reject`, { 
+        rejectionReason: reason 
+      });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['project-proposals'] });
+    },
+  });
+}
+
+/**
+ * Fetch current user's projects (company dashboard)
+ */
+export function useMyProjects(page = 0, size = 20) {
+  return useQuery({
+    queryKey: ['my-projects', page, size],
+    queryFn: async ({ signal }) => {
+      const { data } = await apiClient.get('/projects/my-projects', {
+        params: { page, size },
+        signal
+      });
+      return data;
+    },
+    staleTime: 2 * 60 * 1000, // 2 minutes
   });
 }

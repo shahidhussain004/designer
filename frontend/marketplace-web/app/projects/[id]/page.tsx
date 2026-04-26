@@ -5,10 +5,16 @@ import { JobDetailsSkeleton } from '@/components/Skeletons';
 import { PageLayout } from '@/components/ui';
 import { useProject, useSubmitProposal } from '@/hooks/useProjects';
 import { useUserProfile } from '@/hooks/useUsers';
-import { authService } from '@/lib/auth';
+import { useAuth } from '@/lib/auth';
 import logger from '@/lib/logger';
-import { User } from '@/types';
-import { AlertCircle, ArrowLeft, Briefcase, Calendar, CheckCircle, DollarSign, Layers, Send, User as UserIcon, XCircle } from 'lucide-react';
+import {
+  AlertCircle, ArrowLeft, Briefcase, Calendar, CheckCircle, Clock, DollarSign,
+  Eye,
+  FileText, Flame,
+  MessageSquare,
+  Send, Star,
+  XCircle
+} from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -48,6 +54,15 @@ interface ProposalRequest {
   estimatedDuration?: number;
 }
 
+interface ExistingProposal {
+  id: number;
+  status: string;
+  proposedRate: number;
+  estimatedDuration: number;
+  coverLetter: string;
+  createdAt: string;
+}
+
 export default function ProjectDetailsPage() {
   const params = useParams();
   const projectId = params.id as string;
@@ -55,8 +70,7 @@ export default function ProjectDetailsPage() {
   const { data: project, isLoading, error, refetch } = useProject(projectId);
   const { data: company } = useUserProfile(project?.companyId || null);
   const submitProposalMutation = useSubmitProposal();
-
-  const [user, setUser] = useState<User | null>(null);
+  const { user } = useAuth();
   const [proposalOpen, setProposalOpen] = useState(false);
   const [proposalData, setProposalData] = useState<ProposalRequest>({
     projectId: 0,
@@ -67,13 +81,36 @@ export default function ProjectDetailsPage() {
   const [proposalSuccess, setProposalSuccess] = useState(false);
   const [proposalError, setProposalError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<{ coverLetter?: string; proposedRate?: string; estimatedDuration?: string }>({});
+  const [existingProposal, setExistingProposal] = useState<ExistingProposal | null>(null);
+  const [checkingProposal, setCheckingProposal] = useState(false);
 
+  // Check if user has already submitted a proposal
   useEffect(() => {
-    const currentUser = authService.getCurrentUser();
-    if (currentUser) {
-      setUser(currentUser);
-    }
-  }, []);
+    const checkExistingProposal = async () => {
+      if (user && user.role === 'FREELANCER' && projectId) {
+        setCheckingProposal(true);
+        try {
+          const response = await fetch(`http://localhost:8080/api/projects/${projectId}/proposals/my-proposal`, {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            }
+          });
+          if (response.ok) {
+            const proposal = await response.json();
+            setExistingProposal(proposal);
+          } else if (response.status === 404) {
+            // No proposal found - that's fine
+            setExistingProposal(null);
+          }
+        } catch (err) {
+          logger.error('Error checking existing proposal:', err);
+        } finally {
+          setCheckingProposal(false);
+        }
+      }
+    };
+    checkExistingProposal();
+  }, [user, projectId]);
 
   useEffect(() => {
     if (project) {
@@ -117,6 +154,21 @@ export default function ProjectDetailsPage() {
       setProposalSuccess(true);
       setProposalOpen(false);
       setProposalData({ projectId: project!.id, coverLetter: '', proposedRate: 0, estimatedDuration: 30 });
+
+      // Refresh the proposal status
+      try {
+        const response = await fetch(`http://localhost:8080/api/projects/${projectId}/proposals/my-proposal`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          }
+        });
+        if (response.ok) {
+          const proposal = await response.json();
+          setExistingProposal(proposal);
+        }
+      } catch (refreshErr) {
+        logger.error('Error refreshing proposal:', refreshErr);
+      }
 
       setTimeout(() => setProposalSuccess(false), 5000);
     } catch (err: unknown) {
@@ -206,149 +258,323 @@ export default function ProjectDetailsPage() {
         </div>
       )}
 
-      {/* Header */}
-      <div className="bg-secondary-900 text-white">
+      {/* Header with Status Badges */}
+      <div className="bg-gradient-to-br from-secondary-900 via-secondary-800 to-secondary-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <Link href="/projects" className="inline-flex items-center gap-2 text-secondary-400 hover:text-white mb-4">
+          <Link href="/projects" className="inline-flex items-center gap-2 text-secondary-300 hover:text-white mb-6 transition-colors">
             <ArrowLeft className="w-4 h-4" />
-            Back to Browse Projects
+            Back to Projects
           </Link>
-          <h1 className="text-3xl font-bold">{project.title}</h1>
+          
+          <div className="flex items-start justify-between gap-6 flex-wrap">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2 flex-wrap">
+                {project.isUrgent && (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-red-500/20 text-red-200 rounded-full text-xs font-semibold border border-red-500/30">
+                    <Flame className="w-3 h-3" />
+                    URGENT
+                  </span>
+                )}
+                {project.isFeatured && (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-amber-500/20 text-amber-200 rounded-full text-xs font-semibold border border-amber-500/30">
+                    <Star className="w-3 h-3" />
+                    FEATURED
+                  </span>
+                )}
+                <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
+                  project.status === 'OPEN' ? 'bg-success-500/20 text-success-200 border border-success-500/30' : 
+                  project.status === 'IN_PROGRESS' ? 'bg-blue-500/20 text-blue-200 border border-blue-500/30' :
+                  project.status === 'CLOSED' ? 'bg-secondary-500/20 text-secondary-300 border border-secondary-500/30' :
+                  'bg-secondary-500/20 text-secondary-300 border border-secondary-500/30'
+                }`}>
+                  {project.status}
+                </span>
+              </div>
+              <h1 className="text-4xl font-bold mb-2">{project.title}</h1>
+              <p className="text-secondary-300 text-lg">{project.projectCategory?.name || 'Uncategorized'} • {project.experienceLevel?.name || 'Not specified'}</p>
+            </div>
+            
+            {user && user.id === project.companyId && (
+              <Link
+                href={`/projects/${projectId}/edit`}
+                className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg font-medium transition-colors border border-white/20"
+              >
+                Edit Project
+              </Link>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
+          {/* Main Content - Left Column (2/3) */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Description */}
-            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
-              <h2 className="text-xl font-bold text-secondary-900 mb-4">Project Description</h2>
-              <p className="text-secondary-700 whitespace-pre-wrap">{project.description}</p>
-            </div>
+            {/* Description Section */}
+            <section className="bg-white rounded-xl shadow-sm border border-secondary-200 p-8">
+              <h2 className="text-2xl font-bold text-secondary-900 mb-6">Project Description</h2>
+              <div className="prose prose-sm max-w-none text-secondary-700 whitespace-pre-wrap leading-relaxed">
+                {project.description}
+              </div>
+            </section>
 
-            {/* Meta Grid */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-4">
-                <div className="flex items-center gap-3">
-                  <Layers className="w-5 h-5 text-secondary-400" />
-                  <div>
-                    <p className="text-xs text-secondary-500">Category</p>
-                    <p className="font-medium text-secondary-900">{project.category?.name ?? 'Uncategorized'}</p>
-                  </div>
+            {/* Scope of Work */}
+            {project.scopeOfWork && (
+              <section className="bg-white rounded-xl shadow-sm border border-secondary-200 p-8">
+                <h2 className="text-2xl font-bold text-secondary-900 mb-6 flex items-center gap-3">
+                  <FileText className="w-6 h-6 text-primary-600" />
+                  Scope of Work
+                </h2>
+                <div className="prose prose-sm max-w-none text-secondary-700 whitespace-pre-wrap leading-relaxed">
+                  {project.scopeOfWork}
+                </div>
+              </section>
+            )}
+
+            {/* Skills Section */}
+            <section className="bg-white rounded-xl shadow-sm border border-secondary-200 p-8">
+              <h2 className="text-2xl font-bold text-secondary-900 mb-6">Required Skills & Experience</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Required Skills */}
+                <div>
+                  <h3 className="font-semibold text-secondary-900 mb-4">Required Skills</h3>
+                  {project.requiredSkills && Array.isArray(project.requiredSkills) && project.requiredSkills.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {project.requiredSkills.map((skill: any, i: number) => (
+                        <span key={i} className="px-4 py-2 bg-primary-50 text-primary-700 rounded-full text-sm font-medium border border-primary-200">
+                          {typeof skill === 'string' ? skill : skill.skill}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-secondary-500 text-sm">Not specified</p>
+                  )}
+                </div>
+
+                {/* Preferred Skills */}
+                <div>
+                  <h3 className="font-semibold text-secondary-900 mb-4">Preferred Skills</h3>
+                  {project.preferredSkills && Array.isArray(project.preferredSkills) && project.preferredSkills.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {project.preferredSkills.map((skill: any, i: number) => (
+                        <span key={i} className="px-4 py-2 bg-secondary-100 text-secondary-700 rounded-full text-sm font-medium border border-secondary-300">
+                          {typeof skill === 'string' ? skill : skill.skill}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-secondary-500 text-sm">Not specified</p>
+                  )}
                 </div>
               </div>
-              <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-4">
+              
+              {/* Experience Level Detail */}
+              <div className="mt-6 pt-6 border-t border-secondary-200">
+                <h3 className="font-semibold text-secondary-900 mb-3">Experience Level Required</h3>
                 <div className="flex items-center gap-3">
                   <Briefcase className="w-5 h-5 text-secondary-400" />
-                  <div>
-                    <p className="text-xs text-secondary-500">Experience Level</p>
-                    <p className="font-medium text-secondary-900">{project.experienceLevel?.name}</p>
-                  </div>
+                  <p className="text-secondary-700">{project.experienceLevel?.name || 'Not specified'}</p>
                 </div>
               </div>
-              <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-4">
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-secondary-400" />
-                  <div>
-                    <p className="text-xs text-secondary-500">Status</p>
-                    <span className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${
-                      project.status === 'OPEN' ? 'bg-success-100 text-success-700' : 'bg-primary-100 text-primary-700'
-                    }`}>
-                      {project.status}
-                    </span>
+            </section>
+
+            {/* Timeline & Project Details */}
+            <section className="bg-white rounded-xl shadow-sm border border-secondary-200 p-8">
+              <h2 className="text-2xl font-bold text-secondary-900 mb-6">Timeline & Details</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="p-4 bg-secondary-50 rounded-lg">
+                  <p className="text-xs text-secondary-500 uppercase font-semibold tracking-wide mb-2">Duration</p>
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-5 h-5 text-secondary-400" />
+                    <p className="font-medium text-secondary-900">{project.estimatedDurationDays ? `${project.estimatedDurationDays} days` : 'Not specified'}</p>
                   </div>
                 </div>
-              </div>
-              <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-4">
-                <div className="flex items-center gap-3">
-                  <Calendar className="w-5 h-5 text-secondary-400" />
-                  <div>
-                    <p className="text-xs text-secondary-500">Posted</p>
-                    <p className="font-medium text-secondary-900">{new Date(project.createdAt).toLocaleDateString()}</p>
+                
+                <div className="p-4 bg-secondary-50 rounded-lg">
+                  <p className="text-xs text-secondary-500 uppercase font-semibold tracking-wide mb-2">Timeline</p>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-secondary-400" />
+                    <p className="font-medium text-secondary-900">{project.timeline || 'Not specified'}</p>
                   </div>
                 </div>
+                
+                <div className="p-4 bg-secondary-50 rounded-lg">
+                  <p className="text-xs text-secondary-500 uppercase font-semibold tracking-wide mb-2">Project Type</p>
+                  <p className="font-medium text-secondary-900">
+                    {project.projectType === 'SINGLE_PROJECT' ? 'One-Time' : project.projectType === 'ONGOING' ? 'Ongoing' : project.projectType}
+                  </p>
+                </div>
               </div>
-            </div>
+            </section>
 
             {/* Company Info */}
             {company && (
-              <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
-                <h2 className="text-xl font-bold text-secondary-900 mb-4">About the Company</h2>
-                <div className="flex items-center justify-between">
+              <section className="bg-gradient-to-br from-primary-50 to-secondary-50 rounded-xl border border-primary-200 p-8">
+                <h2 className="text-2xl font-bold text-secondary-900 mb-6">About the Hiring Company</h2>
+                <div className="flex items-center justify-between gap-6">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-secondary-200 rounded-full flex items-center justify-center">
-                      <UserIcon className="w-6 h-6 text-secondary-500" />
+                    <div className="w-16 h-16 bg-gradient-to-br from-primary-600 to-primary-700 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                      {company.fullName?.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <p className="font-semibold text-secondary-900">{company.fullName}</p>
-                      <p className="text-sm text-secondary-500">@{company.username}</p>
+                      <p className="text-xl font-bold text-secondary-900">{company.fullName}</p>
+                      <p className="text-secondary-600">@{company.username}</p>
+                      {company.bio && <p className="text-sm text-secondary-600 mt-1">{company.bio}</p>}
                     </div>
                   </div>
-                  <Link href={`/users/${company.id}/profile`} className="text-primary-600 hover:text-primary-700 font-medium text-sm">
-                    View Profile →
+                  <Link 
+                    href={`/users/${company.id}/profile`} 
+                    className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium whitespace-nowrap"
+                  >
+                    View Profile
                   </Link>
                 </div>
-              </div>
+              </section>
             )}
           </div>
 
-          {/* Sidebar */}
+          {/* Sidebar - Right Column (1/3) */}
           <div className="space-y-6">
-            {/* Budget Card */}
-            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
-              <div className="text-center mb-4">
-                <p className="text-sm text-secondary-500">Budget</p>
-                <p className="text-3xl font-bold text-secondary-900">${project.budget}</p>
-              </div>
+            {/* Budget Card - Prominent */}
+            <section className="bg-gradient-to-br from-primary-600 to-primary-700 text-white rounded-xl shadow-lg p-8">
+              <p className="text-primary-100 text-sm uppercase font-semibold tracking-wide mb-2">
+                {project.budgetType === 'HOURLY' ? 'Hourly Rate Range' : 'Total Budget'}
+              </p>
               
-              {user && user.role === 'FREELANCER' && user.id !== project.companyId ? (
-                <button
-                  onClick={() => {
-                    if (!proposalOpen) {
-                      setProposalData({
-                        projectId: project!.id,
-                        coverLetter: '',
-                        proposedRate: 0,
-                        estimatedDuration: 30
-                      });
-                    }
-                    setProposalOpen(!proposalOpen);
-                  }}
-                  className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
-                    proposalOpen 
-                      ? 'border border-secondary-300 text-secondary-700 hover:bg-secondary-50'
-                      : 'bg-primary-600 text-white hover:bg-primary-700'
-                  }`}
-                >
-                  {proposalOpen ? 'Cancel' : 'Send Proposal'}
-                </button>
-              ) : user && user.id === project.companyId ? (
-                <div className="p-4 bg-primary-50 border border-primary-200 rounded-lg text-center">
-                  <p className="text-sm text-primary-700">This is your project posting</p>
+              {project.budgetType === 'HOURLY' && project.budgetMinCents && project.budgetMaxCents ? (
+                <h3 className="text-4xl font-bold mb-6">
+                  ${(project.budgetMinCents / 100).toLocaleString()} - ${(project.budgetMaxCents / 100).toLocaleString()}
+                </h3>
+              ) : project.budgetAmountCents ? (
+                <h3 className="text-4xl font-bold mb-6">
+                  ${(project.budgetAmountCents / 100).toLocaleString()}
+                </h3>
+              ) : project.maxBudget ? (
+                <h3 className="text-4xl font-bold mb-6">
+                  ${project.maxBudget.toLocaleString()}
+                </h3>
+              ) : (
+                <h3 className="text-2xl font-bold mb-6 text-primary-100">
+                  Budget TBD
+                </h3>
+              )}
+              
+              <div className="space-y-4 mb-6 pt-6 border-t border-primary-500/50">
+                {project.budgetMinCents && project.budgetMaxCents ? (
+                  <div>
+                    <p className="text-primary-100 text-xs font-semibold mb-1">Budget Range</p>
+                    <p className="text-lg font-medium">${(project.budgetMinCents / 100).toLocaleString()} - ${(project.budgetMaxCents / 100).toLocaleString()}</p>
+                  </div>
+                ) : null}
+                <div>
+                  <p className="text-primary-100 text-xs font-semibold mb-1">Budget Type</p>
+                  <p className="font-medium">{project.budgetType === 'HOURLY' ? 'Hourly Rate' : 'Fixed Price'}</p>
+                </div>
+                {project.currency && (
+                  <div>
+                    <p className="text-primary-100 text-xs font-semibold mb-1">Currency</p>
+                    <p className="font-medium">{project.currency}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Proposal Button Logic */}
+              {user && Number(user.id) === Number(project.companyId) ? (
+                <div className="space-y-3">
+                  <div className="p-3 bg-white/10 border border-white/20 rounded-lg text-center">
+                    <p className="text-sm text-primary-100">This is your project</p>
+                  </div>
+                  <Link
+                    href={`/projects/${projectId}/proposals`}
+                    className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-white text-primary-600 rounded-lg hover:bg-primary-50 transition-colors font-semibold"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    View Proposals
+                  </Link>
+                </div>
+              ) : user && user.role === 'FREELANCER' ? (
+                existingProposal ? (
+                  <div className="space-y-3">
+                    <div className="p-4 bg-white/10 border border-white/20 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-sm text-primary-100 font-semibold">Your Proposal</p>
+                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          existingProposal.status === 'ACCEPTED' ? 'bg-success-500 text-white' :
+                          existingProposal.status === 'REJECTED' ? 'bg-error-500 text-white' :
+                          existingProposal.status === 'SHORTLISTED' ? 'bg-warning-500 text-white' :
+                          'bg-info-500 text-white'
+                        }`}>
+                          {existingProposal.status}
+                        </span>
+                      </div>
+                      <div className="text-white space-y-1">
+                        <p className="text-sm">Rate: <span className="font-bold">${existingProposal.proposedRate}</span></p>
+                        <p className="text-sm">Duration: <span className="font-bold">{existingProposal.estimatedDuration} days</span></p>
+                        <p className="text-xs text-primary-100 mt-2">Submitted: {new Date(existingProposal.createdAt).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+                    <Link
+                      href="/dashboard/freelancer"
+                      className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-white text-primary-600 rounded-lg hover:bg-primary-50 transition-colors font-semibold"
+                    >
+                      <MessageSquare className="w-4 h-4" />
+                      View My Proposals
+                    </Link>
+                  </div>
+                ) : checkingProposal ? (
+                  <div className="w-full py-3 px-4 bg-white/20 text-white rounded-lg text-center">
+                    <span className="text-sm">Checking...</span>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      if (!proposalOpen) {
+                        setProposalData({
+                          projectId: project!.id,
+                          coverLetter: '',
+                          proposedRate: 0,
+                          estimatedDuration: 30
+                        });
+                      }
+                      setProposalOpen(!proposalOpen);
+                    }}
+                    className={`w-full py-3 px-4 rounded-lg font-semibold transition-all ${
+                      proposalOpen 
+                        ? 'bg-white/20 text-white border border-white/40 hover:bg-white/30'
+                        : 'bg-white text-primary-600 hover:bg-primary-50 shadow-lg'
+                    }`}
+                  >
+                    {proposalOpen ? 'Cancel' : 'Send Proposal'}
+                  </button>
+                )
+              ) : user && user.role === 'COMPANY' ? (
+                <div className="p-3 bg-white/10 border border-white/20 rounded-lg text-center">
+                  <p className="text-sm text-primary-100">
+                    This project is for freelancers to apply to
+                  </p>
                 </div>
               ) : (
                 <Link
                   href="/auth/login"
-                  className="block w-full py-3 px-4 border border-secondary-300 text-secondary-700 rounded-lg hover:bg-secondary-50 transition-colors font-medium text-center"
+                  className="block w-full py-3 px-4 bg-white text-primary-600 rounded-lg hover:bg-primary-50 transition-colors font-semibold text-center"
                 >
                   Sign In to Propose
                 </Link>
               )}
-            </div>
+            </section>
 
-            {/* Proposal Form */}
+            {/* Proposal Form - Appears when freelancer opens it */}
             {proposalOpen && user && user.role === 'FREELANCER' && (
-              <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
-                <form onSubmit={handleProposalSubmit} className="space-y-4">
-                  <h3 className="font-semibold text-secondary-900 flex items-center gap-2">
-                    <Send className="w-4 h-4" />
+              <section className="bg-white rounded-xl shadow-lg border border-secondary-200 p-6">
+                <form onSubmit={handleProposalSubmit} className="space-y-5">
+                  <h3 className="font-bold text-secondary-900 text-lg flex items-center gap-2">
+                    <Send className="w-5 h-5 text-primary-600" />
                     Submit Your Proposal
                   </h3>
 
                   <div>
-                    <label className="block text-sm font-medium text-secondary-700 mb-1">
+                    <label className="block text-sm font-semibold text-secondary-900 mb-2">
                       Your Proposed Rate ($)
                     </label>
                     <div className="relative">
@@ -358,7 +584,8 @@ export default function ProjectDetailsPage() {
                         value={proposalData.proposedRate}
                         onChange={(e) => setProposalData({ ...proposalData, proposedRate: parseFloat(e.target.value) })}
                         required
-                        className="w-full pl-9 pr-4 py-2 border border-secondary-300 rounded-lg focus:outline-none"
+                        placeholder="Enter your rate"
+                        className="w-full pl-10 pr-4 py-2 border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                       />
                     </div>
                     {fieldErrors.proposedRate && (
@@ -367,14 +594,15 @@ export default function ProjectDetailsPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-secondary-700 mb-1">
+                    <label className="block text-sm font-semibold text-secondary-900 mb-2">
                       Estimated Duration (days)
                     </label>
                     <input
                       type="number"
                       value={proposalData.estimatedDuration || 30}
                       onChange={(e) => setProposalData({ ...proposalData, estimatedDuration: parseInt(e.target.value) })}
-                      className="w-full px-4 py-2 border border-secondary-300 rounded-lg focus:outline-none"
+                      placeholder="30"
+                      className="w-full px-4 py-2 border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     />
                     {fieldErrors.estimatedDuration && (
                       <p className="text-error-600 text-sm mt-1">{fieldErrors.estimatedDuration}</p>
@@ -382,16 +610,16 @@ export default function ProjectDetailsPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-secondary-700 mb-1">
+                    <label className="block text-sm font-semibold text-secondary-900 mb-2">
                       Cover Letter
                     </label>
                     <textarea
                       value={proposalData.coverLetter}
                       onChange={(e) => setProposalData({ ...proposalData, coverLetter: e.target.value })}
-                      rows={6}
+                      rows={5}
                       required
-                      className="w-full px-4 py-2 border border-secondary-300 rounded-lg focus:outline-none"
-                      placeholder="Introduce yourself and explain why you're the right fit for this project..."
+                      placeholder="Tell the company why you're the perfect fit..."
+                      className="w-full px-4 py-2 border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
                     />
                     {fieldErrors.coverLetter && (
                       <p className="text-error-600 text-sm mt-1">{fieldErrors.coverLetter}</p>
@@ -401,37 +629,60 @@ export default function ProjectDetailsPage() {
                   <button
                     type="submit"
                     disabled={submitProposalMutation.isPending}
-                    className="w-full py-3 px-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium disabled:opacity-50"
+                    className="w-full py-3 px-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {submitProposalMutation.isPending ? 'Submitting...' : 'Submit Proposal'}
                   </button>
                 </form>
-              </div>
+              </section>
             )}
 
-            {/* Quick Stats */}
-            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
-              <h3 className="font-semibold text-secondary-900 mb-4">Quick Stats</h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-secondary-500">Budget</span>
-                  <span className="font-medium text-secondary-900">${project.budget}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-secondary-500">Status</span>
-                  <span className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${
-                    project.status === 'OPEN' ? 'bg-success-100 text-success-700' : 'bg-primary-100 text-primary-700'
-                  }`}>
-                    {project.status}
+            {/* Project Stats */}
+            <section className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6">
+              <h3 className="font-bold text-secondary-900 mb-4">Project Stats</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-secondary-50 rounded-lg">
+                  <span className="flex items-center gap-2 text-secondary-600">
+                    <Eye className="w-4 h-4" />
+                    Views
                   </span>
+                  <span className="font-bold text-secondary-900">{project.viewsCount || 0}</span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-secondary-50 rounded-lg">
+                  <span className="flex items-center gap-2 text-secondary-600">
+                    <MessageSquare className="w-4 h-4" />
+                    Proposals
+                  </span>
+                  <span className="font-bold text-secondary-900">{project.proposalCount || 0}</span>
                 </div>
                 <hr className="border-secondary-200" />
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-secondary-500">Posted</span>
-                  <span className="text-secondary-700">{new Date(project.createdAt).toLocaleDateString()}</span>
+                <div className="flex items-center justify-between pt-2 text-sm">
+                  <span className="text-secondary-600">Posted</span>
+                  <span className="font-medium text-secondary-900">{new Date(project.createdAt).toLocaleDateString()}</span>
                 </div>
+                {project.publishedAt && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-secondary-600">Published</span>
+                    <span className="font-medium text-secondary-900">{new Date(project.publishedAt).toLocaleDateString()}</span>
+                  </div>
+                )}
               </div>
-            </div>
+            </section>
+
+            {/* Priority Badge */}
+            {project.priorityLevel && (
+              <section className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6">
+                <h3 className="font-bold text-secondary-900 mb-4">Priority Level</h3>
+                <div className={`px-4 py-3 rounded-lg text-center font-semibold ${
+                  project.priorityLevel === 'URGENT' ? 'bg-red-100 text-red-700 border border-red-300' :
+                  project.priorityLevel === 'HIGH' ? 'bg-orange-100 text-orange-700 border border-orange-300' :
+                  project.priorityLevel === 'MEDIUM' ? 'bg-yellow-100 text-yellow-700 border border-yellow-300' :
+                  'bg-green-100 text-green-700 border border-green-300'
+                }`}>
+                  {project.priorityLevel}
+                </div>
+              </section>
+            )}
           </div>
         </div>
       </div>

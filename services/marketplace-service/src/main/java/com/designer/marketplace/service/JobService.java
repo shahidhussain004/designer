@@ -667,6 +667,48 @@ public class JobService {
     }
 
     /**
+     * Mark job as filled (with ownership verification)
+     * OPTIMIZED: Uses denormalized company_id for O(1) permission check
+     * 
+     * @param userId The ID of the user marking the job as filled
+     * @param jobId The ID of the job to mark as filled
+     * @param applicationId Optional - The application ID that resulted in the hire
+     */
+    @Transactional
+    public JobResponse markJobAsFilledAsOwner(Long userId, Long jobId, Long applicationId) {
+        // ✅ FAST: Get user with denormalized company_id
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+        if (user.getCompanyId() == null) {
+            throw new SecurityException("No company profile associated with your account");
+        }
+
+        // Get the job WITH company relationship EAGERLY LOADED
+        Job job = jobRepository.findByIdWithCompanyAndCategory(jobId)
+                .orElseThrow(() -> new ResourceNotFoundException("Job not found with id: " + jobId));
+
+        // ✅ DIRECT COMPARISON: No database query needed!
+        if (!job.getCompany().getId().equals(user.getCompanyId())) {
+            throw new SecurityException("You do not have permission to mark this job as filled");
+        }
+
+        job.setStatus(Job.JobStatus.FILLED);
+        job.setFilledAt(LocalDateTime.now());
+        
+        // Optionally track which application resulted in the hire
+        if (applicationId != null) {
+            job.setFilledByApplicationId(applicationId);
+        }
+
+        Job saved = jobRepository.save(job);
+        log.info("Marked job {} as FILLED by user {} (company {}), application: {}", 
+                jobId, userId, user.getCompanyId(), applicationId);
+
+        return JobResponse.fromEntity(saved);
+    }
+
+    /**
      * Delete job as owner (with ownership verification)
      * OPTIMIZED: Uses denormalized company_id for O(1) permission check
      */

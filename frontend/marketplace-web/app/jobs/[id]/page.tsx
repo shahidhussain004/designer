@@ -1,9 +1,10 @@
 "use client";
 
 import { ErrorMessage } from '@/components/ErrorMessage';
+import { OfferDetailsView } from '@/components/OfferDetailsView';
 import { JobDetailsSkeleton } from '@/components/Skeletons';
 import { PageLayout } from '@/components/ui';
-import { useCloseJob, useDeleteJob, useJob, useMyApplications, useMyCompany, usePublishJob } from '@/hooks/useJobs';
+import { useCloseJob, useDeleteJob, useJob, useMarkJobAsFilled, useMyApplications, useMyCompany, usePublishJob } from '@/hooks/useJobs';
 import { useAuth } from '@/lib/auth';
 import {
   AlertCircle,
@@ -63,11 +64,13 @@ export default function JobDetailsPage() {
   // Job management mutations
   const publishJobMutation = usePublishJob();
   const closeJobMutation = useCloseJob();
+  const markAsFilledMutation = useMarkJobAsFilled();
   const deleteJobMutation = useDeleteJob();
 
   // Loading states
   const [isPublishing, setIsPublishing] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [isMarkingFilled, setIsMarkingFilled] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   // Handle publish
@@ -99,6 +102,22 @@ export default function JobDetailsPage() {
       alert('Failed to close job. Please try again.');
     } finally {
       setIsClosing(false);
+    }
+  };
+
+  // Handle mark as filled
+  const handleMarkAsFilled = async () => {
+    if (!confirm('Are you sure you want to mark this job as filled? This indicates the position has been successfully filled.')) return;
+    
+    setIsMarkingFilled(true);
+    try {
+      await markAsFilledMutation.mutateAsync({ id: jobId });
+      refetch();
+    } catch (error) {
+      console.error('Failed to mark job as filled:', error);
+      alert('Failed to mark job as filled. Please try again.');
+    } finally {
+      setIsMarkingFilled(false);
     }
   };
 
@@ -540,6 +559,18 @@ export default function JobDetailsPage() {
                         </button>
                       )}
 
+                      {/* Mark as Filled Button (for OPEN or CLOSED status) */}
+                      {(job.status === 'OPEN' || job.status === 'CLOSED') && (
+                        <button
+                          onClick={handleMarkAsFilled}
+                          disabled={isMarkingFilled}
+                          className="w-full px-4 py-3 rounded-lg bg-primary-600 text-white hover:bg-primary-700 font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+                        >
+                          <CheckCircle className="w-4 h-4" />
+                          {isMarkingFilled ? 'Marking as Filled...' : 'Mark as Filled'}
+                        </button>
+                      )}
+
                       {/* View Applications Button */}
                       <Link
                         href={`/jobs/${job.id}/applications`}
@@ -580,6 +611,8 @@ export default function JobDetailsPage() {
                   <h3 className="text-lg font-bold text-secondary-900 mb-2">Company Account</h3>
                   <p className="text-secondary-600 text-sm">Only freelancers can apply for jobs. Switch to a freelancer account to apply.</p>
                 </div>
+              ) : userApplication && userApplication.status?.toUpperCase() === 'OFFERED' ? (
+                <OfferDetailsView application={userApplication} />
               ) : userApplication ? (
                 <div className="bg-white rounded-xl shadow-sm border border-success-200 p-6">
                   <div className="text-center">

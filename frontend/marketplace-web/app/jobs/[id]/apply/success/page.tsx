@@ -1,6 +1,7 @@
 "use client";
 
 import { PageLayout } from '@/components/ui';
+import { useApplication } from '@/hooks/useJobs';
 import { useAuth } from '@/lib/auth';
 import {
   ArrowRight,
@@ -14,18 +15,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-
-interface ApplicationData {
-  id: number;
-  jobTitle: string;
-  companyName: string;
-  fullName: string;
-  email: string;
-  phone?: string;
-  createdAt: string;
-  status: string;
-}
+import { useState } from 'react';
 
 export default function ApplicationSuccessPage() {
   const params = useParams();
@@ -35,37 +25,29 @@ export default function ApplicationSuccessPage() {
   const { user: _user } = useAuth();
   
   const [copied, setCopied] = useState(false);
-  const [applicationData, setApplicationData] = useState<ApplicationData | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  // Mock application data - in production, this would come from backend
-  useEffect(() => {
-    const mockData: ApplicationData = {
-      id: parseInt(applicationId || '26'),
-      jobTitle: 'Frontend Developer',
-      companyName: 'InnovateLab',
-      fullName: 'Shahid Hussain',
-      email: 'shahid.hussain@seb.se',
-      phone: '0704622760',
-      createdAt: new Date().toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      }),
-      status: 'PENDING'
-    };
-    setApplicationData(mockData);
-    setLoading(false);
-  }, [applicationId]);
+  // Fetch real application data from backend
+  const { data: application, isLoading: loading, error } = useApplication(applicationId);
 
   const copyToClipboard = () => {
-    if (applicationData) {
-      navigator.clipboard.writeText(`Application #${applicationData.id}`);
+    if (application) {
+      navigator.clipboard.writeText(`Application #${application.id}`);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
+  };
+
+  // Helper to format dates from backend
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   if (loading) {
@@ -78,7 +60,7 @@ export default function ApplicationSuccessPage() {
     );
   }
 
-  if (!applicationData) {
+  if (error || !application) {
     return (
       <PageLayout>
         <div className="mx-auto max-w-2xl px-4 py-12">
@@ -109,7 +91,7 @@ export default function ApplicationSuccessPage() {
             </h1>
             
             <p className="text-xl text-secondary-600 mb-2">
-              Your application for <strong>{applicationData.jobTitle}</strong> at <strong>{applicationData.companyName}</strong> has been successfully submitted.
+              Your application for <strong>{application.jobTitle}</strong> at <strong>{application.companyName}</strong> has been successfully submitted.
             </p>
             
             <p className="text-secondary-500">
@@ -124,7 +106,7 @@ export default function ApplicationSuccessPage() {
               <div>
                 <p className="text-sm font-semibold text-secondary-500 uppercase tracking-wide mb-2">Application Reference</p>
                 <div className="flex items-center gap-3 mb-6">
-                  <code className="text-2xl font-mono font-bold text-primary-600">#{applicationData.id}</code>
+                  <code className="text-2xl font-mono font-bold text-primary-600">#{application.id}</code>
                   <button
                     onClick={copyToClipboard}
                     className="p-2 hover:bg-secondary-100 rounded-lg transition-colors group"
@@ -136,7 +118,7 @@ export default function ApplicationSuccessPage() {
                 {copied && <p className="text-sm text-success-600 font-medium">Copied to clipboard!</p>}
                 
                 <p className="text-sm font-semibold text-secondary-500 uppercase tracking-wide mb-2 mt-6">Submitted On</p>
-                <p className="text-secondary-900 font-medium">{applicationData.createdAt}</p>
+                <p className="text-secondary-900 font-medium">{formatDate(application.appliedAt || application.createdAt)}</p>
               </div>
 
               {/* Right Column - Contact Info */}
@@ -145,16 +127,16 @@ export default function ApplicationSuccessPage() {
                 <div className="space-y-3">
                   <div>
                     <p className="text-xs text-secondary-500 mb-1">Full Name</p>
-                    <p className="font-medium text-secondary-900">{applicationData.fullName}</p>
+                    <p className="font-medium text-secondary-900">{application.fullName}</p>
                   </div>
                   <div>
                     <p className="text-xs text-secondary-500 mb-1">Email Address</p>
-                    <p className="font-medium text-secondary-900">{applicationData.email}</p>
+                    <p className="font-medium text-secondary-900">{application.email}</p>
                   </div>
-                  {applicationData.phone && (
+                  {application.phone && (
                     <div>
                       <p className="text-xs text-secondary-500 mb-1">Phone Number</p>
-                      <p className="font-medium text-secondary-900">{applicationData.phone}</p>
+                      <p className="font-medium text-secondary-900">{application.phone}</p>
                     </div>
                   )}
                 </div>
@@ -181,7 +163,7 @@ export default function ApplicationSuccessPage() {
                 <div className="pb-8">
                   <h3 className="text-lg font-bold text-secondary-900 mb-2">Application Review</h3>
                   <p className="text-secondary-600 mb-3">
-                    The hiring team at {applicationData.companyName} will carefully review your application. We typically review applications within 3-5 business days.
+                    The hiring team at {application.companyName} will carefully review your application. We typically review applications within 3-5 business days.
                   </p>
                   <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary-50 text-primary-700 rounded-full text-sm font-medium">
                     <Clock className="w-4 h-4" />
